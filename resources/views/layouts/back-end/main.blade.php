@@ -19,6 +19,50 @@
     </div>
     <div id="layoutSidenav_content">
         <main>
+            @if ($errors->any())
+                <div class="col-12">
+                    <div class="alert alert-danger alert-dismissible fade show z-index-1 w-auto error-alert position-absolute end-0 position-absolute end-0" role="alert">
+                        @foreach ($errors->all() as $error)
+                            <div>{{$error}}</div>
+                        @endforeach
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            @endif
+            {{--                For Insert message Showing--}}
+            @if (session('success'))
+                <div class="col-12">
+                    <div class="alert alert-success alert-dismissible fade show z-index-1 position-absolute end-0 w-auto error-alert" role="alert">
+                        <div>{{session('success')}}</div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            @endif
+            {{--                For Insert message Showing--}}
+            @if (session('error'))
+                <div class="col-12">
+                    <div class="alert alert-danger alert-dismissible fade show z-index-1 position-absolute end-0 w-auto error-alert" role="alert">
+                        <div>{{session('error')}}</div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            @endif
+            @if (session('warning'))
+                <div class="col-12">
+                    <div class="alert alert-warning alert-dismissible fade show z-index-1 position-absolute end-0 w-auto error-alert" role="alert">
+                        <div>{{session('warning')}}</div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            @endif
             @yield('mainContent')
         </main>
         @include("layouts.back-end._footer")

@@ -18,8 +18,8 @@ Route::group(['middleware' => ['auth']],function (){
     });
 
     Route::controller(ComplainController::class)->group(function (){
-        Route::match(['post','get'],'add-complain','create')->name('add-complain');
-        Route::match(['post','get'],'list-complain','show')->name('list-complain');
+        Route::match(['post','get'],'add-complain','create')->name('add.complain');
+        Route::match(['post','get'],'list-complain','show')->name('list.complain');
     });
 });
 

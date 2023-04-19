@@ -39,3 +39,13 @@
     --bs-btn-disabled-border-color: #f47920;
     --bs-gradient: none;
 }
+.close {
+    position: absolute;
+    right: 0;
+    top: 10px;
+    border: none;
+    background: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: red;
+}

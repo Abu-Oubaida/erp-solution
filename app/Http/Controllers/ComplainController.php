@@ -6,6 +6,7 @@ use App\Models\complains;
 use App\Models\department;
 use App\Models\priority;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ComplainController extends Controller
 {
@@ -45,7 +46,35 @@ class ComplainController extends Controller
     {
         $request->validate([
             'complain_title'    =>  ['required', 'string', 'max:255'],
+            'priority'    =>  ['required', 'numeric'],
+            'to'    =>  ['required', 'numeric'],
+            'content'    =>  ['required', 'string'],
         ]);
+        extract($request->post());
+        try {
+            if (!($pri = priority::where('status',1)->where('id',$priority)->first()))
+            {
+                return back()->with('error','Invalid Priority Selection!')->withInput();
+            }
+            if (!($dept = department::where('status',1)->where('id',$to)->first()))
+            {
+                return back()->with('error','Invalid Department Selection!')->withInput();
+            }
+            $user = Auth::user();
+            complains::create([
+                'user_id'       =>  $user->id,
+                'title'         =>  $complain_title,
+                'priority'      =>  $pri->priority_number,
+                'details'       =>  "$content",
+                'to_dept'       =>  $dept->id,
+                'status'        =>  1
+            ]);
+            return back()->with('success','Data save successfully');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+        dd($content);
     }
 
     /**
