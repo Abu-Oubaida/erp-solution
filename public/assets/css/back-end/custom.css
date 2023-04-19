@@ -1,0 +1,41 @@
+.text-chl-important {
+    color: #f47920!important;
+}
+.text-chl {
+    color: #f47920;
+}
+.bg-chl {
+    background: #f47920;
+}
+.text-chl-white {
+    color: white;
+}
+.bg-chl-white {
+    background: #ffffff7a;
+}
+.bg-image-dashboard {
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.btn-chl {
+    background: #f47920;
+    border: 0.5px solid #f47920;
+}
+.btn-chl-outline {
+    --bs-btn-color: #f47920;
+    --bs-btn-border-color: #f47920;
+    --bs-btn-hover-color: #000;
+    --bs-btn-hover-bg: #f47920;
+    --bs-btn-hover-border-color: #f47920;
+    --bs-btn-focus-shadow-rgb: 255,193,7;
+    --bs-btn-active-color: #000;
+    --bs-btn-active-bg: #f47920;
+    --bs-btn-active-border-color: #f47920;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #f47920;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #f47920;
+    --bs-gradient: none;
+}
