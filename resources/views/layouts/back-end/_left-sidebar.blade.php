@@ -1,4 +1,4 @@
-<nav class="sb-sidenav accordion " id="sidenavAccordion" style="background: #f0ffff47;">
+<nav class="sb-sidenav accordion " id="sidenavAccordion" style="background: #f0ffffde;">
     <div class="sb-sidenav-menu">
         <div class="nav">
             <div class="sb-sidenav-menu-heading">Core</div>
@@ -30,15 +30,23 @@
             @endif
                 <nav class="sb-sidenav-menu-nested nav ">
                 @if(Route::currentRouteName() == 'add.complain')
-                    <a class="nav-link" href="{{route('add.complain')}}">New Complain</a>
+                    <a class="nav-link" href="{{route('add.complain')}}">Add New</a>
                 @else
-                    <a class="nav-link text-chl" href="{{route('add.complain')}}">New Complain</a>
+                    <a class="nav-link text-chl" href="{{route('add.complain')}}">Add New</a>
                 @endif
-                @if(Route::currentRouteName() == 'list-complain')
-                        <a class="nav-link" href="{{route("list.complain")}}">Complain List</a>
+
+                @if(Route::currentRouteName() == 'my.list.complain')
+                    <a class="nav-link" href="{{route("my.list.complain")}}">My List</a>
                 @else
-                        <a class="nav-link text-chl" href="{{route("list.complain")}}">Complain List</a>
+                    <a class="nav-link text-chl" href="{{route("my.list.complain")}}">My List</a>
                 @endif
+
+                @if(Route::currentRouteName() == 'list.complain')
+                        <a class="nav-link" href="{{route("list.complain")}}">Received List</a>
+                @else
+                        <a class="nav-link text-chl" href="{{route("list.complain")}}">Received List</a>
+                @endif
+
 
 
                 </nav>

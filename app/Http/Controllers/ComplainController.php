@@ -83,9 +83,32 @@ class ComplainController extends Controller
      * @param  \App\Models\complains  $complains
      * @return \Illuminate\Http\Response
      */
-    public function show(complains $complains)
+    public function show()
     {
-        //
+        try {
+            $user = Auth::user();
+            $complains = null;
+            if ($user->roles->first()->name == 'user')
+            {
+                $complains = complains::leftJoin('users as u','u.id','complains.user_id')->where('user_id','!=',$user->id)->where('forward_to',$user->id)->get();
+            }
+            return view('back-end/complain/list',compact('complains'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+
+
+    }
+    public function myList()
+    {
+        $user = Auth::user();
+        if ($user->roles->first()->name == 'user')
+        {
+            $complains = complains::where('user_id',$user->id)->get();
+            dd($complains);
+        }
+
     }
 
     /**
