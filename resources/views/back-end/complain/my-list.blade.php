@@ -21,7 +21,7 @@
                         <th>Status</th>
                         <th>Priority</th>
                         <th>Submitted Date</th>
-                        <th>Submitted By</th>
+                        <th>Forward To </th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -32,7 +32,7 @@
                         <th>Status</th>
                         <th>Priority</th>
                         <th>Submitted Date</th>
-                        <th>Submitted By</th>
+                        <th>Forward To</th>
                         <th>Action</th>
                     </tr>
                     </tfoot>
@@ -48,11 +48,8 @@
                                 <td>@if($c->status == 1) {!! '<span class="text-primary">Active</span>' !!} @elseif($c->status == 2) {!! '<strong class="text-warning">Processing</strong>' !!} @elseif($c->status == 3) {!! '<strong class="text-danger">Solved</strong>' !!}@elseif($c->status == 4) {!! 'Pending' !!} @elseif($c->status == 5) {!! 'Reject' !!} @else {!! '<span class="text-success">Unknown</span>' !!} @endif</td>
                                 <td>@if($c->priority == 1) {!! '<span class="text-primary">Normal</span>' !!} @elseif($c->priority == 2) {!! '<strong class="text-warning">Urgent</strong>' !!} @elseif($c->priority == 3) {!! '<strong class="text-danger">Very Urgent</strong>' !!} @else {!! '<span class="text-success">Lazy</span>' !!} @endif</td>
                                 <td>{!! $c->created_at !!}</td>
-                                <td>{!! $c->name !!}</td>
-                                <td>
-                                    <a href="{{route('single.view.complain',['complainID'=>\Illuminate\Support\Facades\Crypt::encryptString($c->id)])}}" class="btn btn-sm btn-primary" >View</a>
-{{--                                    <button type="button" class="btn btn-sm btn-primary" value="{!! $c->id !!}" onclick="return Obj.receivedComplainAction(this,'complain-action')" data-bs-toggle="modal" data-bs-target="#complain-action"> View </button>--}}
-                                </td>
+                                <td>@if($c->name) {!! $c->name !!}@else{!! '<span class="text-info">Undefined</span>' !!} @endif</td>
+                                <td><a href="" class="btn btn-sm btn-primary"> View </a></td>
                             </tr>
                         @endforeach
                     @else
@@ -62,23 +59,6 @@
                     @endif
                     </tbody>
                 </table>
-                <div class="modal fade" id="complain-action" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                ...
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary">Understood</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

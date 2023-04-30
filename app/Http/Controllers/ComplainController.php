@@ -7,6 +7,7 @@ use App\Models\department;
 use App\Models\priority;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class ComplainController extends Controller
 {
@@ -74,7 +75,6 @@ class ComplainController extends Controller
         {
             return back()->with('error',$exception->getMessage())->withInput();
         }
-        dd($content);
     }
 
     /**
@@ -90,7 +90,7 @@ class ComplainController extends Controller
             $complains = null;
             if ($user->roles->first()->name == 'user')
             {
-                $complains = complains::leftJoin('users as u','u.id','complains.user_id')->where('user_id','!=',$user->id)->where('forward_to',$user->id)->get();
+                $complains = complains::leftJoin('users as u','u.id','complains.user_id')->where('user_id','!=',$user->id)->where('forward_to',$user->id)->select('complains.*','u.name')->get();
             }
             return view('back-end/complain/list',compact('complains'));
         }catch (\Throwable $exception)
@@ -100,14 +100,32 @@ class ComplainController extends Controller
 
 
     }
+    public function singleView($complainID)
+    {
+        try {
+            $user = Auth::user();
+            $comID = Crypt::decryptString($complainID);
+            $com = complains::leftJoin('users as u','u.id','complains.user_id')->where('complains.user_id','!=',$user->id)->where('complains.forward_to',$user->id)->where('complains.id',$comID)->select('complains.*','u.name')->first();
+            return view('back-end.complain.single-view',compact($com));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
     public function myList()
     {
-        $user = Auth::user();
-        if ($user->roles->first()->name == 'user')
+        try {
+            $user = Auth::user();
+            if ($user->roles->first()->name == 'user')
+            {
+                $complains = complains::leftJoin('users as u','u.id','complains.forward_to')->leftJoin('departments as dept','dept.id','to_dept')->where('complains.user_id',$user->id)->where('complains.status','!=','6')->get(['u.name','complains.*']);
+                return view('back-end/complain/my-list',compact('complains'));
+            }
+        }catch (\Throwable $exception)
         {
-            $complains = complains::where('user_id',$user->id)->get();
-            dd($complains);
+            return back()->with('error',$exception->getMessage());
         }
+
 
     }
 

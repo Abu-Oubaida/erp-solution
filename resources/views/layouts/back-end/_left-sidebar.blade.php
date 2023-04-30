@@ -14,7 +14,7 @@
             </a>
         @endif
             <div class="sb-sidenav-menu-heading">Interface</div>
-            @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'list.complain')
+            @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'list.complain'|| Route::currentRouteName() == 'my.list.complain'|| Route::currentRouteName() == 'single.view.complain')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="true" aria-controls="collapseLayouts">
             @else
                 <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
@@ -23,7 +23,7 @@
                 Complains
                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
             </a>
-            @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'list.complain')
+            @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'list.complain'|| Route::currentRouteName() == 'my.list.complain'|| Route::currentRouteName() == 'single.view.complain')
                 <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
             @else
                 <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
@@ -45,6 +45,9 @@
                         <a class="nav-link" href="{{route("list.complain")}}">Received List</a>
                 @else
                         <a class="nav-link text-chl" href="{{route("list.complain")}}">Received List</a>
+                @endif
+                @if(Route::currentRouteName() == 'single.view.complain')
+                    <a class="nav-link" href="{{route("single.view.complain",['complainID'=>\Illuminate\Support\Facades\Request::route('complainID')])}}">Complain View</a>
                 @endif
 
 
