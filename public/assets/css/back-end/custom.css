@@ -49,3 +49,6 @@
     font-weight: bold;
     color: red;
 }
+.problem-details img {
+    max-width: 100%;
+}

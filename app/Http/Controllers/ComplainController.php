@@ -105,8 +105,9 @@ class ComplainController extends Controller
         try {
             $user = Auth::user();
             $comID = Crypt::decryptString($complainID);
-            $com = complains::leftJoin('users as u','u.id','complains.user_id')->where('complains.user_id','!=',$user->id)->where('complains.forward_to',$user->id)->where('complains.id',$comID)->select('complains.*','u.name')->first();
-            return view('back-end.complain.single-view',compact($com));
+            $com = complains::leftJoin('users as u','u.id','complains.user_id')->where('complains.id',$comID)->select('complains.*','u.name')->first();
+//            dd($com);
+            return view('back-end.complain.single-view',compact('com'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

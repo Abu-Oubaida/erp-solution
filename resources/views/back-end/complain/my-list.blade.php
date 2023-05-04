@@ -49,7 +49,7 @@
                                 <td>@if($c->priority == 1) {!! '<span class="text-primary">Normal</span>' !!} @elseif($c->priority == 2) {!! '<strong class="text-warning">Urgent</strong>' !!} @elseif($c->priority == 3) {!! '<strong class="text-danger">Very Urgent</strong>' !!} @else {!! '<span class="text-success">Lazy</span>' !!} @endif</td>
                                 <td>{!! $c->created_at !!}</td>
                                 <td>@if($c->name) {!! $c->name !!}@else{!! '<span class="text-info">Undefined</span>' !!} @endif</td>
-                                <td><a href="" class="btn btn-sm btn-primary"> View </a></td>
+                                <td><a href="{{route('single.view.complain',['complainID'=>\Illuminate\Support\Facades\Crypt::encryptString($c->id)])}}" class="btn btn-sm btn-primary"> View </a></td>
                             </tr>
                         @endforeach
                     @else
