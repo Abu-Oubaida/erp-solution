@@ -4,7 +4,7 @@
         <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item">
-                <a href="{{\Request::path()}}" class="text-capitalize text-chl">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
+                <a href="{{url(\Request::path())}}" class="text-capitalize text-chl">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
             </li>
         </ol>
         <div class="card mb-4">
@@ -32,7 +32,9 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="row"></div>
+                                    <div class="row float-end">
+                                        {!! ($com->user_id == \Illuminate\Support\Facades\Auth::user()->id)?"<a href='".route('edit.me.complain',['complainID'=>\Illuminate\Support\Facades\Crypt::encryptString($com->id)])."' class='btn btn-primary btn-sm w-auto' role='button'><i class='fas fa-edit'></i> Edit</a>":''!!}
+                                    </div>
                                 </div>
                                 <div class="col-md-12">
                                     <hr>

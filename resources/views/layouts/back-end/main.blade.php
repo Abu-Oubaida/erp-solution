@@ -12,8 +12,8 @@
 </head>
 <body class="sb-nav-fixed">
 @include("layouts.back-end._header")
-<div id="layoutSidenav" class="bg-image-dashboard" style="background-image: linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(117, 19, 93, 0.73)),
-    url({{url("image/bg/chl-2.jpg")}});">
+{{--<div id="layoutSidenav" class="bg-image-dashboard" style="background-image: linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(117, 19, 93, 0.73)), url({{url("image/bg/chl-2.jpg")}});">--}}
+<div id="layoutSidenav" class="bg-image-dashboard">
     <div id="layoutSidenav_nav">
         @include("layouts.back-end._left-sidebar")
     </div>
