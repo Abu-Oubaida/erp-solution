@@ -42,3 +42,8 @@
             console.error( error );
         } );
 </script>
+<script>
+    $('.close').click(function() {
+        $(".alert").hide(500)
+    })
+</script>

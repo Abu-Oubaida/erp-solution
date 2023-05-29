@@ -1,12 +1,22 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
+        <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
         <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
-        <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item">
-                <a href="{{\Request::path()}}" class="text-capitalize text-chl">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
-            </li>
-        </ol>
+        <div class="row">
+            <div class="col-md-10">
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item">
+                        <a href="{{\Illuminate\Support\Facades\URL::current()}}" class="text-capitalize text-chl">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
+                    </li>
+                </ol>
+            </div>
+            <div class="col-md-2">
+                <div class="float-end">
+                    <a class="btn btn-success btn-sm" href="{{route('my.list.complain')}}"><i class="fas fa-list-check"></i>  My List</a>
+                </div>
+            </div>
+        </div>
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">

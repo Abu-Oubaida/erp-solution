@@ -13,8 +13,7 @@
             </div>
             <div class="col-md-2">
                 <div class="float-end">
-                    <a class="btn btn-success btn-sm" href="{{route('individual.list.complain')}}"><i class="fas fa-list"></i>  Received List</a>
-                    <a class="btn btn-danger btn-sm" href="{{route('my.trash.list.complain')}}"><i class="fas fa-trash"></i>  My Trash List</a>
+                    <a class="btn btn-success btn-sm" href="{{route('my.list.complain')}}"><i class="fas fa-list-check"></i>  My List</a>
                 </div>
             </div>
         </div>
