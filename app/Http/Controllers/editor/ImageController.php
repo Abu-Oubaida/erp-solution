@@ -16,7 +16,7 @@ class ImageController extends Controller
             $fileName = pathinfo($orginalName, PATHINFO_FILENAME);
             $extension = $request->file('upload')->getClientOriginalExtension();
             $fileName = $fileName.'_'.time().'.'.$extension;
-            $request->file('upload')->move(public_path('image/media'),$fileName);
+            $a = $request->file('upload')->move(public_path('image/media'),$fileName);
             $url = asset('image/media/'.$fileName);
             return response()->json(['fileName'=>$fileName,'uploaded'=>1,'url'=>$url]);
         }

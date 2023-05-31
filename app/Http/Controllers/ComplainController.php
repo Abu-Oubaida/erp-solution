@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\complains;
 use App\Models\department;
 use App\Models\priority;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -106,6 +107,11 @@ class ComplainController extends Controller
     {
         try {
             $user = Auth::user();
+            $userRole = $user->roles()->first();
+            if (isset($userRole) && $userRole->id <= 3)
+            {
+                $forwardTo = User::where('status',1)->where('id','!=',$user->id)->de->get();
+            }
             $comID = Crypt::decryptString($complainID);
             $com = complains::leftJoin('users as u','u.id','complains.user_id')->where('complains.id',$comID)->select('complains.*','u.name')->first();
 //            dd($com);
@@ -259,7 +265,7 @@ class ComplainController extends Controller
             $user = Auth::user();
             $cid = Crypt::decryptString($id);
             complains::where('id',$cid)->where('user_id',$user->id)->update([
-                'updated_by'       =>  $user->id,
+//                'updated_by'    =>  $user->id,
                 'status'        =>  7,// where 7 = inactive but delete for user
                 'updated_at'    =>  date('Y-m-d H:i:s'),
             ]);

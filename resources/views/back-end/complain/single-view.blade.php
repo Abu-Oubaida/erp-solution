@@ -3,11 +3,29 @@
     <div class="container-fluid px-4">
         <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
         <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
-        <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item">
-                <a href="{{url(\Request::path())}}" class="text-capitalize text-chl">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
-            </li>
-        </ol>
+        <div class="row">
+            <div class="col-md-4">
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item">
+                        <a href="{{url(\Request::path())}}" class="text-capitalize text-chl">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
+                    </li>
+                </ol>
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <label for="forwaed">Forward to: &nbsp;</label>
+                            <select class="form-control" name="" id="forwaed">
+                                <option value="">--Select Option--</option>
+                                <option value="0">None</option>
+                            </select>
+                            <button class="btn btn-primary btn-chl" id="btnNavbarSearch" type="button"> <i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
