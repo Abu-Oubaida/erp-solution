@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="float-end">
-                            {!! ($complain->user_id == \Illuminate\Support\Facades\Auth::user()->id)?"<a href='".route('single.view.complain',['complainID'=>\Illuminate\Support\Facades\Crypt::encryptString($complain->id)])."' class='btn btn-success btn-sm w-auto' role='button'><i class='fas fa-eye'></i> View</a>":''!!}
+                            {!! ($complain->user_id == \Illuminate\Support\Facades\Auth::user()->id)?"<a href='".route('single.view.complain',['complainID'=>\Illuminate\Support\Facades\Crypt::encryptString($complain->id)])."' class='btn btn-success w-auto' role='button'><i class='fas fa-eye'></i> View</a>":''!!}
                         </div>
                     </div>
                 </div>
