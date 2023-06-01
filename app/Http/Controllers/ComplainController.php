@@ -91,10 +91,10 @@ class ComplainController extends Controller
         try {
             $user = Auth::user();
             $complains = null;
-            if ($user->roles->first()->name == 'user')
-            {
+//            if ($user->roles->first()->name == 'user')
+//            {
                 $complains = complains::leftJoin('users as u','u.id','complains.user_id')->where('user_id','!=',$user->id)->where('forward_to',$user->id)->select('complains.*','u.name')->get();
-            }
+//            }
             return view('back-end/complain/list',compact('complains'));
         }catch (\Throwable $exception)
         {
@@ -108,14 +108,18 @@ class ComplainController extends Controller
         try {
             $user = Auth::user();
             $userRole = $user->roles()->first();
+            $forwardTo = null;
             if (isset($userRole) && $userRole->id <= 3)
             {
-                $forwardTo = User::where('status',1)->where('id','!=',$user->id)->de->get();
+                $forwardTo = User::where('status',1)->where('id','!=',$user->id)->get();
+            }
+            else{
+                $forwardTo = User::where('status',1)->where('dept_id',$user->dept_id)->get();
             }
             $comID = Crypt::decryptString($complainID);
             $com = complains::leftJoin('users as u','u.id','complains.user_id')->where('complains.id',$comID)->select('complains.*','u.name')->first();
 //            dd($com);
-            return view('back-end.complain.single-view',compact('com'));
+            return view('back-end.complain.single-view',compact('com','forwardTo','complainID'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -125,11 +129,11 @@ class ComplainController extends Controller
     {
         try {
             $user = Auth::user();
-            if ($user->roles->first()->name == 'user')
-            {
+//            if ($user->roles->first()->name == 'user')
+//            {
                 $complains = complains::leftJoin('users as u','u.id','complains.forward_to')->leftJoin('departments as dept','dept.id','to_dept')->where('complains.user_id',$user->id)->where('complains.status','<','6')->get(['u.name','complains.*']);
                 return view('back-end/complain/my-list',compact('complains'));
-            }
+//            }
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -139,11 +143,11 @@ class ComplainController extends Controller
     {
         try {
             $user = Auth::user();
-            if ($user->roles->first()->name == 'user')
-            {
+//            if ($user->roles->first()->id == 'user')
+//            {
                 $complains = complains::leftJoin('users as u','u.id','complains.forward_to')->leftJoin('departments as dept','dept.id','to_dept')->leftJoin('users as uu','uu.id','complains.user_id')->where('complains.to_dept',$user->dept_id)->where('complains.status','<','6')->get(['u.name','uu.name as submittedBy','complains.*']);
                 return view('back-end/complain/departmental-list',compact('complains'));
-            }
+//            }
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -153,24 +157,24 @@ class ComplainController extends Controller
     {
         try {
             $user = Auth::user();
-            if ($user->roles->first()->name == 'user')
-            {
+//            if ($user->roles->first()->name == 'user')
+//            {
                 $complains = complains::leftJoin('users as u','u.id','complains.forward_to')->leftJoin('departments as dept','dept.id','to_dept')->where('complains.user_id',$user->id)->where('complains.status','=','7')->get(['u.name','complains.*']);
 //                dd($complains);
                 return view('back-end/complain/my-trash-list',compact('complains'));
-            }
+//            }
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
     }
-    public function editMe(Request $request, $id)
+    public function editMy(Request $request, $id)
     {
         $complain = null;
         try {
             if ($request->isMethod('post'))
             {
-                return $this->editMeStore($request);
+                return $this->editMyStore($request);
             }
             $uese = Auth::user();
             $cid = Crypt::decryptString($id);
@@ -181,14 +185,14 @@ class ComplainController extends Controller
             }
             $priorities = priority::where('status',1)->get();
             $depts = department::where('status',1)->get();
-            return view('back-end.complain.edit',compact('complain','priorities','depts'));
+            return view('back-end.complain.edit',compact('complain','priorities','depts','id'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
 
     }
-    public function editMeStore(Request $request)
+    public function editMyStore(Request $request)
     {
         $request->validate([
             'complain_title'    =>  ['required', 'string', 'max:255'],
