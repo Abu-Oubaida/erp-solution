@@ -13,7 +13,41 @@
                 Dashboard
             </a>
         @endif
+            <a class="nav-link text-chl" href="{{route('file-manager')}}">
+                <div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div>
+                File Manager
+            </a>
             <div class="sb-sidenav-menu-heading">Interface</div>
+{{--User Management--}}
+            @if(Route::currentRouteName() == 'add.user')
+                <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="true" aria-controls="userLayouts">
+            @else
+                <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="false" aria-controls="userLayouts">
+            @endif
+                <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>
+                User Management
+                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+            </a>
+            @if(Route::currentRouteName() == 'add.user')
+                <div class="collapse show" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+            @else
+                <div class="collapse" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+            @endif
+                    <nav class="sb-sidenav-menu-nested nav ">
+                        @if(Route::currentRouteName() == 'add.user')
+                            <a class="nav-link" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+                        @else
+                            <a class="nav-link text-chl" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+                        @endif
+
+                        @if(Route::currentRouteName() == 'my.list.complain')
+                            <a class="nav-link" href="{{route("my.list.complain")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+                        @else
+                            <a class="nav-link text-chl" href="{{route("my.list.complain")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+                        @endif
+                    </nav>
+                </div>
+{{--Complain section--}}
             @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'individual.list.complain'|| Route::currentRouteName() == 'my.list.complain'|| Route::currentRouteName() == 'single.view.complain' || Route::currentRouteName() == 'edit.me.complain' || Route::currentRouteName() == 'my.complain.trash.list' || Route::currentRouteName() == 'departmental.list.complain')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="true" aria-controls="collapseLayouts">
             @else

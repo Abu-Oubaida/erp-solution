@@ -1,9 +1,27 @@
 <?php return array (
+  'alexusmai/laravel-file-manager' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Alexusmai\\LaravelFileManager\\FileManagerServiceProvider',
+    ),
+  ),
   'fruitcake/laravel-cors' => 
   array (
     'providers' => 
     array (
       0 => 'Fruitcake\\Cors\\CorsServiceProvider',
+    ),
+  ),
+  'intervention/image' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Intervention\\Image\\ImageServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Image' => 'Intervention\\Image\\Facades\\Image',
     ),
   ),
   'laravel/breeze' => 
