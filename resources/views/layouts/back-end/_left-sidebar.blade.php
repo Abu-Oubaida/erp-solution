@@ -19,7 +19,7 @@
             </a>
             <div class="sb-sidenav-menu-heading">Interface</div>
 {{--User Management--}}
-            @if(Route::currentRouteName() == 'add.user')
+            @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="true" aria-controls="userLayouts">
             @else
                 <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="false" aria-controls="userLayouts">
@@ -28,7 +28,7 @@
                 User Management
                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
             </a>
-            @if(Route::currentRouteName() == 'add.user')
+            @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list')
                 <div class="collapse show" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
             @else
                 <div class="collapse" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
@@ -40,10 +40,10 @@
                             <a class="nav-link text-chl" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
                         @endif
 
-                        @if(Route::currentRouteName() == 'my.list.complain')
-                            <a class="nav-link" href="{{route("my.list.complain")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+                        @if(Route::currentRouteName() == 'user.list')
+                            <a class="nav-link" href="{{route("user.list")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
                         @else
-                            <a class="nav-link text-chl" href="{{route("my.list.complain")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+                            <a class="nav-link text-chl" href="{{route("user.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
                         @endif
                     </nav>
                 </div>

@@ -53,7 +53,7 @@ class RegisteredUserController extends Controller
             $deptInfo = department::where('id',$dept)->first();
             $branch = branch::where('id',$branch)->first();
             if ($branch->branch_type == 'head office') $header = 'H'; else $header = "P";
-            $priviusUsers = User::where('status',1)->where('dept_id',$dept)->where('branch_id',$branch)->get();
+            $priviusUsers = User::where('status',1)->where('dept_id',$dept)->get();
             $priviusUserCount = count($priviusUsers);
 //            dd($priviusUserCount >= 10 && $priviusUserCount < 100);
             if ($priviusUserCount < 10)

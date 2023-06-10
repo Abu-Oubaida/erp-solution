@@ -18,9 +18,14 @@ Route::group(['middleware' => ['auth']],function (){
     Route::controller(DashboardController::class)->group(function (){
         Route::match(['post','get'],'dashboard','index')->name('dashboard');
     });
-    Route::controller(UserController::class,)->group(function (){
-        Route::match(['post','get'],'add-user','create')->name('add.user');
+
+    Route::group(['middleware'=>['auth','role:superadmin']],function (){
+        Route::controller(UserController::class,)->group(function (){
+            Route::match(['post','get'],'add-user','create')->name('add.user');
+            Route::get('user-list','show')->name('user.list');
+        });
     });
+
     Route::get("filemanager", [FileManagerController::class,'index'])->name('file-manager');
     Route::controller(ComplainController::class)->group(function (){
         Route::match(['post','get'],'add-complain','create')->name('add.complain');

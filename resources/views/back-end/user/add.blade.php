@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-2">
                 <div class="float-end">
-                    <a class="btn btn-success btn-sm" href="{{route('add.user')}}"><i class="fas fa-list-check"></i>  My List</a>
+                    <a class="btn btn-success btn-sm" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  User List</a>
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
                 <div class="row">
                     <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
                 </div>
-                <form action="{{ route('add.complain') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('add.user') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <div class="col-md-3">
@@ -89,20 +89,20 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
-                                <input class="form-control" id="pass" name="password" type="password" placeholder="Enter password" value="{{old('password')}}"/>
+                                <input class="form-control" id="pass" name="password" type="password" placeholder="Enter password" value=""/>
                                 <label for="password">New password <span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
-                                <input class="form-control" id="conform" name="conform" type="password" placeholder="Enter conform password" value="{{old('conform')}}"/>
+                                <input class="form-control" id="conform" name="password_confirmation" type="password" placeholder="Enter conform password" value=""/>
                                 <label for="conform">Conform password <span class="text-danger">*</span></label>
                             </div>
                         </div>
 
                         <div class="col-md-12">
                             <div class="form-floating mb-3 float-end">
-                                <input type="submit" value="Submit Complain" class="btn btn-chl-outline" name="submit" >
+                                <input type="submit" value="Insert User" class="btn btn-chl-outline" name="submit" >
                             </div>
                         </div>
                     </div>
