@@ -5,11 +5,13 @@ namespace App\Http\Controllers\superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\branch;
 use App\Models\department;
+use App\Models\filemanager_permission;
 use App\Models\Role;
 use App\Models\User;
 use http\Exception\BadConversionException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 
@@ -114,6 +116,77 @@ class UserController extends Controller
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function SingleView($id)
+    {
+        $userID = Crypt::decryptString($id);
+        $dir = "E:/LocalServer/htdocs/chl/public/file-manager";
+        $fileManagers = scandir($dir);
+        unset($fileManagers[0]);
+        unset($fileManagers[1]);
+        $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
+        $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$userID)->select('dept.dept_name','r.display_name','users.*')->first();
+//        dd($user);
+        return view('back-end.user.single-view',compact('user','fileManagers','filPermission'));
+    }
+
+    public function UserPerSubmit(Request $request)
+    {
+        try {
+            extract($request->post());
+            $id = Crypt::decryptString($ref);
+            if ($data = filemanager_permission::where("user_id",$id)->where('dir_name',$dir)->first())
+            {
+                echo json_encode(array(
+                    'error' => array(
+                        'msg' => "Data already exist",
+                        'code' => 403,
+                    )
+                ));
+            }
+            else{
+                filemanager_permission::create([
+                    'status'=>1,
+                    'user_id'=>$id,
+                    'dir_name'=>$dir,
+                    'permission_type'=>$per,
+                ]);
+                $filPermission = filemanager_permission::where('status',1)->where('user_id',$id)->orderBy('id', 'DESC')->get();
+                return view("back-end.user._file-permission-list",compact('filPermission'));
+            }
+        }catch (\Throwable $exception)
+        {
+            echo json_encode(array(
+                'error' => array(
+                    'msg' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                )
+            ));
+        }
+    }
+
+    public function UserPerDelete(Request $request)
+    {
+        try {
+            extract($request->post());
+            $id = Crypt::decryptString($ref);
+            if ($id)
+            {
+                $userID = filemanager_permission::where('id',$id)->select('user_id')->first();
+                filemanager_permission::where('id',$id)->update(['status'=>0]);
+                $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID->user_id)->orderBy('id', 'DESC')->get();
+                return view("back-end.user._file-permission-list",compact('filPermission'));
+            }
+        }catch (\Throwable $exception)
+        {
+            echo json_encode(array(
+                'error' => array(
+                    'msg' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                )
+            ));
         }
     }
 }

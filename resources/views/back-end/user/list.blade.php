@@ -69,7 +69,7 @@
                                 <td>{!! $u->display_name !!}</td>
                                 <td>@if($u->status == 1) {!! '<span class="text-primary">Active</span>' !!}  @else {!! '<span class="text-danger">Inactive</span>' !!} @endif</td>
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-primary" title="View"><i class='fas fa-eye'></i></a>
+                                    <a href="{{route('user.single.view',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="btn btn-sm btn-primary" title="View"><i class='fas fa-eye'></i></a>
 {{--                                    <button type="button" class="btn btn-sm btn-primary" value="{!! $u->id !!}" onclick="return Obj.receivedComplainAction(this,'complain-action')" data-bs-toggle="modal" data-bs-target="#complain-action"> View </button>--}}
                                 </td>
                             </tr>

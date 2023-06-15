@@ -23,6 +23,9 @@ Route::group(['middleware' => ['auth']],function (){
         Route::controller(UserController::class,)->group(function (){
             Route::match(['post','get'],'add-user','create')->name('add.user');
             Route::get('user-list','show')->name('user.list');
+            Route::get('user-view/{userID}','SingleView')->name('user.single.view');
+            Route::post('user-per-add','UserPerSubmit');
+            Route::post('user-per-delete','UserPerDelete');
         });
     });
 

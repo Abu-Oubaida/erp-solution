@@ -9,6 +9,7 @@
     <title>{{str_replace('-', ' | ', config('app.name'))}}</title>
     <link rel="icon" href="{{url("image/logo/chl_logo.png")}}">
     <x-back-end._header-link/>
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 </head>
 <body class="sb-nav-fixed">
 @include("layouts.back-end._header")
