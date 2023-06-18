@@ -19,37 +19,39 @@
             </a>
             <div class="sb-sidenav-menu-heading">Interface</div>
 {{--User Management--}}
-            @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view')
-                <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="true" aria-controls="userLayouts">
-            @else
-                <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="false" aria-controls="userLayouts">
-            @endif
-                <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>
-                User Management
-                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-            </a>
-            @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view')
-                <div class="collapse show" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-            @else
-                <div class="collapse" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-            @endif
-                    <nav class="sb-sidenav-menu-nested nav ">
-                        @if(Route::currentRouteName() == 'add.user')
-                            <a class="nav-link" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
-                        @else
-                            <a class="nav-link text-chl" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+    @if(\Illuminate\Support\Facades\Auth::user()->hasRole('superadmin'))
+        @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view')
+            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="true" aria-controls="userLayouts">
+                @else
+                    <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="false" aria-controls="userLayouts">
                         @endif
+                        <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>
+                        User Management
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view')
+                        <div class="collapse show" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                            @else
+                                <div class="collapse" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                    @endif
+                                    <nav class="sb-sidenav-menu-nested nav ">
+                                        @if(Route::currentRouteName() == 'add.user')
+                                            <a class="nav-link" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+                                        @else
+                                            <a class="nav-link text-chl" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+                                        @endif
 
-                        @if(Route::currentRouteName() == 'user.list')
-                            <a class="nav-link" href="{{route("user.list")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
-                        @else
-                            <a class="nav-link text-chl" href="{{route("user.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
-                        @endif
-                        @if(Route::currentRouteName() == 'user.single.view')
-                            <a class="nav-link" href="{{route("user.single.view",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
-                        @endif
-                    </nav>
-                </div>
+                                        @if(Route::currentRouteName() == 'user.list')
+                                            <a class="nav-link" href="{{route("user.list")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+                                        @else
+                                            <a class="nav-link text-chl" href="{{route("user.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+                                        @endif
+                                        @if(Route::currentRouteName() == 'user.single.view')
+                                            <a class="nav-link" href="{{route("user.single.view",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
+                                        @endif
+                                    </nav>
+                                </div>
+    @endif
 {{--Complain section--}}
             @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'individual.list.complain'|| Route::currentRouteName() == 'my.list.complain'|| Route::currentRouteName() == 'single.view.complain' || Route::currentRouteName() == 'edit.me.complain' || Route::currentRouteName() == 'my.complain.trash.list' || Route::currentRouteName() == 'departmental.list.complain')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="true" aria-controls="collapseLayouts">
@@ -122,19 +124,22 @@
                 @endif
                 </nav>
             </div>
-            <div class="sb-sidenav-menu-heading">Addons</div>
-            <a class="nav-link text-chl" href="charts.html">
-                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                Charts
-            </a>
-            <a class="nav-link text-chl" href="tables.html">
-                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                Tables
-            </a>
+{{--            <div class="sb-sidenav-menu-heading">Addons</div>--}}
+{{--            <a class="nav-link text-chl" href="charts.html">--}}
+{{--                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>--}}
+{{--                Charts--}}
+{{--            </a>--}}
+{{--            <a class="nav-link text-chl" href="tables.html">--}}
+{{--                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>--}}
+{{--                Tables--}}
+{{--            </a>--}}
         </div>
     </div>
     <div class="sb-sidenav-footer text-chl">
-        <div class="small">Logged in as:</div>
+        <div class="small">
+            Welcome Mr./Ms. {{\Illuminate\Support\Facades\Auth::user()->name}}
+        </div>
+        <div class="small">Logged in as: {!! \Illuminate\Support\Facades\Auth::user()->roles->first()->display_name !!}</div>
         {{config('app.name')}}
     </div>
 </nav>

@@ -12,6 +12,7 @@ use http\Exception\BadConversionException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 
@@ -121,15 +122,23 @@ class UserController extends Controller
 
     public function SingleView($id)
     {
-        $userID = Crypt::decryptString($id);
-        $dir = "E:/LocalServer/htdocs/chl/public/file-manager";
-        $fileManagers = scandir($dir);
-        unset($fileManagers[0]);
-        unset($fileManagers[1]);
-        $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
-        $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$userID)->select('dept.dept_name','r.display_name','users.*')->first();
+        try {
+            $userID = Crypt::decryptString($id);
+            $dir = config('app.file_manager_url');
+
+            $fileManagers = scandir($dir);
+            unset($fileManagers[0]);
+            unset($fileManagers[1]);
+            $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
+            $roles = Role::get();
+            $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$userID)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
 //        dd($user);
-        return view('back-end.user.single-view',compact('user','fileManagers','filPermission'));
+            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+
     }
 
     public function UserPerSubmit(Request $request)
@@ -139,12 +148,16 @@ class UserController extends Controller
             $id = Crypt::decryptString($ref);
             if ($data = filemanager_permission::where("user_id",$id)->where('dir_name',$dir)->first())
             {
-                echo json_encode(array(
-                    'error' => array(
-                        'msg' => "Data already exist",
-                        'code' => 403,
-                    )
-                ));
+                filemanager_permission::where("user_id",$id)->where('dir_name',$dir)->update([
+                    'status'=>1,
+                    'permission_type'=>$per,
+                ]);
+//                echo json_encode(array(
+//                    'error' => array(
+//                        'msg' => "Data already exist",
+//                        'code' => 403,
+//                    )
+//                ));
             }
             else{
                 filemanager_permission::create([
@@ -153,9 +166,9 @@ class UserController extends Controller
                     'dir_name'=>$dir,
                     'permission_type'=>$per,
                 ]);
-                $filPermission = filemanager_permission::where('status',1)->where('user_id',$id)->orderBy('id', 'DESC')->get();
-                return view("back-end.user._file-permission-list",compact('filPermission'));
             }
+            $filPermission = filemanager_permission::where('status',1)->where('user_id',$id)->orderBy('id', 'DESC')->get();
+            return view("back-end.user._file-permission-list",compact('filPermission'));
         }catch (\Throwable $exception)
         {
             echo json_encode(array(
@@ -187,6 +200,79 @@ class UserController extends Controller
                     'code' => $exception->getCode(),
                 )
             ));
+        }
+    }
+
+    public function userStatusChange(Request $request)
+    {
+        if ($request->isMethod('post'))
+        {
+            try {
+                extract($request->post());
+                $userId = Crypt::decryptString($id);
+                if ($user_status == 1)
+                {
+                    $status = 1;
+                }else {
+                    $status = 0;
+                }
+                if (User::where('id',$userId)->first())
+                {
+                    User::where('id',$userId)->update([
+                        'status'=>$status,
+                    ]);
+                    return back()->with('success','Update successfully!');
+                }
+            }catch (\Throwable $exception)
+            {
+                return back()->with('error',$exception->getMessage());
+            }
+
+
+        }
+    }
+    public function userRoleChange(Request $request)
+    {
+        if ($request->isMethod('post'))
+        {
+            try {
+                extract($request->post());
+                $userId = Crypt::decryptString($id);
+                if($role_users = DB::table('role_user')->where('role_id',$user_role)->first())
+                {
+                    DB::table('role_user')->where('user_id',$userId)->update(['role_id'=>$user_role]);
+                }
+                return back()->with('success','Data update successfully');
+
+            }catch (\Throwable $exception)
+            {
+                return back()->with('error',$exception->getMessage());
+            }
+
+
+        }
+    }
+    public function userPasswordChange(Request $request)
+    {
+        if ($request->isMethod('post'))
+        {
+            try {
+                extract($request->post());
+                $userId = Crypt::decryptString($id);
+                if(User::where('id',$userId)->first())
+                {
+                    User::where('id',$userId)->update([
+                        "password" => Hash::make($password)
+                    ]);
+                }
+                return back()->with('success','Data update successfully');
+
+            }catch (\Throwable $exception)
+            {
+                return back()->with('error',$exception->getMessage());
+            }
+
+
         }
     }
 }

@@ -26,6 +26,9 @@ Route::group(['middleware' => ['auth']],function (){
             Route::get('user-view/{userID}','SingleView')->name('user.single.view');
             Route::post('user-per-add','UserPerSubmit');
             Route::post('user-per-delete','UserPerDelete');
+            Route::post('user-status-change','userStatusChange')->name('user.status.change');
+            Route::post('user-role-change','userRoleChange')->name('user.role.change');
+            Route::post('user-password-change','userPasswordChange')->name('user.password.change');
         });
     });
 

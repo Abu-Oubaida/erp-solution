@@ -57,6 +57,7 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
 
     'asset_url' => env('ASSET_URL', null),
+    'file_manager_url'=>env('APP_FILE_MANAGER','E:/LocalServer/htdocs/chl/public/file-manager'),
 
     /*
     |--------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-chl-white">
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="{{route('dashboard')}}"><img src="{{url("image/logo/chl_logo.png")}}" width="70%" alt="Credence Housing Limited"></a>
+    <a class="navbar-brand ps-3" href="{{route('root')}}"><img src="{{url("image/logo/chl_logo.png")}}" width="70%" alt="Credence Housing Limited"></a>
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 text-chl-important" id="sidebarToggle"><i class="fas fa-bars"></i></button>
     <!-- Navbar Search-->

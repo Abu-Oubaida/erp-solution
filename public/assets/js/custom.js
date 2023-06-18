@@ -13,6 +13,8 @@ if(window.location.port)
             let per = $("#per").val()
             let dir = $("#dir").val()
             let ref = $("#per").attr('ref')
+            // alert(window.location.origin + sourceDir + "/user-per-add")
+            // return false
             if (per.length > 0 && dir.length > 0)
             {
                 let url = window.location.origin + sourceDir + "/user-per-add";
@@ -29,6 +31,7 @@ if(window.location.port)
                         } catch (e) {
                             $("#f-p-list").html(data)
                             alert('Data added successfully!')
+                            window.location.reload()
                         }
                     }
                 })
@@ -54,8 +57,8 @@ if(window.location.port)
                             data = JSON.parse(data)
                             alert(data.error.msg)
                         } catch (e) {
-                            $("#f-p-list").html(data)
                             alert('Data added successfully!')
+                            window.location.reload()
                         }
                     }
                 })

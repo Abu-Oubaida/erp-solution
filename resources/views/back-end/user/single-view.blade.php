@@ -29,113 +29,279 @@
                 </div>
             </div>
         </div>
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        @if(!($user))
-                            <div class="row">
-                                <div class="col-md-12 text-center text-danger">
-                                    Not Found!
-                                </div>
-                            </div>
-                        @else
-                            <div class="row">
-                                <div class="col-md-3">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                @if(!($user))
                                     <div class="row">
-                                        <table>
-                                            <thead>
-                                            <tr>
-                                                <th>User Information</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <th>Name:</th>
-                                                    <td>{!! $user->name !!}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Employee ID:</th>
-                                                    <td>{!! $user->employee_id !!}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Department:</th>
-                                                    <td>{!! $user->dept_name !!}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Access Role:</th>
-                                                    <td>{!! $user->display_name !!}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Email:</th>
-                                                    <td>{!! $user->email !!}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Phone:</th>
-                                                    <td>{!! $user->phone !!}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <h6>User File Manager Permission</h6>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <select class="form-control" id="per" ref="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
-                                                <option value="">--Permission--</option>
-                                                <option value="1">View Only</option>
-                                                <option value="2">Read/Write</option>
-                                                <option value="2">Read/Write/Delete</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-5">
-                                            <select class="form-control" id="dir">
-                                                <option value="">--Select folder--</option>
-                                                @if(@$fileManagers && count($fileManagers))
-                                                    @foreach($fileManagers as $file)
-                                                        <option value="{!!$file!!}">{!! $file !!}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <button class="btn btn-primary btn-chl" id="perAdd" type="button" onclick="return confirm('Are you sure!')"><i class="fas fa-plus"></i> Add</button>
+                                        <div class="col-md-12 text-center text-danger">
+                                            Not Found!
                                         </div>
                                     </div>
+                                @else
                                     <div class="row">
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Directory</th>
-                                                    <th>Permission</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="f-p-list">
-                                            @include("back-end.user._file-permission-list")
-                                            </tbody>
-                                        </table>
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <table>
+                                                    <thead>
+                                                    <tr>
+                                                        <th>User Information</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <th>Name:</th>
+                                                        <td>{!! $user->name !!}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Employee ID:</th>
+                                                        <td>{!! $user->employee_id !!}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Department:</th>
+                                                        <td>{!! $user->dept_name !!}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Access Role:</th>
+                                                        <td>{!! $user->display_name !!}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Email:</th>
+                                                        <td>{!! $user->email !!}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Phone:</th>
+                                                        <td>{!! $user->phone !!}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Account Status:</th>
+                                                        <td>@if($user->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <h4 class="text-center">Take Action Here</h4>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <form action="{!! route("user.status.change") !!}" method="post">
+                                                        @csrf
+                                                        <div class="input-group float-end">
+                                                            <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
+                                                            <select class="form-control" name="user_status" id="forwaed">
+                                                                <option value="">--Select Option--</option>
+                                                                <option value="1" @if($user->status) selected @endif>Active</option>
+                                                                <option value="0" @if(!($user->status)) selected @endif>Inactive</option>
+                                                            </select>
+                                                            <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user status?')" type="submit"> Change Status</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <form action="{!! route('user.role.change') !!}" method="post">
+                                                        @csrf
+                                                        <div class="input-group float-end">
+                                                            <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
+                                                            <select class="form-control" name="user_role" id="forwaed">
+                                                                <option value="">--Select Option--</option>
+                                                                @if(isset($roles) && count($roles))
+                                                                    @foreach($roles as $r)
+                                                                        <option value="{{$r->id}}" @if($r->id == $user->role_id) selected @endif>{!! $r->display_name !!}</option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                            <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user role?')" type="submit"> Change Role</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <form action="{!! route('user.password.change') !!}" method="post">
+                                                        @csrf
+                                                        <div class="input-group float-end">
+                                                            <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
+                                                            <input class="form-control" type="password" name="password" id="">
+                                                            <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user password?')" type="submit"> Change Password</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <hr>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <hr>
-                                </div>
-                                <div class="col-md-12 problem-details">
-                                    <span>Problem Details:</span>
-{{--                                    {!! $com->details !!}--}}
-                                </div>
-
-
+                                @endif
                             </div>
-                            <div class="row">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                @if(!($user))
+                                    <div class="row">
+                                        <div class="col-md-12 text-center text-danger">
+                                            Not Found!
+                                        </div>
+                                    </div>
+                                @else
+                                    <h6><b>User File Manager Permission</b></h6>
+                                    @if(strtolower($user->display_name) == strtolower('superadmin'))
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <table class="table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Directory</th>
+                                                        <th>Permission</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="table-secondary">
+                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>
+                                                        </tr>
+                                                        @if(@$fileManagers && count($fileManagers))
+                                                            @foreach($fileManagers as $file)
+                                                                <tr>
+                                                                    <td>#</td>
+                                                                    <td>{!! $file !!}</td>
+                                                                    <td>Red/Write/Delete</td>
+                                                                    <td>Locked</td>
+                                                                </tr>
+                                                            @endforeach
+                                                        @endif
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <select class="form-control" id="per" ref="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
+                                                    <option value="">--Permission--</option>
+                                                    <option value="1">View Only</option>
+                                                    <option value="2">Read/Write</option>
+                                                    <option value="3">Read/Write/Delete</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <select class="form-control" id="dir">
+                                                    <option value="">--Select folder--</option>
+                                                    @if(@$fileManagers && count($fileManagers))
+                                                        @foreach($fileManagers as $file)
+                                                            <option value="{!!$file!!}">{!! $file !!}</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button class="btn btn-primary btn-chl" id="perAdd" type="button" onclick="return confirm('Are you sure!')"><i class="fas fa-plus"></i> Add</button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Directory</th>
+                                                        <th>Permission</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="f-p-list">
+                                                    @include("back-end.user._file-permission-list")
+                                                    </tbody>
+                                                    <tbody>
+                                                    @if(strtolower($user->display_name) == strtolower('admin'))
+                                                        <tr class="table-secondary">
+                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#</td>
+                                                            <td>admin</td>
+                                                            <td>Red/Write</td>
+                                                            <td>Locked</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#</td>
+                                                            <td>user</td>
+                                                            <td>Red/Write</td>
+                                                            <td>Locked</td>
+                                                        </tr><tr>
+                                                            <td>#</td>
+                                                            <td>common</td>
+                                                            <td>Red/Write</td>
+                                                            <td>Locked</td>
+                                                        </tr><tr>
+                                                            <td>#</td>
+                                                            <td>gest</td>
+                                                            <td>Red/Write</td>
+                                                            <td>Locked</td>
+                                                        </tr>
+                                                        @elseif (strtolower($user->display_name) == strtolower('user'))
+                                                        <tr class="table-secondary">
+                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#</td>
+                                                            <td>user</td>
+                                                            <td>Red/Write</td>
+                                                            <td>Locked</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#</td>
+                                                            <td>common</td>
+                                                            <td>Red/Write</td>
+                                                            <td>Locked</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#</td>
+                                                            <td>gest</td>
+                                                            <td>Red/Write</td>
+                                                            <td>Locked</td>
+                                                        </tr>
+                                                    @else
+                                                        <tr>
+                                                            <td>#</td>
+                                                            <td>common</td>
+                                                            <td>Only View</td>
+                                                            <td>Locked</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>#</td>
+                                                            <td>gest</td>
+                                                            <td>Only View</td>
+                                                            <td>Locked</td>
+                                                        </tr>
+                                                    @endif
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    @endif
 
+                                @endif
                             </div>
-                        @endif
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 @stop
