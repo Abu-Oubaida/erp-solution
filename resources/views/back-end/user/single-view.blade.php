@@ -134,6 +134,26 @@
                                                     </form>
                                                 </div>
                                             </div>
+                                            <br>
+                                            <div calss="row">
+                                                <div class="col-md-12">
+                                                    <form action="{!! route('user.dept.change') !!}" method="post">
+                                                        @csrf
+                                                        <div class="input-group float-end">
+                                                            <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
+                                                            <select class="form-control" name="dept_id" id="">
+                                                                <option value="">--Select Option--</option>
+                                                                @if(isset($deptlist) && count($deptlist))
+                                                                    @foreach($deptlist as $d)
+                                                                        <option value="{{$d->id}}" @if($d->id == $user->dept_id) selected @endif>{!! $d->dept_name !!}</option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                            <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user Department?')" type="submit"> Change Department</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-12">
                                             <hr>
@@ -226,70 +246,70 @@
                                                     <tbody id="f-p-list">
                                                     @include("back-end.user._file-permission-list")
                                                     </tbody>
-                                                    <tbody>
-                                                    @if(strtolower($user->display_name) == strtolower('admin'))
-                                                        <tr class="table-secondary">
-                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>#</td>
-                                                            <td>admin</td>
-                                                            <td>Red/Write</td>
-                                                            <td>Locked</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>#</td>
-                                                            <td>user</td>
-                                                            <td>Red/Write</td>
-                                                            <td>Locked</td>
-                                                        </tr><tr>
-                                                            <td>#</td>
-                                                            <td>common</td>
-                                                            <td>Red/Write</td>
-                                                            <td>Locked</td>
-                                                        </tr><tr>
-                                                            <td>#</td>
-                                                            <td>gest</td>
-                                                            <td>Red/Write</td>
-                                                            <td>Locked</td>
-                                                        </tr>
-                                                        @elseif (strtolower($user->display_name) == strtolower('user'))
-                                                        <tr class="table-secondary">
-                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>#</td>
-                                                            <td>user</td>
-                                                            <td>Red/Write</td>
-                                                            <td>Locked</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>#</td>
-                                                            <td>common</td>
-                                                            <td>Red/Write</td>
-                                                            <td>Locked</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>#</td>
-                                                            <td>gest</td>
-                                                            <td>Red/Write</td>
-                                                            <td>Locked</td>
-                                                        </tr>
-                                                    @else
-                                                        <tr>
-                                                            <td>#</td>
-                                                            <td>common</td>
-                                                            <td>Only View</td>
-                                                            <td>Locked</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>#</td>
-                                                            <td>gest</td>
-                                                            <td>Only View</td>
-                                                            <td>Locked</td>
-                                                        </tr>
-                                                    @endif
-                                                    </tbody>
+{{--                                                    <tbody>--}}
+{{--                                                    @if(strtolower($user->display_name) == strtolower('admin'))--}}
+{{--                                                        <tr class="table-secondary">--}}
+{{--                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>admin</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>user</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr><tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>common</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr><tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>gest</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        @elseif (strtolower($user->display_name) == strtolower('user'))--}}
+{{--                                                        <tr class="table-secondary">--}}
+{{--                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>user</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>common</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>gest</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                    @else--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>common</td>--}}
+{{--                                                            <td>Only View</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>gest</td>--}}
+{{--                                                            <td>Only View</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                    @endif--}}
+{{--                                                    </tbody>--}}
                                                 </table>
                                             </div>
                                         </div>

@@ -129,11 +129,12 @@ class UserController extends Controller
             $fileManagers = scandir($dir);
             unset($fileManagers[0]);
             unset($fileManagers[1]);
+            $deptlist = department::where('status',1)->get();
             $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
             $roles = Role::get();
             $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$userID)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
 //        dd($user);
-            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles'));
+            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptlist'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -263,6 +264,29 @@ class UserController extends Controller
                 {
                     User::where('id',$userId)->update([
                         "password" => Hash::make($password)
+                    ]);
+                }
+                return back()->with('success','Data update successfully');
+
+            }catch (\Throwable $exception)
+            {
+                return back()->with('error',$exception->getMessage());
+            }
+
+
+        }
+    }
+    public function userDepartmentChange(Request $request)
+    {
+        if ($request->isMethod('post'))
+        {
+            try {
+                extract($request->post());
+                $userId = Crypt::decryptString($id);
+                if(department::where('id',$dept_id)->first())
+                {
+                    User::where('id',$userId)->update([
+                        "dept_id" => $dept_id
                     ]);
                 }
                 return back()->with('success','Data update successfully');

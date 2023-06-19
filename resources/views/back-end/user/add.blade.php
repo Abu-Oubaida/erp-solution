@@ -31,7 +31,7 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
                                 <input class="form-control" id="name" name="name" type="text" placeholder="Enter full name" value="{{old('name')}}"/>
-                                <label for="complain_title">Full name <span class="text-danger">*</span></label>
+                                <label for="name">Full name <span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-3">

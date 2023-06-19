@@ -48,14 +48,14 @@ class UsersACLRepository implements ACLRepository
             $array=[
                 ['disks' => 'file-manager', 'path' => '/', 'access' => 2],
                 ['disks' => 'file-manager', 'path' => '/*', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'admin', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'admin/*', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'user', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'user/*', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'common', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'common/*', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'guest', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'guest/*', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'admin', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'admin/*', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'user', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'user/*', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'common', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'common/*', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'guest', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'guest/*', 'access' => 2],
             ];
             foreach ($fileManagers as $file)
             {
@@ -79,12 +79,12 @@ class UsersACLRepository implements ACLRepository
             $array=[
                 ['disks' => 'file-manager', 'path' => '/', 'access' => 2],
                 ['disks' => 'file-manager', 'path' => '/*', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'user', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'user/*', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'common', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'common/*', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'guest', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => 'guest/*', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'user', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'user/*', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'common', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'common/*', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'guest', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => 'guest/*', 'access' => 2],
             ];
             foreach ($fileManagers as $file)
             {

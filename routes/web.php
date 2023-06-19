@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\superadmin\DepartmentController;
 use App\Http\Controllers\superadmin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +19,7 @@ Route::group(['middleware' => ['auth']],function (){
     Route::controller(DashboardController::class)->group(function (){
         Route::match(['post','get'],'dashboard','index')->name('dashboard');
     });
-
+    //Super Admin Start
     Route::group(['middleware'=>['auth','role:superadmin']],function (){
         Route::controller(UserController::class,)->group(function (){
             Route::match(['post','get'],'add-user','create')->name('add.user');
@@ -29,8 +30,14 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('user-status-change','userStatusChange')->name('user.status.change');
             Route::post('user-role-change','userRoleChange')->name('user.role.change');
             Route::post('user-password-change','userPasswordChange')->name('user.password.change');
+            Route::post('user-dept-change','userDepartmentChange')->name('user.dept.change');
         });
-    });
+        //Department
+        Route::controller(DepartmentController::class,)->group(function (){
+            Route::match(['post','get'],'add-department','create')->name('add.department');
+        });
+
+    });//Super Admin End
 
     Route::get("filemanager", [FileManagerController::class,'index'])->name('file-manager');
     Route::controller(ComplainController::class)->group(function (){
