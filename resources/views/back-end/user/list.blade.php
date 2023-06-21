@@ -68,8 +68,16 @@
                                 <td>{!! $u->dept_name !!}</td>
                                 <td>{!! $u->display_name !!}</td>
                                 <td>@if($u->status == 1) {!! '<span class="text-primary">Active</span>' !!}  @else {!! '<span class="text-danger">Inactive</span>' !!} @endif</td>
-                                <td>
-                                    <a href="{{route('user.single.view',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="btn btn-sm btn-primary" title="View"><i class='fas fa-eye'></i></a>
+                                <td class="">
+                                    <a href="{{route('user.single.view',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-primary" title="View"><i class='fas fa-eye'></i></a>
+                                    <a href="{{route('user.edit',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
+                                    <form action="" class="display-inline">
+                                        @method('delete')
+                                        @csrf
+                                        <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($u->id) !!}">
+                                        <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the user?')"><i class="fas fa-trash"></i></button>
+                                    </form>
+
 {{--                                    <button type="button" class="btn btn-sm btn-primary" value="{!! $u->id !!}" onclick="return Obj.receivedComplainAction(this,'complain-action')" data-bs-toggle="modal" data-bs-target="#complain-action"> View </button>--}}
                                 </td>
                             </tr>

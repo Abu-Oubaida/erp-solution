@@ -1,7 +1,7 @@
 /node_modules
 /public/hot
 /public/storage
-/public/file-manager
+/public/file-manager/*
 /storage/*.key
 .env
 .env.backup

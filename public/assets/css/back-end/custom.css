@@ -52,3 +52,9 @@
 .problem-details img {
     max-width: 100%;
 }
+.display-inline {
+    display: inline-block!important;
+}
+.bg-none {
+    background: none!important;
+}

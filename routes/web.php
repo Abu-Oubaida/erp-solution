@@ -18,6 +18,7 @@ Route::post('upload', [ImageController::class,'upload'])->name('editor-img-uploa
 Route::group(['middleware' => ['auth']],function (){
     Route::controller(DashboardController::class)->group(function (){
         Route::match(['post','get'],'dashboard','index')->name('dashboard');
+        Route::post('change-password','ChangePassword')->name('change.password');
     });
     //Super Admin Start
     Route::group(['middleware'=>['auth','role:superadmin']],function (){
@@ -25,6 +26,8 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['post','get'],'add-user','create')->name('add.user');
             Route::get('user-list','show')->name('user.list');
             Route::get('user-view/{userID}','SingleView')->name('user.single.view');
+            Route::match(['post','get'],'user-edit/{userID}','UserEdit')->name('user.edit');
+            Route::delete('user-delete','UserDelete')->name('user.delete');
             Route::post('user-per-add','UserPerSubmit');
             Route::post('user-per-delete','UserPerDelete');
             Route::post('user-status-change','userStatusChange')->name('user.status.change');

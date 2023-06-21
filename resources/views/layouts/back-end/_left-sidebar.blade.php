@@ -20,7 +20,7 @@
             <div class="sb-sidenav-menu-heading">Interface</div>
 {{--User Management--}}
     @if(\Illuminate\Support\Facades\Auth::user()->hasRole('superadmin'))
-        @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view')
+        @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department')
             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="true" aria-controls="userLayouts">
         @else
             <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="false" aria-controls="userLayouts">
@@ -29,7 +29,7 @@
                 User Management
                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
             </a>
-            @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view')
+            @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department')
                 <div class="collapse show" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
             @else
                 <div class="collapse" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">

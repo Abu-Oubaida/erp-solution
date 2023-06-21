@@ -228,9 +228,8 @@ class UserController extends Controller
             {
                 return back()->with('error',$exception->getMessage());
             }
-
-
         }
+        return back()->with('error','Access Denied!');
     }
     public function userRoleChange(Request $request)
     {
@@ -249,9 +248,8 @@ class UserController extends Controller
             {
                 return back()->with('error',$exception->getMessage());
             }
-
-
         }
+        return back()->with('error','Access Denied!');
     }
     public function userPasswordChange(Request $request)
     {
@@ -272,9 +270,8 @@ class UserController extends Controller
             {
                 return back()->with('error',$exception->getMessage());
             }
-
-
         }
+        return back()->with('error','Access Denied!');
     }
     public function userDepartmentChange(Request $request)
     {
@@ -297,6 +294,35 @@ class UserController extends Controller
             }
 
 
+        }
+        return back()->with('error','Access Denied!');
+    }
+
+    public function UserEdit(Request $request,$id)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $this->UserUpdate($request);
+            }
+            $userID = Crypt::decryptString($id);
+            $deptlist = department::where('status',1)->get();
+            $roles = Role::get();
+            $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$userID)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
+            return view('back-end.user.edit',compact('user','roles','deptlist'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function UserUpdate(Request $request)
+    {
+        try {
+            extract($request->post());
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
         }
     }
 }
