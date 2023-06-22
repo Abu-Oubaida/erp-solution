@@ -14,7 +14,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
+use PhpParser\Node\Stmt\If_;
 
 class UserController extends Controller
 {
@@ -72,23 +74,32 @@ class UserController extends Controller
                 if ($branches->branch_type == 'head office') $header = 'H'; else $header = "P";
                 $priviusUsers = User::where('status',1)->where('dept_id',$dept)->get();
                 $priviusUserCount = count($priviusUsers);
+                $threeDigitId = str_pad($priviusUserCount, 3, '0', STR_PAD_LEFT);
+                $nid = $header.$depts->dept_code.$threeDigitId;
+                while (User::where('employee_id',$nid)->first())
+                {
+                    $threeDigitId++;
+                    $nid = $header.$depts->dept_code.(str_pad($threeDigitId, 3, '0', STR_PAD_LEFT));
+                }
+
 //            dd($priviusUserCount >= 10 && $priviusUserCount < 100);
-                if ($priviusUserCount < 10)
-                {
-                    $priviusUserCount++;
-                    $empID = ($header.$depts->dept_code."00").$priviusUserCount;
-                }
-                elseif ($priviusUserCount >= 10 && $priviusUserCount < 100)
-                {
-                    $priviusUserCount++;
-                    $empID = ($header.$depts->dept_code."0").$priviusUserCount;
-                }
-                else {
-                    $priviusUserCount++;
-                    $empID = $header.$depts->dept_code.$priviusUserCount;
-                }
+//                if ($priviusUserCount < 10)
+//                {
+//                    $priviusUserCount++;
+//                    $empID = ($depts->dept_code."00");
+//                }
+//                elseif ($priviusUserCount >= 10 && $priviusUserCount < 100)
+//                {
+//                    $priviusUserCount++;
+//                    $empID = ($depts->dept_code."0");
+//                }
+//                else {
+//                    $priviusUserCount++;
+//                    $empID = $depts->dept_code;
+//                }
+
                 $user = User::create([
-                    'employee_id' => $empID,
+                    'employee_id' => $nid,
                     'name' => $name,
                     'phone' => $phone,
                     'email' => $email,
@@ -301,15 +312,17 @@ class UserController extends Controller
     public function UserEdit(Request $request,$id)
     {
         try {
-            if ($request->isMethod('post'))
+            if ($request->isMethod('put'))
             {
                 $this->UserUpdate($request);
             }
             $userID = Crypt::decryptString($id);
-            $deptlist = department::where('status',1)->get();
+            $depts = department::where('status',1)->get();
             $roles = Role::get();
+            $branches = branch::where('status',1)->get();
             $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$userID)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
-            return view('back-end.user.edit',compact('user','roles','deptlist'));
+//            dd($user->phone);
+            return view('back-end.user.edit',compact('user','roles','depts','branches'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -319,7 +332,32 @@ class UserController extends Controller
     public function UserUpdate(Request $request)
     {
         try {
+            $request->validate([
+                'name'  => ['required', 'string', 'max:255'],
+                'phone' => ['required', 'numeric', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
+                'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
+                'dept'  => ['required', 'exists:departments,id'],
+                'branch'  => ['required', 'exists:branches,id'],
+                'roll'  => ['required','numeric', 'exists:roles,id'],
+            ]);
             extract($request->post());
+            $UserID = Crypt::decryptString($id);
+            $user = User::where('id',$UserID)->first();
+//            if ($user->dept_id != $dept)
+//            {
+//
+//            }
+//            User::where('id',$UserID)->update([
+//                'employee_id' => $empID,
+//                'name' => $name,
+//                'phone' => $phone,
+//                'email' => $email,
+//                'dept_id' => $depts->id,
+//                'status' => 1,
+//                'branch_id' => $branches->id,
+//                'password' => Hash::make($request->password),
+//            ]);
+
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

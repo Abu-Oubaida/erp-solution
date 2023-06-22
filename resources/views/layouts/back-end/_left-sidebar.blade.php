@@ -20,7 +20,7 @@
             <div class="sb-sidenav-menu-heading">Interface</div>
 {{--User Management--}}
     @if(\Illuminate\Support\Facades\Auth::user()->hasRole('superadmin'))
-        @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department')
+        @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department'|| Route::currentRouteName() == 'user.edit')
             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="true" aria-controls="userLayouts">
         @else
             <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="false" aria-controls="userLayouts">
@@ -29,7 +29,7 @@
                 User Management
                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
             </a>
-            @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department')
+            @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department'|| Route::currentRouteName() == 'user.edit')
                 <div class="collapse show" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
             @else
                 <div class="collapse" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
@@ -48,6 +48,9 @@
                         @endif
                         @if(Route::currentRouteName() == 'user.single.view')
                             <a class="nav-link" href="{{route("user.single.view",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
+                        @endif
+                        @if(Route::currentRouteName() == 'user.edit')
+                            <a class="nav-link" href="{{route("user.edit",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
                         @endif
 {{--                        Department--}}
                         @if(Route::currentRouteName() == 'add.department')
