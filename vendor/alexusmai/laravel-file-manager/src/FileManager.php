@@ -3,14 +3,17 @@
 namespace Alexusmai\LaravelFileManager;
 
 use Alexusmai\LaravelFileManager\Events\Deleted;
+use Alexusmai\LaravelFileManager\Events\Download;
 use Alexusmai\LaravelFileManager\Services\ConfigService\ConfigRepository;
 use Alexusmai\LaravelFileManager\Services\TransferService\TransferFactory;
 use Alexusmai\LaravelFileManager\Traits\CheckTrait;
 use Alexusmai\LaravelFileManager\Traits\ContentTrait;
 use Alexusmai\LaravelFileManager\Traits\PathTrait;
+use App\Models\Download_history;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -299,8 +302,19 @@ class FileManager
         } else {
             $filename = basename($path);
         }
+        try {
+            Download_history::create([
+                'disk_name' =>  $disk,
+                'path'      =>  $path,
+                'file_name' =>  $filename,
+                'created_by'=>  Auth::user()->id,
+            ]);
+            return Storage::disk($disk)->download($path, $filename);
+        }catch (\Throwable $exception)
+        {
+            return json($exception);
+        }
 
-        return Storage::disk($disk)->download($path, $filename);
     }
 
     /**
