@@ -137,7 +137,7 @@ class FileManagerController extends Controller
         );
 
         event(new FilesUploaded($request));
-
+//        dd($request->file('files')->getClientOriginalName());
         return response()->json($uploadResponse);
     }
 

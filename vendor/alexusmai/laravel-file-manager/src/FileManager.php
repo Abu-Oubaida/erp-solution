@@ -9,7 +9,9 @@ use Alexusmai\LaravelFileManager\Services\TransferService\TransferFactory;
 use Alexusmai\LaravelFileManager\Traits\CheckTrait;
 use Alexusmai\LaravelFileManager\Traits\ContentTrait;
 use Alexusmai\LaravelFileManager\Traits\PathTrait;
+use App\Models\Deleted_history;
 use App\Models\Download_history;
+use App\Models\file_uploading_history;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
@@ -180,6 +182,15 @@ class FileManager
                         )
                     ) . '.' . $file->getClientOriginalExtension();
             }
+            file_uploading_history::create([
+                'status'    =>  'success',
+                'message'   =>  'uploaded',
+                'disk_name' =>  $disk,
+                'path'      =>  $path,
+                'file_name' =>  $name,
+                'overwrite' =>  $overwrite,
+                'created_by'=>  Auth::user()->id,
+            ]);
             // overwrite or save file
             Storage::disk($disk)->putFileAs(
                 $path,
@@ -221,6 +232,12 @@ class FileManager
             if (!Storage::disk($disk)->exists($item['path'])) {
                 continue;
             } else {
+                Deleted_history::create([
+                    'disk_name' =>  $disk,
+                    'path'      =>  $item['path'],
+                    'type'      =>  $item['type'],
+                    'created_by'=>  Auth::user()->id,
+                ]);
                 if ($item['type'] === 'dir') {
                     Storage::disk($disk)->deleteDirectory($item['path']);
                 } else {
