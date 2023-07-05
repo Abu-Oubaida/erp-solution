@@ -13,13 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('create_directory_histories', function (Blueprint $table) {
+        Schema::create('pest_histories', function (Blueprint $table) {
             $table->id();
-            $table->string('status');
-            $table->string('message');
-            $table->string('disk_name');
-            $table->string('path')->nullable();
-            $table->string('file_name');
+            $table->string('status')->nullable();
+            $table->string('message')->nullable();
+            $table->string('type')->nullable()->comment('copy/cut');
+            $table->string('disk_name')->nullable();
+            $table->string('to')->nullable();
+            $table->string('from')->nullable();
+            $table->string('document_type')->nullable()->comment('file/directory');
             $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
@@ -33,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('create_directory_histories');
+        Schema::dropIfExists('pest_histories');
     }
 };

@@ -32,6 +32,8 @@ class UsersACLRepository implements ACLRepository
 
             $fileManagers = scandir($dir);
             $array=[
+                    ['disks' => 'file-manager', 'path' => '', 'access' => 2],
+                    ['disks' => 'file-manager', 'path' => '*', 'access' => 2],
                     ['disks' => 'file-manager', 'path' => '/', 'access' => 2],
                     ['disks' => 'file-manager', 'path' => '/*', 'access' => 2],
                 ];

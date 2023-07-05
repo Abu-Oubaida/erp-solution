@@ -629,6 +629,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Http\\Requests\\ProfileUpdateRequest' => __DIR__ . '/../..' . '/app/Http/Requests/ProfileUpdateRequest.php',
         'App\\Http\\UsersACLRepository' => __DIR__ . '/../..' . '/app/Http/UsersACLRepository.php',
         'App\\Models\\Create_file_history' => __DIR__ . '/../..' . '/app/Models/Create_file_history.php',
+        'App\\Models\\Deleted_history' => __DIR__ . '/../..' . '/app/Models/Deleted_history.php',
         'App\\Models\\Download_history' => __DIR__ . '/../..' . '/app/Models/Download_history.php',
         'App\\Models\\Permission' => __DIR__ . '/../..' . '/app/Models/Permission.php',
         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',

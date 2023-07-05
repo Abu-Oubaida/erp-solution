@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('status');
             $table->string('message');
             $table->string('disk_name');
-            $table->string('path');
+            $table->string('path')->nullable();
             $table->string('file_name');
             $table->text('content');
             $table->unsignedBigInteger('created_by');

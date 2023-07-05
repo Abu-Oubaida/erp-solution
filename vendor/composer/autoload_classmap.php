@@ -77,6 +77,7 @@ return array(
     'App\\Http\\Requests\\ProfileUpdateRequest' => $baseDir . '/app/Http/Requests/ProfileUpdateRequest.php',
     'App\\Http\\UsersACLRepository' => $baseDir . '/app/Http/UsersACLRepository.php',
     'App\\Models\\Create_file_history' => $baseDir . '/app/Models/Create_file_history.php',
+    'App\\Models\\Deleted_history' => $baseDir . '/app/Models/Deleted_history.php',
     'App\\Models\\Download_history' => $baseDir . '/app/Models/Download_history.php',
     'App\\Models\\Permission' => $baseDir . '/app/Models/Permission.php',
     'App\\Models\\Role' => $baseDir . '/app/Models/Role.php',

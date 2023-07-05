@@ -12,6 +12,7 @@ use Alexusmai\LaravelFileManager\Traits\PathTrait;
 use App\Models\Deleted_history;
 use App\Models\Download_history;
 use App\Models\file_uploading_history;
+use App\Models\Pest_history;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
@@ -269,6 +270,7 @@ class FileManager
      */
     public function paste($disk, $path, $clipboard): array
     {
+        $auth = Auth::user();
         // compare disk names
         if ($disk !== $clipboard['disk']) {
 
@@ -278,8 +280,45 @@ class FileManager
         }
 
         $transferService = TransferFactory::build($disk, $path, $clipboard);
-
-        return $transferService->filesTransfer();
+        $transferServiceArray = (array) $transferService;
+        $rs = $transferService->filesTransfer();
+        if (count($clipboard['directories']))
+        {
+            $i=0;
+            while (count($clipboard['directories']) > $i)
+            {
+                Pest_history::create([
+                    'status'=>$rs['result']['status'],
+                    'message'=>$rs['result']['message'],
+                    'type'=>$transferService->clipboard['type'],
+                    'disk_name'=>$disk,
+                    'to'=>$path,
+                    'from'=>$clipboard['directories'][$i],
+                    'document_type'=>'directories',
+                    'created_by'=>$auth->id,
+                ]);
+                $i++;
+            }
+        }
+        if (count($clipboard['files']))
+        {
+            $i=0;
+            while (count($clipboard['files']) > $i)
+            {
+                Pest_history::create([
+                    'status'=>$rs['result']['status'],
+                    'message'=>$rs['result']['message'],
+                    'type'=>$transferService->clipboard['type'],
+                    'disk_name'=>$disk,
+                    'to'=>$path,
+                    'from'=>$clipboard['files'][$i],
+                    'document_type'=>'files',
+                    'created_by'=>$auth->id,
+                ]);
+                $i++;
+            }
+        }
+        return $rs;
     }
 
     /**
