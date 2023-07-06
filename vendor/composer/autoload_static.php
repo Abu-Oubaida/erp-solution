@@ -632,6 +632,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\Deleted_history' => __DIR__ . '/../..' . '/app/Models/Deleted_history.php',
         'App\\Models\\Download_history' => __DIR__ . '/../..' . '/app/Models/Download_history.php',
         'App\\Models\\Permission' => __DIR__ . '/../..' . '/app/Models/Permission.php',
+        'App\\Models\\Pest_history' => __DIR__ . '/../..' . '/app/Models/Pest_history.php',
         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\branch' => __DIR__ . '/../..' . '/app/Models/branch.php',

@@ -13,6 +13,7 @@ use App\Models\Deleted_history;
 use App\Models\Download_history;
 use App\Models\file_uploading_history;
 use App\Models\Pest_history;
+use App\Models\Rename_history;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
@@ -333,7 +334,14 @@ class FileManager
     public function rename($disk, $newName, $oldName): array
     {
         Storage::disk($disk)->move($oldName, $newName);
-
+        Rename_history::create([
+            'status'=>'success',
+            'message'=>'renamed',
+            'disk_name'=>$disk,
+            'old_name'=>$oldName,
+            'new_name'=>$newName,
+            'created_by'=>Auth::user()->id,
+        ]);
         return [
             'result' => [
                 'status'  => 'success',

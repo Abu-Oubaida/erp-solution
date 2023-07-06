@@ -4,7 +4,7 @@
                     <div class="col-lg-6">
                         <div class="card border-0 rounded-lg mt-4 p-5">
                             <div class="card-header text-center">
-                                <img src="{{url("image/logo/chl_logo.png")}}" alt="Credence Housing Limited" class="img-fluid" width="50%">
+                                <a href="{{route('root')}}"><img src="{{url("image/logo/chl_logo.png")}}" alt="Credence Housing Limited" class="img-fluid" width="50%"></a>
                             </div>
                             <div class="card-body">
                                 @if ($errors->any())

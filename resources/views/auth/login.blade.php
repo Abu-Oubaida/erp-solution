@@ -5,7 +5,7 @@
                     <div class="col-lg-4">
                         <div class="card border-0 rounded-lg mt-5 p-5">
                             <div class="card-header text-center">
-                                <img src="{{url("image/logo/chl_logo.png")}}" alt="Credence Housing Limited" class="img-fluid" width="50%">
+                                <a href="{{route('root')}}"><img src="{{url("image/logo/chl_logo.png")}}" alt="Credence Housing Limited" class="img-fluid" width="50%"></a>
                             </div>
                             <div class="card-body">
                                 @if ($errors->any())
@@ -25,6 +25,16 @@
                                     <div class="col-12">
                                         <div class="alert alert-success alert-dismissible fade show z-index-1 right-0 w-auto error-alert" role="alert">
                                             <div>{{session('success')}}</div>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endif
+                                @if (session('status'))
+                                    <div class="col-12">
+                                        <div class="alert alert-success alert-dismissible fade show z-index-1 right-0 w-auto error-alert" role="alert">
+                                            <div>{{session('status')}}</div>
                                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
