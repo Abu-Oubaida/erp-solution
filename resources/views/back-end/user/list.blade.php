@@ -71,7 +71,7 @@
                                 <td class="">
                                     <a href="{{route('user.single.view',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-primary" title="View"><i class='fas fa-eye'></i></a>
                                     <a href="{{route('user.edit',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
-                                    <form action="" class="display-inline">
+                                    <form action="{{route('user.delete')}}" class="display-inline" method="post">
                                         @method('delete')
                                         @csrf
                                         <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($u->id) !!}">

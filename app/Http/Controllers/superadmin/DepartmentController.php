@@ -9,6 +9,8 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
 {
@@ -49,10 +51,10 @@ class DepartmentController extends Controller
         //
         try {
             $request->validate([
-                'dept_name'  => ['required', 'string', 'max:255','unique:'.department::class],
-                'dept_code' => ['required', 'numeric', 'unique:'.department::class],
+                'dept_name'  => ['required', 'string', 'max:255',Rule::unique('departments')],
+                'dept_code' => ['required', 'numeric', Rule::unique('departments')],
                 'status' => ['required', 'string',],
-                'remarks'=> ['sometime','nullable','string'],
+                'remarks'=> ['nullable','sometimes','string'],
             ]);
             extract($request->post());
             if (department::where("dept_name",$dept_name)->orWhere('dept_code',$dept_code)->where('status',1)->first())

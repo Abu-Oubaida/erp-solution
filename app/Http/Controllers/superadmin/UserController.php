@@ -11,6 +11,7 @@ use App\Models\User;
 use http\Exception\BadConversionException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -72,7 +73,7 @@ class UserController extends Controller
                     return back()->with('error','User roll not found!')->withInput();
                 }
                 if ($branches->branch_type == 'head office') $header = 'H'; else $header = "P";
-                $priviusUsers = User::where('status',1)->where('dept_id',$dept)->get();
+                $priviusUsers = User::where('status',1)->get();
                 $priviusUserCount = count($priviusUsers);
                 $threeDigitId = str_pad($priviusUserCount, 3, '0', STR_PAD_LEFT);
                 $nid = $header.$depts->dept_code.$threeDigitId;
@@ -123,7 +124,7 @@ class UserController extends Controller
     public function show()
     {
         try {
-            $users = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->select('dept.dept_name','r.display_name','users.*')->get();
+            $users = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.status','!=',5)->select('dept.dept_name','r.display_name','users.*')->get();
             return view('back-end/user/list',compact('users'));
         }catch (\Throwable $exception)
         {
@@ -242,6 +243,27 @@ class UserController extends Controller
         }
         return back()->with('error','Access Denied!');
     }
+    public function UserDelete(Request $request)
+    {
+        if ($request->isMethod('delete'))
+        {
+            try {
+                extract($request->post());
+                $userId = Crypt::decryptString($id);
+                if (User::where('id',$userId)->first())
+                {
+                    User::where('id',$userId)->update([
+                        'status'=>5,//delete
+                    ]);
+                    return back()->with('warning','User Deleted!');
+                }
+            }catch (\Throwable $exception)
+            {
+                return back()->with('error',$exception->getMessage());
+            }
+        }
+        return back()->with('error','Access Denied!');
+    }
     public function userRoleChange(Request $request)
     {
         if ($request->isMethod('post'))
@@ -291,10 +313,18 @@ class UserController extends Controller
             try {
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
+                $oldData = User::where('id',$userId)->first();
                 if(department::where('id',$dept_id)->first())
                 {
                     User::where('id',$userId)->update([
                         "dept_id" => $dept_id
+                    ]);
+                    DB::table('department_transfer_histories')->insert([
+                        'transfer_user_id'=>$userId,
+                        'new_dept_id'=>$dept_id,
+                        'from_dept_id'=>$oldData->dept_id,
+                        'transfer_by'=>Auth::user()->id,
+                        'created_at'=>now(),
                     ]);
                 }
                 return back()->with('success','Data update successfully');
@@ -343,20 +373,46 @@ class UserController extends Controller
             extract($request->post());
             $UserID = Crypt::decryptString($id);
             $user = User::where('id',$UserID)->first();
-//            if ($user->dept_id != $dept)
-//            {
-//
-//            }
-//            User::where('id',$UserID)->update([
-//                'employee_id' => $empID,
-//                'name' => $name,
-//                'phone' => $phone,
-//                'email' => $email,
-//                'dept_id' => $depts->id,
-//                'status' => 1,
-//                'branch_id' => $branches->id,
-//                'password' => Hash::make($request->password),
-//            ]);
+            $depts = department::where('id',$dept)->first();
+            $branches = branch::where('id',$branch)->first();
+            if (!$depts)
+            {
+                return back()->with('error','Department not found!')->withInput();
+            }
+            if (!$branches)
+            {
+                return back()->with('error','Branches not found!')->withInput();
+            }
+
+            if ($user->dept_id != $dept)
+            {
+                DB::table('department_transfer_histories')->insert([
+                    'transfer_user_id'=>$UserID,
+                    'new_dept_id'=>$dept,
+                    'from_dept_id'=>$user->dept_id,
+                    'transfer_by'=>Auth::user()->id,
+                    'created_at'=>now(),
+                ]);
+            }
+            if ($user->branch_id != $branch)
+            {
+                DB::table('branch_transfer_histories')->insert( [
+                    'transfer_user_id'=>$UserID,
+                    'new_branch_id'=>$branch,
+                    'from_branch_id'=>$user->branch_id,
+                    'transfer_by'=>Auth::user()->id,
+                    'created_at'=>now(),
+                ]);
+            }
+            User::where('id',$UserID)->update([
+                'name' => $name,
+                'phone' => $phone,
+                'email' => $email,
+                'dept_id' => $depts->id,
+                'branch_id' => $branches->id,
+
+            ]);
+            return back()->with('success','Data update successfully!');
 
         }catch (\Throwable $exception)
         {

@@ -32,13 +32,13 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-">
-                                        <input class="form-control" id="name" name="dept_name" type="text" placeholder="Enter department name" value="{{old('name')}}" required/>
+                                        <input class="form-control" id="name" name="dept_name" type="text" placeholder="Enter department name" value="{{old('dept_name')}}" required/>
                                         <label for="name">Department Name<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="code" name="dept_code" type="text" placeholder="Department Code" value="{{old('code')}}" required/>
+                                        <input class="form-control" id="code" name="dept_code" type="text" placeholder="Department Code" value="{{old('dept_code')}}" required/>
                                         <label for="code">Department Code<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
@@ -46,15 +46,15 @@
                                     <div class="form-floating mb-3">
                                         <select class="form-control" name="status" id="status" required>
                                             <option value=""></option>
-                                            <option value="1">Active</option>
-                                            <option value="0">Inactive</option>
+                                            <option value="1" @if(old('status') == 1) selected @endif>Active</option>
+                                            <option value="0" @if(old('status') == 0) selected @endif>Inactive</option>
                                         </select>
                                         <label for="status">Status<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-floating mb-3">
-                                        <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10"></textarea>
+                                        <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10">{{old('remarks')}}</textarea>
                                         <label for="remarks">Details</label>
                                     </div>
                                 </div>
@@ -88,7 +88,7 @@
                             @endphp
                             @foreach($deplist as $d)
                                 <tr>
-                                    <td>{!! $no !!}</td>
+                                    <td>{!! $no++ !!}</td>
                                     <td>{!! $d->dept_name !!}</td>
                                     <td>{!! $d->dept_code !!}</td>
                                     <td>@if($d->status==1) Active @else Inactive @endif</td>
