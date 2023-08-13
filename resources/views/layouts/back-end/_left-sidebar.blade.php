@@ -81,9 +81,9 @@
             @endif
 {{--Complain section--}}
             @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'individual.list.complain'|| Route::currentRouteName() == 'my.list.complain'|| Route::currentRouteName() == 'single.view.complain' || Route::currentRouteName() == 'edit.me.complain' || Route::currentRouteName() == 'my.complain.trash.list' || Route::currentRouteName() == 'departmental.list.complain')
-                <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="true" aria-controls="collapseLayouts">
+            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="true" aria-controls="collapseLayouts">
             @else
-                <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+            <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
             @endif
                 <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                 Complains
@@ -149,6 +149,27 @@
                     <a class="nav-link text-chl" href="{{route("my.complain.trash.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-trash"></i></div> My Trash List</a>
                 @endif
                 </nav>
+            </div>
+            @if(Route::currentRouteName() == 'add.number' )
+            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#simLayouts" aria-expanded="true" aria-controls="simLayouts">
+            @else
+            <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#simLayouts" aria-expanded="false" aria-controls="simLayouts">
+            @endif
+                <div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div>
+                Mobile SIM
+                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+            </a>
+            @if(Route::currentRouteName() == 'add.number')
+                <div class="collapse show" id="simLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+            @else
+                <div class="collapse" id="simLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+            @endif
+                <nav class="sb-sidenav-menu-nested nav ">
+                @if(Route::currentRouteName() == 'add.number')
+                        <a class="nav-link" href="{{route('add.number')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add New</a>
+                @else
+                    <a class="nav-link text-chl" href="{{route('add.number')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add New</a>
+                @endif
             </div>
 {{--            <div class="sb-sidenav-menu-heading">Addons</div>--}}
 {{--            <a class="nav-link text-chl" href="charts.html">--}}

@@ -18,7 +18,7 @@
     <div class="container-fluid">
         <div class="row">
             <h1 class="text-center">Credence Housing Limited: File Manager</h1>
-            <h5 class="text-center">Welcome Mr./Ms. {!! \Illuminate\Support\Facades\Auth::user()->name !!}</h5>
+            <h5 class="text-center">Welcome {!! \Illuminate\Support\Facades\Auth::user()->name !!}</h5>
             <div>
                 <a href="{{route('root')}}" class="btn btn-success">Home</a>
                 <a href="{{route('dashboard')}}" class="btn btn-info">Dashboard</a>

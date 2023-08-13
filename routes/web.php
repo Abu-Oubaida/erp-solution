@@ -6,6 +6,7 @@ use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\superadmin\DepartmentController;
+use App\Http\Controllers\superadmin\MobileSIMController;
 use App\Http\Controllers\superadmin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,10 @@ Route::group(['middleware' => ['auth']],function (){
         //Department
         Route::controller(DepartmentController::class,)->group(function (){
             Route::match(['post','get'],'add-department','create')->name('add.department');
+        });
+        //Mobile SIM Controller
+        Route::controller(MobileSIMController::class)->group(function (){
+            Route::match(['post','get'],'add-number','create')->name('add.number');
         });
 
     });//Super Admin End
