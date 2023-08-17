@@ -49,13 +49,15 @@
                                             <option value="1">Postpaid</option>
                                             <option value="2">Prepaid</option>
                                         </select>
-                                        <label for="type">Number<span class="text-danger">*</span></label>
+                                        <label for="type">SIM Type<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-1">
                                     <div class="form-floating mb-3">
                                         <select class="form-control" name="status" id="status" required>
                                             <option value=""></option>
+                                            <option value="3" @if(old('status') == 3) selected @endif>Stored</option>
+                                            <option value="2" @if(old('status') == 2) selected @endif>Using</option>
                                             <option value="1" @if(old('status') == 1) selected @endif>Active</option>
                                             <option value="0" @if(old('status') == 0) selected @endif>Inactive</option>
                                         </select>
@@ -68,7 +70,12 @@
                                         <label for="ceilingOP">Ceiling set by Operator</label>
                                     </div>
                                 </div>
-
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" id="details" name="details"></textarea>
+                                        <label for="details">Ceiling set by Operator</label>
+                                    </div>
+                                </div>
 
                                 <div class="col-md-12">
                                     <div class="form-floating mb-3 float-end">
