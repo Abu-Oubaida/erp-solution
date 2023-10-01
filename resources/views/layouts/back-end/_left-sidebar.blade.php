@@ -78,7 +78,51 @@
                             </div>
                     </nav>
                 </div>
-            @endif
+    @endif
+{{--Accounts File Storage System--}}
+                @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list')
+                    <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts" aria-expanded="true" aria-controls="accLayouts">
+                @else
+                    <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts" aria-expanded="false" aria-controls="accLayouts">
+                @endif
+                        <div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div>
+                        Accounts File
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list')
+                        <div class="collapse show" id="accLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    @else
+                        <div class="collapse" id="accLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    @endif
+                            <nav class="sb-sidenav-menu-nested nav ">
+                                @if(Route::currentRouteName() == 'add.voucher.type')
+                                    <a class="nav-link" href="{{route('add.voucher.type')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Voucher Type</a>
+                                @else
+                                    <a class="nav-link text-chl" href="{{route('add.voucher.type')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Voucher Type</a>
+                                @endif
+
+                                @if(Route::currentRouteName() == 'edit.voucher.type')
+                                    <a class="nav-link" href="{{route("edit.voucher.type",['voucherTypeID'=>\Illuminate\Support\Facades\Request::route('voucherTypeID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Voucher Type Edit</a>
+                                @endif
+                                @if(Route::currentRouteName() == 'add.voucher.info')
+                                    <a class="nav-link" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Upload Option</a>
+                                @else
+                                    <a class="nav-link text-chl" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Upload Option</a>
+                                @endif
+
+                                @if(Route::currentRouteName() == 'uploaded.voucher.list')
+                                    <a class="nav-link" href="{{route("uploaded.voucher.list")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> Voucher List</a>
+                                @else
+                                    <a class="nav-link text-chl" href="{{route("uploaded.voucher.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> Voucher List</a>
+                                @endif
+                                @if(Route::currentRouteName() == 'user.single.view')
+                                    <a class="nav-link" href="{{route("user.single.view",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
+                                @endif
+                                @if(Route::currentRouteName() == 'user.edit')
+                                    <a class="nav-link" href="{{route("user.edit",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
+                                @endif
+                            </nav>
+                        </div>
 {{--Complain section--}}
             @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'individual.list.complain'|| Route::currentRouteName() == 'my.list.complain'|| Route::currentRouteName() == 'single.view.complain' || Route::currentRouteName() == 'edit.me.complain' || Route::currentRouteName() == 'my.complain.trash.list' || Route::currentRouteName() == 'departmental.list.complain')
             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="true" aria-controls="collapseLayouts">

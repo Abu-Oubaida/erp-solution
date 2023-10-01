@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountVoucherController;
 use App\Http\Controllers\ComplainController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\editor\ImageController;
@@ -48,6 +49,13 @@ Route::group(['middleware' => ['auth']],function (){
     });//Super Admin End
 
     Route::get("filemanager", [FileManagerController::class,'index'])->name('file-manager');
+    Route::controller(AccountVoucherController::class)->group(function (){
+        Route::match(['post','get'],'add-voucher-type','createVoucherType')->name('add.voucher.type');
+        Route::match(['put','get'],'edit-voucher-type/{voucherTypeID}','editVoucherType')->name('edit.voucher.type');
+        Route::delete('delete-voucher-type','deleteVoucherType')->name('delete.voucher.type');
+        Route::match(['post','get'],'add-voucher','create')->name('add.voucher.info');
+        Route::get('voucher-list','VoucherList')->name('uploaded.voucher.list');
+    });
     Route::controller(ComplainController::class)->group(function (){
         Route::match(['post','get'],'add-complain','create')->name('add.complain');
         Route::match(['post','get'],'complain-list','show')->name('individual.list.complain');
