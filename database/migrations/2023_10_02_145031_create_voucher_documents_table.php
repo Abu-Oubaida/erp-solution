@@ -13,13 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('account_voucher_infos', function (Blueprint $table) {
+        Schema::create('voucher_documents', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('voucher_type_id');
-            $table->foreign('voucher_type_id')->references('id')->on('voucher_types')->onDelete('cascade');
-            $table->date('voucher_date');
-            $table->string('voucher_number');
-            $table->integer('file_count')->nullable()->comment('if multiple file in a request');
+            $table->unsignedBigInteger('voucher_info_id');
+            $table->foreign('voucher_info_id')->references('id')->on('account_voucher_infos')->onDelete('cascade');
+            $table->text('document')->nullable();
+            $table->text('filepath')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('updated_by')->nullable();
@@ -35,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('account_voucher_infos');
+        Schema::dropIfExists('voucher_documents');
     }
 };

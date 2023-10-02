@@ -28,13 +28,19 @@
                 <form action="{{ route('add.voucher.info') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-floating mb-3">
                                 <input class="form-control" id="voucher_number" name="voucher_number" type="text" placeholder="Enter Voucher Number" value="{{old('voucher_number')}}"/>
                                 <label for="voucher_number">Voucher Number <span class="text-danger">*</span></label>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="voucher_date" name="voucher_date" type="date" placeholder="Enter Voucher Date" value="{{old('voucher_date')}}"/>
+                                <label for="voucher_date">Voucher Date <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
                             <div class="form-floating mb-3">
                                 <select class="form-control" name="voucher_type" id="voucher_type">
                                     <option value="">--Select Voucher Type--</option>
@@ -49,15 +55,15 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
                                 <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10"></textarea>
-                                <label for="remarks">Remarks<span class="text-danger">*</span></label>
+                                <label for="remarks">Remarks</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
-                                <input type="file" class="form-control" name="voucher_file" id="voucher_file" >
+                                <input type="file" class="form-control" name="voucher_file[]" multiple id="voucher_file" >
                                 <label for="voucher_file">Voucher Document<span class="text-danger">*</span></label>
-                                <small>.pdf/.image</small>
+                                <small>jpeg,png,pdf/ Maximum size 500 MB</small>
                             </div>
                         </div>
 
@@ -80,11 +86,11 @@
                         <table id="datatablesSimple">
                             <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Voucher type title</th>
-                                <th>Status</th>
-                                <th>Code</th>
+                                <th>SL</th>
+                                <th>Voucher Number</th>
+                                <th>Voucher Type</th>
                                 <th>Remarks</th>
+                                <th>Document</th>
                                 <th>Created By</th>
                                 <th>Updated By</th>
                                 <th>Action</th>
@@ -92,11 +98,11 @@
                             </thead>
                             <tfoot>
                             <tr>
-                                <th>No</th>
-                                <th>Voucher type title</th>
-                                <th>Status</th>
-                                <th>Code</th>
+                                <th>SL</th>
+                                <th>Voucher Number</th>
+                                <th>Voucher Type</th>
                                 <th>Remarks</th>
+                                <th>Document</th>
                                 <th>Created By</th>
                                 <th>Updated By</th>
                                 <th>Action</th>
