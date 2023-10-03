@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('voucher_date');
             $table->string('voucher_number');
             $table->integer('file_count')->nullable()->comment('if multiple file in a request');
+            $table->text('remarks')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('updated_by')->nullable();

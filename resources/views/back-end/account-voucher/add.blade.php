@@ -87,6 +87,7 @@
                             <thead>
                             <tr>
                                 <th>SL</th>
+                                <th>Date</th>
                                 <th>Voucher Number</th>
                                 <th>Voucher Type</th>
                                 <th>Remarks</th>
@@ -99,6 +100,7 @@
                             <tfoot>
                             <tr>
                                 <th>SL</th>
+                                <th>Date</th>
                                 <th>Voucher Number</th>
                                 <th>Voucher Type</th>
                                 <th>Remarks</th>
@@ -109,27 +111,35 @@
                             </tr>
                             </tfoot>
                             <tbody>
-                            @if(isset($voucherTypes) && count($voucherTypes))
+                            @if(isset($voucherInfos) && count($voucherInfos))
                                 @php
                                     $no= 1;
                                 @endphp
-                                @foreach($voucherTypes as $vt)
+                                @foreach($voucherInfos as $data)
                                     <tr>
                                         <td>{!! $no++ !!}</td>
-                                        <td>{!! $vt->voucher_type_title !!}</td>
-                                        <td>@if($vt->status ==1) Active @else Inactive @endif</td>
-                                        <td>{!! $vt->code !!}</td>
-                                        <td>{!! $vt->remarks !!}</td>
-                                        <td>{!! $vt->createdBY->name !!}</td>
-                                        <td>{!! $vt->updatedBY->name !!}</td>
+                                        <td>{!! date('d-M-y', strtotime($data->voucher_date)) !!}</td>
+                                        <td>{!! $data->voucher_number !!}</td>
+                                        <td>{!! $data->VoucherType->voucher_type_title !!}</td>
+                                        <td>{!! $data->remarks !!}</td>
                                         <td>
-                                            <a href="{{route('edit.voucher.type',["voucherTypeID"=>\Illuminate\Support\Facades\Crypt::encryptString($vt->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
-                                            <form action="{{route('delete.voucher.type')}}" class="display-inline" method="post">
-                                                @method('delete')
-                                                @csrf
-                                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($vt->id) !!}">
-                                                <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the voucher type?')"><i class="fas fa-trash"></i></button>
-                                            </form>
+                                            @php $x = 1;@endphp
+                                            @foreach($data->VoucherDocument as $d)
+                                                <div><strong>{!! $x++ !!}.</strong> <a href="">  {!! $d->document !!}</a></div>
+                                            @endforeach
+                                        </td>
+{{--                                        <td></td>--}}
+{{--                                        <td></td>--}}
+                                        <td>{!! ($data->createdBY)? $data->createdBY->name:'-' !!}</td>
+                                        <td>{!! ($data->updatedBY)? $data->updatedBY->name:'-' !!}</td>
+                                        <td>
+{{--                                            <a href="{{route('edit.voucher.type',["voucherTypeID"=>\Illuminate\Support\Facades\Crypt::encryptString($vt->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>--}}
+{{--                                            <form action="{{route('delete.voucher.type')}}" class="display-inline" method="post">--}}
+{{--                                                @method('delete')--}}
+{{--                                                @csrf--}}
+{{--                                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($vt->id) !!}">--}}
+{{--                                                <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the voucher type?')"><i class="fas fa-trash"></i></button>--}}
+{{--                                            </form>--}}
                                         </td>
                                     </tr>
                                 @endforeach

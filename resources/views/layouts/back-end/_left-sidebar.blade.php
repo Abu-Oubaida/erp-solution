@@ -80,23 +80,25 @@
                 </div>
     @endif
 {{--Accounts File Storage System--}}
-                @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list')
+                @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info')
                     <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts" aria-expanded="true" aria-controls="accLayouts">
                 @else
                     <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts" aria-expanded="false" aria-controls="accLayouts">
                 @endif
-                        <div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="sb-nav-link-icon"><i class="fas fa-file-invoice-dollar"></i></div>
                         Accounts File
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
-                    @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list')
+                    @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info')
                         <div class="collapse show" id="accLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     @else
                         <div class="collapse" id="accLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     @endif
                             <nav class="sb-sidenav-menu-nested nav ">
                                 @if(Route::currentRouteName() == 'add.voucher.type')
-                                    <a class="nav-link" href="{{route('add.voucher.type')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Voucher Type</a>
+                                    <a class="nav-link" href="{{route('add.voucher.type')}}">
+                                        <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Voucher Type
+                                    </a>
                                 @else
                                     <a class="nav-link text-chl" href="{{route('add.voucher.type')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Voucher Type</a>
                                 @endif
@@ -104,11 +106,42 @@
                                 @if(Route::currentRouteName() == 'edit.voucher.type')
                                     <a class="nav-link" href="{{route("edit.voucher.type",['voucherTypeID'=>\Illuminate\Support\Facades\Request::route('voucherTypeID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Voucher Type Edit</a>
                                 @endif
-                                @if(Route::currentRouteName() == 'add.voucher.info')
-                                    <a class="nav-link" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Upload Option</a>
+
+                                @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info')
+                                    <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="true" aria-controls="pagesUploadOption">
+                                        <div class="sb-nav-link-icon"><i class="fas fa-upload" aria-hidden="true"></i></div>
+                                        Upload Option
+                                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                    </a>
+                                    <div class="collapse show" id="pagesUploadOption" aria-labelledby="headingOne" data-bs-parent="#pagesUploadOption">
                                 @else
-                                    <a class="nav-link text-chl" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Upload Option</a>
+                                    <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="false" aria-controls="pagesUploadOption">
+                                        <div class="sb-nav-link-icon"><i class="fas fa-upload" aria-hidden="true"></i></div>
+                                        Upload Option
+                                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                    </a>
+                                    <div class="collapse" id="pagesUploadOption" aria-labelledby="headingOne" data-bs-parent="#pagesUploadOption">
                                 @endif
+                                        <nav class="sb-sidenav-menu-nested nav">
+                                            @if(Route::currentRouteName() == 'add.voucher.info')
+                                                <a class="nav-link" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Voucher</a>
+                                            @else
+                                                <a class="nav-link text-chl" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Voucher</a>
+                                            @endif
+
+                                            @if(Route::currentRouteName() == 'add.fr.info')
+                                                <a class="nav-link" href="{{route('add.fr.info')}}"><div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div> FR</a>
+                                            @else
+                                                <a class="nav-link text-chl" href="{{route('add.fr.info')}}"><div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div> FR</a>
+                                            @endif
+
+                                            @if(Route::currentRouteName() == 'add.bill.info')
+                                                <a class="nav-link" href="{{route('add.bill.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill"></i></div> Bill</a>
+                                            @else
+                                                <a class="nav-link text-chl" href="{{route('add.bill.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill"></i></div> Bill</a>
+                                            @endif
+                                        </nav>
+                                    </div>
 
                                 @if(Route::currentRouteName() == 'uploaded.voucher.list')
                                     <a class="nav-link" href="{{route("uploaded.voucher.list")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> Voucher List</a>

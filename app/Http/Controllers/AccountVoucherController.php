@@ -144,7 +144,9 @@ class AccountVoucherController extends Controller
                 return $this->store($request);
             }
             $voucherTypes = VoucherType::where('status',1)->get();
-            return view('back-end/account-voucher/add',compact("voucherTypes"));
+            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->get();
+//            dd($voucherInfos);
+            return view('back-end/account-voucher/add',compact("voucherTypes","voucherInfos"));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -170,7 +172,9 @@ class AccountVoucherController extends Controller
                 'voucher_number'    =>  $voucher_number,
                 'voucher_date'      =>  $voucher_date,
                 'file_count'        =>  count($request->file('voucher_file')),
+                'remarks'           =>  $remarks,
                 'created_by'        =>  $user->id,
+                'created_at'        =>  now(),
             ]);
             if (!$firstInsert) {
                 // Rollback the transaction if the first insert failed
@@ -192,6 +196,7 @@ class AccountVoucherController extends Controller
                         'document'          =>  $fileName,
                         'filepath'          =>  $this->accounts_document_path,
                         'created_by'        =>  $user->id,
+                        'created_at'        =>  now(),
                     ]);
 
                     if (!$secondInsert) {

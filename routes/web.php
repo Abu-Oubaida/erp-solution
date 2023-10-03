@@ -54,6 +54,8 @@ Route::group(['middleware' => ['auth']],function (){
         Route::match(['put','get'],'edit-voucher-type/{voucherTypeID}','editVoucherType')->name('edit.voucher.type');
         Route::delete('delete-voucher-type','deleteVoucherType')->name('delete.voucher.type');
         Route::match(['post','get'],'add-voucher','create')->name('add.voucher.info');
+        Route::match(['post','get'],'add-bill','createBill')->name('add.bill.info');
+        Route::match(['post','get'],'add-fr','createFr')->name('add.fr.info');
         Route::get('voucher-list','VoucherList')->name('uploaded.voucher.list');
     });
     Route::controller(ComplainController::class)->group(function (){
