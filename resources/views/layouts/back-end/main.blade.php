@@ -65,6 +65,9 @@
                 </div>
             @endif
             @yield('mainContent')
+            <div id='ajax_loader' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+                <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+            </div>
         </main>
         @include("layouts.back-end._footer")
     </div>

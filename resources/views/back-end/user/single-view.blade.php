@@ -30,7 +30,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row">
@@ -159,6 +159,169 @@
                                             <hr>
                                         </div>
                                     </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                @if(!($user))
+                                    <div class="row">
+                                        <div class="col-md-12 text-center text-danger">
+                                            Not Found!
+                                        </div>
+                                    </div>
+                                @else
+                                    <h6><b>User File Manager Permission</b></h6>
+                                    @if(strtolower($user->display_name) == strtolower('superadmin'))
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <table class="table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Directory</th>
+                                                        <th>Permission</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="table-secondary">
+                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>
+                                                        </tr>
+                                                        @if(@$fileManagers && count($fileManagers))
+                                                            @foreach($fileManagers as $file)
+                                                                <tr>
+                                                                    <td>#</td>
+                                                                    <td>{!! $file !!}</td>
+                                                                    <td>Red/Write/Delete</td>
+                                                                    <td>Locked</td>
+                                                                </tr>
+                                                            @endforeach
+                                                        @endif
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <form action="" method="post">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label for="user">For User</label>
+                                                    <select class="form-control" id="user" name="user" disabled>
+                                                        <option value="{!! \Illuminate\Support\Facades\Crypt::encryptString($user->name) !!}" selected>{!! $user->name !!}</option>
+                                                    </select>
+
+                                                    <label for="parentPermission">Parent Permission</label>
+                                                    <select class="form-control" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
+                                                        <option value="">--Select Option--</option>
+                                                        @if($permissionParents)
+                                                            @foreach($permissionParents as $data)
+                                                                <option value="{!! $data->id !!}">{!! $data->display_name !!}</option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <label for="childPermission">Child Permission</label>
+                                                    <select class="form-control" id="childPermission" multiple="multiple" name="childPermission[]">
+                                                        <option value="0">1. None</option>
+                                                    </select>
+                                                    <sub>Multiple Option choice-able  <span class="badge bg-secondary">Ctrl + </span> OR <span class="badge bg-primary">Shift + </span></sub>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <button class="btn btn-primary btn-chl float-end" id="perAdding" name="perAdding" type="submit" onclick="return confirm('Are you sure!')"><i class="fas fa-plus"></i> Add</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Directory</th>
+                                                        <th>Permission</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="f-p-list">
+                                                    @include("back-end.user._file-permission-list")
+                                                    </tbody>
+{{--                                                    <tbody>--}}
+{{--                                                    @if(strtolower($user->display_name) == strtolower('admin'))--}}
+{{--                                                        <tr class="table-secondary">--}}
+{{--                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>admin</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>user</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr><tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>common</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr><tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>gest</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        @elseif (strtolower($user->display_name) == strtolower('user'))--}}
+{{--                                                        <tr class="table-secondary">--}}
+{{--                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>user</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>common</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>gest</td>--}}
+{{--                                                            <td>Red/Write</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                    @else--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>common</td>--}}
+{{--                                                            <td>Only View</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                        <tr>--}}
+{{--                                                            <td>#</td>--}}
+{{--                                                            <td>gest</td>--}}
+{{--                                                            <td>Only View</td>--}}
+{{--                                                            <td>Locked</td>--}}
+{{--                                                        </tr>--}}
+{{--                                                    @endif--}}
+{{--                                                    </tbody>--}}
+                                                </table>
+                                            </div>
+                                        </div>
+                                    @endif
+
                                 @endif
                             </div>
                         </div>

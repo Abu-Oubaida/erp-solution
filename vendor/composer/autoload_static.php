@@ -639,6 +639,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\Rename_history' => __DIR__ . '/../..' . '/app/Models/Rename_history.php',
         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
+        'App\\Models\\UserPermission' => __DIR__ . '/../..' . '/app/Models/UserPermission.php',
         'App\\Models\\VoucherDocument' => __DIR__ . '/../..' . '/app/Models/VoucherDocument.php',
         'App\\Models\\VoucherType' => __DIR__ . '/../..' . '/app/Models/VoucherType.php',
         'App\\Models\\branch' => __DIR__ . '/../..' . '/app/Models/branch.php',

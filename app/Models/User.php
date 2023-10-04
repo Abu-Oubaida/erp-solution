@@ -40,6 +40,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function permissions()
+    {
+        return $this->hasMany(PermissionUser::class);
+    }
+
 //    public function voucherTypeCreate()
 //    {
 //        return $this->hasMany(VoucherType::class,'created_by');

@@ -7,8 +7,13 @@ if(window.location.port)
     sourceDir = "";
 }
 (function ($){
+    $(document).ajaxStop(function(){
+        $("#ajax_loader").hide();
+    });
+    $(document).ajaxStart(function (){
+        $("#ajax_loader").show();
+    });
     $(document).ready(function(){
-
         $('#perAdd').click(function (){
             let per = $("#per").val()
             let dir = $("#dir").val()
@@ -64,16 +69,37 @@ if(window.location.port)
                 })
             }
         })
-        // Obj = {
-        //     receivedComplainAction : function (e,actionID) {
-        //         // $('#'+actionID).addClass('show')
-        //         // $('#'+actionID).removeAttr("aria-hidden")
-        //         // $('#'+actionID).attr("aria-modal",'true')
-        //         // $('#'+actionID).attr("role",'dialog')
-        //         // $('#'+actionID).show()
-        //         $('.modal-body').html("<h1>Hello</h1>")
-        //     }
-        // }
+        Obj = {
+            fiendPermissionChild : function (e,actionID) {
+                let id = $(e).val()
+                if (id)
+                {
+                    let url = window.location.origin + sourceDir + "/fiend-permission-child";
+                    $.ajax({
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        url: url,
+                        type: "POST",
+                        data: {'pid':id},
+                        success: function (data) {
+                            if (data.error){
+                                // throw data.error.msg;
+                                let division = "<option></option>";
+                                $("#"+actionID).append(division);
+                                alert(data.error.msg)
+                            }else{
+                                // Parse the JSON string into an object
+                                let permissions = JSON.parse(data).results;
+                                let counter = 2
+                                permissions.forEach(function(permission) {
+                                    let response = "<option value=\"" + permission.name + "\">"+ counter++ +". " + permission.display_name +"</option>";
+                                    $("#"+actionID).append(response);
+                                });
+                            }
+                        }
+                    })
+                }
+            }
+        }
 
     })
 }(jQuery))

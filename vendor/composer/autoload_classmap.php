@@ -87,6 +87,7 @@ return array(
     'App\\Models\\Rename_history' => $baseDir . '/app/Models/Rename_history.php',
     'App\\Models\\Role' => $baseDir . '/app/Models/Role.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
+    'App\\Models\\UserPermission' => $baseDir . '/app/Models/UserPermission.php',
     'App\\Models\\VoucherDocument' => $baseDir . '/app/Models/VoucherDocument.php',
     'App\\Models\\VoucherType' => $baseDir . '/app/Models/VoucherType.php',
     'App\\Models\\branch' => $baseDir . '/app/Models/branch.php',

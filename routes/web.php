@@ -16,7 +16,9 @@ Route::get('/', function () {
     return view('welcome');
 })->name('root');
 Route::post('upload', [ImageController::class,'upload'])->name('editor-img-upload');
-
+Route::controller(\App\Http\Controllers\superadmin\ajaxRequestController::class)->group(function (){
+    Route::post('fiend-permission-child','fienPermissionChild')->name('fien.permission.child');
+});
 Route::group(['middleware' => ['auth']],function (){
     Route::controller(DashboardController::class)->group(function (){
         Route::match(['post','get'],'dashboard','index')->name('dashboard');

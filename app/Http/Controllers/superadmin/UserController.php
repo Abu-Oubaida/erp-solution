@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\branch;
 use App\Models\department;
 use App\Models\filemanager_permission;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use http\Exception\BadConversionException;
@@ -141,12 +142,13 @@ class UserController extends Controller
             $fileManagers = scandir($dir);
             unset($fileManagers[0]);
             unset($fileManagers[1]);
+            $permissionParents = Permission::where('parent_id',null)->get();
             $deptlist = department::where('status',1)->get();
             $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
             $roles = Role::get();
             $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$userID)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
 //        dd($user);
-            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptlist'));
+            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptlist','permissionParents'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
