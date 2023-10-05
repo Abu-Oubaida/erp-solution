@@ -89,6 +89,13 @@ if(window.location.port)
                             }else{
                                 // Parse the JSON string into an object
                                 let permissions = JSON.parse(data).results;
+                                // console.log(permissions)
+                                // return false
+                                if ( permissions.length == 0 ) {
+                                    alert("No data found!")
+                                    let response = "<option value=\"none\">1. None</option>";
+                                    $("#"+actionID).html(response);
+                                }
                                 let counter = 2
                                 permissions.forEach(function(permission) {
                                     let response = "<option value=\"" + permission.name + "\">"+ counter++ +". " + permission.display_name +"</option>";

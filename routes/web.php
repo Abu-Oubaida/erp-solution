@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\superadmin\DepartmentController;
 use App\Http\Controllers\superadmin\MobileSIMController;
 use App\Http\Controllers\superadmin\UserController;
+use App\Http\Controllers\superadmin\UserPermissionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -40,12 +41,17 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('user-dept-change','userDepartmentChange')->name('user.dept.change');
         });
         //Department
-        Route::controller(DepartmentController::class,)->group(function (){
+        Route::controller(DepartmentController::class)->group(function (){
             Route::match(['post','get'],'add-department','create')->name('add.department');
         });
         //Mobile SIM Controller
         Route::controller(MobileSIMController::class)->group(function (){
             Route::match(['post','get'],'add-number','create')->name('add.number');
+        });
+        //User Permission Controller
+        Route::controller(UserPermissionController::class)->group(function (){
+            Route::post('add-user-permission','addPermission')->name('add.user.permission');
+            Route::delete('delete-user-permission','removePermission')->name('remove.user.permission');
         });
 
     });//Super Admin End

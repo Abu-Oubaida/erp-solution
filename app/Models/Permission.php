@@ -10,4 +10,9 @@ class Permission extends LaratrustPermission
 
     protected $fillable = ['parent_id', 'name', 'display_name', 'description'];
 
+    public function PermissionUser()
+    {
+        return $this->hasMany(PermissionUser::class,'parent_id');
+    }
+
 }
