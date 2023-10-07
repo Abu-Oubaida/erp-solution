@@ -8,6 +8,7 @@ use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\superadmin\DepartmentController;
 use App\Http\Controllers\superadmin\MobileSIMController;
+use App\Http\Controllers\superadmin\prorammerController;
 use App\Http\Controllers\superadmin\UserController;
 use App\Http\Controllers\superadmin\UserPermissionController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,11 @@ Route::group(['middleware' => ['auth']],function (){
     });
     //Super Admin Start
     Route::group(['middleware'=>['auth','role:superadmin']],function (){
+        Route::controller(prorammerController::class)->group(function (){
+            Route::match(['post','get'],'permission-input','create')->name('permission.input');
+            Route::delete('permission-input-delete','delete')->name('permission.input.delete');
+        });
+
         Route::controller(UserController::class,)->group(function (){
             Route::match(['post','get'],'add-user','create')->name('add.user');
             Route::get('user-list','show')->name('user.list');
@@ -57,11 +63,23 @@ Route::group(['middleware' => ['auth']],function (){
     });//Super Admin End
 
     Route::get("filemanager", [FileManagerController::class,'index'])->name('file-manager');
+
     Route::controller(AccountVoucherController::class)->group(function (){
-        Route::match(['post','get'],'add-voucher-type','createVoucherType')->name('add.voucher.type');
-        Route::match(['put','get'],'edit-voucher-type/{voucherTypeID}','editVoucherType')->name('edit.voucher.type');
-        Route::delete('delete-voucher-type','deleteVoucherType')->name('delete.voucher.type');
-        Route::match(['post','get'],'add-voucher','create')->name('add.voucher.info');
+        Route::middleware(['permission:voucher_type_add'])->group(function () {
+            Route::match(['post','get'],'add-voucher-type','createVoucherType')->name('add.voucher.type');
+        });
+        Route::middleware(['permission:voucher_type_edit'])->group(function (){
+            Route::match(['put','get'],'edit-voucher-type/{voucherTypeID}','editVoucherType')->name('edit.voucher.type');
+        });
+        Route::middleware(['permission:voucher_type_delete'])->group(function (){
+            Route::delete('delete-voucher-type','deleteVoucherType')->name('delete.voucher.type');
+        });
+
+        Route::middleware(['permission:voucher_document_upload'])->group(function () {
+            // Your routes that require 'add_module' permission
+            Route::match(['post','get'],'add-voucher','create')->name('add.voucher.info');
+        });
+
         Route::match(['post','get'],'add-bill','createBill')->name('add.bill.info');
         Route::match(['post','get'],'add-fr','createFr')->name('add.fr.info');
         Route::get('voucher-list','VoucherList')->name('uploaded.voucher.list');

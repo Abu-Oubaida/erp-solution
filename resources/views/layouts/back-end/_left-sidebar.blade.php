@@ -20,6 +20,30 @@
             <div class="sb-sidenav-menu-heading">Interface</div>
 {{--User Management--}}
     @if(\Illuminate\Support\Facades\Auth::user()->hasRole('superadmin'))
+            @if(Route::currentRouteName() == 'permission.input' )
+                <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#programmerLayouts" aria-expanded="true" aria-controls="programmerLayouts">
+            @else
+                <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#programmerLayouts" aria-expanded="false" aria-controls="programmerLayouts">
+            @endif
+                    <div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div>
+                    For Programmer
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+            @if(Route::currentRouteName() == 'permission.input')
+                <div class="collapse show" id="programmerLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+            @else
+                <div class="collapse" id="programmerLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+            @endif
+                    <nav class="sb-sidenav-menu-nested nav ">
+                        @if(Route::currentRouteName() == 'permission.input')
+                            <a class="nav-link" href="{{route('permission.input')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Permission Input</a>
+                        @else
+                            <a class="nav-link text-chl" href="{!! route('permission.input') !!}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Permission Input</a>
+                        @endif
+                    </nav>
+                </div>
+
+
         @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department'|| Route::currentRouteName() == 'user.edit')
             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="true" aria-controls="userLayouts">
         @else
@@ -236,17 +260,18 @@
                 Mobile SIM
                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
             </a>
-            @if(Route::currentRouteName() == 'add.number')
-                <div class="collapse show" id="simLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-            @else
-                <div class="collapse" id="simLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-            @endif
+        @if(Route::currentRouteName() == 'add.number')
+            <div class="collapse show" id="simLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+        @else
+            <div class="collapse" id="simLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+        @endif
                 <nav class="sb-sidenav-menu-nested nav ">
                 @if(Route::currentRouteName() == 'add.number')
                         <a class="nav-link" href="{{route('add.number')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add New</a>
                 @else
                     <a class="nav-link text-chl" href="{{route('add.number')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add New</a>
                 @endif
+                </nav>
             </div>
 {{--            <div class="sb-sidenav-menu-heading">Addons</div>--}}
 {{--            <a class="nav-link text-chl" href="charts.html">--}}

@@ -177,133 +177,100 @@
                                         </div>
                                     </div>
                                 @else
-                                    <h6><b>User File Manager Permission</b></h6>
-                                    @if(strtolower($user->display_name) == strtolower('superadmin'))
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <table class="table">
-                                                    <thead>
-                                                    <tr>
-                                                        <th>No</th>
-                                                        <th>Directory</th>
-                                                        <th>Permission</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr class="table-secondary">
-                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>
-                                                        </tr>
-                                                        @if(@$fileManagers && count($fileManagers))
-                                                            @foreach($fileManagers as $file)
-                                                                <tr>
-                                                                    <td>#</td>
-                                                                    <td>{!! $file !!}</td>
-                                                                    <td>Red/Write/Delete</td>
-                                                                    <td>Locked</td>
-                                                                </tr>
+
+                                    <div class="row">
+                                        <form action="{!! route('add.user.permission') !!}" method="post">
+                                            @csrf
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label for="user">For User</label>
+                                                    <select class="form-control" id="user" name="user_id">
+                                                        <option value="{!! $user->id !!}" selected>{!! $user->name !!}</option>
+                                                    </select>
+
+                                                    <label for="parentPermission">Parent Permission</label>
+                                                    <select class="form-control" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
+                                                        <option value="">--Select Option--</option>
+                                                        @if($permissionParents)
+                                                            @foreach($permissionParents as $data)
+                                                                <option value="{!! $data->id !!}">{!! $data->display_name !!}</option>
                                                             @endforeach
                                                         @endif
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <div class="row">
-                                            <form action="{!! route('add.user.permission') !!}" method="post">
-                                                @csrf
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <label for="user">For User</label>
-                                                        <select class="form-control" id="user" name="user_id">
-                                                            <option value="{!! $user->id !!}" selected>{!! $user->name !!}</option>
-                                                        </select>
-
-                                                        <label for="parentPermission">Parent Permission</label>
-                                                        <select class="form-control" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
-                                                            <option value="">--Select Option--</option>
-                                                            @if($permissionParents)
-                                                                @foreach($permissionParents as $data)
-                                                                    <option value="{!! $data->id !!}">{!! $data->display_name !!}</option>
-                                                                @endforeach
-                                                            @endif
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-8">
-                                                        <label for="childPermission">Child Permission</label>
-                                                        <select class="form-control" id="childPermission" multiple="multiple" name="childPermission[]">
-                                                            <option value="none">1. None</option>
-                                                        </select>
-                                                        <sub>Multiple Option choice-able  <span class="badge bg-secondary">Ctrl + </span> OR <span class="badge bg-primary">Shift + </span></sub>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <button class="btn btn-primary btn-chl float-end" id="perAdding" name="perAdding" type="submit" onclick="return confirm('Are you sure!')"><i class="fas fa-plus"></i> Add</button>
-                                                    </div>
+                                                    </select>
                                                 </div>
-                                            </form>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <br>
-                                                <table id="datatablesSimple">
-                                                    <thead>
-                                                    <tr>
-                                                        <th>No</th>
-                                                        <th>Parent Permission Name</th>
-                                                        <th>Child Permission Name</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tfoot>
-                                                    <tr>
-                                                        <th>No</th>
-                                                        <th>Parent Permission Name</th>
-                                                        <th>Child Permission Name</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    </tfoot>
-                                                    <tbody>
-                                                    @if(count($userPermissions))
-                                                        @php
-                                                            $i=1;
-                                                        @endphp
-                                                        @foreach($userPermissions as $p)
-                                                            <tr>
-                                                                <td>{!! $i++ !!}</td>
-                                                                <td>
-                                                                    <span class="text-capitalize">
-                                                                        {!! $p->permissionParent->display_name !!}
-                                                                    </span>
-                                                                </td>
-                                                                <td>
-                                                                    <span class="text-capitalize">
-                                                                        @if($p->is_parent == null) {!! str_replace('_',' ',$p->permission_name) !!} @endif
-                                                                    </span>
-                                                                </td>
-
-                                                                <td class="">
-                                                                    <form action="{!! route('remove.user.permission') !!}" class="display-inline" method="post">
-                                                                        @method('delete')
-                                                                        @csrf
-                                                                        <input type="hidden" name="user_id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($user->id) !!}">
-                                                                        <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($p->id) !!}">
-                                                                        <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this permission?')"><i class="fas fa-trash"></i></button>
-                                                                    </form>
-
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
-                                                    @else
-                                                        <tr>
-                                                            <td colspan="6" class="text-center text-danger">Not found!</td>
-                                                        </tr>
-                                                    @endif
-                                                    </tbody>
-                                                </table>
+                                                <div class="col-md-8">
+                                                    <label for="childPermission">Child Permission</label>
+                                                    <select class="form-control" id="childPermission" multiple="multiple" name="childPermission[]">
+                                                        <option value="none">1. None</option>
+                                                    </select>
+                                                    <sub>Multiple Option choice-able  <span class="badge bg-secondary">Ctrl + </span> OR <span class="badge bg-primary">Shift + </span></sub>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <button class="btn btn-primary btn-chl float-end" id="perAdding" name="perAdding" type="submit" onclick="return confirm('Are you sure!')"><i class="fas fa-plus"></i> Add</button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    @endif
+                                        </form>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <br>
+                                            <table id="datatablesSimple">
+                                                <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Parent Permission Name</th>
+                                                    <th>Child Permission Name</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                                </thead>
+                                                <tfoot>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Parent Permission Name</th>
+                                                    <th>Child Permission Name</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                                </tfoot>
+                                                <tbody>
+                                                @if(count($userPermissions))
+                                                    @php
+                                                        $i=1;
+                                                    @endphp
+                                                    @foreach($userPermissions as $p)
+                                                        <tr>
+                                                            <td>{!! $i++ !!}</td>
+                                                            <td>
+                                                                <span class="text-capitalize">
+                                                                    {!! $p->permissionParent->display_name !!}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-capitalize">
+                                                                    @if($p->is_parent == null) {!! str_replace('_',' ',$p->permission_name) !!} @endif
+                                                                </span>
+                                                            </td>
 
+                                                            <td class="">
+                                                                <form action="{!! route('remove.user.permission') !!}" class="display-inline" method="post">
+                                                                    @method('delete')
+                                                                    @csrf
+                                                                    <input type="hidden" name="user_id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($user->id) !!}">
+                                                                    <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($p->id) !!}">
+                                                                    <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this permission?')"><i class="fas fa-trash"></i></button>
+                                                                </form>
+
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @else
+                                                    <tr>
+                                                        <td colspan="4" class="text-center text-danger">Not found!</td>
+                                                    </tr>
+                                                @endif
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 @endif
                             </div>
                         </div>
