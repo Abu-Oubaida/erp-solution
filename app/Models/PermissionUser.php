@@ -9,7 +9,7 @@ class PermissionUser extends Model
 {
     use HasFactory;
     protected $fillable = ['permission_name','parent_id'];
-
+    protected $table = 'permission_users';
     public function permissionParent()
     {
         return $this->belongsTo(Permission::class,'parent_id');

@@ -28,9 +28,8 @@
                                 <div class="col-md-3">
                                     <div class="form-floating mb-">
                                         <select class="form-control" name="permission_parent" id="permission_parent" required>
-                                            <option value="null">Null</option>
                                             @foreach($permissions as $p)
-                                                <option value="{!! $p->id !!}">{!! $p->display_name !!}</option>
+                                                <option value="{!! $p->id !!}" @if(old('permission_parent') == $p->id) selected @endif>{!! $p->display_name !!}</option>
                                             @endforeach
                                         </select>
                                         <label for="permission_parent">Permission Parent<span class="text-danger">*</span></label>
@@ -39,15 +38,15 @@
                                 <div class="col-md-3">
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="permission_name" name="permission_name" type="text" placeholder="Enter Permission Name" value="{{old('permission_name')}}" required/>
-                                        <label for="permission_name">Permission_Name</label>
+                                        <label for="permission_name">Permission_Name<span class="text-danger">*</span></label>
                                         <sub>Permission name must be seperated by under_score ( a_b )</sub>
                                     </div>
                                 </div>
 
                                 <div class="col-md-3">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="permission_display_name" name="permission_display_name" type="number" placeholder="Enter Permission Display Name" value="{{old('permission_display_name')}}" required/>
-                                        <label for="permission_display_name">Display Name</label>
+                                        <input class="form-control" id="permission_display_name" name="permission_display_name" type="text" placeholder="Enter Permission Display Name" value="{{old('permission_display_name')}}" required/>
+                                        <label for="permission_display_name">Display Name<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
 
@@ -97,7 +96,7 @@
                     <tbody>
                     @if(isset($permissions) && count($permissions))
                         @php
-                            $no= 1;
+                            $no= count($permissions);
                         @endphp
                         @foreach($permissions as $data)
                             <tr>
@@ -137,7 +136,7 @@
                                     </td>
                                 </tr>
                             @endforeach
-                            @php($no++)
+                            @php($no--)
                         @endforeach
                     @else
                         <tr>

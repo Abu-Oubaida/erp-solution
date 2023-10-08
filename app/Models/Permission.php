@@ -20,4 +20,6 @@ class Permission extends LaratrustPermission
         return $this->hasMany(Permission::class,'parent_id');
     }
 
+
+
 }
