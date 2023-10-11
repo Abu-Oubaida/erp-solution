@@ -14,165 +14,76 @@
 
 {{--#2.1 Super Admin Components Start--}}
         <group3>
-            @if(\Illuminate\Support\Facades\Auth::user()->hasRole('superadmin'))
-                @include('layouts.back-end.sidebar-components.interface._only_super_admin')
-            @endif
+        @if(\Illuminate\Support\Facades\Auth::user()->hasRole('superadmin'))
+            @include('layouts.back-end.sidebar-components.interface._only_super_admin')
+        @endif
         </group3>{{--#2.1 Super Admin Components End--}}
 {{--#2.2    User Management Start--}}
         <group4>
 {{--#2.2.1  Permission Chck User Management Start--}}
-            @if(auth()->user()->hasPermission('add_department') || auth()->user()->hasPermission('add_user') || auth()->user()->hasPermission('list_user') || auth()->user()->hasPermission('view_user') || auth()->user()->hasPermission('edit_user') || auth()->user()->hasPermission('delete_user') || auth()->user()->hasPermission('add_department'))
+        @if(auth()->user()->hasPermission('add_department') || auth()->user()->hasPermission('add_user') || auth()->user()->hasPermission('list_user') || auth()->user()->hasPermission('view_user') || auth()->user()->hasPermission('edit_user') || auth()->user()->hasPermission('delete_user') || auth()->user()->hasPermission('add_department'))
 {{--#2.2.1.1   Route/URL Chck and set navigation header User Management Start--}}
-                <subgroup1>
-                @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department'|| Route::currentRouteName() == 'user.edit')
-                    <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="true" aria-controls="userLayouts">
-                        <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>
-                        User Management
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div class="collapse show" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                @else
-                    <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="false" aria-controls="userLayouts">
-                        <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>
-                        User Management
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div class="collapse" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                @endif
-                        <nav class="sb-sidenav-menu-nested nav ">
-{{--                        Only User Related Menu and Submenu is here--}}
-                            @include('layouts.back-end.sidebar-components.interface._user_menu_submenu')
-{{--                        Only Department Related Menu and Submenu is here--}}
-                            @include('layouts.back-end.sidebar-components.interface._department_menu_submenu')
-                        </nav>
-                    </div>
-                </subgroup1>{{--#2.2.1.1   Route/URL Chck and set navigation header User Management End--}}
-                @endif{{--#2.2.1  Permission Chck User Management End--}}
+            <subgroup1>
+            @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department'|| Route::currentRouteName() == 'user.edit')
+                <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="true" aria-controls="userLayouts">
+                    <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>
+                    User Management
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse show" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+            @else
+                <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts" aria-expanded="false" aria-controls="userLayouts">
+                    <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>
+                    User Management
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="userLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+            @endif
+                    <nav class="sb-sidenav-menu-nested nav ">
+{{--                    Only User Related Menu and Submenu is here--}}
+                        @include('layouts.back-end.sidebar-components.interface._user_menu_submenu')
+{{--                    Only Department Related Menu and Submenu is here--}}
+                        @include('layouts.back-end.sidebar-components.interface._department_menu_submenu')
+                    </nav>
+                </div>
+            </subgroup1>{{--#2.2.1.1   Route/URL Chck and set navigation header User Management End--}}
+        @endif{{--#2.2.1  Permission Chck User Management End--}}
         </group4>{{--#2.2    User Management End--}}
 
-{{--Accounts File Storage System--}}
-        {{--If Has Account File permission ALL Start--}}
+{{--#2.3    Accounts File Storage System Start--}}
+        <group5>
+{{--#2.3.1  Permission Chck Accounts File Storage System Start--}}
             @if(auth()->user()->hasPermission('add_voucher_type') || auth()->user()->hasPermission('edit_voucher_type') || auth()->user()->hasPermission('delete_voucher_type') || auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document'))
-                {{--Routhe Check For All Type of Accounts Option Here--}}
+{{--#2.3.1.1   Route/URL Chck and set navigation header Accounts File Storage Start--}}
+                <subgroup1>
                 @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info')
                     <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts" aria-expanded="true" aria-controls="accLayouts">
-                @else
-                    <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts" aria-expanded="false" aria-controls="accLayouts">
-                @endif
                         <div class="sb-nav-link-icon"><i class="fas fa-file-invoice-dollar"></i></div>
                         Accounts File
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
-                    @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info')
-                        <div class="collapse show" id="accLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                    @else
-                        <div class="collapse" id="accLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                    @endif
-                            <nav class="sb-sidenav-menu-nested nav ">
-                            @if(auth()->user()->hasPermission('add_voucher_type'))
-                                @if(Route::currentRouteName() == 'add.voucher.type')
-                                    <a class="nav-link" href="{{route('add.voucher.type')}}">
-                                        <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Voucher Type
-                                    </a>
-                                @else
-                                    <a class="nav-link text-chl" href="{{route('add.voucher.type')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Voucher Type</a>
-                                @endif
-                            @endif
-                            @if(auth()->user()->hasPermission('edit_voucher_type'))
-                                @if(Route::currentRouteName() == 'edit.voucher.type')
-                                    <a class="nav-link" href="{{route("edit.voucher.type",['voucherTypeID'=>\Illuminate\Support\Facades\Request::route('voucherTypeID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Voucher Type Edit</a>
-                                @endif
-                            @endif
-{{--                        Upload Option Start Here--}}
-                            @if(auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document'))
+                    <div class="collapse show" id="accLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                @else
+                    <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts" aria-expanded="false" aria-controls="accLayouts">
+                        <div class="sb-nav-link-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        Accounts File
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="accLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                @endif
+                        <nav class="sb-sidenav-menu-nested nav ">
+{{--                    Only Accounts Document related menu and submenu--}}
+                        @include('layouts.back-end.sidebar-components.interface.accounts._type_menu_submenu')
+{{--                    Only Document Upload related menu and submenu Here--}}
+                        @include('layouts.back-end.sidebar-components.interface.accounts._add_document_menu_submenu')
+{{--                    Only List of Documet related menu and submenu Here--}}
+                        @include('layouts.back-end.sidebar-components.interface.accounts._uploded_document_list_menu_submenu')
+                        </nav>
+                    </div>
+                </subgroup1>{{--#2.3.1.1   Route/URL Chck and set navigation header Accounts File Storage End--}}
+            @endif {{--#2.3.1  Permission Chck Accounts File Storage System End--}}
+        </group5>{{--#2.3    Accounts File Storage System End--}}
 
-                                @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info')
-                                    <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="true" aria-controls="pagesUploadOption">
-                                        <div class="sb-nav-link-icon"><i class="fas fa-upload" aria-hidden="true"></i></div>
-                                        Upload Option
-                                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                                    </a>
-                                    <div class="collapse show" id="pagesUploadOption" aria-labelledby="headingOne" data-bs-parent="#pagesUploadOption">
-                                @else
-                                    <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="false" aria-controls="pagesUploadOption">
-                                        <div class="sb-nav-link-icon"><i class="fas fa-upload" aria-hidden="true"></i></div>
-                                        Upload Option
-                                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                                    </a>
-                                    <div class="collapse" id="pagesUploadOption" aria-labelledby="headingOne" data-bs-parent="#pagesUploadOption">
-                                @endif
-                                        <nav class="sb-sidenav-menu-nested nav">
-{{--                                    Upload Voucher Permission Check Start--}}
-                                        @if(auth()->user()->hasPermission('add_voucher_document'))
-                                            @if(Route::currentRouteName() == 'add.voucher.info')
-                                                <a class="nav-link" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Voucher</a>
-                                            @else
-                                                <a class="nav-link text-chl" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Voucher</a>
-                                            @endif
-                                        @endif
-{{--                                    Upload Voucher Permission Check End--}}
-{{--                                    Upload FR Permission Check Start--}}
-                                        @if(auth()->user()->hasPermission('add_fr_document'))
-                                            @if(Route::currentRouteName() == 'add.fr.info')
-                                                <a class="nav-link" href="{{route('add.fr.info')}}"><div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div> FR</a>
-                                            @else
-                                                <a class="nav-link text-chl" href="{{route('add.fr.info')}}"><div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div> FR</a>
-                                            @endif
-                                        @endif
-{{--                                    Upload FR Permission Check End--}}
-{{--                                    Upload Bill Permission Check Start--}}
-                                        @if(auth()->user()->hasPermission('add_bill_document'))
-                                            @if(Route::currentRouteName() == 'add.bill.info')
-                                                <a class="nav-link" href="{{route('add.bill.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill"></i></div> Bill</a>
-                                            @else
-                                                <a class="nav-link text-chl" href="{{route('add.bill.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill"></i></div> Bill</a>
-                                            @endif
-                                        @endif
-{{--                                    Upload Bill Permission Check End--}}
-                                        </nav>
-                                    </div>
-                            @endif {{--Upload Option End Here--}}
-{{--                        List of Documet Permission Check Start--}}
-                            @if(auth()->user()->hasPermission('list_voucher_document'))
-                                @if(Route::currentRouteName() == 'uploaded.voucher.list')
-                                    <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadList" aria-expanded="true" aria-controls="pagesUploadList">
-                                        <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div>
-                                        Uploaded List
-                                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                                    </a>
-                                    <div class="collapse show" id="pagesUploadList" aria-labelledby="headingOne" data-bs-parent="#pagesUploadList">
-                                @else
-                                    <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadList" aria-expanded="false" aria-controls="pagesUploadList">
-                                        <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div>
-                                        Uploaded List
-                                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                                    </a>
-                                    <div class="collapse" id="pagesUploadList" aria-labelledby="headingOne" data-bs-parent="#pagesUploadList">
-                                @endif
-                                        <nav class="sb-sidenav-menu-nested nav">
-                                            @if(Route::currentRouteName() == 'uploaded.voucher.list')
-                                                <a class="nav-link" href="{{route('uploaded.voucher.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Voucher List</a>
-                                            @else
-                                                <a class="nav-link text-chl" href="{{route('uploaded.voucher.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Voucher List</a>
-                                            @endif
-
-{{--                                            @if(Route::currentRouteName() == 'add.fr.info')--}}
-{{--                                                <a class="nav-link" href="{{route('add.fr.info')}}"><div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div> FR</a>--}}
-{{--                                            @else--}}
-{{--                                                <a class="nav-link text-chl" href="{{route('add.fr.info')}}"><div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div> FR</a>--}}
-{{--                                            @endif--}}
-
-{{--                                            @if(Route::currentRouteName() == 'add.bill.info')--}}
-{{--                                                <a class="nav-link" href="{{route('add.bill.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill"></i></div> Bill</a>--}}
-{{--                                            @else--}}
-{{--                                                <a class="nav-link text-chl" href="{{route('add.bill.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-money-bill"></i></div> Bill</a>--}}
-{{--                                            @endif--}}
-                                        </nav>
-                                    </div>
-                            @endif{{--List of Documet Permission Check End--}}
-                            </nav>
-                        </div>
-            @endif {{--If Has Account File permission ALL Start--}}
 
 {{--Complain section--}}
             @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'individual.list.complain'|| Route::currentRouteName() == 'my.list.complain'|| Route::currentRouteName() == 'single.view.complain' || Route::currentRouteName() == 'edit.me.complain' || Route::currentRouteName() == 'my.complain.trash.list' || Route::currentRouteName() == 'departmental.list.complain')
