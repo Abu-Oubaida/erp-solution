@@ -20,7 +20,7 @@ class CustomSeparatorRule implements Rule
 
     public function validate($attribute, $value, $parameters, $validator)
     {
-        $separator = $parameters[0] ?? '-'; // Default separator is '-'
+        $separator = $parameters[0] ?? '_'; // Default separator is '-'
 
         $pattern = "/^[a-zA-Z0-9]+{$separator}[a-zA-Z0-9]+{$separator}[a-zA-Z0-9]+$/";
 

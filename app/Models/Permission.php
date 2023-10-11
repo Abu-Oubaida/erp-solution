@@ -17,7 +17,7 @@ class Permission extends LaratrustPermission
 
     public function childPermission()
     {
-        return $this->hasMany(Permission::class,'parent_id');
+        return $this->hasMany(Permission::class,'parent_id')->orderBy('name','asc');
     }
 
 

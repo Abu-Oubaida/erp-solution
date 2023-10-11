@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\superadmin\ajaxRequestController;
 use App\Http\Controllers\superadmin\DepartmentController;
 use App\Http\Controllers\superadmin\MobileSIMController;
 use App\Http\Controllers\superadmin\prorammerController;
@@ -18,7 +19,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('root');
 Route::post('upload', [ImageController::class,'upload'])->name('editor-img-upload');
-Route::controller(\App\Http\Controllers\superadmin\ajaxRequestController::class)->group(function (){
+Route::controller(ajaxRequestController::class)->group(function (){
     Route::post('fiend-permission-child','fienPermissionChild')->name('fien.permission.child');
 });
 Route::group(['middleware' => ['auth']],function (){
@@ -32,28 +33,6 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['post','get'],'permission-input','create')->name('permission.input');
             Route::delete('permission-input-delete','delete')->name('permission.input.delete');
         });
-
-        Route::controller(UserController::class,)->group(function (){
-            Route::match(['post','get'],'add-user','create')->name('add.user');
-            Route::get('user-list','show')->name('user.list');
-            Route::get('user-view/{userID}','SingleView')->name('user.single.view');
-            Route::match(['put','get'],'user-edit/{userID}','UserEdit')->name('user.edit');
-            Route::delete('user-delete','UserDelete')->name('user.delete');
-            Route::post('user-per-add','UserPerSubmit');
-            Route::post('user-per-delete','UserPerDelete');
-            Route::post('user-status-change','userStatusChange')->name('user.status.change');
-            Route::post('user-role-change','userRoleChange')->name('user.role.change');
-            Route::post('user-password-change','userPasswordChange')->name('user.password.change');
-            Route::post('user-dept-change','userDepartmentChange')->name('user.dept.change');
-        });
-        //Department
-        Route::controller(DepartmentController::class)->group(function (){
-            Route::match(['post','get'],'add-department','create')->name('add.department');
-        });
-        //Mobile SIM Controller
-        Route::controller(MobileSIMController::class)->group(function (){
-            Route::match(['post','get'],'add-number','create')->name('add.number');
-        });
         //User Permission Controller
         Route::controller(UserPermissionController::class)->group(function (){
             Route::post('add-user-permission','addPermission')->name('add.user.permission');
@@ -62,20 +41,56 @@ Route::group(['middleware' => ['auth']],function (){
 
     });//Super Admin End
 
-    Route::get("filemanager", [FileManagerController::class,'index'])->name('file-manager');
+    Route::controller(UserController::class,)->group(function (){
+        Route::middleware(['permission:add_user'])->group(function (){
+            Route::match(['post','get'],'add-user','create')->name('add.user');
+        });
+        Route::middleware(['permission:list_user'])->group(function (){
+            Route::get('user-list','show')->name('user.list');
+        });
+        Route::middleware(['permission:view_user'])->group(function (){
+            Route::get('user-view/{userID}','SingleView')->name('user.single.view');
+        });
+        Route::middleware(['permission:edit_user'])->group(function (){
+            Route::match(['put','get'],'user-edit/{userID}','UserEdit')->name('user.edit');
+            Route::post('user-status-change','userStatusChange')->name('user.status.change');
+            Route::post('user-role-change','userRoleChange')->name('user.role.change');
+            Route::post('user-password-change','userPasswordChange')->name('user.password.change');
+            Route::post('user-dept-change','userDepartmentChange')->name('user.dept.change');
+        });
+        Route::middleware(['permission:delete_user'])->group(function (){
+            Route::delete('user-delete','UserDelete')->name('user.delete');
+        });
+//        Route::post('user-per-add','UserPerSubmit');
+//        Route::post('user-per-delete','UserPerDelete');
+    });
+    //Department
+    Route::controller(DepartmentController::class)->group(function (){
+        Route::middleware(['permission:add_department'])->group(function (){
+            Route::match(['post','get'],'add-department','create')->name('add.department');
+        });
+    });
+    //Mobile SIM Controller
+    Route::controller(MobileSIMController::class)->group(function (){
+        Route::match(['post','get'],'add-number','create')->name('add.number');
+    });
+
+    Route::middleware(['permission:file_manager'])->group(function (){
+        Route::get("filemanager", [FileManagerController::class,'index'])->name('file-manager');
+    });
 
     Route::controller(AccountVoucherController::class)->group(function (){
-        Route::middleware(['permission:voucher_type_add'])->group(function () {
+        Route::middleware(['permission:add_voucher_type'])->group(function () {
             Route::match(['post','get'],'add-voucher-type','createVoucherType')->name('add.voucher.type');
         });
-        Route::middleware(['permission:voucher_type_edit'])->group(function (){
+        Route::middleware(['permission:edit_voucher_type'])->group(function (){
             Route::match(['put','get'],'edit-voucher-type/{voucherTypeID}','editVoucherType')->name('edit.voucher.type');
         });
-        Route::middleware(['permission:voucher_type_delete'])->group(function (){
+        Route::middleware(['permission:delete_voucher_type'])->group(function (){
             Route::delete('delete-voucher-type','deleteVoucherType')->name('delete.voucher.type');
         });
 
-        Route::middleware(['permission:voucher_document_upload'])->group(function () {
+        Route::middleware(['permission:add_voucher_document'])->group(function () {
             // Your routes that require 'add_module' permission
             Route::match(['post','get'],'add-voucher','create')->name('add.voucher.info');
         });

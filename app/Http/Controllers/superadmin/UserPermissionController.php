@@ -66,16 +66,21 @@ class UserPermissionController extends Controller
                             $existingPermissionChild = $user->permissions()->where('permission_name', $permissionChild->name)->first();
                             if (!$existingPermissionChild)
                             {
-                                $id = $user->permissions()->create([
+                                $create = $user->permissions()->create([
                                     'permission_name' => $permissionChild->name,
                                     'parent_id' => $parentPermission,
-                                ])->id;
-                                PermissionUserHistory::create([
-                                    'admin_id'=>Auth::user()->id,
-                                    'user_id'=>$user->id,
-                                    'permission_id'=>$id,
-                                    'operation_name'=> 'added',
                                 ]);
+                                if ($create->id)
+                                {
+                                    PermissionUserHistory::create([
+                                        'admin_id'=>Auth::user()->id,
+                                        'user_id'=>$user->id,
+                                        'permission_id'=>$create->id,
+                                        'operation_name'=> 'added',
+                                    ]);
+                                    return back()->with('success','Permission added successfully.');
+                                }
+                                return back()->with('warning','Permission added successfully. But History add not possible');
                             }
                         }
                     }
@@ -96,7 +101,7 @@ class UserPermissionController extends Controller
         $request->validate([
             'id' => 'required|string',
         ]);
-//        try {
+        try {
             extract($request->post());
 
             $pid = Crypt::decryptString($id);
@@ -111,9 +116,9 @@ class UserPermissionController extends Controller
                 'operation_name'=> 'deleted',
             ]);
             return back()->with('success','Permission removed successfully.');
-//        }catch (\Throwable $exception)
-//        {
-//            return back()->with('error',$exception->getMessage())->withInput();
-//        }
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
     }
 }

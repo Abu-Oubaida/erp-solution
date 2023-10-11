@@ -79,7 +79,7 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
-                    <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                    <h3 class="text-capitalize">Your Added/Updated Documents List</h3>
                 </div>
                 <div class="row">
                     <div class="col-md-12">

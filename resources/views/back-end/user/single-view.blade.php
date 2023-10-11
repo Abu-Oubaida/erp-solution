@@ -170,6 +170,9 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
+                                <h6><b>User All Module/Interface Permissions</b></h6>
+                            </div>
+                            <div class="col-md-12">
                                 @if(!($user))
                                     <div class="row">
                                         <div class="col-md-12 text-center text-danger">
@@ -246,7 +249,7 @@
                                                             </td>
                                                             <td>
                                                                 <span class="text-capitalize">
-                                                                    @if($p->is_parent == null) {!! str_replace('_',' ',$p->permission_name) !!} @endif
+                                                                    @if($p->is_parent == null) {!! /*str_replace('_',' ',$p->permission_name)*/ $p->permission_name!!}@endif
                                                                 </span>
                                                             </td>
 

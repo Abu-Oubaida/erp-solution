@@ -97,9 +97,10 @@ if(window.location.port)
                                     $("#"+actionID).html(response);
                                 }
                                 let counter = 2
+                                let response = "<option value=\"none\">1. None</option>";
                                 permissions.forEach(function(permission) {
-                                    let response = "<option value=\"" + permission.name + "\">"+ counter++ +". " + permission.display_name +"</option>";
-                                    $("#"+actionID).append(response);
+                                    response += "<option value=\"" + permission.name + "\">"+ counter++ +". " + permission.display_name +"</option>";
+                                    $("#"+actionID).html(response);
                                 });
                             }
                         }

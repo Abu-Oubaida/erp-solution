@@ -20,7 +20,7 @@ class prorammerController extends Controller
             {
                 $this->store($request);
             }
-            $permissions = Permission::with('childPermission')->where('parent_id',null)->orderBy('id','DESC')->get();
+            $permissions = Permission::with('childPermission')->where('parent_id',null)->orderBy('id','ASC')->get();
             return view('back-end/programmer/add',compact("permissions"));
         }catch (\Throwable $exception)
         {
@@ -32,7 +32,7 @@ class prorammerController extends Controller
     {
         $rules= [
             'permission_parent'  => ['string','required', 'max:255','exists:permissions,id'],
-            'permission_name'  => ['string','required', 'max:255','custom_separator:_','unique:permissions,name'],
+            'permission_name'  => ['string','required', 'max:255','regex:/^[a-z0-9_]+$/','unique:permissions,name'],
             'permission_display_name'  => ['string','required', 'max:255','unique:permissions,display_name'],
             'description'  => ['string','sometimes','nullable', 'max:255'],
         ];

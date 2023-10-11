@@ -39,7 +39,7 @@
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="permission_name" name="permission_name" type="text" placeholder="Enter Permission Name" value="{{old('permission_name')}}" required/>
                                         <label for="permission_name">Permission_Name<span class="text-danger">*</span></label>
-                                        <sub>Permission name must be seperated by under_score ( a_b )</sub>
+                                        <sub>Only acceptable character are " a-z and 0-9_ " </sub>
                                     </div>
                                 </div>
 
@@ -96,17 +96,18 @@
                     <tbody>
                     @if(isset($permissions) && count($permissions))
                         @php
-                            $no= count($permissions);
+//                            $no= count($permissions);
+                            $no= 1;
                         @endphp
                         @foreach($permissions as $data)
                             <tr>
-                                <td>{!! $no !!}</td>
-                                <td>{!! $data->display_name   !!}</td>
-                                <td>{!! $data->name   !!}</td>
-                                <td>{!! $data->display_name   !!}</td>
-                                <td>{!! $data->description   !!}</td>
-                                <td>{!! date('d-M-y',strtotime($data->created_at))   !!}</td>
-                                <td>{!! date('d-M-y',strtotime($data->updated_at))   !!}</td>
+                                <td><strong>{!! $no !!}</strong></td>
+                                <td><strong>{!! $data->parent_id == null ?"NULL":$data->display_name   !!}</strong></td>
+                                <td><strong>{!! $data->name   !!}</strong></td>
+                                <td><strong>{!! $data->display_name   !!}</strong></td>
+                                <td><strong>{!! $data->description   !!}</strong></td>
+                                <td><strong>{!! date('d-M-y',strtotime($data->created_at))   !!}</strong></td>
+                                <td><strong>{!! date('d-M-y',strtotime($data->updated_at))   !!}</strong></td>
                                 <td>
                                     <form action="{{route('permission.input.delete')}}" class="display-inline" method="post">
                                         @method('delete')
@@ -136,7 +137,7 @@
                                     </td>
                                 </tr>
                             @endforeach
-                            @php($no--)
+                            @php($no++)
                         @endforeach
                     @else
                         <tr>

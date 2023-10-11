@@ -144,7 +144,8 @@ class AccountVoucherController extends Controller
                 return $this->store($request);
             }
             $voucherTypes = VoucherType::where('status',1)->get();
-            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->get();
+            $user = Auth::user();
+            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->get();
 //            dd($voucherInfos);
             return view('back-end/account-voucher/add',compact("voucherTypes","voucherInfos"));
         }catch (\Throwable $exception)
