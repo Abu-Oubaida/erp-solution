@@ -16,7 +16,9 @@
             </div>
             <div class="col-md-2">
                 <div class="float-end">
-                    <a class="btn btn-success btn-sm" href="{{route('add.user')}}"><i class="fas fa-list-ol"></i> Add User</a>
+                    @if(auth()->user()->hasPermission('add_voucher_document'))
+                    <a class="btn btn-success btn-sm" href="{{route('add.voucher.info')}}"><i class="fas fa-upload" aria-hidden="true"></i> Upload Voucher</a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -26,86 +28,7 @@
                 {{str_replace('.', ' ', \Route::currentRouteName())}}
             </div>
             <div class="card-body">
-                <table id="datatablesSimple">
-                    <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Employee ID</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Dept.</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tfoot>
-                    <tr>
-                        <th>No</th>
-                        <th>Employee ID</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Dept.</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                    </tfoot>
-                    <tbody>
-                    @if(count($users))
-                        @php
-                        $i=1;
-                        @endphp
-                        @foreach($users as $u)
-                            <tr>
-                                <td>{!! $i++ !!}</td>
-                                <td>{!! $u->employee_id !!}</td>
-                                <td>{!! $u->name !!}</td>
-                                <td>{!! $u->phone !!}</td>
-                                <td>{!! $u->email !!}</td>
-                                <td>{!! $u->dept_name !!}</td>
-                                <td>{!! $u->display_name !!}</td>
-                                <td>@if($u->status == 1) {!! '<span class="text-primary">Active</span>' !!}  @else {!! '<span class="text-danger">Inactive</span>' !!} @endif</td>
-                                <td class="">
-                                    <a href="{{route('user.single.view',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-primary" title="View"><i class='fas fa-eye'></i></a>
-                                    <a href="{{route('user.edit',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
-                                    <form action="{{route('user.delete')}}" class="display-inline" method="post">
-                                        @method('delete')
-                                        @csrf
-                                        <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($u->id) !!}">
-                                        <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the user?')"><i class="fas fa-trash"></i></button>
-                                    </form>
-
-{{--                                    <button type="button" class="btn btn-sm btn-primary" value="{!! $u->id !!}" onclick="return Obj.receivedComplainAction(this,'complain-action')" data-bs-toggle="modal" data-bs-target="#complain-action"> View </button>--}}
-                                </td>
-                            </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="6" class="text-center text-danger">Not found!</td>
-                        </tr>
-                    @endif
-                    </tbody>
-                </table>
-                <div class="modal fade" id="complain-action" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                ...
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary">Understood</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @include('back-end.account-voucher._voucher_list')
             </div>
         </div>
     </div>

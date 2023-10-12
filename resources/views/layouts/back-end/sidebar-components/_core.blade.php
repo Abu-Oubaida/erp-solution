@@ -9,7 +9,7 @@
         Dashboard
     </a>
 @endif
-@if(auth()->user()->hasPermission('add_department'))
+@if(auth()->user()->hasPermission('file_manager'))
     <a class="nav-link text-chl" href="{{route('file-manager')}}">
         <div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div>
         File Manager

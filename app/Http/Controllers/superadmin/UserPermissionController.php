@@ -53,6 +53,9 @@ class UserPermissionController extends Controller
                 //child permission
                 if (count($childPermission) != 0)
                 {
+                    $error = 0;
+                    $historyError = 0;
+                    $success = 0;
                     foreach ($childPermission as $data)
                     {
                         if (!($data == 'none'))
@@ -60,7 +63,7 @@ class UserPermissionController extends Controller
                             $permissionChild = Permission::where('parent_id',$parentPermission)->where('name',$data)->first();
                             if (!$permissionChild)
                             {
-                                return back()->with('error','Invalid child permission '.$data);
+                                return back()->with('error','Invalid child permission ('.$data.')');
                             }
                             // Check if the permission already exists for the user
                             $existingPermissionChild = $user->permissions()->where('permission_name', $permissionChild->name)->first();
@@ -72,19 +75,50 @@ class UserPermissionController extends Controller
                                 ]);
                                 if ($create->id)
                                 {
-                                    PermissionUserHistory::create([
+                                    $h = PermissionUserHistory::create([
                                         'admin_id'=>Auth::user()->id,
                                         'user_id'=>$user->id,
                                         'permission_id'=>$create->id,
                                         'operation_name'=> 'added',
                                     ]);
-                                    return back()->with('success','Permission added successfully.');
+                                   ($h)? $success++ : $historyError++;
+                                }else{
+                                    $error++;
                                 }
-                                return back()->with('warning','Permission added successfully. But History add not possible');
+                            }
+                        }
+                        else{
+                            $permission = Permission::find($parentPermission);
+                            if (!$permission)
+                            {
+                                return back()->with('error','Invalid parent permission ('.$data.')');
+                            }
+                            $existingPermissionParent = $user->permissions()->where('permission_name', $permission->name)->first();
+                            if (!$existingPermissionParent)
+                            {
+                                $create = $user->permissions()->create([
+                                    'permission_name' => $permission->name,
+                                    'parent_id' => $parentPermission,
+                                ]);
+                                if ($create->id)
+                                {
+                                    $h = PermissionUserHistory::create([
+                                        'admin_id'=>Auth::user()->id,
+                                        'user_id'=>$user->id,
+                                        'permission_id'=>$create->id,
+                                        'operation_name'=> 'added',
+                                    ]);
+                                    ($h)? $success++ : $historyError++;
+                                }else{
+                                    $error++;
+                                }
                             }
                         }
                     }
-                    return back()->with('success','Permission added successfully.');
+                    if ($success > $error+$historyError)
+                        return back()->with('success','Maximum number of permission added successfully! Please verify on list');
+                    elseif ($success < $error+$historyError)
+                        return back()->with('error','Maximum number of permission added not possible! Please verify on list');
                 }
                 return back()->with('error','No options are selected');
             }

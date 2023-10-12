@@ -217,4 +217,27 @@ class AccountVoucherController extends Controller
         }
 
     }
+
+    public function voucherList()
+    {
+        try {
+            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->get();
+            return view('back-end/account-voucher/list',compact('voucherInfos'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function voucherDocumentView($vID)
+    {
+        try {
+            $id = Crypt::decryptString($vID);
+            $document = VoucherDocument::find($id);
+            return view('back-end/account-voucher/single-view',compact('document'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
 }

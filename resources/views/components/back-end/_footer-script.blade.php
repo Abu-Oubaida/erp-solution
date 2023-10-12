@@ -47,3 +47,16 @@
         $(".alert").hide(500)
     })
 </script>
+{{--<script>--}}
+{{--    // Disable right-click context menu--}}
+{{--    window.addEventListener('contextmenu', function (e) {--}}
+{{--        e.preventDefault();--}}
+{{--    });--}}
+
+{{--    // Disable F12 key--}}
+{{--    window.addEventListener('keydown', function (e) {--}}
+{{--        if (e.key === 'F12') {--}}
+{{--            e.preventDefault();--}}
+{{--        }--}}
+{{--    });--}}
+{{--</script>--}}

@@ -144,7 +144,7 @@ class UserController extends Controller
             unset($fileManagers[0]);
             unset($fileManagers[1]);
             $permissionParents = Permission::where('parent_id',null)->get();
-            $userPermissions = PermissionUser::with('permissionParent')->where('user_id',$userID)->orderBy('parent_id','DESC')->get();
+            $userPermissions = PermissionUser::with('permissionParent')->where('user_id',$userID)->orderBy('permission_name','asc')->get();
             $deptlist = department::where('status',1)->get();
             $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
             $roles = Role::get();
