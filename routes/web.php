@@ -29,7 +29,12 @@ Route::get('/', function () {
 # 2.0 Others Hidden
 Route::post('upload', [ImageController::class,'upload'])->name('editor-img-upload');
 Route::controller(ajaxRequestController::class)->group(function (){
-    Route::post('fiend-permission-child','fienPermissionChild')->name('fien.permission.child');
+# 2.1 Fiend child of a permission only for super admin access
+    Route::post('fiend-permission-child','findPermissionChild')->name('fien.permission.child');
+# 2.2 Fiend voucher document for preview this document on pop-up modal
+    Route::post('fiend-voucher-document','findVoucherDocument')->name('fien.voucher.document');
+# 2.3 Fiend voucher document info for sharing
+    Route::post('fiend-voucher-document-info','findVoucherDocumentInfo')->name('fien.voucher.document.info');
 });//2.0 End
 
 # 3.0 All with Auth

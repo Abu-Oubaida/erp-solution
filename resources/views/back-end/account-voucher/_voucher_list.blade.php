@@ -41,59 +41,11 @@
                     @php $x = 1;@endphp
                     @foreach($data->VoucherDocument as $d)
                         <div>
-                            <strong>{!! $x++ !!}.</strong> {!! $d->document !!} &nbsp; <a href="" data-bs-toggle="modal" data-bs-target="#staticBackdrop_{!! $d->id !!}" title="Quick View"> <i class="fa-solid fa-eye"></i></a> &nbsp;
+                            <strong>{!! $x++ !!}.</strong> {!! $d->document !!} &nbsp; <a href="" title="Quick View" vtype="{!! $data->VoucherType->voucher_type_title !!}" vno="{!! $data->voucher_number !!}" path="{!! \Illuminate\Support\Facades\Crypt::encryptString(url($d->filepath.$d->document)) !!}" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','v_type','v_no')"> <i class="fa-solid fa-eye"></i></a>
+                            &nbsp;
                             <a href="{!! route('view.voucher.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window"><i class="fa-solid fa-up-right-from-square"></i></a>
-                        </div>
-                        <!-- Modal -->
-                        <div class="modal modal-xl fade" id="staticBackdrop_{!! $d->id !!}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel_{!! $d->id !!}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="staticBackdropLabel_{!! $d->id !!}">{!! $d->document !!}</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <strong>Voucher No: {!! $data->voucher_number !!}</strong>
-                                            </div>
-                                            <div class="col-md-6 text-end">
-                                                <strong>Voucher Type: {!! $data->VoucherType->voucher_type_title !!}</strong>
-                                            </div>
-                                        </div>
-                                        @php
-                                            // Extract the file extension
-                                            $fileExtension = pathinfo($d->filepath.$d->document,PATHINFO_EXTENSION);
-                                        @endphp
-
-                                        @if (in_array($fileExtension, ['pdf', 'doc', 'txt','jpg','jpeg','png','JPG'])) <!-- Add your allowed extensions -->
-                                        <!-- Embed the PDF using iframe -->
-                                        <embed src="{{ url($d->filepath.$d->document) }}#toolbar=0" style="width:100%; height:700px;" />
-                                        {{--                                                                @elseif (in_array($fileExtension, ['dox', 'excel', 'xlsx', 'txt','docx']))--}}
-                                        {{--                                                                    <iframe src="https://docs.google.com/viewer?url={{ url($d->filepath.$d->document) }}&embedded=true" style="width: 100%; height: 600px;"></iframe>--}}
-                                        @elseif ($fileExtension === 'mp4')
-                                            <video controls style="width: 100%">
-                                                <source src="{{ url($d->filepath.$d->document) }}" type="video/mp4">
-                                                Your browser does not support the video tag.
-                                            </video>
-                                        @else
-                                            <div class="row">
-                                                <div class="col-md-12 text-center">
-                                                    <h1 class="text-center">Sorry! This file type is not supported for preview.</h1>
-                                                    <a class="btn btn-success text-center" href="{{ url($d->filepath.$d->document) }}" download>
-                                                        Click To Download
-                                                    </a>
-                                                </div>
-                                            </div>
-
-                                        @endif
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary">Understood</button>
-                                    </div>
-                                </div>
-                            </div>
+                            &nbsp;
+                            <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)"><i class="fas fa-share"></i></a>
                         </div>
                     @endforeach
                 </td>
@@ -119,3 +71,61 @@
     @endif
     </tbody>
 </table>
+<!-- Modal For Preview -->
+<div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="v_document_name"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Voucher No: <span id="v_no"></span></strong>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <strong>Voucher Type: <span id="v_type"></span></strong>
+                    </div>
+                </div>
+                <div id="documentPreview"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Understood</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal-2 For Share -->
+<div class="modal modal-xl fade" id="shareModel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="shareModelLabel" aria-hidden="true">
+    <div class="modal-dialog" id="model_dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="v_document_title"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                            <div class="tags-input" id="tags-input">
+                                <input class="tag-input" type="text" list="hello" placeholder="Add a email address" id="tag-input">
+                                <div class="tags" id="tags"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3 float-end">
+                            <button class="btn btn-success" id="submit-tags"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Understood</button>
+            </div>
+        </div>
+    </div>
+</div>

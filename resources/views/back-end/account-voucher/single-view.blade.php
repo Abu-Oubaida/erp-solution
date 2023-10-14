@@ -3,6 +3,16 @@
     <div class="container-fluid px-4">
         <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
         <div class="row">
+            <div class="col-md-5">
+                <h1 class="modal-title fs-5 d-inline-block" id="v_document_name">{!! $document->document !!}</h1>
+            </div>
+            <div class="col-md-7">
+                <span><strong>Voucher Number</strong>:{!! $document->accountVoucherInfo->voucher_number !!}</span>
+                <span class="float-end"><strong>Voucher Type</strong>:{!! $document->accountVoucherInfo->VoucherType->voucher_type_title !!}</span>
+            </div>
+            <div class="col-md-12">
+                <strong>Remarks:</strong> {!! $document->accountVoucherInfo->remarks !!}
+            </div>
             @php
                 // Extract the file extension
                 $fileExtension = pathinfo($document->filepath.$document->document,PATHINFO_EXTENSION);

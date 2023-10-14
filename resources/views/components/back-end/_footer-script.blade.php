@@ -47,6 +47,7 @@
         $(".alert").hide(500)
     })
 </script>
+<script src="{!! url('assets/js/customRawScript.js') !!}"></script>
 {{--<script>--}}
 {{--    // Disable right-click context menu--}}
 {{--    window.addEventListener('contextmenu', function (e) {--}}

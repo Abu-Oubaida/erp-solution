@@ -61,3 +61,47 @@
 .z-index-1 {
     z-index: 10000;
 }
+.tags-input {
+    border: 1px solid #bdbdbd;
+    padding: 5px;
+    display: block;
+    border-radius: 5px;
+    min-height: 100px;
+}
+.tag-input{
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #a6a6a6;
+    padding: 5px;
+    outline: none;
+}
+
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.tag {
+    background-color: #3498db;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+.hr-text {
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.hr-text hr {
+    flex: 1;
+    border: none;
+    height: 1px;
+    background: #000; /* Change the background color as needed */
+    margin: 0 10px;
+}

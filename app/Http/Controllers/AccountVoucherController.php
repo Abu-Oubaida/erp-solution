@@ -233,7 +233,8 @@ class AccountVoucherController extends Controller
     {
         try {
             $id = Crypt::decryptString($vID);
-            $document = VoucherDocument::find($id);
+            $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
+//            dd($document);
             return view('back-end/account-voucher/single-view',compact('document'));
         }catch (\Throwable $exception)
         {
