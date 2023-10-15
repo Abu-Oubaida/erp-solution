@@ -44,6 +44,10 @@ Route::group(['middleware' => ['auth']],function (){
         Route::match(['post','get'],'dashboard','index')->name('dashboard');
         Route::post('change-password','ChangePassword')->name('change.password');
     });//3.1 End
+# 3.2 Send mail for document sharing
+    Route::controller(ajaxRequestController::class)->group(function (){
+        Route::post('share-voucher-document-email','shareVoucherDocument')->name('share.voucher.document');
+    });//3.2 End
 
 # 3.2 Super Admin Controller
     Route::group(['middleware'=>['auth','role:superadmin']],function (){

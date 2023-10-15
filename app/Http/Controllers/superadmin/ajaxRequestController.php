@@ -86,4 +86,23 @@ class ajaxRequestController extends Controller
             ));
         }
     }
+
+    public function shareVoucherDocument(Request $request)
+    {
+        try {
+            extract($request->post());
+            $id = Crypt::decryptString($refId);
+            echo json_encode(array(
+                'results' => $id
+            ));
+        }catch (\Throwable $exception)
+        {
+            echo json_encode(array(
+                'error' => array(
+                    'msg' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                )
+            ));
+        }
+    }
 }

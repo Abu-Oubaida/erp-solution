@@ -100,32 +100,6 @@
 <!-- Modal-2 For Share -->
 <div class="modal modal-xl fade" id="shareModel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="shareModelLabel" aria-hidden="true">
     <div class="modal-dialog" id="model_dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="v_document_title"></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-floating mb-3">
-                            <div class="tags-input" id="tags-input">
-                                <input class="tag-input" type="text" list="hello" placeholder="Add a email address" id="tag-input">
-                                <div class="tags" id="tags"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-floating mb-3 float-end">
-                            <button class="btn btn-success" id="submit-tags"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Understood</button>
-            </div>
-        </div>
+
     </div>
 </div>

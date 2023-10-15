@@ -14,6 +14,7 @@ if(window.location.port)
         $("#ajax_loader").show();
     });
     $(document).ready(function(){
+        const tags = [];
         $('#perAdd').click(function (){
             let per = $("#per").val()
             let dir = $("#dir").val()
@@ -69,6 +70,17 @@ if(window.location.port)
                 })
             }
         })
+        // $('#tag-input').on('keydown',function(event) {
+        //     alert("hello")
+        //     // const pressedKey = event.keyCode;
+        //     // console.log(pressedKey)
+        //     // Obj.tagInput(this, pressedKey);  // Assuming Obj.tagInput is your function
+        //
+        //     // // Prevent the default behavior (e.g., form submission) for certain keys if needed
+        //     // if (pressedKey === 'Enter' || pressedKey === 'Tab') {
+        //     //     event.preventDefault();
+        //     // }
+        // });
         Obj = {
             fiendPermissionChild : function (e,actionID) {
                 let id = $(e).val()
@@ -179,13 +191,52 @@ if(window.location.port)
                         if (data.error){
                             alert(data.error.msg)
                         }else{
+                            while(tags.length > 0) {
+                                tags.pop();
+                            }
                             $('#model_dialog').html(data)
                             $('#shareModel').modal('show')
                         }
                     }
                 })
                 return false
-            }
+            },
+            closeSharingModel:function (e) {
+                while(tags.length > 0) {
+                    tags.pop();
+                }
+
+            },
+            tagInput:function (event)
+            {
+                console.log(tags)
+                const value = $(event).val()
+                const regex = /\s|,/;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (regex.test(value))
+                {
+                    const leanedData = value.replace(/[\s,]/g, '');
+                    if (emailRegex.test(leanedData))
+                    {
+                        const tagValue = leanedData.trim();
+                        const tag = $('<div>').addClass('tag').attr('onclick','return Obj.removeTag(this)').text(tagValue+' 🗙');
+                        $('#tags').append(tag);
+                        $('#tag-input').val('');
+                        tags.push(tagValue);
+                    }
+                }
+            },
+            removeTag:function (event)
+            {
+
+                const tagValue = $(event).text();
+                const index = tags.indexOf(tagValue);
+                if (index !== -1) {
+                    tags.splice(index, 1);
+                }
+                $(event).remove();
+            },
         }
         function checkFileExists(url, callback) {
             const xhr = new XMLHttpRequest();

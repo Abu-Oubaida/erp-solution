@@ -9,8 +9,8 @@
                 <span><i class="fa-regular fa-envelope"></i> You can share your document link via email</span>
                 <div class="form-floating mb-3">
                     <div class="tags-input" id="tags-input">
-                        <input class="tag-input" type="text" list="hello" placeholder="Add a people and group" id="tag-input">
-                        <datalist id="hello">
+                        <input class="tag-input" type="text" list="users" placeholder="Add a people and group" id="tag-input" onkeyup="return Obj.tagInput(this)">
+                        <datalist id="users">
                     @if(count($userEmails))
                         @foreach($userEmails as $u)
                             <option value="{!! $u->email !!}">{!! $u->name !!}</option>
@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-12">
                 <div class="form-floating mb-3 float-end">
-                    <button class="btn btn-success" id="submit-tags"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
+                    <button class="btn btn-success" id="submit-tags" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($results->id) !!}"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
                 </div>
             </div>
 
@@ -63,54 +63,60 @@
     </div>
 </div>
 <script>
-    const tagInput = document.getElementById('tag-input');
-    const tagsDiv = document.getElementById('tags');
-    const submitButton = document.getElementById('submit-tags');
+    {{--const tagInput = document.getElementById('tag-input');--}}
+    {{--const tagsDiv = document.getElementById('tags');--}}
+    {{--const submitButton = document.getElementById('submit-tags');--}}
 
-    const tags = [];
+    {{--const tags = [];--}}
 
-    tagInput.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter' && tagInput.value.trim() !== '') {
-            const tagValue = tagInput.value.trim();
-            const tag = document.createElement('div');
-            tag.classList.add('tag');
-            tag.textContent = tagValue;
-            tagsDiv.appendChild(tag);
-            tagInput.value = '';
-            tags.push(tagValue);
-        }
-    });
+    {{--tagInput.addEventListener('keydown', function(event) {--}}
+    {{--    if (event.key === 'Enter' && tagInput.value.trim() !== '') {--}}
+    {{--        const tagValue = tagInput.value.trim();--}}
+    {{--        const tag = document.createElement('div');--}}
+    {{--        tag.classList.add('tag');--}}
+    {{--        tag.textContent = tagValue;--}}
+    {{--        tagsDiv.appendChild(tag);--}}
+    {{--        tagInput.value = '';--}}
+    {{--        tags.push(tagValue);--}}
+    {{--    }--}}
+    {{--});--}}
 
-    tagsDiv.addEventListener('click', function(event) {
-        if (event.target.classList.contains('tag')) {
-            const tagValue = event.target.textContent;
-            const index = tags.indexOf(tagValue);
-            if (index !== -1) {
-                tags.splice(index, 1);
-            }
-            event.target.remove();
-        }
-    });
+    // tagsDiv.addEventListener('click', function(event) {
+    //     if (event.target.classList.contains('tag')) {
+    //         const tagValue = event.target.textContent;
+    //         const index = tags.indexOf(tagValue);
+    //         if (index !== -1) {
+    //             tags.splice(index, 1);
+    //         }
+    //         event.target.remove();
+    //     }
+    // });
 
-    submitButton.addEventListener('click', function() {
-        // Send the tags to the server via an AJAX request
-        const url = 'YOUR_BACKEND_ENDPOINT'; // Replace with your server endpoint
-        const data = { tags: tags };
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token if needed
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Tags submitted:', data);
-                // Handle the response from the server if needed
-            })
-            .catch(error => console.error('Error:', error));
-    });
+    {{--submitButton.addEventListener('click', function() {--}}
+    {{--    // Send the tags to the server via an AJAX request--}}
+    {{--    const url = window.location.origin + sourceDir + "/share-voucher-document-email";; // Replace with your server endpoint--}}
+    {{--    const refId = this.getAttribute('ref')--}}
+    {{--    const data = { tags: tags , refId: refId};--}}
+    {{--    if(data.tags.length <= 0)--}}
+    {{--    {--}}
+    {{--        alert("Error! Empty Field")--}}
+    {{--        return false--}}
+    {{--    }else {--}}
+    {{--        fetch(url, {--}}
+    {{--            method: 'POST',--}}
+    {{--            headers: {--}}
+    {{--                'Content-Type': 'application/json',--}}
+    {{--                'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token if needed--}}
+    {{--            },--}}
+    {{--            body: JSON.stringify(data)--}}
+    {{--        })--}}
+    {{--            .then(response => response.json())--}}
+    {{--            .then(data => {--}}
+    {{--                console.log('Tags submitted:', data);--}}
+    {{--                // Handle the response from the server if needed--}}
+    {{--            })--}}
+    {{--            .catch(error => console.error('Error:', error));--}}
+    {{--    }--}}
+    {{--});--}}
 
 </script>
