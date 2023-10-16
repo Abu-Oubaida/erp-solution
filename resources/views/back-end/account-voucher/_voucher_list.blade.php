@@ -102,4 +102,7 @@
     <div class="modal-dialog" id="model_dialog">
 
     </div>
+    <div id='ajax_loader2' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+        <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+    </div>
 </div>

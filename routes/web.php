@@ -46,7 +46,7 @@ Route::group(['middleware' => ['auth']],function (){
     });//3.1 End
 # 3.2 Send mail for document sharing
     Route::controller(ajaxRequestController::class)->group(function (){
-        Route::post('share-voucher-document-email','shareVoucherDocument')->name('share.voucher.document');
+        Route::post('share-voucher-document-email','shareVoucherDocumentEmail')->name('share.voucher.document');
     });//3.2 End
 
 # 3.2 Super Admin Controller
@@ -196,6 +196,8 @@ Route::group(['middleware' => ['auth']],function (){
 
 
 });//3.0 End
-
-
+# 4.0 Share Document View
+Route::controller(\App\Http\Controllers\ShareDocumentViewController::class)->group(function (){
+    Route::get('voucher-document-view','voucherDocumentView')->name('voucher.document.view');
+});
 require __DIR__.'/auth.php';

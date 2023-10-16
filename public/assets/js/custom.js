@@ -9,9 +9,11 @@ if(window.location.port)
 (function ($){
     $(document).ajaxStop(function(){
         $("#ajax_loader").hide();
+        $("#ajax_loader2").hide();
     });
     $(document).ajaxStart(function (){
         $("#ajax_loader").show();
+        $("#ajax_loader2").show();
     });
     $(document).ready(function(){
         const tags = [];
@@ -209,7 +211,7 @@ if(window.location.port)
             },
             tagInput:function (event)
             {
-                console.log(tags)
+                // console.log(tags)
                 const value = $(event).val()
                 const regex = /\s|,/;
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -236,6 +238,35 @@ if(window.location.port)
                     tags.splice(index, 1);
                 }
                 $(event).remove();
+            },
+            sendDocumentEmail:function (e)
+            {
+                const url = window.location.origin + sourceDir + "/share-voucher-document-email";
+                const refId = $(e).attr('ref');
+                const message = $('#message').val()
+                // const data = { tags: tags, refId: refId };
+                if (tags.length <= 0) {
+                    alert("Error! Empty Field");
+                    return false;
+                } else {
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        data: {tags: tags, refId: refId, message: message},
+                        success: function(data) {
+                            if (data.error){
+                                alert(data.error.msg)
+                            }else {
+                                data = JSON.parse(data)
+                                alert(data.results)
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                }
             },
         }
         function checkFileExists(url, callback) {

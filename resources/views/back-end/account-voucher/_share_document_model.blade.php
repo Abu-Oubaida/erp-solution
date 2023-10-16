@@ -6,10 +6,10 @@
     <div class="modal-body">
         <div class="row">
             <div class="col-md-12">
-                <span><i class="fa-regular fa-envelope"></i> You can share your document link via email</span>
+                <span><i class="fa-regular fa-envelope"></i> You can share your document link via email <sup class="text-danger">*</sup></span>
                 <div class="form-floating mb-3">
                     <div class="tags-input" id="tags-input">
-                        <input class="tag-input" type="text" list="users" placeholder="Add a people and group" id="tag-input" onkeyup="return Obj.tagInput(this)">
+                        <input class="tag-input" type="text" list="users" placeholder="Add a people and group *" id="tag-input" onkeyup="return Obj.tagInput(this)">
                         <datalist id="users">
                     @if(count($userEmails))
                         @foreach($userEmails as $u)
@@ -22,8 +22,14 @@
                 </div>
             </div>
             <div class="col-md-12">
+                <div class="form-floating mb-3">
+                    <input class="form-control" name="message" id="message"/>
+                    <label for="message">Message</label>
+                </div>
+            </div>
+            <div class="col-md-12">
                 <div class="form-floating mb-3 float-end">
-                    <button class="btn btn-success" id="submit-tags" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($results->id) !!}"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
+                    <button class="btn btn-success" id="submit-tags" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($results->id) !!}" onclick="return Obj.sendDocumentEmail(this)"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
                 </div>
             </div>
 
