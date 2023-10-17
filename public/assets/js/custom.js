@@ -257,9 +257,14 @@ if(window.location.port)
                         success: function(data) {
                             if (data.error){
                                 alert(data.error.msg)
+                                return false
                             }else {
                                 data = JSON.parse(data)
                                 alert(data.results)
+                                if (data.results)
+                                    $('#shareModel').modal('hide')
+                                else
+                                    return false
                             }
                         },
                         error: function(error) {
@@ -268,6 +273,29 @@ if(window.location.port)
                     });
                 }
             },
+            emailLinkStatusChange:function (e) {
+                const ref = $(e).attr('ref')
+                const status = $(e).attr('status')
+                const url = window.location.origin + sourceDir + "/email-link-status-change";
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data: {ref: ref, status: status},
+                    success: function(data) {
+                        if (data.error){
+                            alert(data.error.msg)
+                        }else {
+                            data = JSON.parse(data)
+                            alert(data.results)
+                            $('#shareModel').modal('hide')
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error:', error);
+                    }
+                });
+            }
         }
         function checkFileExists(url, callback) {
             const xhr = new XMLHttpRequest();

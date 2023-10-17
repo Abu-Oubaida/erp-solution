@@ -8,6 +8,8 @@ use App\Models\DocumentShareLinkEmail;
 use App\Models\Permission;
 use App\Models\User;
 use App\Models\VoucherDocument;
+use App\Models\VoucherDocumentShareEmailLink;
+use App\Models\VoucherDocumentShareEmailList;
 use App\Models\VoucherType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,7 +84,11 @@ class ajaxRequestController extends Controller
             $id = Crypt::decryptString($id);
             $results = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
             $userEmails = User::all(['name','email']);
-            return view('back-end/account-voucher/_share_document_model',compact('results','userEmails'));
+            $shareData =VoucherDocumentShareEmailLink::with('ShareEmails')->where('share_document_id',$id)->get();
+//            echo json_encode(array(
+//                'results' => $shareData
+//            ));
+            return view('back-end/account-voucher/_share_document_model',compact('results','userEmails','shareData'));
         }catch (\Throwable $exception)
         {
             echo json_encode(array(
@@ -126,27 +132,42 @@ class ajaxRequestController extends Controller
             {
                 $share_id = $this->generateUniqueId();
                 $shareLink = route('voucher.document.view',['document'=>Crypt::encryptString($id),'share'=>$share_id]);
-                foreach ($tags as $email)
-                {
-                    $insert = DB::table('document_share_link_emails')->insert([
-                        'share_id'  =>  $share_id,
-                        'share_document_id' =>  $id,
-                        'share_email'   =>  $email,
-                        'status'    =>  1,
-                        'shared_by' =>  Auth::user()->id,
-                    ]);
-                    if (!$insert) {
-                        // Rollback the transaction if the second insert for any item failed
-                        DB::rollBack();
-                        echo json_encode(array(
-                            'error' => array(
-                                'msg' => 'Failed to execute the insert.',
-                                'code' => '126',
-                            )
-                        ));
-                    }
+                $insert1 = DB::table('voucher_document_share_email_links')->insertGetId([
+                    'share_id'  =>  $share_id,
+                    'share_document_id' =>  $id,
+                    'status'    =>  1,
+                    'shared_by' =>  Auth::user()->id,
+                ]);
+                if (!$insert1) {
+                    // Rollback the transaction if the second insert for any item failed
+                    DB::rollBack();
+                    echo json_encode(array(
+                        'error' => array(
+                            'msg' => 'Failed to execute the insert.',
+                            'code' => '126',
+                        )
+                    ));
                 }
-                DB::commit();
+                else{
+                    foreach ($tags as $email)
+                    {
+                        $insert2 = DB::table('voucher_document_share_email_lists')->insert([
+                            'share_id'  =>  $insert1,
+                            'email'   =>  $email,
+                        ]);
+                        if (!$insert2) {
+                            // Rollback the transaction if the second insert for any item failed
+                            DB::rollBack();
+                            echo json_encode(array(
+                                'error' => array(
+                                    'msg' => 'Failed to execute the insert.',
+                                    'code' => '126',
+                                )
+                            ));
+                        }
+                    }
+                    DB::commit();
+                }
                 if ($tags && (is_array($tags) || is_object($tags))) {
                     Mail::to($tags)->send(new ShareVoucherDocument($shareLink, $message));
                     // Email sent successfully
@@ -163,6 +184,55 @@ class ajaxRequestController extends Controller
                 echo json_encode(array(
                     'error' => array(
                         'msg' => 'Document Not Found!',
+                        'code' => '404',
+                    )
+                ));
+            }
+        }catch (\Throwable $exception)
+        {
+            echo json_encode(array(
+                'error' => array(
+                    'msg' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                )
+            ));
+        }
+    }
+
+    public function emailLinkStatusChange(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ref' => 'required','string',
+            'status' => 'required','string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+        try {
+            extract($request->post());
+            $id = Crypt::decryptString($ref);
+            $status = Crypt::decryptString($status);
+            if ($status == 0)
+            {
+                $newStatus = 1;
+            }
+            else{
+                $newStatus = 0;
+            }
+            if (VoucherDocumentShareEmailLink::find($id))
+            {
+                VoucherDocumentShareEmailLink::where('id',$id)->update([
+                    'status'=>$newStatus,
+                ]);
+                echo json_encode(array(
+                    'results' => 'Data update successfully!'
+                ));
+
+            }else{
+                echo json_encode(array(
+                    'error' => array(
+                        'msg' => 'Not Found!',
                         'code' => '404',
                     )
                 ));

@@ -47,6 +47,7 @@ Route::group(['middleware' => ['auth']],function (){
 # 3.2 Send mail for document sharing
     Route::controller(ajaxRequestController::class)->group(function (){
         Route::post('share-voucher-document-email','shareVoucherDocumentEmail')->name('share.voucher.document');
+        Route::post('email-link-status-change','emailLinkStatusChange')->name('email.link.status.change');
     });//3.2 End
 
 # 3.2 Super Admin Controller

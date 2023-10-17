@@ -13,11 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('document_share_link_emails', function (Blueprint $table) {
+        Schema::create('voucher_document_share_email_links', function (Blueprint $table) {
             $table->id();
             $table->string('share_id');
             $table->unsignedBigInteger('share_document_id');
-            $table->string('share_email');
             $table->integer('status')->comment('1=active, 2=inactive/delete');
             $table->unsignedBigInteger('shared_by');
             $table->timestamps();
@@ -33,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('document_share_link_emails');
+        Schema::dropIfExists('voucher_document_share_email_links');
     }
 };

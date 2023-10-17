@@ -60,6 +60,36 @@
             <div class="col-md-2 text-end">
                 <button class="btn btn-success"><i class="fa-solid fa-link"></i> Copy link</button>
             </div>
+            <div class="col-md-12">
+                <span><i class="fa-regular fa-envelope"></i> This document share via email list</span>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Share ID</th>
+                            <th>Share Emails</th>
+                            <th>Share Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    @foreach($shareData as $e)
+                        <tr>
+                            <td><a href="{!! $shareLink = route('voucher.document.view',['document'=>Crypt::encryptString($e->share_document_id),'share'=>$e->share_id]); !!}" target="_blank">{!! $e->share_id !!}</a></td>
+                            <td>
+                                @if(count($e->ShareEmails))
+                                    @foreach($e->ShareEmails as $email)
+                                        {!! $email->email !!} <br>
+                                    @endforeach
+                                @endif
+                            </td>
+                            <td>@if($e->status) <span class="badge bg-success">Active</span> @else <span class="badge bg-danger">Inactive</span> @endif</td>
+                            <td>
+                                @if($e->status) <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure!')? Obj.emailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Inactive</button> @else <button class="btn btn-success btn-sm" onclick="return confirm('Are you sure!')? Obj.emailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Active</button> @endif
+
+                            </td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
         </div>
 
     </div>
