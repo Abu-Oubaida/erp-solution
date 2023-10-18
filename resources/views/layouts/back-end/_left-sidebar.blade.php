@@ -57,14 +57,14 @@
             {{--#2.3    Accounts File Storage System Start--}}
             <group5>
                 {{--#2.3.1  Permission Chck Accounts File Storage System Start--}}
-                @if(auth()->user()->hasPermission('add_voucher_type') || auth()->user()->hasPermission('edit_voucher_type') || auth()->user()->hasPermission('delete_voucher_type') || auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document')|| auth()->user()->hasPermission('view_voucher_document'))
+                @if(auth()->user()->hasPermission('add_voucher_type') || auth()->user()->hasPermission('edit_voucher_type') || auth()->user()->hasPermission('delete_voucher_type') || auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document')|| auth()->user()->hasPermission('view_voucher_document') || auth()->user()->hasPermission('salary_certificate_input'))
                     {{--#2.3.1.1   Route/URL Chck and set navigation header Accounts File Storage Start--}}
                     <subgroup1>
-                        @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info'|| Route::currentRouteName() == 'view.voucher.document')
+                        @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info'|| Route::currentRouteName() == 'view.voucher.document' || Route::currentRouteName() == 'input.salary.certificate')
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts"
                                aria-expanded="true" aria-controls="accLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                                Accounts File
+                                Accounts
                                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                             </a>
                             <div class="collapse show" id="accLayouts" aria-labelledby="headingOne"
@@ -73,7 +73,7 @@
                                     <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse"
                                        data-bs-target="#accLayouts" aria-expanded="false" aria-controls="accLayouts">
                                         <div class="sb-nav-link-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                                        Accounts File
+                                        Accounts
                                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                                     </a>
                                     <div class="collapse" id="accLayouts" aria-labelledby="headingOne"
@@ -81,11 +81,11 @@
                                         @endif
                                         <nav class="sb-sidenav-menu-nested nav ">
                                             {{--                    Only Accounts Document related menu and submenu--}}
-                                            @include('layouts.back-end.sidebar-components.interface.accounts._type_menu_submenu')
+                                            @include('layouts.back-end.sidebar-components.interface.accounts._add_menu_submenu')
                                             {{--                    Only Document Upload related menu and submenu Here--}}
                                             @include('layouts.back-end.sidebar-components.interface.accounts._add_document_menu_submenu')
                                             {{--                    Only List of Documet related menu and submenu Here--}}
-                                            @include('layouts.back-end.sidebar-components.interface.accounts._uploaded_document_list_menu_submenu')
+                                            @include('layouts.back-end.sidebar-components.interface.accounts._view_list_menu_submenu')
                                         </nav>
                                     </div>
                     </subgroup1>{{--#2.3.1.1   Route/URL Chck and set navigation header Accounts File Storage End--}}

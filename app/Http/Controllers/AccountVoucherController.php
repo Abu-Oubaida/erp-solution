@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account_voucher;
+use App\Models\User;
 use App\Models\VoucherDocument;
 use App\Models\VoucherType;
 use Illuminate\Http\RedirectResponse;
@@ -234,11 +235,29 @@ class AccountVoucherController extends Controller
         try {
             $id = Crypt::decryptString($vID);
             $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-//            dd($document);
             return view('back-end/account-voucher/single-view',compact('document'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
+    }
+
+    public function salaryCertificateInput(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                return $this->salaryCertificateInputStore($request);
+            }
+            $users = User::with(['getDepartment','getBrance'])->where('status',1)->get();
+            return view('back-end/account-voucher/salary/input-certificate',compact('users'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+    }
+    private function salaryCertificateInputStore(Request $request)
+    {
+
     }
 }

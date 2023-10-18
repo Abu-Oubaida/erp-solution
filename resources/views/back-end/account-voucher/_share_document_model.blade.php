@@ -47,6 +47,7 @@
             <div class="col-md-2">
                 <div class="form-group mb-3">
                     <select class="form-control" name="voucher_type" id="voucher_type">
+                        <option value="0">--Select Option--</option>
                         <option value="1">Only view</option>
                         <option value="2">View/Download</option>
                     </select>
@@ -95,7 +96,7 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Understood</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Understood</button>
     </div>
 </div>
 <script>

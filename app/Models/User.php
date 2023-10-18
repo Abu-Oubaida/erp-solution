@@ -67,6 +67,14 @@ class User extends Authenticatable
         return 'User'; // Default user type if no role is associated
     }
 
+    public function getDepartment()
+    {
+        return $this->belongsTo(department::class,'dept_id');
+    }
+    public function getBrance()
+    {
+        return $this->belongsTo(branch::class,'branch_id');
+    }
 //    public function voucherTypeCreate()
 //    {
 //        return $this->hasMany(VoucherType::class,'created_by');

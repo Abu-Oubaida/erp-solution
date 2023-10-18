@@ -2,14 +2,14 @@
     @if(Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'view.voucher.document')
     <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadList" aria-expanded="true" aria-controls="pagesUploadList">
         <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div>
-        Uploaded List
+        View List
         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
     </a>
     <div class="collapse show" id="pagesUploadList" aria-labelledby="headingOne" data-bs-parent="#pagesUploadList">
     @else
     <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadList" aria-expanded="false" aria-controls="pagesUploadList">
         <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div>
-        Uploaded List
+        View List
         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
     </a>
     <div class="collapse" id="pagesUploadList" aria-labelledby="headingOne" data-bs-parent="#pagesUploadList">
