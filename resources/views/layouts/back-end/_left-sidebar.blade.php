@@ -57,10 +57,10 @@
             {{--#2.3    Accounts File Storage System Start--}}
             <group5>
                 {{--#2.3.1  Permission Chck Accounts File Storage System Start--}}
-                @if(auth()->user()->hasPermission('add_voucher_type') || auth()->user()->hasPermission('edit_voucher_type') || auth()->user()->hasPermission('delete_voucher_type') || auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document')|| auth()->user()->hasPermission('view_voucher_document') || auth()->user()->hasPermission('salary_certificate_input'))
+                @if(auth()->user()->hasPermission('add_voucher_type') || auth()->user()->hasPermission('edit_voucher_type') || auth()->user()->hasPermission('delete_voucher_type') || auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document')|| auth()->user()->hasPermission('view_voucher_document') || auth()->user()->hasPermission('salary_certificate_input') || auth()->user()->hasPermission('salary_certificate_list'))
                     {{--#2.3.1.1   Route/URL Chck and set navigation header Accounts File Storage Start--}}
                     <subgroup1>
-                        @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info'|| Route::currentRouteName() == 'view.voucher.document' || Route::currentRouteName() == 'input.salary.certificate')
+                        @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info'|| Route::currentRouteName() == 'view.voucher.document' || Route::currentRouteName() == 'input.salary.certificate' || Route::currentRouteName() == 'salary.certificate.list')
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts"
                                aria-expanded="true" aria-controls="accLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-file-invoice-dollar"></i></div>

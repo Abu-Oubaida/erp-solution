@@ -1,5 +1,5 @@
 @if(auth()->user()->hasPermission('list_voucher_document') || auth()->user()->hasPermission('view_voucher_document'))
-    @if(Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'view.voucher.document')
+    @if(Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'view.voucher.document' || Route::currentRouteName() == 'salary.certificate.list')
     <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadList" aria-expanded="true" aria-controls="pagesUploadList">
         <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div>
         View List
@@ -25,6 +25,13 @@
         @if(auth()->user()->hasPermission('view_voucher_document'))
             @if(Route::currentRouteName() == 'view.voucher.document')
                 <a class="nav-link" href="{{route('view.voucher.document',['vID'=>\Illuminate\Support\Facades\Request::route('vID')])}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Voucher View</a>
+            @endif
+        @endif
+        @if(auth()->user()->hasPermission('salary_certificate_list'))
+            @if(Route::currentRouteName() == 'salary.certificate.list')
+                <a class="nav-link" href="{{route('salary.certificate.list')}}" title="Salary Certificate List"><div class="sb-nav-link-icon"><i class="fa-solid fa-money-check-dollar"></i></div> Salary Cert. List</a>
+            @else
+                <a class="nav-link text-chl" href="{{route('salary.certificate.list')}}" title="Salary Certificate List"><div class="sb-nav-link-icon"><i class="fa-solid fa-money-check-dollar"></i></div> Salary Cert. List</a>
             @endif
         @endif
             {{--                                            @if(Route::currentRouteName() == 'add.fr.info')--}}

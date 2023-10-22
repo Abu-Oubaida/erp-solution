@@ -155,10 +155,14 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:view_voucher_document'])->group(function () {
             Route::get('voucher-document-view/{vID}','voucherDocumentView')->name('view.voucher.document');
         });//3.7.6
-# 3.7.7 List uploaded voucher document
+# 3.7.7 Salary certificate input
         Route::middleware(['permission:salary_certificate_input'])->group(function () {
             Route::match(['get','post'],'salary-certificate-input','salaryCertificateInput')->name('input.salary.certificate');
         });//3.7.7
+# 3.7.8 Salary certificate List
+        Route::middleware(['permission:salary_certificate_list'])->group(function () {
+            Route::match(['get'],'salary-certificate-list','salaryCertificateList')->name('salary.certificate.list');
+        });//3.7.8
 
     });//3.7 End
 

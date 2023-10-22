@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Account_voucher;
 use App\Models\User;
+use App\Models\UserSalaryCertificateData;
 use App\Models\VoucherDocument;
 use App\Models\VoucherType;
 use Illuminate\Http\RedirectResponse;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AccountVoucherController extends Controller
 {
@@ -249,8 +251,13 @@ class AccountVoucherController extends Controller
             {
                 return $this->salaryCertificateInputStore($request);
             }
-            $users = User::with(['getDepartment','getBrance'])->where('status',1)->get();
-            return view('back-end/account-voucher/salary/input-certificate',compact('users'));
+            $users = User::with(['getDepartment','getBranch'])->where('status',1)->get();
+            $datas = UserSalaryCertificateData::with('userInfo','userInfo.getDepartment','userInfo.getBranch')->where('status',1)->where(function ($query){
+                $query->where('created_by',Auth::user()->id);
+                $query->orWhere('updated_by',Auth::user()->id);
+            })->get();
+//            dd($datas);
+            return view('back-end/account-voucher/salary/input-certificate',compact('users','datas'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -258,6 +265,47 @@ class AccountVoucherController extends Controller
     }
     private function salaryCertificateInputStore(Request $request)
     {
-
+        $validator = Validator::make($request->all(), [
+            'officer' => ['required','string','exists:users,name'],
+            'from' => ['required','date','before:to'],
+            'to' => ['required','date','after:from'],
+            'basic' => ['required','numeric'],
+            'house_rent' => ['required','numeric'],
+            'conveyance' => ['required','numeric'],
+            'medical' => ['required','numeric'],
+            'bonus' => ['required','numeric'],
+            'others' => ['sometimes','nullable','numeric'],
+            'remarks' => ['sometimes','nullable','string'],
+        ]);
+        if ($validator->fails()) {
+//            return response()->json(['error' => $validator->errors()], 422);
+            return back()->with('error',$validator->errors())->withInput();
+        }
+        try {
+            extract($validator->getData());
+            $user = User::where('name',$officer)->first();
+            $checkData = UserSalaryCertificateData::where('financial_yer_from',$from)->where('financial_yer_to',$to)->where('user_id',$user->id)->first();
+            if ($checkData)
+            {
+                return back()->with('warning',"This financial years data already has in DB, Can't add new, Please try to edit")->withInput();
+            }
+            UserSalaryCertificateData::create([
+                'status'=>1,'user_id'=>$user->id,'financial_yer_from'=>$from,'financial_yer_to'=>$to,'basic'=>$basic,'house_rent'=>$house_rent,'conveyance'=>$conveyance,'medical_allowance'=>$medical,'festival_bonus'=>$bonus,'others'=>$others,'remarks'=>$remarks,'created_by'=>Auth::user()->id,'updated_by'=>null,
+            ]);
+            return back()->with('success','Data save successfully');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+    }
+    public function salaryCertificateList()
+    {
+        try {
+            $datas = UserSalaryCertificateData::with('userInfo','userInfo.getDepartment','userInfo.getBranch')->get();
+            return view('back-end/account-voucher/salary/input-certificate-list',compact('datas'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
     }
 }

@@ -4,7 +4,7 @@
         <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
         <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-12">
                 <ol class="breadcrumb mb-4">
                     <li class="breadcrumb-item">
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
@@ -14,10 +14,22 @@
                     </li>
                 </ol>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-6">
+                <div class="float-start">
+                    <strong>For Upload the file_name.xlsx use this section. <a href="{!! url('file-manager/Account Document/Salary certificate of CHL-360.xlsx') !!}">Prototype is here</a> Please flowing the exact format</strong>
+                    <div class="input-group mb-3">
+                        <input type="file" class="form-control" id="file_upload">
+                        <label class="input-group-text" for="file_upload"><i class="fa-solid fa-cloud-arrow-up"></i> &nbsp; Upload</label>
+                    </div>
+{{--                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">--}}
+{{--                        Launch demo modal--}}
+{{--                    </button>--}}
+                </div>
+            </div>
+            <div class="col-md-6">
                 <div class="float-end">
-                    @if(auth()->user()->hasPermission('list_voucher_document'))
-                        <a class="btn btn-success btn-sm" href="{{route("uploaded.voucher.list")}}"><i class="fas fa-list-check"></i> Uploaded List</a>
+                    @if(auth()->user()->hasPermission('salary_certificate_list'))
+                        <a class="btn btn-success btn-sm" href="{{route("salary.certificate.list")}}"><i class="fas fa-list-check"></i> List View</a>
                     @endif
                 </div>
             </div>
@@ -36,7 +48,7 @@
                                 <datalist id="officer-list">
                             @if(count($users))
                                 @foreach($users as $user)
-                                    <option value="{!! $user->name !!}">{!! $user->employee_id !!}, {!! $user->getDepartment->dept_name !!} , {!! $user->getBrance->branch_name !!} </option>
+                                    <option value="{!! $user->name !!}">{!! $user->employee_id !!}, {!! $user->getDepartment->dept_name !!} , {!! $user->getBranch->branch_name !!} </option>
                                 @endforeach
                             @endif
                                 </datalist>
@@ -119,15 +131,34 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
-                    <h3 class="text-capitalize">Your Added/Updated Documents List</h3>
+                    <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}} List (your entered only)</h3>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-{{--                        @include('back-end.account-voucher._voucher_list')--}}
+                        @include('back-end.account-voucher.salary._input_certificate_list')
                     </div>
                 </div>
             </div>
         </div>
     </div>
+<!-- Modal -->
+    <div class="modal modal-xl fade" id="myModal" tabindex="-1" aria-labelledby="userDataModelLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-fullscreen-custom">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="userDataModelLabel">Title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table id="data-table"></table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @stop
 

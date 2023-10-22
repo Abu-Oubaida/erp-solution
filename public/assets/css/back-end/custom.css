@@ -105,3 +105,9 @@
     background: #000; /* Change the background color as needed */
     margin: 0 10px;
 }
+.modal-fullscreen-custom {
+    width: 80vw;
+    max-width: none;
+    height: 100%;
+    margin: 0 auto;
+}

@@ -71,9 +71,22 @@ class User extends Authenticatable
     {
         return $this->belongsTo(department::class,'dept_id');
     }
-    public function getBrance()
+    public function getBranch()
     {
         return $this->belongsTo(branch::class,'branch_id');
+    }
+
+    public function getSalaryCertificateList()
+    {
+        return $this->hasMany(UserSalaryCertificateData::class,'user_id');
+    }
+    public function createdSalaryCertificate()
+    {
+        return $this->hasMany(UserSalaryCertificateData::class,'created_by');
+    }
+    public function updatedSalaryCertificate()
+    {
+        return $this->hasMany(UserSalaryCertificateData::class,'updated_by');
     }
 //    public function voucherTypeCreate()
 //    {

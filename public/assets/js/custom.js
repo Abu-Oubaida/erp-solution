@@ -17,6 +17,7 @@ if(window.location.port)
     });
     $(document).ready(function(){
         const tags = [];
+        const employeeDatas = [];
         $('#perAdd').click(function (){
             let per = $("#per").val()
             let dir = $("#dir").val()
@@ -72,17 +73,81 @@ if(window.location.port)
                 })
             }
         })
-        // $('#tag-input').on('keydown',function(event) {
-        //     alert("hello")
-        //     // const pressedKey = event.keyCode;
-        //     // console.log(pressedKey)
-        //     // Obj.tagInput(this, pressedKey);  // Assuming Obj.tagInput is your function
-        //
-        //     // // Prevent the default behavior (e.g., form submission) for certain keys if needed
-        //     // if (pressedKey === 'Enter' || pressedKey === 'Tab') {
-        //     //     event.preventDefault();
-        //     // }
-        // });
+        document.getElementById("file_upload").addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: "binary" });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    if(jsonData[0].length !== 12)
+                    {
+                        alert('Invalid input data! Please flowing the prototype of data format!')
+                        return false
+                    }
+                    if (!((jsonData[0][0] === 'Employee ID*' || jsonData[0][0] === 'Employee ID') && (jsonData[0][1] === 'Name') && (jsonData[0][2] === 'Department') && (jsonData[0][3] === 'Financial Year From *' || jsonData[0][3] === 'Financial Year From' ) && (jsonData[0][4] === 'Financial Year To *' || jsonData[0][4] === 'Financial Year To' ) && (jsonData[0][5] === 'Basic*' || jsonData[0][5] === 'Basic' ) && (jsonData[0][6] === 'House Rent *' || jsonData[0][6] === 'House Rent' ) && (jsonData[0][7] === 'Conveyance *' || jsonData[0][7] === 'Conveyance' ) && (jsonData[0][8] === 'Medical Allowance *' || jsonData[0][8] === 'Medical Allowance' ) && (jsonData[0][9] === 'Festival Bonus *' || jsonData[0][9] === 'Festival Bonus' ) && (jsonData[0][10] === 'Others' ) && (jsonData[0][11] === 'Total' ) ))
+                    {
+                        alert('Invalid input data! Please flowing the prototype of data format!')
+                        return false
+                    }
+                    for (let i = 0; i < jsonData.length; i++) {
+                        for (let j = 0; j < jsonData[i].length; j++) {
+                            if(typeof jsonData[i][j] === 'undefined')
+                            {
+                                jsonData[i][j] = 'N/A'
+                            }
+                        }
+                    }
+                    employeeDatas.push(jsonData)
+                    showModal(employeeDatas,file.name);
+                    // $('#userDataModelLabel').innerText = file.name
+                };
+                reader.readAsBinaryString(file);
+            }
+        });
+        // Function to display the modal
+        function showModal(data,fileName) {
+            const modal = document.getElementById("myModal");
+            const modelTitle = document.getElementById("userDataModelLabel")
+            const dataTable = document.getElementById("data-table");
+            while (dataTable.firstChild) {
+                dataTable.removeChild(dataTable.firstChild);
+            }
+
+            // Create a table from the data
+            const table = document.createElement("table");
+            table.className = "table";
+            // console.log(data)
+            // return false
+            let t=0
+            let action
+            data[0].forEach(rowData => {
+                const row = document.createElement("tr");
+                if(t===0)
+                    action = "Action"
+                else
+                    action = '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,'+t+',`'+fileName+'`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>'
+                let cell
+                rowData.forEach(cellData => {
+                    cell = document.createElement("td");
+                    cell.textContent = cellData;
+                    row.appendChild(cell);
+                });
+                cell = document.createElement("td");
+                cell.innerHTML=action;
+                row.appendChild(cell);
+                table.appendChild(row);
+                t++
+            });
+
+            // Append the table to the modal
+            dataTable.appendChild(table);
+            modelTitle.innerText = fileName
+            $('#myModal').modal('show')
+        }
+
         Obj = {
             fiendPermissionChild : function (e,actionID) {
                 let id = $(e).val()
@@ -120,6 +185,11 @@ if(window.location.port)
                         }
                     })
                 }
+            },
+            removeElementOfEmployeeData:function (e,index,file){
+                // console.log(employeeDatas[0][index])
+                employeeDatas[0].splice(index, 1)
+                showModal(employeeDatas,file)
             },
 
             findDocument: function (e,actionID,actionID2,actionID3){
@@ -295,7 +365,19 @@ if(window.location.port)
                         console.error('Error:', error);
                     }
                 });
-            }
+            },
+            // salaryCertificateDataRead:function (e,inputID){
+            //     if (!confirm('Are you sure!'))
+            //         return false
+            //
+            //
+            //     // const xmlFileInput = document.getElementById(inputID);
+            //     // if (xmlFileInput.files.length > 0) {
+            //     //     const xmlFile = xmlFileInput.files[0];
+            //     //     console.log(xmlFile)
+            //     //     // loadXmlFile(xmlFile);
+            //     // }
+            // },
         }
         function checkFileExists(url, callback) {
             const xhr = new XMLHttpRequest();
