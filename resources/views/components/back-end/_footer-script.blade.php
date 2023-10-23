@@ -3,12 +3,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.4/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <script src="{{url("assets/js/scripts.js")}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-<script src="{{url("assets/js/chart-area-demo.js")}}"></script>
-<script src="{{url("assets/js/chart-bar-demo.js")}}"></script>
+{{--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>--}}
+{{--<script src="{{url("assets/js/chart-area-demo.js")}}"></script>--}}
+{{--<script src="{{url("assets/js/chart-bar-demo.js")}}"></script>--}}
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
 <script src="{{url("assets/js/datatables-simple-demo.js")}}"></script>
 <script src="{{url("assets/js/custom.js")}}"></script>
+@if(Route::CurrentRouteName() == 'add.complain'|| Route::CurrentRouteName() == 'edit.my.complain')
 <script>
     ClassicEditor
         .create( document.querySelector( '#editor' ),{
@@ -44,6 +45,7 @@
             console.error( error );
         } );
 </script>
+@endif
 <script>
     $('.close').click(function() {
         $(".alert").hide(500)

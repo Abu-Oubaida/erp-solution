@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-6">
                 <div class="float-start">
-                    <strong>For Upload the file_name.xlsx use this section. <a href="{!! url('file-manager/Account Document/Salary certificate of CHL-360.xlsx') !!}">Prototype is here</a> Please flowing the exact format</strong>
+                    <strong>For Upload the file_name.xlsx use this section. <a href="{!! route('export.user.salary.prototype') !!}">Prototype is here</a> Please flowing the exact format</strong>
                     <div class="input-group mb-3">
                         <input type="file" class="form-control" id="file_upload">
                         <label class="input-group-text" for="file_upload"><i class="fa-solid fa-cloud-arrow-up"></i> &nbsp; Upload</label>
@@ -150,11 +150,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <table id="data-table"></table>
+                    <table id="data-table" class="table"></table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-primary" onclick="return confirm('Are you sure?'), Obj.employeeDataSubmit(this)">Save changes</button>
                 </div>
             </div>
         </div>

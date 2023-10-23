@@ -83,7 +83,7 @@
                                             {{--                    Only Accounts Document related menu and submenu--}}
                                             @include('layouts.back-end.sidebar-components.interface.accounts._add_menu_submenu')
                                             {{--                    Only Document Upload related menu and submenu Here--}}
-                                            @include('layouts.back-end.sidebar-components.interface.accounts._add_document_menu_submenu')
+                                            @include('layouts.back-end.sidebar-components.interface.accounts._upload_option_menu_submenu')
                                             {{--                    Only List of Documet related menu and submenu Here--}}
                                             @include('layouts.back-end.sidebar-components.interface.accounts._view_list_menu_submenu')
                                         </nav>
@@ -98,7 +98,7 @@
                 @if(auth()->user()->hasPermission('add_complain') || auth()->user()->hasPermission('delete_complain') || auth()->user()->hasPermission('edit_complain') || auth()->user()->hasPermission('list_complain_all') || auth()->user()->hasPermission('list_department_complain_all') || auth()->user()->hasPermission('list_my_complain') || auth()->user()->hasPermission('list_my_complain_trash') || auth()->user()->hasPermission('view_complain_single'))
                     {{--#2.4.1.1   Route/URL Chck and set navigation header Complain section Start--}}
                     <subgroup1>
-                        @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'individual.list.complain'|| Route::currentRouteName() == 'my.list.complain'|| Route::currentRouteName() == 'single.view.complain' || Route::currentRouteName() == 'edit.me.complain' || Route::currentRouteName() == 'my.complain.trash.list' || Route::currentRouteName() == 'departmental.list.complain')
+                        @if(Route::currentRouteName() == 'add.complain' || Route::currentRouteName() == 'individual.list.complain'|| Route::currentRouteName() == 'my.list.complain'|| Route::currentRouteName() == 'single.view.complain' || Route::currentRouteName() == 'edit.my.complain' || Route::currentRouteName() == 'my.complain.trash.list' || Route::currentRouteName() == 'departmental.list.complain')
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts"
                                aria-expanded="true" aria-controls="collapseLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>

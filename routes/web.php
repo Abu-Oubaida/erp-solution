@@ -66,6 +66,9 @@ Route::group(['middleware' => ['auth']],function (){
         Route::controller(UserController::class)->group(function (){
             Route::post('user-per-add','UserPerSubmit');
             Route::post('user-per-delete','UserPerDelete');
+            Route::middleware(['permission:salary_certificate_input'])->group(function () {
+                Route::get('export-user-salary-prototype','exportUserSalaryPrototype')->name('export.user.salary.prototype');
+            });
         });//3.2.3 End
     });//3.2 End
 
@@ -158,6 +161,7 @@ Route::group(['middleware' => ['auth']],function (){
 # 3.7.7 Salary certificate input
         Route::middleware(['permission:salary_certificate_input'])->group(function () {
             Route::match(['get','post'],'salary-certificate-input','salaryCertificateInput')->name('input.salary.certificate');
+            Route::match(['post'],'salary-certificate-input-excel','salaryCertificateInputExcelStore')->name('input.salary.certificate.excel');
         });//3.7.7
 # 3.7.8 Salary certificate List
         Route::middleware(['permission:salary_certificate_list'])->group(function () {

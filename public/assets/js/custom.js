@@ -76,22 +76,23 @@ if(window.location.port)
         document.getElementById("file_upload").addEventListener("change", function (e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
+                const reader = new FileReader()
                 reader.onload = function (e) {
-                    const data = e.target.result;
-                    const workbook = XLSX.read(data, { type: "binary" });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                    if(jsonData[0].length !== 12)
+                    const data = e.target.result
+                    const workbook = XLSX.read(data, { type: "binary" })
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 })
+                    if(jsonData[0].length !== 13)
                     {
                         alert('Invalid input data! Please flowing the prototype of data format!')
                         return false
                     }
-                    if (!((jsonData[0][0] === 'Employee ID*' || jsonData[0][0] === 'Employee ID') && (jsonData[0][1] === 'Name') && (jsonData[0][2] === 'Department') && (jsonData[0][3] === 'Financial Year From *' || jsonData[0][3] === 'Financial Year From' ) && (jsonData[0][4] === 'Financial Year To *' || jsonData[0][4] === 'Financial Year To' ) && (jsonData[0][5] === 'Basic*' || jsonData[0][5] === 'Basic' ) && (jsonData[0][6] === 'House Rent *' || jsonData[0][6] === 'House Rent' ) && (jsonData[0][7] === 'Conveyance *' || jsonData[0][7] === 'Conveyance' ) && (jsonData[0][8] === 'Medical Allowance *' || jsonData[0][8] === 'Medical Allowance' ) && (jsonData[0][9] === 'Festival Bonus *' || jsonData[0][9] === 'Festival Bonus' ) && (jsonData[0][10] === 'Others' ) && (jsonData[0][11] === 'Total' ) ))
+                    if (!((jsonData[0][0] === 'Employee ID*' || jsonData[0][0] === 'Employee ID') && (jsonData[0][1] === 'Name') && (jsonData[0][2] === 'Department') && (jsonData[0][3] === 'Financial Year From*' || jsonData[0][3] === 'Financial Year From' ) && (jsonData[0][4] === 'Financial Year To*' || jsonData[0][4] === 'Financial Year To' ) && (jsonData[0][5] === 'Basic*' || jsonData[0][5] === 'Basic' ) && (jsonData[0][6] === 'House Rent*' || jsonData[0][6] === 'House Rent' ) && (jsonData[0][7] === 'Conveyance*' || jsonData[0][7] === 'Conveyance' ) && (jsonData[0][8] === 'Medical Allowance*' || jsonData[0][8] === 'Medical Allowance' ) && (jsonData[0][9] === 'Festival Bonus*' || jsonData[0][9] === 'Festival Bonus' ) && (jsonData[0][10] === 'Others' ) && (jsonData[0][11] === 'Total' ) && (jsonData[0][12] === 'Remarks' ) ))
                     {
                         alert('Invalid input data! Please flowing the prototype of data format!')
                         return false
                     }
+                    console.log(jsonData)
                     for (let i = 0; i < jsonData.length; i++) {
                         for (let j = 0; j < jsonData[i].length; j++) {
                             if(typeof jsonData[i][j] === 'undefined')
@@ -102,9 +103,8 @@ if(window.location.port)
                     }
                     employeeDatas.push(jsonData)
                     showModal(employeeDatas,file.name);
-                    // $('#userDataModelLabel').innerText = file.name
                 };
-                reader.readAsBinaryString(file);
+                reader.readAsBinaryString(file)
             }
         });
         // Function to display the modal
@@ -113,37 +113,35 @@ if(window.location.port)
             const modelTitle = document.getElementById("userDataModelLabel")
             const dataTable = document.getElementById("data-table");
             while (dataTable.firstChild) {
-                dataTable.removeChild(dataTable.firstChild);
+                dataTable.removeChild(dataTable.firstChild)
             }
 
             // Create a table from the data
-            const table = document.createElement("table");
-            table.className = "table";
-            // console.log(data)
-            // return false
+            const table = document.createElement("table")
+            table.className = "table"
             let t=0
             let action
             data[0].forEach(rowData => {
-                const row = document.createElement("tr");
+                const row = document.createElement("tr")
                 if(t===0)
                     action = "Action"
                 else
                     action = '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,'+t+',`'+fileName+'`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>'
                 let cell
                 rowData.forEach(cellData => {
-                    cell = document.createElement("td");
-                    cell.textContent = cellData;
-                    row.appendChild(cell);
+                    cell = document.createElement("td")
+                    cell.textContent = cellData
+                    row.appendChild(cell)
                 });
-                cell = document.createElement("td");
-                cell.innerHTML=action;
-                row.appendChild(cell);
-                table.appendChild(row);
+                cell = document.createElement("td")
+                cell.innerHTML=action
+                row.appendChild(cell)
+                table.appendChild(row)
                 t++
             });
 
             // Append the table to the modal
-            dataTable.appendChild(table);
+            dataTable.appendChild(table)
             modelTitle.innerText = fileName
             $('#myModal').modal('show')
         }
@@ -161,25 +159,23 @@ if(window.location.port)
                         data: {'pid':id},
                         success: function (data) {
                             if (data.error){
-                                // throw data.error.msg;
-                                let division = "<option></option>";
-                                $("#"+actionID).append(division);
+                                // throw data.error.msg
+                                let division = "<option></option>"
+                                $("#"+actionID).append(division)
                                 alert(data.error.msg)
                             }else{
                                 // Parse the JSON string into an object
-                                let permissions = JSON.parse(data).results;
-                                // console.log(permissions)
-                                // return false
+                                let permissions = JSON.parse(data).results
                                 if ( permissions.length == 0 ) {
                                     alert("No data found!")
-                                    let response = "<option value=\"none\">1. None</option>";
-                                    $("#"+actionID).html(response);
+                                    let response = "<option value=\"none\">1. None</option>"
+                                    $("#"+actionID).html(response)
                                 }
                                 let counter = 2
-                                let response = "<option value=\"none\">1. None</option>";
+                                let response = "<option value=\"none\">1. None</option>"
                                 permissions.forEach(function(permission) {
-                                    response += "<option value=\"" + permission.name + "\">"+ counter++ +". " + permission.display_name +"</option>";
-                                    $("#"+actionID).html(response);
+                                    response += "<option value=\"" + permission.name + "\">"+ counter++ +". " + permission.display_name +"</option>"
+                                    $("#"+actionID).html(response)
                                 });
                             }
                         }
@@ -187,9 +183,40 @@ if(window.location.port)
                 }
             },
             removeElementOfEmployeeData:function (e,index,file){
-                // console.log(employeeDatas[0][index])
                 employeeDatas[0].splice(index, 1)
                 showModal(employeeDatas,file)
+            },
+            employeeDataSubmit:function (e) {
+                if (employeeDatas[0].length <= 1)
+                {
+                    alert('Empty data set please upload your excel file on the input field!')
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/salary-certificate-input-excel";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    contentType: 'application/json',
+                    url: url,
+                    type: "POST",
+                    data: JSON.stringify({'input': employeeDatas[0]}),
+                    success:function (data)
+                    {
+                        data = JSON.parse(data)
+                        if (data.error) {
+                            let alertMessage = data.message + '\nErrors:\n';
+                            for (let field in data.errors) {
+                                if (data.errors.hasOwnProperty(field)) {
+                                    alertMessage += field + ': ' + data.errors[field].join(', ') + '\n';
+                                }
+                            }
+                            alert(alertMessage);
+                            return false
+                        } else {
+                            // Handle success
+                            console.log("Success: " + data.message);
+                        }
+                    }
+                })
             },
 
             findDocument: function (e,actionID,actionID2,actionID3){

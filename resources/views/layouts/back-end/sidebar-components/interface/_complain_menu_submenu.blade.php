@@ -55,8 +55,8 @@
 @endif
 
 @if(auth()->user()->hasPermission('edit_complain'))
-    @if(Route::currentRouteName() == 'edit.me.complain')
-        <a class="nav-link" href="{{route("edit.me.complain",['complainID'=>\Illuminate\Support\Facades\Request::route('complainID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Complain Edit</a>
+    @if(Route::currentRouteName() == 'edit.my.complain')
+        <a class="nav-link" href="{{route("edit.my.complain",['complainID'=>\Illuminate\Support\Facades\Request::route('complainID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Complain Edit</a>
     @endif
 @endif
 

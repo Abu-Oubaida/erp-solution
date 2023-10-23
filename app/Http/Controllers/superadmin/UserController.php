@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\superadmin;
 
+use App\Exports\UsersSalaryCertificateDataExport;
+use App\Exports\UsersSalaryDataExport1;
 use App\Http\Controllers\Controller;
 use App\Models\branch;
 use App\Models\department;
@@ -19,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpParser\Node\Stmt\If_;
 
 class UserController extends Controller
@@ -422,5 +425,10 @@ class UserController extends Controller
         {
             return back()->with('error',$exception->getMessage());
         }
+    }
+
+    public function exportUserSalaryPrototype()
+    {
+        return Excel::download(new UsersSalaryCertificateDataExport,'salary certificate input data.xlsx');
     }
 }

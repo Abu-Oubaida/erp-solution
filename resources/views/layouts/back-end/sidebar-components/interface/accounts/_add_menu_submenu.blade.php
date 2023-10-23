@@ -37,11 +37,11 @@
                 @if(auth()->user()->hasPermission('salary_certificate_input'))
                     @if(Route::currentRouteName() == 'input.salary.certificate')
                         <a class="nav-link" href="{{route('input.salary.certificate')}}" title="Input Salary Certificate">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Salary Cert. Input
+                            <div class="sb-nav-link-icon"><i class="fa-regular fa-money-bill-1"></i></div> Salary Cert. Input
                         </a>
                     @else
                         <a class="nav-link text-chl" href="{{route('input.salary.certificate')}}" title="Input Salary Certificate">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div>Salary Cert. Input
+                            <div class="sb-nav-link-icon"><i class="fa-regular fa-money-bill-1"></i></div>Salary Cert. Input
                         </a>
                     @endif
                 @endif
