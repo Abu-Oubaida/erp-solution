@@ -271,33 +271,38 @@ class AccountVoucherController extends Controller
             unset($input[0]);
             // Define validation rules for the request data
             $rules = [
-                '*.*' => 'required',
-                '*.1' => 'exists:users,name',
-//                '*.3' => 'date','before:*.4',
-//                '*.4' => 'date','after:*.3',
-                '*.5' => 'numeric',
-                '*.6' => 'numeric',
-                '*.7' => 'numeric',
-                '*.8' => 'numeric',
-                '*.9' => 'numeric',
-                '*.11' => 'numeric',
-                '*.12' => 'string',
+                '*.*' => ['required'],
+                '*.1' => ['exists:users,name'],
+                '*.3' => ['date','before:*.4'],
+                '*.4' => ['date','after:*.3'],
+                '*.5' => ['numeric'],
+                '*.6' => ['numeric'],
+                '*.7' => ['numeric'],
+                '*.8' => ['numeric'],
+                '*.9' => ['numeric'],
+                '*.11' => ['numeric'],
+                '*.12' => ['string'],
             ];
             $customMessages = [
                 '*.1.exists' => 'The :attribute with the name ":value" does not exist in the users table.',
-//                '*.3.date' => 'Invalid date!',
-//                '*.3.before' => 'Financial Year From must be before Financial Year To',
-//                '*.4.date' => 'Invalid date!',
-//                '*.3.after' => 'Financial Year To must be after Financial Year From',
+                '*.3.date' => 'Invalid date!',
+                '*.3.before' => 'Financial Year From must be before Financial Year To',
+                '*.4.date' => 'Invalid date!',
+                '*.3.after' => 'Financial Year To must be after Financial Year From',
             ];
             $validator = Validator::make($input,$rules,$customMessages);
             // Check if validation fails
             if ($validator->fails()) {
                 // Return an error response in JSON format
                 $errors = $validator->errors();
-                echo json_encode(['error' => true, 'message' => 'Validation failed', 'errors' => $errors]);
-                return false;
-//                return response()->json(['error' => true, 'message' => 'Validation failed', 'errors' => $errors], 422);
+//                echo json_encode(['error' => true, 'message' => 'Validation failed', 'errors' => $errors]);
+//                return false;
+                $response = [
+                    'error' => true,
+                    'message' => 'Validation failed',
+                    'errors' => $errors,
+                ];
+                return response()->json($response, 200);
             }
             $response = [
                 'error' => false,

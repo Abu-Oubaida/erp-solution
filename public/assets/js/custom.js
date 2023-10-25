@@ -73,7 +73,7 @@ if(window.location.port)
                 })
             }
         })
-        document.getElementById("file_upload").addEventListener("change", function (e) {
+        $('#file_upload').on('change',function (e){
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader()
@@ -92,12 +92,11 @@ if(window.location.port)
                         alert('Invalid input data! Please flowing the prototype of data format!')
                         return false
                     }
-                    console.log(jsonData)
                     for (let i = 0; i < jsonData.length; i++) {
                         for (let j = 0; j < jsonData[i].length; j++) {
                             if(typeof jsonData[i][j] === 'undefined')
                             {
-                                jsonData[i][j] = 'N/A'
+                                jsonData[i][j] = 0
                             }
                         }
                     }
@@ -201,7 +200,9 @@ if(window.location.port)
                     data: JSON.stringify({'input': employeeDatas[0]}),
                     success:function (data)
                     {
-                        data = JSON.parse(data)
+                        // data = JSON.parse(data)
+                        // console.log(data)
+                        // return false
                         if (data.error) {
                             let alertMessage = data.message + '\nErrors:\n';
                             for (let field in data.errors) {
