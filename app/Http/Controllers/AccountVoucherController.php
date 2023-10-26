@@ -272,8 +272,9 @@ class AccountVoucherController extends Controller
             // Define validation rules for the request data
             $rules = [
                 '*.*' => ['required'],
+                '*.0' => ['exists:users,employee_id'],
                 '*.1' => ['exists:users,name'],
-                '*.3' => ['date','before:*.4'],
+                '*.3' => ['date'],
                 '*.4' => ['date','after:*.3'],
                 '*.5' => ['numeric'],
                 '*.6' => ['numeric'],
@@ -284,10 +285,11 @@ class AccountVoucherController extends Controller
                 '*.12' => ['string'],
             ];
             $customMessages = [
+                '*.0.exists' => 'The :attribute with the Employee ID ":value" does not exist in the users table.',
                 '*.1.exists' => 'The :attribute with the name ":value" does not exist in the users table.',
-                '*.3.date' => 'Invalid date!',
+                '*.3.date' => 'Invalid date! Please check your excel file and make sure Financial Year From values data type must be string/text',
                 '*.3.before' => 'Financial Year From must be before Financial Year To',
-                '*.4.date' => 'Invalid date!',
+                '*.4.date' => 'Invalid date! Please check your excel file and make sure Financial Year To values data type must be string/text',
                 '*.3.after' => 'Financial Year To must be after Financial Year From',
             ];
             $validator = Validator::make($input,$rules,$customMessages);
@@ -295,19 +297,79 @@ class AccountVoucherController extends Controller
             if ($validator->fails()) {
                 // Return an error response in JSON format
                 $errors = $validator->errors();
-//                echo json_encode(['error' => true, 'message' => 'Validation failed', 'errors' => $errors]);
-//                return false;
                 $response = [
                     'error' => true,
                     'message' => 'Validation failed',
                     'errors' => $errors,
                 ];
-                return response()->json($response, 200);
             }
-            $response = [
-                'error' => false,
-                'message' => $input,
-            ];
+            else {
+                // Return a success response in JSON format
+                $unStroed=[];
+                $alreadyHave=[];
+                $stroed=[];
+                foreach ($input as $key=>$data)
+                {
+//                    $stroed[$key]= $key;
+                    $user = User::where('employee_id',$data[0])->first();
+                    if ($user)
+                    {
+                        $checkData = UserSalaryCertificateData::where('financial_yer_from',$data[3])->where('financial_yer_to',$data[4])->where('user_id',$user->id)->first();
+                        if (!$checkData)
+                        {
+                            $insert = UserSalaryCertificateData::create([
+                                'status'=>1,
+                                'user_id'=>$user->id,
+                                'financial_yer_from'=>$data[3],//From year
+                                'financial_yer_to'=>$data[4],//To year
+                                'basic'=>$data[5],//Basic
+                                'house_rent'=>$data[6],//House Rent
+                                'conveyance'=>$data[7],//Conveyance
+                                'medical_allowance'=>$data[8],//Medical allowance
+                                'festival_bonus'=>$data[9],//Festival Bonus
+                                'others'=>$data[10],//Others
+                                'remarks'=>$data[12],//Remarks
+                                'created_by'=>Auth::user()->id,
+                                'updated_by'=>null
+                            ]);
+                            if ($insert)
+                            {
+                                $stroed[$key] = [
+                                    'Employee ID'  =>  $data[0],
+                                    'Name'  =>  $data[1],
+                                    'Department'  =>  $data[2],
+                                ];
+                            }
+                            else{
+                                $unStroed[$key] = [
+                                    'Employee ID'  =>  $data[0],
+                                    'Name'  =>  $data[1],
+                                    'Department'  =>  $data[2],
+                                ];
+                            }
+                        }
+                        else{
+                            $alreadyHave[$key] = [
+                                'Employee ID'  =>  $data[0],
+                                'Name'  =>  $data[1],
+                                'Department'  =>  $data[2],
+                            ];
+                        }
+                    }else{
+                        $unStroed[$key] = [
+                            'Employee ID'  =>  $data[0],
+                            'Name'  =>  $data[1],
+                            'Department'  =>  $data[2],
+                        ];
+                    }
+                }
+                $response = [
+                    'error' => false,
+                    'errorMessage' => $unStroed? $unStroed:null,
+                    'successMessage' => $stroed? $stroed:null,
+                    'alreadyHasMessage' => $alreadyHave? $alreadyHave:null,
+                ];
+            }
             return response()->json($response, 200);
         }catch (\Throwable $exception)
         {

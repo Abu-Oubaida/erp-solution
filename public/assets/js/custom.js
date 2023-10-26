@@ -120,13 +120,25 @@ if(window.location.port)
             table.className = "table"
             let t=0
             let action
+            let row_o = 1;
             data[0].forEach(rowData => {
                 const row = document.createElement("tr")
-                if(t===0)
-                    action = "Action"
-                else
-                    action = '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,'+t+',`'+fileName+'`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>'
                 let cell
+                if(t===0)
+                {
+                    action = "Action"
+                    cell = document.createElement("td")
+                    cell.textContent = "SL"
+                    row.appendChild(cell)
+                }
+                else
+                {
+                    action = '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,'+t+',`'+fileName+'`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>'
+                    cell = document.createElement("td")
+                    cell.textContent = row_o
+                    row_o++;
+                    row.appendChild(cell)
+                }
                 rowData.forEach(cellData => {
                     cell = document.createElement("td")
                     cell.textContent = cellData
@@ -200,21 +212,51 @@ if(window.location.port)
                     data: JSON.stringify({'input': employeeDatas[0]}),
                     success:function (data)
                     {
-                        // data = JSON.parse(data)
-                        // console.log(data)
-                        // return false
                         if (data.error) {
-                            let alertMessage = data.message + '\nErrors:\n';
-                            for (let field in data.errors) {
-                                if (data.errors.hasOwnProperty(field)) {
-                                    alertMessage += field + ': ' + data.errors[field].join(', ') + '\n';
+                            let alertMessage = data.message + '\nErrors:\n'
+                            if (data.errors)
+                            {
+                                for (let field in data.errors) {
+                                    if (data.errors.hasOwnProperty(field)) {
+                                        alertMessage += field + ': ' + data.errors[field].join(', ') + '\n'
+                                    }
                                 }
                             }
-                            alert(alertMessage);
+                            alert(alertMessage)
                             return false
                         } else {
                             // Handle success
-                            console.log("Success: " + data.message);
+                            // console.log("Success: " + data)
+                            let alertMessage = ''
+                            if (data.errorMessage)
+                            {
+                                // Extract and display the Error Message
+                                alertMessage += "Error! This Data Are Added not Possible:\n"
+                                for (let key in data.errorMessage) {
+                                    let employee = data.errorMessage[key]
+                                    alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`
+                                }
+                            }
+                            if (data.successMessage)
+                            {
+                                // Extract and display the Success Message
+                                alertMessage += "This Data Are Added Successfully:\n"
+                                for (let key in data.successMessage) {
+                                    let employee = data.successMessage[key]
+                                    alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`
+                                }
+                            }
+                            if (data.alreadyHasMessage)
+                            {
+                                // Extract and display the alreadyHasMessage
+                                alertMessage += "This Data are Already Exists in DB:\n"
+                                for (let key in data.alreadyHasMessage) {
+                                    let employee = data.alreadyHasMessage[key]
+                                    alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`
+                                }
+                            }
+                            alert(alertMessage)
+                            return true
                         }
                     }
                 })
