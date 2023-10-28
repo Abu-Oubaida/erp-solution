@@ -21,10 +21,10 @@
             {{--#2.2    User Management Start--}}
             <group4>
                 {{--#2.2.1  Permission Chck User Management Start--}}
-                @if(auth()->user()->hasPermission('add_department') || auth()->user()->hasPermission('add_user') || auth()->user()->hasPermission('list_user') || auth()->user()->hasPermission('view_user') || auth()->user()->hasPermission('edit_user') || auth()->user()->hasPermission('delete_user') || auth()->user()->hasPermission('add_department'))
+                @if(auth()->user()->hasPermission('add_department') || auth()->user()->hasPermission('add_user') || auth()->user()->hasPermission('list_user') || auth()->user()->hasPermission('view_user') || auth()->user()->hasPermission('edit_user') || auth()->user()->hasPermission('delete_user') || auth()->user()->hasPermission('add_department')|| auth()->user()->hasPermission('add_designation'))
                     {{--#2.2.1.1   Route/URL Chck and set navigation header User Management Start--}}
                     <subgroup1>
-                        @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department'|| Route::currentRouteName() == 'user.edit')
+                        @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department'|| Route::currentRouteName() == 'user.edit' || Route::currentRouteName() == 'add.designation')
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts"
                                aria-expanded="true" aria-controls="userLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>
@@ -48,6 +48,8 @@
                                             @include('layouts.back-end.sidebar-components.interface._user_menu_submenu')
                                             {{--                    Only Department Related Menu and Submenu is here--}}
                                             @include('layouts.back-end.sidebar-components.interface._department_menu_submenu')
+                                            {{--                    Only Designaton Related Menu and Submenu is here--}}
+                                            @include('layouts.back-end.sidebar-components.interface._designation_menu_submenu')
                                         </nav>
                                     </div>
                     </subgroup1>{{--#2.2.1.1   Route/URL Chck and set navigation header User Management End--}}

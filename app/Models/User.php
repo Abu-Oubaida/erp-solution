@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 use Laratrust\Traits\LaratrustUserTrait;
 
@@ -66,10 +67,13 @@ class User extends Authenticatable
 
         return 'User'; // Default user type if no role is associated
     }
-
     public function getDepartment()
     {
         return $this->belongsTo(department::class,'dept_id');
+    }
+    public function getDesignation()
+    {
+        return $this->belongsTo(Designation::class,'designation');
     }
     public function getBranch()
     {

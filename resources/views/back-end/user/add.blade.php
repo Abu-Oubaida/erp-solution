@@ -59,7 +59,7 @@
                                 <label for="branch">Branch Name</label>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-floating mb-3">
                                 <select class="form-control" id="to" name="dept">
                                     <option value=""></option>
@@ -73,7 +73,21 @@
                                 <label for="priority">To Department <span class="text-danger">*</span></label>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
+                            <div class="form-floating mb-3">
+                                <select class="form-control" id="designation" name="designation">
+                                    <option value=""></option>
+                                    @if(isset($designations) || (count($designations) > 0))
+                                        <option value="0">--Select please--</option>
+                                        @foreach($designations as $d)
+                                            <option value="{{$d->id}}" @if(old('designation') == $d->id) selected @endif>{{$d->title}}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <label for="designation">Desingation <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
                             <div class="form-floating mb-3">
                                 <select class="form-control" id="roll" name="roll">
                                     <option value=""></option>

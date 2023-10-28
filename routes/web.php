@@ -12,6 +12,7 @@ use App\Http\Controllers\superadmin\MobileSIMController;
 use App\Http\Controllers\superadmin\prorammerController;
 use App\Http\Controllers\superadmin\UserController;
 use App\Http\Controllers\superadmin\UserPermissionController;
+use App\Http\Controllers\superadmin\DesignationController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 # 0.0 Clear
@@ -107,9 +108,7 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:add_department'])->group(function (){
             Route::match(['post','get'],'add-department','create')->name('add.department');
         });//3.4.1 End
-
     });//3.4 End
-
 # 3.5 Mobile SIM Controller
     Route::controller(MobileSIMController::class)->group(function (){
 # 3.5.1 Add SIM number
@@ -206,8 +205,12 @@ Route::group(['middleware' => ['auth']],function (){
         });//3.8.8
 
     });//3.8 End
-
-
+# 3.9 User Designation
+    Route::controller(DesignationController::class)->group(function (){
+        Route::middleware(['permission:add_designation'])->group(function (){
+            Route::match(['post','get'],'add-designation','create')->name('add.designation');
+        });
+    });
 });//3.0 End
 # 4.0 Share Document View
 Route::controller(\App\Http\Controllers\ShareDocumentViewController::class)->group(function (){

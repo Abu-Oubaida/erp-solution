@@ -35,6 +35,7 @@
                         <th>Phone</th>
                         <th>Email</th>
                         <th>Dept.</th>
+                        <th>Designation</th>
                         <th>Role</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -48,6 +49,7 @@
                         <th>Phone</th>
                         <th>Email</th>
                         <th>Dept.</th>
+                        <th>Designation</th>
                         <th>Role</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -65,8 +67,11 @@
                                 <td>{!! $u->name !!}</td>
                                 <td>{!! $u->phone !!}</td>
                                 <td>{!! $u->email !!}</td>
-                                <td>{!! $u->dept_name !!}</td>
-                                <td>{!! $u->display_name !!}</td>
+                                <td>{!! $u->getDepartment->dept_name !!}</td>
+                                <td>{!! ($u->getDesignation)?$u->getDesignation->title:"N/A" !!}</td>
+                                <td>@foreach ($u->roles as $role)
+                                        {{ $role->display_name }}
+                                    @endforeach</td>
                                 <td>@if($u->status == 1) {!! '<span class="text-primary">Active</span>' !!}  @else {!! '<span class="text-danger">Inactive</span>' !!} @endif</td>
                                 <td class="">
                                     <a href="{{route('user.single.view',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-primary" title="View"><i class='fas fa-eye'></i></a>

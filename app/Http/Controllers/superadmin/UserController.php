@@ -7,11 +7,16 @@ use App\Exports\UsersSalaryDataExport1;
 use App\Http\Controllers\Controller;
 use App\Models\branch;
 use App\Models\department;
+use App\Models\Designation;
 use App\Models\filemanager_permission;
 use App\Models\Permission;
 use App\Models\PermissionUser;
 use App\Models\Role;
 use App\Models\User;
+use App\Rules\BraccheStatusRule;
+use App\Rules\DepartmentStatusRule;
+use App\Rules\DesignationStatusRule;
+use App\Rules\RoleStatusRule;
 use http\Exception\BadConversionException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -37,7 +42,8 @@ class UserController extends Controller
                 $depts = department::where('status',1)->get();
                 $branches = branch::where('status',1)->get();
                 $roles = Role::get();
-                return view('back-end.user.add',compact('depts','branches','roles'));
+                $designations = Designation::where('status',1)->get();
+                return view('back-end.user.add',compact('depts','branches','roles','designations'));
             }
 
         }catch (\Throwable $exception)
@@ -53,34 +59,20 @@ class UserController extends Controller
                 'name'  => ['required', 'string', 'max:255'],
                 'phone' => ['required', 'numeric', 'unique:'.User::class],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-                'dept'  => ['required', 'exists:departments,id'],
-                'branch'  => ['required', 'exists:branches,id'],
-                'roll'  => ['required','numeric', 'exists:roles,id'],
+                'dept'  => ['required', 'integer', new DepartmentStatusRule],
+                'designation'  => ['required', 'integer', new DesignationStatusRule],
+                'branch'  => ['required', 'integer', new BraccheStatusRule],
+                'roll'  => ['required','integer', new RoleStatusRule],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
             ]);
             if ($request->isMethod('post'))
             {
                 extract($request->post());
-                if ($user = User::where('phone',$phone)->orWhere('email',$email)->first())
-                {
-                    return back()->with('warning','Duplicate email/phone data found!')->withInput();
-                }
-                if (!($branches = branch::where('id',$branch)->where('status',1)->first()))
-                {
-                    return back()->with('error','Branch not found!')->withInput();
-                }
-                if (!($depts = department::where('status',1)->where('id',$dept)->first()))
-                {
-                    return back()->with('error','Department not found!')->withInput();
-                }
-                if (!($roles = Role::where('id',$roll)->first()))
-                {
-                    return back()->with('error','User roll not found!')->withInput();
-                }
+                $branches = branch::where('id',$branch)->where('status',1)->first();
                 if ($branches->branch_type == 'head office') $header = 'H'; else $header = "P";
-                $priviusUsers = User::where('status',1)->get();
-                $priviusUserCount = count($priviusUsers);
-                $threeDigitId = str_pad($priviusUserCount, 3, '0', STR_PAD_LEFT);
+                $previousUsers = User::where('status',1)->get();
+                $previousUserCount = count($previousUsers);
+                $threeDigitId = str_pad($previousUserCount, 3, '0', STR_PAD_LEFT);
                 $nid = $header.$depts->dept_code.$threeDigitId;
                 while (User::where('employee_id',$nid)->first())
                 {
@@ -111,6 +103,7 @@ class UserController extends Controller
                     'email' => $email,
                     'dept_id' => $depts->id,
                     'status' => 1,
+                    'designation' => $designation,
                     'branch_id' => $branches->id,
                     'password' => Hash::make($request->password),
                 ]);
@@ -129,7 +122,8 @@ class UserController extends Controller
     public function show()
     {
         try {
-            $users = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.status','!=',5)->select('dept.dept_name','r.display_name','users.*')->get();
+            $users = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.status','!=',5)->get();
+//            dd($users);
             return view('back-end/user/list',compact('users'));
         }catch (\Throwable $exception)
         {
