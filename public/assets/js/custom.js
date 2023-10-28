@@ -256,7 +256,7 @@ if(window.location.port)
                                 }
                             }
                             alert(alertMessage)
-                            return true
+                            return wondow.location.reload()
                         }
                     }
                 })
