@@ -13,10 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('complains', function (Blueprint $table) {
-            $table->integer('priority')->default('1')->comment("1=normal, 2=urgent, 3=very-urgent, 4=lazy")->after('title');
-            $table->integer('progress')->nullable()->after('status');
-
+        Schema::create('designation_change_histories', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
         });
     }
 
@@ -27,8 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('complains', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('designation_change_histories');
     }
 };

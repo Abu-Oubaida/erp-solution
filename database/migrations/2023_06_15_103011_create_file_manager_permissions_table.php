@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('filemanager_permissions', function (Blueprint $table) {
+        Schema::create('file_manager_permissions', function (Blueprint $table) {
             $table->id();
             $table->integer('status')->comment('1=active, 0=deleted');
             $table->unsignedBigInteger('user_id');
