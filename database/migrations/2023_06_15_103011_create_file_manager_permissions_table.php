@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->integer('status')->comment('1=active, 0=deleted');
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete("cascade");
             $table->string('dir_name');
             $table->integer('permission_type')->comment('1=only view, 2=read/write,3=read/write/delete');
             $table->timestamps();

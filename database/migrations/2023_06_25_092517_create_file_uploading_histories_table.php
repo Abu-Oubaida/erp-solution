@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('file_name');
             $table->string('overwrite');
             $table->unsignedBigInteger('created_by');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

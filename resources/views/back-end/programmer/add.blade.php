@@ -41,6 +41,9 @@
                                         <label for="permission_name">Permission_Name<span class="text-danger">*</span></label>
                                         <sub>Only acceptable character are " a-z and 0-9_ " </sub>
                                     </div>
+                                    <label for="is_parent">
+                                        <input type="checkbox" name="is_parent" id="is_parent" value="1"> Is parent ?
+                                    </label>
                                 </div>
 
                                 <div class="col-md-3">
@@ -59,7 +62,7 @@
 
                                 <div class="col-md-12">
                                     <div class="form-floating mb-3 float-end">
-                                        <input type="submit" value="Insert" class="btn btn-chl-outline" name="submit" >
+                                        <input type="submit" value="Add" class="btn btn-chl-outline" name="submit" >
                                     </div>
                                 </div>
                             </div>
@@ -73,6 +76,7 @@
                     <tr>
                         <th>No</th>
                         <th>Parent</th>
+                        <th>Type</th>
                         <th>Name</th>
                         <th>Display Name</th>
                         <th>Details</th>
@@ -85,6 +89,7 @@
                     <tr>
                         <th>No</th>
                         <th>Parent</th>
+                        <th>Type</th>
                         <th>Name</th>
                         <th>Display Name</th>
                         <th>Details</th>
@@ -102,7 +107,8 @@
                         @foreach($permissions as $data)
                             <tr>
                                 <td><strong>{!! $no !!}</strong></td>
-                                <td><strong>{!! $data->parent_id == null ?"NULL":$data->display_name   !!}</strong></td>
+                                <td><strong>{!! ($data->parentName != null)?$data->parentName->display_name:"NULL"  !!}</strong></td>
+                                <td><strong>{!! $data->is_parent == null ?"Chile":"Parent"   !!}</strong></td>
                                 <td><strong>{!! $data->name   !!}</strong></td>
                                 <td><strong>{!! $data->display_name   !!}</strong></td>
                                 <td><strong>{!! $data->description   !!}</strong></td>
@@ -121,7 +127,8 @@
                             @foreach($data->childPermission as $child)
                                 <tr>
                                     <td><div class="text-end">{!! $no !!}.{!! $a++ !!}</div></td>
-                                    <td>{!! $data->display_name   !!}</td>
+                                    <td>{!! $data->display_name!!}</td>
+                                    <td>{!! ($child->is_parent == null) ?"Chile":"<strong>Parent</strong>"   !!}</td>
                                     <td>{!! $child->name   !!}</td>
                                     <td>{!! $child->display_name   !!}</td>
                                     <td>{!! $child->description   !!}</td>

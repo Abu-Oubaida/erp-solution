@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('path');
             $table->string('file_name');
             $table->unsignedBigInteger('created_by');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

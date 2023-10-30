@@ -2,7 +2,9 @@
 
 namespace App\Rules;
 
+use App\Models\User;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Crypt;
 
 class UserStatusCheck implements Rule
 {
@@ -26,6 +28,9 @@ class UserStatusCheck implements Rule
     public function passes($attribute, $value)
     {
         //
+        return User::where('id',Crypt::decryptString($value))
+            ->where('status',1)
+            ->exists();
     }
 
     /**
@@ -35,6 +40,6 @@ class UserStatusCheck implements Rule
      */
     public function message()
     {
-        return 'The validation error message.';
+        return 'The selected user is invalid or inactive.';
     }
 }

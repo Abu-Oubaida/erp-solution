@@ -20,8 +20,6 @@ return new class extends Migration
             $table->integer('status')->comment('1=active, 2=inactive/delete');
             $table->unsignedBigInteger('shared_by');
             $table->timestamps();
-            $table->foreign('shared_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('share_document_id')->references('id')->on('voucher_documents')->onDelete('cascade');
         });
     }
 

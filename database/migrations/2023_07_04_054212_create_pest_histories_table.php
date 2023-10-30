@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('from')->nullable();
             $table->string('document_type')->nullable()->comment('file/directory');
             $table->unsignedBigInteger('created_by');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

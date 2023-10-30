@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('share_id')->comment('');
             $table->string('email');
             $table->timestamps();
-            $table->foreign('share_id')->references('id')->on('voucher_document_share_email_links');
         });
     }
 

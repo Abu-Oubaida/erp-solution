@@ -20,7 +20,8 @@ class prorammerController extends Controller
             {
                 $this->store($request);
             }
-            $permissions = Permission::with('childPermission')->where('parent_id',null)->orderBy('id','ASC')->get();
+            $permissions = Permission::with(['childPermission','parentName'])->where('parent_id',null)->orWhere('is_parent','!=',null)->orderBy('id','ASC')->get();
+//            dd($permissions);
             return view('back-end/programmer/add',compact("permissions"));
         }catch (\Throwable $exception)
         {
@@ -49,6 +50,7 @@ class prorammerController extends Controller
             Permission::create([
                 'parent_id' =>  $permission_parent,
                 'name'      =>  $permission_name,
+                'is_parent'  =>  $request->is_parent,
                 'display_name'=>  $permission_display_name,
                 'description'=>  $description,
             ]);

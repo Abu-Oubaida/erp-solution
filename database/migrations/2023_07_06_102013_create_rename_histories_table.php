@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('old_name')->nullable();
             $table->string('new_name')->nullable();
             $table->unsignedBigInteger('created_by');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

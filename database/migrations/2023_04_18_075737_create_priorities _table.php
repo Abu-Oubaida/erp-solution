@@ -16,13 +16,11 @@ return new class extends Migration
         Schema::create('priorities', function (Blueprint $table) {
             $table->id();
             $table->integer('status')->default(1)->comment('1=active, 0=inactive');
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->bigInteger('priority_number')->unique();
             $table->text('remarks')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('updated_by')->nullable();
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -19,8 +19,6 @@ return new class extends Migration
             $table->string('permission_name');
 //            $table->integer('is_parent')->default(null)->nullable();
             $table->unsignedBigInteger('parent_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('parent_id')->references('id')->on('permissions')->onDelete('cascade');
             $table->timestamps();
         });
     }

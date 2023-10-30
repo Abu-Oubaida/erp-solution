@@ -15,15 +15,14 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('employee_id')->unique()->nullable()->after('id');
+            $table->string('employee_id')->unique()->nullable();
             $table->string('name');
-            $table->string('phone');
-            $table->string('email')->unique();
+            $table->string('phone')->nullable();
+            $table->string('email')->unique()->nullable();
             $table->integer('status')->default('1')->comment('1=active, 0=inactive, 4=cool');
-            $table->bigInteger('dept_id');
-            $table->foreign('dept_id')->references('id')->on('departments')->onDelete('cascade');
-            $table->string('designation')->nullable();
-            $table->string('branch_name')->nullable();
+            $table->bigInteger('dept_id')->nullable();
+            $table->bigInteger('designation')->nullable();
+            $table->bigInteger('branch_id')->nullable();
             $table->date('joining_date')->nullable();
             $table->text('profile_pic')->nullable();
             $table->timestamp('email_verified_at')->nullable();

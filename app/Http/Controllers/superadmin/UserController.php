@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\branch;
 use App\Models\department;
 use App\Models\Designation;
+use App\Models\DesignationChangeHistory;
 use App\Models\filemanager_permission;
 use App\Models\Permission;
 use App\Models\PermissionUser;
@@ -17,6 +18,7 @@ use App\Rules\BraccheStatusRule;
 use App\Rules\DepartmentStatusRule;
 use App\Rules\DesignationStatusRule;
 use App\Rules\RoleStatusRule;
+use App\Rules\UserStatusCheck;
 use http\Exception\BadConversionException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -103,7 +105,7 @@ class UserController extends Controller
                     'email' => $email,
                     'dept_id' => $depts->id,
                     'status' => 1,
-                    'designation' => $designation,
+                    'designation_id' => $designation,
                     'branch_id' => $branches->id,
                     'password' => Hash::make($request->password),
                 ]);
@@ -140,14 +142,15 @@ class UserController extends Controller
             $fileManagers = scandir($dir);
             unset($fileManagers[0]);
             unset($fileManagers[1]);
-            $permissionParents = Permission::where('parent_id',null)->get();
+            $permissionParents = Permission::where('parent_id',null)->orWhere('is_parent',1)->get();
             $userPermissions = PermissionUser::with('permissionParent')->where('user_id',$userID)->orderBy('permission_name','asc')->get();
             $deptlist = department::where('status',1)->get();
             $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
             $roles = Role::get();
-            $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$userID)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
-//        dd($user);
-            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptlist','permissionParents','userPermissions'));
+            $designations = Designation::where('status',1)->get();
+            $user = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.id',$userID)->first();
+//        dd($designations);
+            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptlist','permissionParents','userPermissions','designations'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -309,7 +312,7 @@ class UserController extends Controller
     }
     public function userDepartmentChange(Request $request)
     {
-        if ($request->isMethod('post'))
+        if ($request->isMethod('put'))
         {
             try {
                 extract($request->post());
@@ -338,6 +341,35 @@ class UserController extends Controller
 
         }
         return back()->with('error','Access Denied!');
+    }
+
+    public function userDesignationChange(Request $request)
+    {
+        try {
+            if ($request->isMethod('put'))
+            {
+                $request->validate([
+                    'id'    =>  ['required','string',new UserStatusCheck],
+                    'designation_id'    =>  ['required','integer', new DesignationStatusRule]
+                ]);
+                extract($request->post());
+                $userId = Crypt::decryptString($id);
+                $oldData = User::find($userId);
+                User::where('id',$userId)->update([
+                    'designation_id'   =>  $designation_id,
+                ]);
+                DesignationChangeHistory::create([
+                    'transfer_user_id'=>$userId,
+                    'new_dept_id'=>$designation_id,
+                    'from_dept_id'=>$oldData->designation_id,
+                    'transfer_by'=>Auth::user()->id,
+                ]);
+
+            }
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
     }
 
     public function UserEdit(Request $request,$id)

@@ -15,6 +15,10 @@ return new class extends Migration
     {
         Schema::create('designation_change_histories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('transfer_user_id');
+            $table->unsignedBigInteger('new_designation_id');
+            $table->unsignedBigInteger('old_designation_id')->nullable();
+            $table->unsignedBigInteger('transfer_by');
             $table->timestamps();
         });
     }

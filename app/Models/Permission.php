@@ -8,7 +8,7 @@ class Permission extends LaratrustPermission
 {
     public $guarded = [];
 
-    protected $fillable = ['parent_id', 'name', 'display_name', 'description'];
+    protected $fillable = ['parent_id', 'name','is_parent', 'display_name', 'description'];
 
     public function PermissionUser()
     {
@@ -17,7 +17,11 @@ class Permission extends LaratrustPermission
 
     public function childPermission()
     {
-        return $this->hasMany(Permission::class,'parent_id')->orderBy('name','asc');
+        return $this->hasMany(Permission::class,'parent_id')->where('is_parent',null)->orderBy('name','asc');
+    }
+    public function parentName()
+    {
+        return $this->belongsTo(Permission::class,'parent_id');
     }
 
 

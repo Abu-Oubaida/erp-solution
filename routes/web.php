@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShareDocumentViewController;
 use App\Http\Controllers\superadmin\ajaxRequestController;
 use App\Http\Controllers\superadmin\DepartmentController;
 use App\Http\Controllers\superadmin\MobileSIMController;
@@ -93,7 +94,8 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('user-status-change','userStatusChange')->name('user.status.change');
             Route::post('user-role-change','userRoleChange')->name('user.role.change');
             Route::post('user-password-change','userPasswordChange')->name('user.password.change');
-            Route::post('user-dept-change','userDepartmentChange')->name('user.dept.change');
+            Route::put('user-dept-change','userDepartmentChange')->name('user.dept.change');
+            Route::put('user-designation-change','userDesignationChange')->name('user.designation.change');
         });//3.3.4 End
 # 3.3.5 User delete
         Route::middleware(['permission:delete_user'])->group(function (){
@@ -213,7 +215,7 @@ Route::group(['middleware' => ['auth']],function (){
     });
 });//3.0 End
 # 4.0 Share Document View
-Route::controller(\App\Http\Controllers\ShareDocumentViewController::class)->group(function (){
+Route::controller(ShareDocumentViewController::class)->group(function (){
     Route::get('voucher-document-view','voucherDocumentView')->name('voucher.document.view');
 });
 require __DIR__.'/auth.php';

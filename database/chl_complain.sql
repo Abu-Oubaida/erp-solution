@@ -417,10 +417,10 @@ CREATE TABLE `failed_jobs` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `filemanager_permissions`
+-- Table structure for table `file_manager_permissions`
 --
 
-CREATE TABLE `filemanager_permissions` (
+CREATE TABLE `file_manager_permissions` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `status` int(11) NOT NULL COMMENT '1=active, 0=deleted',
   `user_id` bigint(20) UNSIGNED NOT NULL,
@@ -431,10 +431,10 @@ CREATE TABLE `filemanager_permissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `filemanager_permissions`
+-- Dumping data for table `file_manager_permissions`
 --
 
-INSERT INTO `filemanager_permissions` (`id`, `status`, `user_id`, `dir_name`, `permission_type`, `created_at`, `updated_at`) VALUES
+INSERT INTO `file_manager_permissions` (`id`, `status`, `user_id`, `dir_name`, `permission_type`, `created_at`, `updated_at`) VALUES
 (1, 0, 4, 'Account_Finance', 1, '2023-06-15 06:54:00', '2023-10-05 03:51:34'),
 (3, 1, 4, 'Brand_Management', 2, '2023-06-15 07:27:54', '2023-06-18 05:09:37'),
 (4, 1, 4, 'Chl_design', 1, '2023-06-15 07:28:33', '2023-06-18 05:02:55'),
@@ -523,17 +523,17 @@ CREATE TABLE `migrations` (
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(1, '2014_10_12_000000_create_users_table', 1),
-(2, '2014_10_12_100000_create_password_resets_table', 1),
-(3, '2019_08_19_000000_create_failed_jobs_table', 1),
-(4, '2019_12_14_000001_create_personal_access_tokens_table', 1),
-(5, '2023_04_15_051654_laratrust_setup_tables', 2),
-(6, '2023_04_15_074849_create_departments_table', 3),
-(7, '2023_04_15_093951_create_branches_table', 4),
-(8, '2023_04_17_035846_create_complain_table', 5),
-(9, '2023_04_18_074021_update_complains_table', 6),
+(1, '2023_04_15_074849_create_departments_table', 1),
+(2, '2023_04_15_093951_create_branches_table', 1),
+(3, '2023_10_28_144138_create_designations_table.php', 1),
+(4, '2014_10_12_000000_create_users_table', 1),
+(5, '2014_10_12_100000_create_password_resets_table', 1),
+(6, '2019_08_19_000000_create_failed_jobs_table', 1),
+(7, '2019_12_14_000001_create_personal_access_tokens_table', 1),
+(8, '2023_04_15_051654_laratrust_setup_tables', 2),
+(9, '2023_04_17_035846_create_complain_table', 5),
 (10, '2023_04_18_075737_create_priority_table', 7),
-(11, '2023_06_15_103011_create_filemanager_permissions_table', 8),
+(11, '2023_06_15_103011_create_file_manager_permissions_table', 8),
 (12, '2023_06_24_095214_create_create_file_histories_table', 9),
 (13, '2023_06_24_112959_create_create_directory_histories_table', 10),
 (14, '2023_06_24_114612_create_download_histories_table', 11),
@@ -546,9 +546,13 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (21, '2023_09_28_161717_create_account_voucher_types', 18),
 (22, '2023_09_28_160330_create_account_voucher_infos_table', 19),
 (23, '2023_09_30_154651_create_voucher_types_table', 20),
-(27, '2023_10_05_161342_create_permission_user_histories_table', 21),
-(28, '2023_10_05_152241_create_permission_users_table', 22),
-(29, '2023_10_02_145031_create_voucher_documents_table', 23);
+(24, '2023_10_05_161342_create_permission_user_histories_table', 21),
+(25, '2023_10_05_152241_create_permission_users_table', 22),
+(26, '2023_10_02_145031_create_voucher_documents_table', 23),
+(27, '2023_10_17_155258_create_voucher_document_share_email_links_table.php', 24),
+(28, '2023_10_17_155458_create_voucher_document_share_email_lists_table.php', 24),
+(29, '2023_10_21_140827_create_user_salary_certificate_data_table.php', 25),
+(30, '2023_10_30_105254_create_designation_change_histories_table.php', 26);
 
 -- --------------------------------------------------------
 
@@ -593,17 +597,17 @@ CREATE TABLE `permissions` (
 
 INSERT INTO `permissions` (`id`, `parent_id`, `name`, `display_name`, `description`, `created_at`, `updated_at`) VALUES
 (1, NULL, 'none', 'None', 'None', NULL, NULL),
-(2, 8, 'voucher_document_upload', 'Voucher Document Upload', 'Accounts Voucher Document Upload', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
-(3, 8, 'voucher_document_edit', 'Voucher Document Edit', 'Accounts Voucher Document Edit', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
-(4, 8, 'voucher_document_delete', 'Voucher Document Delete', 'Accounts Voucher Document Edit', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
-(5, 8, 'voucher_document_list', 'Voucher Document List', 'Accounts Voucher Document List', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
-(6, 8, 'voucher_document_view', 'Voucher Document View', 'Accounts Voucher Document View', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
-(8, NULL, 'accounts_file', 'Accounts File', 'Accounts File Upload', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
-(9, 8, 'voucher_type_add', 'Voucher Type Add', 'Voucher Type Add', '2023-10-07 07:29:21', '2023-10-07 07:29:21'),
-(10, 8, 'voucher_type_edit', 'Voucher Type Edit', 'Voucher Type Edit', '2023-10-07 07:29:21', '2023-10-07 07:29:21'),
-(11, 8, 'voucher_type_delete', 'Voucher Type Delete', 'Voucher Type Delete', '2023-10-07 07:29:21', '2023-10-07 07:29:21'),
-(12, 8, 'voucher_type_list', 'Voucher Type List', 'Voucher Type List', '2023-10-07 07:29:21', '2023-10-07 07:29:21'),
-(13, 8, 'voucher_type_view', 'Voucher Type View', 'Voucher Type View', '2023-10-07 07:29:21', '2023-10-07 07:29:21');
+(2, NULL, 'accounts_file', 'Accounts File', 'Accounts File Upload', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
+(3, 2, 'voucher_document_upload', 'Voucher Document Upload', 'Accounts Voucher Document Upload', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
+(4, 2, 'voucher_document_edit', 'Voucher Document Edit', 'Accounts Voucher Document Edit', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
+(5, 2, 'voucher_document_delete', 'Voucher Document Delete', 'Accounts Voucher Document Edit', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
+(6, 2, 'voucher_document_list', 'Voucher Document List', 'Accounts Voucher Document List', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
+(7, 2, 'voucher_document_view', 'Voucher Document View', 'Accounts Voucher Document View', '2023-10-04 09:41:29', '2023-10-04 09:41:29'),
+(8, 2, 'voucher_type_add', 'Voucher Type Add', 'Voucher Type Add', '2023-10-07 07:29:21', '2023-10-07 07:29:21'),
+(9, 2, 'voucher_type_edit', 'Voucher Type Edit', 'Voucher Type Edit', '2023-10-07 07:29:21', '2023-10-07 07:29:21'),
+(10, 2, 'voucher_type_delete', 'Voucher Type Delete', 'Voucher Type Delete', '2023-10-07 07:29:21', '2023-10-07 07:29:21'),
+(11, 2, 'voucher_type_list', 'Voucher Type List', 'Voucher Type List', '2023-10-07 07:29:21', '2023-10-07 07:29:21'),
+(12, 2, 'voucher_type_view', 'Voucher Type View', 'Voucher Type View', '2023-10-07 07:29:21', '2023-10-07 07:29:21');
 
 -- --------------------------------------------------------
 
@@ -855,7 +859,7 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `dept_id` bigint(20) NOT NULL,
   `status` int(11) NOT NULL DEFAULT 1 COMMENT '1=active, 0=inactive, 4=cool, 5=deleted',
-  `designation` varchar(255) DEFAULT NULL,
+  `designation_id` bigint(20) DEFAULT NULL,
   `branch_id` bigint(20) DEFAULT NULL,
   `joining_date` date DEFAULT NULL,
   `profile_pic` text DEFAULT NULL,
@@ -870,7 +874,7 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `employee_id`, `name`, `phone`, `email`, `dept_id`, `status`, `designation`, `branch_id`, `joining_date`, `profile_pic`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
+INSERT INTO `users` (`id`, `employee_id`, `name`, `phone`, `email`, `dept_id`, `status`, `designation_id`, `branch_id`, `joining_date`, `profile_pic`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
 (1, 'H100001', 'Abu Oubaida', '01877772225', 'abuoubaida36@gmail.com', 1, 1, NULL, 1, NULL, NULL, NULL, '$2y$10$kMzSJzslbUEvE.4rYha/Lu1SX6fYn799F.PJv0/FcFiA.XqWyprZe', 'A5vodrExtLXvLUILeWS6jrL5b9cn7rBLj24UffEk8oKagUa4tb0qMjHsnH6b', '2023-04-16 00:35:47', '2023-07-06 08:32:09'),
 (2, 'H100002', 'Ahnaf', '01894940525', 'ahnafwub19@gmail.com', 1, 1, NULL, 1, NULL, NULL, NULL, '$2y$10$SAxVIPMcLM2Fnnz3uMaineKui.TXaqSInmtKJS3jEM..hGWE99sRS', NULL, '2023-04-29 03:01:16', '2023-07-08 09:01:39'),
 (3, 'H100003', 'Md Rafiuzzaman', '01884337718', 'credence.mis@gmail.com', 5, 1, NULL, 1, NULL, NULL, NULL, '$2y$10$I3apcEh/OiF7fZI8hqRJmujTfPnxJ9vI1f1bu4dqEU6uaQ6oWCDNC', 'sj5e9MtoL54cVT6gkYMKSK7igIKMTsoDnkREncgemzslT4wPCeoWuCxj0QKC', '2023-06-06 03:15:39', '2023-10-03 05:39:40'),
@@ -1033,11 +1037,11 @@ ALTER TABLE `failed_jobs`
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
 
 --
--- Indexes for table `filemanager_permissions`
+-- Indexes for table `file_manager_permissions`
 --
-ALTER TABLE `filemanager_permissions`
+ALTER TABLE `file_manager_permissions`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `filemanager_permissions_user_id_foreign` (`user_id`);
+  ADD KEY `file_manager_permissions_user_id_foreign` (`user_id`);
 
 --
 -- Indexes for table `file_uploading_histories`
@@ -1229,9 +1233,9 @@ ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `filemanager_permissions`
+-- AUTO_INCREMENT for table `file_manager_permissions`
 --
-ALTER TABLE `filemanager_permissions`
+ALTER TABLE `file_manager_permissions`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
@@ -1377,10 +1381,10 @@ ALTER TABLE `download_histories`
   ADD CONSTRAINT `download_histories_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `filemanager_permissions`
+-- Constraints for table `file_manager_permissions`
 --
-ALTER TABLE `filemanager_permissions`
-  ADD CONSTRAINT `filemanager_permissions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `file_manager_permissions`
+  ADD CONSTRAINT `file_manager_permissions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `file_uploading_histories`

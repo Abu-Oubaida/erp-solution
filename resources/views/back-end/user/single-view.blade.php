@@ -62,11 +62,13 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Department:</th>
-                                                        <td>{!! $user->dept_name !!}</td>
+                                                        <td>{!! $user->getDepartment->dept_name !!}</td>
                                                     </tr>
                                                     <tr>
                                                         <th>Access Role:</th>
-                                                        <td>{!! $user->display_name !!}</td>
+                                                        <td>@foreach ($user->roles as $role)
+                                                                {{ $roleNew = $role->display_name }}
+                                                            @endforeach</td>
                                                     </tr>
                                                     <tr>
                                                         <th>Email:</th>
@@ -112,11 +114,51 @@
                                                                 <option value="">--Select Option--</option>
                                                                 @if(isset($roles) && count($roles))
                                                                     @foreach($roles as $r)
-                                                                        <option value="{{$r->id}}" @if($r->id == $user->role_id) selected @endif>{!! $r->display_name !!}</option>
+                                                                        <option value="{{$r->id}}" @if($r->display_name == $roleNew) selected @endif>{!! $r->display_name !!}</option>
                                                                     @endforeach
                                                                 @endif
                                                             </select>
                                                             <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user role?')" type="submit"> Change Role</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <form action="{!! route('user.designation.change') !!}" method="post">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="input-group float-end">
+                                                            <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
+                                                            <select class="form-control" name="designation_id" id="">
+                                                                <option value="">--Select Option--</option>
+                                                                @if(isset($designations) && count($designations))
+                                                                    @foreach($designations as $dig)
+                                                                        <option value="{{$dig->id}}" @if($dig->id == $user->designation) selected @endif>{!! $dig->title !!}</option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                            <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user Designation?')" type="submit"> Change Designation</button>
+                                                        </div>
+                                                    </form>
+                                                    <br>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <form action="{!! route('user.dept.change') !!}" method="post">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="input-group float-end">
+                                                            <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
+                                                            <select class="form-control" name="dept_id" id="">
+                                                                <option value="">--Select Option--</option>
+                                                                @if(isset($deptlist) && count($deptlist))
+                                                                    @foreach($deptlist as $d)
+                                                                        <option value="{{$d->id}}" @if($d->id == $user->dept_id) selected @endif>{!! $user->getDepartment->dept_name !!}</option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                            <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user Department?')" type="submit"> Change Department</button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -130,26 +172,6 @@
                                                             <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
                                                             <input class="form-control" type="password" name="password" id="">
                                                             <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user password?')" type="submit"> Change Password</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                            <br>
-                                            <div calss="row">
-                                                <div class="col-md-12">
-                                                    <form action="{!! route('user.dept.change') !!}" method="post">
-                                                        @csrf
-                                                        <div class="input-group float-end">
-                                                            <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
-                                                            <select class="form-control" name="dept_id" id="">
-                                                                <option value="">--Select Option--</option>
-                                                                @if(isset($deptlist) && count($deptlist))
-                                                                    @foreach($deptlist as $d)
-                                                                        <option value="{{$d->id}}" @if($d->id == $user->dept_id) selected @endif>{!! $d->dept_name !!}</option>
-                                                                    @endforeach
-                                                                @endif
-                                                            </select>
-                                                            <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user Department?')" type="submit"> Change Department</button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -293,7 +315,7 @@
                                     </div>
                                 @else
                                     <h6><b>User File Manager Permission</b></h6>
-                                    @if(strtolower($user->display_name) == strtolower('superadmin'))
+                                    @if(strtolower($roleNew) == strtolower('superadmin'))
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <table class="table">
