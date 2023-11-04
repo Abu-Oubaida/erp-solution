@@ -349,8 +349,8 @@ class UserController extends Controller
             if ($request->isMethod('put'))
             {
                 $request->validate([
-                    'id'    =>  ['required','string',new UserStatusCheck],
-                    'designation_id'    =>  ['required','integer', new DesignationStatusRule]
+                    'id'  =>  ['required','string',new UserStatusCheck],
+                    'designation_id'  =>  ['required','integer', new DesignationStatusRule]
                 ]);
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
@@ -360,11 +360,11 @@ class UserController extends Controller
                 ]);
                 DesignationChangeHistory::create([
                     'transfer_user_id'=>$userId,
-                    'new_dept_id'=>$designation_id,
-                    'from_dept_id'=>$oldData->designation_id,
+                    'new_designation_id'=>$designation_id,
+                    'old_designation_id'=>$oldData->designation_id,
                     'transfer_by'=>Auth::user()->id,
                 ]);
-
+                return back()->with('success','Data updated successfully!');
             }
         }catch (\Throwable $exception)
         {

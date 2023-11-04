@@ -135,7 +135,7 @@
                                                                 <option value="">--Select Option--</option>
                                                                 @if(isset($designations) && count($designations))
                                                                     @foreach($designations as $dig)
-                                                                        <option value="{{$dig->id}}" @if($dig->id == $user->designation) selected @endif>{!! $dig->title !!}</option>
+                                                                        <option value="{{$dig->id}}" @if($dig->id == $user->designation_id) selected @endif>{!! $dig->title !!}</option>
                                                                     @endforeach
                                                                 @endif
                                                             </select>

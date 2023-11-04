@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AccountVoucherController;
+use App\Http\Controllers\BloodGroupController;
+use App\Http\Controllers\BrachController;
+use App\Http\Controllers\BranchTypeController;
 use App\Http\Controllers\ComplainController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\editor\ImageController;
@@ -212,7 +215,37 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:add_designation'])->group(function (){
             Route::match(['post','get'],'add-designation','create')->name('add.designation');
         });
+    });//3.8 End
+# 3.10 User Designation
+    Route::controller(BranchTypeController::class)->group(function (){
+        Route::middleware(['permission:list_branch_type'])->group(function (){
+            Route::match(['get'],'branch-type-list','index')->name('branch.type.list');
+        });
+        Route::middleware(['permission:add_branch_type'])->group(function (){
+            Route::match(['post'],'add-branch-type','store')->name('add.branch.type');
+        });
     });
+    Route::controller(BrachController::class)->group(function (){
+        Route::middleware(['permission:list_branch'])->group(function (){
+            Route::match(['get'],'branch-list','index')->name('branch.list');
+        });
+        Route::middleware(['permission:add_branch'])->group(function (){
+            Route::match(['post','get'],'add-branch','create')->name('add.branch');
+        });
+
+    });// 3.10 End
+# 3.11 User Blood group
+    Route::controller(BloodGroupController::class)->group(function (){
+        Route::middleware(['permission:list_blood_group'])->group(function (){
+            Route::match(['get'],'blood-group-list','index')->name('blood.group.list');
+        });
+        Route::middleware(['permission:add_blood_group'])->group(function (){
+            Route::match(['post','get'],'add-blood-group','create')->name('add.blood.group');
+        });
+        Route::middleware(['permission:delete_blood_group'])->group(function (){
+            Route::match(['delete'],'delete-blood-group','destroy')->name('delete.blood.group');
+        });
+    });// 3.11 End
 });//3.0 End
 # 4.0 Share Document View
 Route::controller(ShareDocumentViewController::class)->group(function (){

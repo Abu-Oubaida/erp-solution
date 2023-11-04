@@ -1,24 +1,44 @@
-@if(auth()->user()->hasPermission('add_user'))
-    @if(Route::currentRouteName() == 'add.user')
-        <a class="nav-link" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+@if(auth()->user()->hasPermission('add_user') || auth()->user()->hasPermission('list_user') || auth()->user()->hasPermission('view_user') || auth()->user()->hasPermission('edit_user'))
+    @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'edit.user')
+        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#users" aria-expanded="true" aria-controls="users">
+            <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
+            Users
+            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+        </a>
+        <div class="collapse show" id="users" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
     @else
-        <a class="nav-link text-chl" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+        <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#users" aria-expanded="false" aria-controls="users">
+            <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
+            Users
+            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+        </a>
+        <div class="collapse" id="users" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
     @endif
-@endif
-@if(auth()->user()->hasPermission('list_user'))
-    @if(Route::currentRouteName() == 'user.list')
-        <a class="nav-link" href="{{route("user.list")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
-    @else
-        <a class="nav-link text-chl" href="{{route("user.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+            <nav class="sb-sidenav-menu-nested nav">
+                @if(auth()->user()->hasPermission('add_user'))
+                    @if(Route::currentRouteName() == 'add.user')
+                        <a class="nav-link" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+                    @else
+                        <a class="nav-link text-chl" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+                    @endif
+                @endif
+                @if(auth()->user()->hasPermission('list_user'))
+                    @if(Route::currentRouteName() == 'user.list')
+                        <a class="nav-link" href="{{route("user.list")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+                    @else
+                        <a class="nav-link text-chl" href="{{route("user.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+                    @endif
+                @endif
+                @if(auth()->user()->hasPermission('view_user'))
+                    @if(Route::currentRouteName() == 'user.single.view')
+                        <a class="nav-link" href="{{route("user.single.view",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
+                    @endif
+                @endif
+                @if(auth()->user()->hasPermission('edit_user'))
+                    @if(Route::currentRouteName() == 'user.edit')
+                        <a class="nav-link" href="{{route("user.edit",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
+                    @endif
+                @endif
+            </nav>
+        </div>
     @endif
-@endif
-@if(auth()->user()->hasPermission('view_user'))
-    @if(Route::currentRouteName() == 'user.single.view')
-        <a class="nav-link" href="{{route("user.single.view",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
-    @endif
-@endif
-@if(auth()->user()->hasPermission('edit_user'))
-    @if(Route::currentRouteName() == 'user.edit')
-        <a class="nav-link" href="{{route("user.edit",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
-    @endif
-@endif

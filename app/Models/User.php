@@ -21,7 +21,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = ['id', 'employee_id', 'name', 'phone', 'email', 'dept_id', 'status', 'designation', 'branch_id', 'joining_date', 'profile_pic', 'email_verified_at', 'password', 'remember_token', 'created_at', 'updated_at'];
+    protected $fillable = ['id', 'employee_id', 'name', 'phone', 'email', 'dept_id', 'status', 'designation', 'branch_id', 'joining_date','birthdate', 'profile_pic', 'email_verified_at', 'password', 'remember_token', 'created_at', 'updated_at','blood_id','phone_2','email_2','father_name','mother_name','home_no','village','word_no','union','city','sub-district','district','division','capital','country'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -46,10 +46,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(PermissionUser::class);
     }
+
+    public function defaultPermissions()
+    {
+        return $this->hasMany(RoleWiseDefaultPermission::class);
+    }
+
     public function hasPermission($permission)
     {
         // Implement your permission check logic here
-        return $this->isSuperAdmin() || $this->permissions()->where('permission_name', $permission)->exists();
+        return $this->isSuperAdmin()|| $this->defaultPermissions()->where('role_name',$this->getUserType())->where('permission_name',$permission)->exists() || $this->permissions()->where('permission_name', $permission)->exists();
     }
     public function isSuperAdmin()
     {
@@ -73,7 +79,7 @@ class User extends Authenticatable
     }
     public function getDesignation()
     {
-        return $this->belongsTo(Designation::class,'designation');
+        return $this->belongsTo(Designation::class,'designation_id');
     }
     public function getBranch()
     {
