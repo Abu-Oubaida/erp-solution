@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('status');
             $table->string('voucher_type_title');
             $table->string('code')->nullable();
-            $table->text('remarks');
+            $table->text('remarks')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('updated_by');
             $table->timestamps();
