@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-2">
                 <div class="float-end">
-                    <a class="btn btn-success btn-sm" href="{{route('blood.group.list')}}"><i class="fas fa-list-check"></i>  Blood List</a>
+                    <a class="btn btn-primary btn-sm" href="{{route('blood.group.list')}}"><i class="fas fa-list-check"></i>  Blood List</a>
                 </div>
             </div>
         </div>
@@ -48,41 +48,45 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <h3 class="text-capitalize">List of blood group</h3>
-                <table class="table table-sm" id="datatablesSimple">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Blood Group</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(isset($bloods) && count($bloods))
-                            @php
-                                $no= 1;
-                            @endphp
-                            @foreach($bloods as $b)
-                                <tr>
-                                    <td>{!! $no++ !!}</td>
-                                    <td>{!! $b->blood_type !!}</td>
-                                    <td>
-                                        <form action="{{route('delete.blood.group')}}" class="display-inline" method="post">
-                                            @method('delete')
-                                            @csrf
-                                            <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($b->id) !!}">
-                                            <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @else
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="text-capitalize">List of blood group</h3>
+                        <table class="table table-sm" id="datatablesSimple">
+                            <thead>
                             <tr>
-                                <td colspan="3" class="text-danger text-center">Not Found!</td>
+                                <th>No</th>
+                                <th>Blood Group</th>
+                                <th>Action</th>
                             </tr>
-                        @endif
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                            @if(isset($bloods) && count($bloods))
+                                @php
+                                    $no= 1;
+                                @endphp
+                                @foreach($bloods as $b)
+                                    <tr>
+                                        <td>{!! $no++ !!}</td>
+                                        <td>{!! $b->blood_type !!}</td>
+                                        <td>
+                                            <form action="{{route('delete.blood.group')}}" class="display-inline" method="post">
+                                                @method('delete')
+                                                @csrf
+                                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($b->id) !!}">
+                                                <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="3" class="text-danger text-center">Not Found!</td>
+                                </tr>
+                            @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 

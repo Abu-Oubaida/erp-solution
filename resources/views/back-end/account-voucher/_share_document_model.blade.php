@@ -9,8 +9,8 @@
                 <span><i class="fa-regular fa-envelope"></i> You can share your document link via email <sup class="text-danger">*</sup></span>
                 <div class="form-floating mb-3">
                     <div class="tags-input" id="tags-input">
-                        <input class="tag-input" type="text" list="users" placeholder="Add a people and group *" id="tag-input" onkeyup="return Obj.tagInput(this)">
-                        <datalist id="users">
+                        <input class="tag-input" type="text" list="users_email_list" placeholder="Add a people and group *" id="tag-input" onkeyup="return Obj.tagInput(this)">
+                        <datalist id="users_email_list">
                     @if(count($userEmails))
                         @foreach($userEmails as $u)
                             <option value="{!! $u->email !!}">{!! $u->name !!}</option>

@@ -71,37 +71,41 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Name</th>
-                            <th>Code</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(isset($deplist) && count($deplist))
-                            @php
-                                $no= 1;
-                            @endphp
-                            @foreach($deplist as $d)
-                                <tr>
-                                    <td>{!! $no++ !!}</td>
-                                    <td>{!! $d->dept_name !!}</td>
-                                    <td>{!! $d->dept_code !!}</td>
-                                    <td>@if($d->status==1) Active @else Inactive @endif</td>
-                                    <td></td>
-                                </tr>
-                            @endforeach
-                        @else
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <table class="table table-sm" id="datatablesSimple">
+                            <thead>
                             <tr>
-                                <td colspan="5" class="text-danger text-center">Not Found!</td>
+                                <th>No</th>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
-                        @endif
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                            @if(isset($deplist) && count($deplist))
+                                @php
+                                    $no= 1;
+                                @endphp
+                                @foreach($deplist as $d)
+                                    <tr>
+                                        <td>{!! $no++ !!}</td>
+                                        <td>{!! $d->dept_name !!}</td>
+                                        <td>{!! $d->dept_code !!}</td>
+                                        <td>@if($d->status==1) Active @else Inactive @endif</td>
+                                        <td></td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="5" class="text-danger text-center">Not Found!</td>
+                                </tr>
+                            @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 

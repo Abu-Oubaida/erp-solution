@@ -3,7 +3,7 @@
     <div class="container-fluid px-4">
         <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
         <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
-        <a class="btn btn-success btn-sm float-end" href="{{route('branch.list')}}"><i class="fas fa-list-check"></i>  Branch List</a>
+        <a class="btn btn-primary btn-sm float-end" href="{{route('branch.list')}}"><i class="fas fa-list-check"></i>  Branch List</a>
         <div class="row">
             <div class="col-md-12">
                 <ol class="breadcrumb mb-4">
@@ -74,65 +74,7 @@
 
                 <div class="card mb-4">
                     <div class="card-body">
-                        <div class="row">
-                            <h3 class="text-capitalize">List of Branch</h3>
-                            <table class="table table-sm" id="datatablesSimple">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Branch Name</th>
-                                        <th>Branch Type</th>
-                                        <th>Status</th>
-                                        <th>Created By</th>
-                                        <th>Updated By</th>
-                                        <th>Remarks</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Branch Name</th>
-                                        <th>Branch Type</th>
-                                        <th>Status</th>
-                                        <th>Created By</th>
-                                        <th>Updated By</th>
-                                        <th>Remarks</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </tfoot>
-                                <tbody>
-                                @if(isset($branches) && count($branches))
-                                    @php
-                                        $no= 1;
-                                    @endphp
-                                    @foreach($branches as $br)
-                                        <tr>
-                                            <td>{!! $no++ !!}</td>
-                                            <td>{!! $br->branch_name !!}</td>
-                                            <td>{!! $br->branchType->title !!}</td>
-                                            <td>@if($br->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
-                                            <td>{!! ($br->createdBy)?$br->createdBy->name:'' !!}</td>
-                                            <td>{!! ($br->updatedBy)?$br->updatedBy->name:'' !!}</td>
-                                            <td>{!! $br->remarks !!}</td>
-                                            <td>
-                                                <form action="" class="display-inline" method="post">
-                                                    @method('delete')
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($br->id) !!}">
-                                                    <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="3" class="text-danger text-center">Not Found!</td>
-                                    </tr>
-                                @endif
-                                </tbody>
-                            </table>
-                        </div>
+                        @include('back-end.branch._branch_list_data')
                     </div>
                 </div>
             </div>
@@ -186,53 +128,7 @@
                     </div>
                     <div class="card mb-4">
                         <div class="card-body">
-                            <div class="row">
-                                <h3 class="text-capitalize">List of Branch Type</h3>
-                                <table class="table table-sm" id="">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Title</th>
-                                            <th>Status</th>
-                                            <th>Code</th>
-                                            <th>Created By</th>
-                                            <th>Updated By</th>
-                                            <th>Remarks</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    @if(isset($branchTypeAll) && count($branchTypeAll))
-                                        @php
-                                            $no= 1;
-                                        @endphp
-                                        @foreach($branchTypeAll as $b)
-                                            <tr>
-                                                <td>{!! $no++ !!}</td>
-                                                <td>{!! $b->title !!}</td>
-                                                <td>@if($b->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
-                                                <td>{!! $b->code !!}</td>
-                                                <td>{!! ($b->createdBy)?$b->createdBy->name:'' !!}</td>
-                                                <td>{!! ($b->updatedBy)?$b->updatedBy->name:'' !!}</td>
-                                                <td>{!! $b->remarks !!}</td>
-                                                <td>
-                                                    <form action="{{route('delete.blood.group')}}" class="display-inline" method="post">
-                                                        @method('delete')
-                                                        @csrf
-                                                        <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($b->id) !!}">
-                                                        <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @else
-                                        <tr>
-                                            <td colspan="7" class="text-danger text-center">Not Found!</td>
-                                        </tr>
-                                    @endif
-                                    </tbody>
-                                </table>
-                            </div>
+                            @include('back-end.branch._branch_type_list')
                         </div>
                     </div>
                 </div>

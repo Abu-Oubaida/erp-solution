@@ -71,88 +71,93 @@
                 </div>
             </div>
             <div class="col-md-12">
-                <table id="datatablesSimple">
-                    <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Parent</th>
-                        <th>Type</th>
-                        <th>Name</th>
-                        <th>Display Name</th>
-                        <th>Details</th>
-                        <th>Created By</th>
-                        <th>Updated By</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tfoot>
-                    <tr>
-                        <th>No</th>
-                        <th>Parent</th>
-                        <th>Type</th>
-                        <th>Name</th>
-                        <th>Display Name</th>
-                        <th>Details</th>
-                        <th>Created At</th>
-                        <th>Updated At</th>
-                        <th>Action</th>
-                    </tr>
-                    </tfoot>
-                    <tbody>
-                    @if(isset($permissions) && count($permissions))
-                        @php
-//                            $no= count($permissions);
-                            $no= 1;
-                        @endphp
-                        @foreach($permissions as $data)
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="text-capitalize">Permission list</h3>
+                        <table id="permissionstable">
+                            <thead>
                             <tr>
-                                <td><strong>{!! $no !!}</strong></td>
-                                <td><strong>{!! ($data->parentName != null)?$data->parentName->display_name:"NULL"  !!}</strong></td>
-                                <td><strong>{!! $data->is_parent == null ?"Chile":"Parent"   !!}</strong></td>
-                                <td><strong>{!! $data->name   !!}</strong></td>
-                                <td><strong>{!! $data->display_name   !!}</strong></td>
-                                <td><strong>{!! $data->description   !!}</strong></td>
-                                <td><strong>{!! date('d-M-y',strtotime($data->created_at))   !!}</strong></td>
-                                <td><strong>{!! date('d-M-y',strtotime($data->updated_at))   !!}</strong></td>
-                                <td>
-                                    <form action="{{route('permission.input.delete')}}" class="display-inline" method="post">
-                                        @method('delete')
-                                        @csrf
-                                        <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($data->id) !!}">
-                                        <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the parent permission?')"><i class="fas fa-trash"></i></button>
-                                    </form>
-                                </td>
+                                <th>No</th>
+                                <th>Parent</th>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>Display Name</th>
+                                <th>Details</th>
+                                <th>Created By</th>
+                                <th>Updated By</th>
+                                <th>Action</th>
                             </tr>
-                            @php($a=1)
-                            @foreach($data->childPermission as $child)
+                            </thead>
+                            <tfoot>
+                            <tr>
+                                <th>No</th>
+                                <th>Parent</th>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>Display Name</th>
+                                <th>Details</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                                <th>Action</th>
+                            </tr>
+                            </tfoot>
+                            <tbody>
+                            @if(isset($permissions) && count($permissions))
+                                @php
+                                    //                            $no= count($permissions);
+                                                                $no= 1;
+                                @endphp
+                                @foreach($permissions as $data)
+                                    <tr>
+                                        <td><strong>{!! $no !!}</strong></td>
+                                        <td><strong>{!! ($data->parentName != null)?$data->parentName->display_name:"NULL"  !!}</strong></td>
+                                        <td><strong>{!! $data->is_parent == null ?"Child":"Parent"   !!}</strong></td>
+                                        <td><strong>{!! $data->name   !!}</strong></td>
+                                        <td><strong>{!! $data->display_name   !!}</strong></td>
+                                        <td><strong>{!! $data->description   !!}</strong></td>
+                                        <td><strong>{!! date('d-M-y',strtotime($data->created_at))   !!}</strong></td>
+                                        <td><strong>{!! date('d-M-y',strtotime($data->updated_at))   !!}</strong></td>
+                                        <td>
+                                            <form action="{{route('permission.input.delete')}}" class="display-inline" method="post">
+                                                @method('delete')
+                                                @csrf
+                                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($data->id) !!}">
+                                                <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the parent permission?')"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    @php($a=1)
+                                    @foreach($data->childPermission as $child)
+                                        <tr>
+                                            <td><div class="text-end">{!! $no !!}.{!! $a++ !!}</div></td>
+                                            <td>{!! $data->display_name!!}</td>
+                                            <td>{!! ($child->is_parent == null) ?"Child":"<strong>Parent</strong>"   !!}</td>
+                                            <td>{!! $child->name   !!}</td>
+                                            <td>{!! $child->display_name   !!}</td>
+                                            <td>{!! $child->description   !!}</td>
+                                            <td>{!! date('d-M-y',strtotime($child->created_at))   !!}</td>
+                                            <td>{!! date('d-M-y',strtotime($child->updated_at))   !!}</td>
+                                            <td>
+                                                <form action="{{route('permission.input.delete')}}" class="display-inline" method="post">
+                                                    @method('delete')
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($child->id) !!}">
+                                                    <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the child permission?')"><i class="fas fa-trash"></i></button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    @php($no++)
+                                @endforeach
+                            @else
                                 <tr>
-                                    <td><div class="text-end">{!! $no !!}.{!! $a++ !!}</div></td>
-                                    <td>{!! $data->display_name!!}</td>
-                                    <td>{!! ($child->is_parent == null) ?"Chile":"<strong>Parent</strong>"   !!}</td>
-                                    <td>{!! $child->name   !!}</td>
-                                    <td>{!! $child->display_name   !!}</td>
-                                    <td>{!! $child->description   !!}</td>
-                                    <td>{!! date('d-M-y',strtotime($child->created_at))   !!}</td>
-                                    <td>{!! date('d-M-y',strtotime($child->updated_at))   !!}</td>
-                                    <td>
-                                        <form action="{{route('permission.input.delete')}}" class="display-inline" method="post">
-                                            @method('delete')
-                                            @csrf
-                                            <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($child->id) !!}">
-                                            <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the child permission?')"><i class="fas fa-trash"></i></button>
-                                        </form>
-                                    </td>
+                                    <td colspan="8" class="text-danger text-center">Not Found!</td>
                                 </tr>
-                            @endforeach
-                            @php($no++)
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="8" class="text-danger text-center">Not Found!</td>
-                        </tr>
-                    @endif
-                    </tbody>
-                </table>
+                            @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 

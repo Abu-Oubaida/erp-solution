@@ -12,11 +12,13 @@ class BrachController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
      */
     public function index()
     {
         //
+        $branches = branch::with(['branchType','createdBy','updatedBy'])->orderBY('branch_name','asc')->get();
+        $branchTypeAll = BranchType::with(['createdBy','updatedBy'])->orderBY('code','asc')->get();
+        return view('back-end/branch/list',compact('branches','branchTypeAll'));
     }
 
     /**

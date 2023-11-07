@@ -67,37 +67,41 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Name</th>
-                            <th>Priority</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(isset($designations) && count($designations))
-                            @php
-                                $no= 1;
-                            @endphp
-                            @foreach($designations as $d)
-                                <tr>
-                                    <td>{!! $no++ !!}</td>
-                                    <td>{!! $d->title !!}</td>
-                                    <td>{!! $d->priority !!}</td>
-                                    <td>@if($d->status==1) Active @else Inactive @endif</td>
-                                    <td></td>
-                                </tr>
-                            @endforeach
-                        @else
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <table class="table table-sm" id="datatablesSimple">
+                            <thead>
                             <tr>
-                                <td colspan="5" class="text-danger text-center">Not Found!</td>
+                                <th>No</th>
+                                <th>Name</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
-                        @endif
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                            @if(isset($designations) && count($designations))
+                                @php
+                                    $no= 1;
+                                @endphp
+                                @foreach($designations as $d)
+                                    <tr>
+                                        <td>{!! $no++ !!}</td>
+                                        <td>{!! $d->title !!}</td>
+                                        <td>{!! $d->priority !!}</td>
+                                        <td>@if($d->status==1) Active @else Inactive @endif</td>
+                                        <td></td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="5" class="text-danger text-center">Not Found!</td>
+                                </tr>
+                            @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
