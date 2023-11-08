@@ -106,7 +106,7 @@
                                         <div class="form-floating mb-4">
                                             <select class="form-control" id="branch_type_status" name="branch_type_status" required>
                                                 <option value="1">Active</option>
-                                                <option value="2">Inactive</option>
+                                                <option value="0">Inactive</option>
                                             </select>
                                             <label for="branch_type_status">Branch Status<span class="text-danger">*</span></label>
                                         </div>

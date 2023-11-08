@@ -10,7 +10,7 @@
             <th>Created By</th>
             <th>Updated By</th>
             <th>Remarks</th>
-            <th>Action</th>
+            <th><div class="text-center">Action</div></th>
         </tr>
         </thead>
         <tbody>
@@ -28,12 +28,17 @@
                     <td>{!! ($b->updatedBy)?$b->updatedBy->name:'' !!}</td>
                     <td>{!! $b->remarks !!}</td>
                     <td>
-                        <form action="{{route('delete.blood.group')}}" class="display-inline" method="post">
-                            @method('delete')
-                            @csrf
-                            <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($b->id) !!}">
-                            <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
-                        </form>
+                        <div class="text-center">
+                            @if(auth()->user()->hasPermission('edit_branch_type'))
+                            <a href="{!! route('edit.branch.type',['branchTypeID'=>\Illuminate\Support\Facades\Crypt::encryptString($b->id)]) !!}" class="text-success"><i class="fas fa-edit"></i></a>
+                            @endif
+                            <form action="{{route('delete.branch.type')}}" class="display-inline" method="post">
+                                @method('delete')
+                                @csrf
+                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($b->id) !!}">
+                                <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             @endforeach

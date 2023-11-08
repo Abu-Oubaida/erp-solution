@@ -29,7 +29,9 @@
                     <td>{!! $br->remarks !!}</td>
                     <td>
                         <div class="text-center">
-                            <a href="" class="text-success"><i class="fas fa-edit"></i></a>
+                            @if(auth()->user()->hasPermission('edit_branch'))
+                                <a href="{!! route('edit.branch',['branchID'=>\Illuminate\Support\Facades\Crypt::encryptString($br->id)]) !!}" class="text-success"><i class="fas fa-edit"></i></a>
+                            @endif
                             <form action="" class="display-inline" method="post">
                                 @method('delete')
                                 @csrf

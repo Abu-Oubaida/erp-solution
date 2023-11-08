@@ -6,6 +6,8 @@ use App\Models\branch;
 use App\Models\BranchType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Validation\Rule;
 
 class BrachController extends Controller
 {
@@ -90,24 +92,59 @@ class BrachController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request,$id)
     {
         //
+        try {
+            if ($request->isMethod('put'))
+            {
+                return $this->update($request,$id);
+            }
+            $id = Crypt::decryptString($id);
+            $branch = branch::with('branchType')->where('id',$id)->first();
+            $branchTypeActive = BranchType::where('status',1)->orderBY('code','asc')->get();
+            $branches = branch::with(['branchType','createdBy','updatedBy'])->orderBY('branch_name','asc')->get();
+            return view('back-end/branch/edit',compact('branch','branchTypeActive','branches'));
+//            dd($branch);
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         //
+        try {
+            $request->validate([
+                'branch_name'   => ['required','string', Rule::unique('branches', 'branch_name')->ignore(Crypt::decryptString($id))],
+                'branch_type'   => ['required','string','exists:branch_types,id'],
+                'branch_status'   => ['required','string'],
+                'remarks'   => ['sometimes','nullable','string'],
+            ]);
+            extract($request->post());
+            $branchID = Crypt::decryptString($id);
+            if ($branch_status)
+                $status = 1;
+            else
+                $status = 0;
+            branch::where('id',$branchID)->update([
+                'branch_name'   =>  $branch_name,
+                'branch_type'   =>  $branch_type,
+                'status'   =>  $status,
+                'remarks'   =>  $remarks,
+                'updated_by'   =>  Auth::user()->id,
+            ]);
+            return back()->with('success','Data update successfully!');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
     }
 
     /**

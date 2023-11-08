@@ -224,6 +224,12 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:add_branch_type'])->group(function (){
             Route::match(['post'],'add-branch-type','store')->name('add.branch.type');
         });
+        Route::middleware(['permission:edit_branch_type'])->group(function (){
+            Route::match(['put','get'],'edit-branch-type/{branchTypeID}','edit')->name('edit.branch.type');
+        });
+        Route::middleware(['permission:delete_branch_type'])->group(function (){
+            Route::match(['delete'],'delete-branch-type}','destroy')->name('delete.branch.type');
+        });
     });
     Route::controller(BrachController::class)->group(function (){
         Route::middleware(['permission:list_branch'])->group(function (){
@@ -231,6 +237,9 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::middleware(['permission:add_branch'])->group(function (){
             Route::match(['post','get'],'add-branch','create')->name('add.branch');
+        });
+        Route::middleware(['permission:edit_branch'])->group(function (){
+            Route::match(['put','get'],'edit-branch/{branchID}','edit')->name('edit.branch');
         });
 
     });// 3.10 End
