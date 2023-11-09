@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-2">
                 <div class="float-end">
-                    <a class="btn btn-success btn-sm" href="{{route('add.user')}}"><i class="fas fa-list-ol"></i> Add User</a>
+                    <a class="btn btn-success btn-sm" href="{{route('add.user')}}"><i class="fa-solid fa-circle-plus"></i> Add User</a>
                 </div>
             </div>
         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\superadmin;
 
+use App\Exports\EmployeeListPrototypeDataExport;
 use App\Exports\UsersSalaryCertificateDataExport;
 use App\Exports\UsersSalaryDataExport1;
 use App\Http\Controllers\Controller;
@@ -14,7 +15,8 @@ use App\Models\Permission;
 use App\Models\PermissionUser;
 use App\Models\Role;
 use App\Models\User;
-use App\Rules\BraccheStatusRule;
+use App\Models\UserBranchChangeHistory;
+use App\Rules\BranchStatusRule;
 use App\Rules\DepartmentStatusRule;
 use App\Rules\DesignationStatusRule;
 use App\Rules\RoleStatusRule;
@@ -63,50 +65,33 @@ class UserController extends Controller
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
                 'dept'  => ['required', 'integer', new DepartmentStatusRule],
                 'designation'  => ['required', 'integer', new DesignationStatusRule],
-                'branch'  => ['required', 'integer', new BraccheStatusRule],
+                'branch'  => ['required', 'integer', new BranchStatusRule],
                 'roll'  => ['required','integer', new RoleStatusRule],
+                'joining_date'  => ['required','date'],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
             ]);
             if ($request->isMethod('post'))
             {
+//                dd($request->post());
                 extract($request->post());
-                $branches = branch::where('id',$branch)->where('status',1)->first();
-                if ($branches->branch_type == 'head office') $header = 'H'; else $header = "P";
-                $previousUsers = User::where('status',1)->get();
-                $previousUserCount = count($previousUsers);
-                $threeDigitId = str_pad($previousUserCount, 3, '0', STR_PAD_LEFT);
-                $nid = $header.$depts->dept_code.$threeDigitId;
-                while (User::where('employee_id',$nid)->first())
-                {
-                    $threeDigitId++;
-                    $nid = $header.$depts->dept_code.(str_pad($threeDigitId, 3, '0', STR_PAD_LEFT));
-                }
-
-//            dd($priviusUserCount >= 10 && $priviusUserCount < 100);
-//                if ($priviusUserCount < 10)
-//                {
-//                    $priviusUserCount++;
-//                    $empID = ($depts->dept_code."00");
-//                }
-//                elseif ($priviusUserCount >= 10 && $priviusUserCount < 100)
-//                {
-//                    $priviusUserCount++;
-//                    $empID = ($depts->dept_code."0");
-//                }
-//                else {
-//                    $priviusUserCount++;
-//                    $empID = $depts->dept_code;
-//                }
-
+                $dept = department::where('id',$dept)->first();
+                $joining_year = date('y',strtotime($joining_date));
+                $joining_month = date('m',strtotime($joining_date));
+                $countOfEmployee = User::where('dept_id',$dept->id)->count();
+                $fourDigit = str_pad($countOfEmployee, 4, "0", STR_PAD_LEFT);
+                $eid = $joining_year.$joining_month.$dept->dept_code.$fourDigit;
+                $roles = Role::where('id',$roll)->first();
+//                dd($roles);
                 $user = User::create([
-                    'employee_id' => $nid,
+                    'employee_id' => $eid,
                     'name' => $name,
                     'phone' => $phone,
                     'email' => $email,
-                    'dept_id' => $depts->id,
+                    'dept_id' => $dept->id,
                     'status' => 1,
                     'designation_id' => $designation,
-                    'branch_id' => $branches->id,
+                    'branch_id' => $branch,
+                    'joining_date' => date('y-m-d',strtotime($joining_date)),
                     'password' => Hash::make($request->password),
                 ]);
 
@@ -144,13 +129,14 @@ class UserController extends Controller
             unset($fileManagers[1]);
             $permissionParents = Permission::where('parent_id',null)->orWhere('is_parent',1)->get();
             $userPermissions = PermissionUser::with('permissionParent')->where('user_id',$userID)->orderBy('permission_name','asc')->get();
-            $deptlist = department::where('status',1)->get();
+            $deptLists = department::where('status',1)->get();
             $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
             $roles = Role::get();
             $designations = Designation::where('status',1)->get();
+            $branches = branch::where('status',1)->get();
             $user = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.id',$userID)->first();
 //        dd($designations);
-            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptlist','permissionParents','userPermissions','designations'));
+            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','permissionParents','userPermissions','designations','branches'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -371,6 +357,34 @@ class UserController extends Controller
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
+    public function userBranchChange(Request $request)
+    {
+        try {
+            if ($request->isMethod('put'))
+            {
+                $request->validate([
+                    'id'  =>  ['required','string',new UserStatusCheck],
+                    'branch_id'  =>  ['required','integer', new BranchStatusRule]
+                ]);
+                extract($request->post());
+                $userId = Crypt::decryptString($id);
+                $oldData = User::find($userId);
+                User::where('id',$userId)->update([
+                    'branch_id'   =>  $branch_id,
+                ]);
+                UserBranchChangeHistory::create([
+                    'transfer_user_id'=>$userId,
+                    'new_branch_id'=>$branch_id,
+                    'old_designation_id'=>$oldData->branch_id,
+                    'transfer_by'=>Auth::user()->id,
+                ]);
+                return back()->with('success','Data updated successfully!');
+            }
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+    }
 
     public function UserEdit(Request $request,$id)
     {
@@ -399,50 +413,50 @@ class UserController extends Controller
                 'name'  => ['required', 'string', 'max:255'],
                 'phone' => ['required', 'numeric', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
                 'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
-                'dept'  => ['required', 'exists:departments,id'],
-                'branch'  => ['required', 'exists:branches,id'],
-                'roll'  => ['required','numeric', 'exists:roles,id'],
+//                'dept'  => ['required', 'exists:departments,id'],
+//                'branch'  => ['required', 'exists:branches,id'],
+//                'roll'  => ['required','numeric', 'exists:roles,id'],
             ]);
             extract($request->post());
             $UserID = Crypt::decryptString($id);
             $user = User::where('id',$UserID)->first();
-            $depts = department::where('id',$dept)->first();
-            $branches = branch::where('id',$branch)->first();
-            if (!$depts)
-            {
-                return back()->with('error','Department not found!')->withInput();
-            }
-            if (!$branches)
-            {
-                return back()->with('error','Branches not found!')->withInput();
-            }
-
-            if ($user->dept_id != $dept)
-            {
-                DB::table('department_transfer_histories')->insert([
-                    'transfer_user_id'=>$UserID,
-                    'new_dept_id'=>$dept,
-                    'from_dept_id'=>$user->dept_id,
-                    'transfer_by'=>Auth::user()->id,
-                    'created_at'=>now(),
-                ]);
-            }
-            if ($user->branch_id != $branch)
-            {
-                DB::table('branch_transfer_histories')->insert( [
-                    'transfer_user_id'=>$UserID,
-                    'new_branch_id'=>$branch,
-                    'from_branch_id'=>$user->branch_id,
-                    'transfer_by'=>Auth::user()->id,
-                    'created_at'=>now(),
-                ]);
-            }
+//            $depts = department::where('id',$dept)->first();
+//            $branches = branch::where('id',$branch)->first();
+//            if (!$depts)
+//            {
+//                return back()->with('error','Department not found!')->withInput();
+//            }
+//            if (!$branches)
+//            {
+//                return back()->with('error','Branches not found!')->withInput();
+//            }
+//
+//            if ($user->dept_id != $dept)
+//            {
+//                DB::table('department_transfer_histories')->insert([
+//                    'transfer_user_id'=>$UserID,
+//                    'new_dept_id'=>$dept,
+//                    'from_dept_id'=>$user->dept_id,
+//                    'transfer_by'=>Auth::user()->id,
+//                    'created_at'=>now(),
+//                ]);
+//            }
+//            if ($user->branch_id != $branch)
+//            {
+//                DB::table('branch_transfer_histories')->insert( [
+//                    'transfer_user_id'=>$UserID,
+//                    'new_branch_id'=>$branch,
+//                    'from_branch_id'=>$user->branch_id,
+//                    'transfer_by'=>Auth::user()->id,
+//                    'created_at'=>now(),
+//                ]);
+//            }
             User::where('id',$UserID)->update([
                 'name' => $name,
                 'phone' => $phone,
                 'email' => $email,
-                'dept_id' => $depts->id,
-                'branch_id' => $branches->id,
+//                'dept_id' => $depts->id,
+//                'branch_id' => $branches->id,
 
             ]);
             return back()->with('success','Data update successfully!');
@@ -453,8 +467,9 @@ class UserController extends Controller
         }
     }
 
-    public function exportUserSalaryPrototype()
+    public function exportEmployeeDataPrototype()
     {
-        return Excel::download(new UsersSalaryCertificateDataExport,'salary certificate input data.xlsx');
+        return Excel::download(new EmployeeListPrototypeDataExport,'employee.xlsx');
     }
+
 }

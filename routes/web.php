@@ -71,9 +71,6 @@ Route::group(['middleware' => ['auth']],function (){
         Route::controller(UserController::class)->group(function (){
             Route::post('user-per-add','UserPerSubmit');
             Route::post('user-per-delete','UserPerDelete');
-            Route::middleware(['permission:salary_certificate_input'])->group(function () {
-                Route::get('export-user-salary-prototype','exportUserSalaryPrototype')->name('export.user.salary.prototype');
-            });
         });//3.2.3 End
     });//3.2 End
 
@@ -99,11 +96,16 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('user-password-change','userPasswordChange')->name('user.password.change');
             Route::put('user-dept-change','userDepartmentChange')->name('user.dept.change');
             Route::put('user-designation-change','userDesignationChange')->name('user.designation.change');
+            Route::put('user-branch-change','userBranchChange')->name('user.branch.change');
         });//3.3.4 End
 # 3.3.5 User delete
         Route::middleware(['permission:delete_user'])->group(function (){
             Route::delete('user-delete','UserDelete')->name('user.delete');
         });//3.3.5 End
+
+        Route::middleware(['permission:salary_certificate_input'])->group(function () {
+            Route::get('export-employee-prototype','exportEmployeeDataPrototype')->name('export.employee.data.prototype');
+        });
 
     });//3.3 End
 
@@ -171,6 +173,10 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:salary_certificate_list'])->group(function () {
             Route::match(['get'],'salary-certificate-list','salaryCertificateList')->name('salary.certificate.list');
         });//3.7.8
+
+        Route::middleware(['permission:salary_certificate_input'])->group(function () {
+            Route::get('export-user-salary-prototype','exportUserSalaryPrototype')->name('export.user.salary.prototype');
+        });
 
     });//3.7 End
 

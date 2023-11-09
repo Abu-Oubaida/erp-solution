@@ -4,7 +4,7 @@
         <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
         <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-9">
                 <ol class="breadcrumb mb-4">
                     <li class="breadcrumb-item">
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
@@ -14,9 +14,17 @@
                     </li>
                 </ol>
             </div>
-            <div class="col-md-2">
-                <div class="float-end">
-                    <a class="btn btn-success btn-sm" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  User List</a>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-success btn-sm float-end" href="{{route('add.user')}}"><i class="fa-solid fa-circle-plus"></i> Add User</a>
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-info btn-sm float-end" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  User List</a>
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-primary btn-sm float-end" href="{{route('user.single.view',['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><i class='fas fa-eye'></i>  User View</a>
+                    </div>
                 </div>
             </div>
         </div>

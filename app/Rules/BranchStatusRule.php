@@ -5,7 +5,7 @@ namespace App\Rules;
 use App\Models\branch;
 use Illuminate\Contracts\Validation\Rule;
 
-class BraccheStatusRule implements Rule
+class BranchStatusRule implements Rule
 {
     /**
      * Create a new rule instance.

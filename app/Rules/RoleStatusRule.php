@@ -28,7 +28,6 @@ class RoleStatusRule implements Rule
     {
         //
         return Role::where('id', $value)
-            ->where('status', 1)
             ->exists();
     }
 

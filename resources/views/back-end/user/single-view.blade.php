@@ -4,27 +4,26 @@
         <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
         <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-9">
                 <ol class="breadcrumb mb-4">
                     <li class="breadcrumb-item">
-                        <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="text-capitalize text-chl">Previous</a>
+                        <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
                         <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
                     </li>
                 </ol>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-3">
                 <div class="row">
-                    <div class="col-md-4">
-
+                    <div class="col">
+                        <a class="btn btn-success btn-sm float-end" href="{{route('add.user')}}"><i class="fa-solid fa-circle-plus"></i> Add User</a>
                     </div>
-                    <div class="col-md-8">
-{{--                        <div class="float-end">--}}
-{{--                            @if($com->status == 1)--}}
-{{--                                {!! ($com->user_id == \Illuminate\Support\Facades\Auth::user()->id)?"<a href='".route('edit.my.complain',['complainID'=>\Illuminate\Support\Facades\Crypt::encryptString($com->id)])."' class='btn btn-primary w-auto' role='button'><i class='fas fa-edit'></i> Edit</a>":''!!}--}}
-{{--                            @endif--}}
-{{--                        </div>--}}
+                    <div class="col">
+                        <a class="btn btn-info btn-sm float-end" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  User List</a>
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-primary btn-sm float-end" href="{{route('user.edit',['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><i class="fas fa-edit"></i>  User Edit</a>
                     </div>
                 </div>
             </div>
@@ -44,52 +43,48 @@
                                 @else
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="row">
-                                                <table>
-                                                    <thead>
-                                                    <tr>
-                                                        <th>User Information</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr>
-                                                        <th>Name:</th>
-                                                        <td>{!! $user->name !!}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Employee ID:</th>
-                                                        <td>{!! $user->employee_id !!}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Department:</th>
-                                                        <td>{!! $user->getDepartment->dept_name !!}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Access Role:</th>
-                                                        <td>@foreach ($user->roles as $role)
-                                                                {{ $roleNew = $role->display_name }}
-                                                            @endforeach</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Email:</th>
-                                                        <td>{!! $user->email !!}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Phone:</th>
-                                                        <td>{!! $user->phone !!}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Account Status:</th>
-                                                        <td>@if($user->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                            <table>
+                                                <thead>
+                                                <tr>
+                                                    <th>User Information</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <th>Name:</th>
+                                                    <td>{!! $user->name !!}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Employee ID:</th>
+                                                    <td>{!! $user->employee_id !!}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Department:</th>
+                                                    <td>{!! $user->getDepartment->dept_name !!}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Access Role:</th>
+                                                    <td>@foreach ($user->roles as $role)
+                                                            {{ $roleNew = $role->display_name }}
+                                                        @endforeach</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Email:</th>
+                                                    <td>{!! $user->email !!}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Phone:</th>
+                                                    <td>{!! $user->phone !!}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Account Status:</th>
+                                                    <td>@if($user->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="row">
-                                                <h4 class="text-center">Take Action Here</h4>
-                                            </div>
+                                            <h4 class="text-center">Take Action Here</h4>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <form action="{!! route("user.status.change") !!}" method="post">
@@ -152,9 +147,9 @@
                                                             <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
                                                             <select class="form-control" name="dept_id" id="">
                                                                 <option value="">--Select Option--</option>
-                                                                @if(isset($deptlist) && count($deptlist))
-                                                                    @foreach($deptlist as $d)
-                                                                        <option value="{{$d->id}}" @if($d->id == $user->dept_id) selected @endif>{!! $user->getDepartment->dept_name !!}</option>
+                                                                @if(isset($deptLists) && count($deptLists))
+                                                                    @foreach($deptLists as $d)
+                                                                        <option value="{{$d->id}}" @if($d->id == $user->getDepartment->id) selected @endif>{!! $d->dept_name !!}</option>
                                                                     @endforeach
                                                                 @endif
                                                             </select>
@@ -165,7 +160,25 @@
                                             </div>
                                             <br>
                                             <div class="row">
-                                                <div class="col-md-12">
+                                                <div class="col-md-6">
+                                                    <form action="{!! route('user.branch.change') !!}" method="post">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="input-group float-end">
+                                                            <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
+                                                            <select class="form-control" name="branch_id" id="">
+                                                                <option value="">--Select Option--</option>
+                                                                @if(isset($branches) && count($branches))
+                                                                    @foreach($branches as $branch)
+                                                                        <option value="{{$branch->id}}" @if($branch->id == $user->getBranch->id) selected @endif>{!! $branch->branch_name !!}</option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                            <button class="btn btn-primary btn-chl" onclick="return confirm('Are you sure change the user Breach?')" type="submit"> Change Branch</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-md-6">
                                                     <form action="{!! route('user.password.change') !!}" method="post">
                                                         @csrf
                                                         <div class="input-group float-end">
@@ -177,9 +190,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
-                                            <hr>
-                                        </div>
+{{--                                        <div class="col-md-12">--}}
+{{--                                            <hr>--}}
+{{--                                        </div>--}}
                                     </div>
                                 @endif
                             </div>
@@ -194,110 +207,117 @@
                             <div class="col-md-12">
                                 <h6><b>User All Module/Interface Permissions</b></h6>
                             </div>
-                            <div class="col-md-12">
-                                @if(!($user))
-                                    <div class="row">
-                                        <div class="col-md-12 text-center text-danger">
-                                            Not Found!
-                                        </div>
-                                    </div>
-                                @else
-
-                                    <div class="row">
-                                        <form action="{!! route('add.user.permission') !!}" method="post">
-                                            @csrf
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <label for="user">For User</label>
-                                                    <select class="form-control" id="user" name="user_id">
-                                                        <option value="{!! $user->id !!}" selected>{!! $user->name !!}</option>
-                                                    </select>
-
-                                                    <label for="parentPermission">Parent Permission</label>
-                                                    <select class="form-control" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
-                                                        <option value="">--Select Option--</option>
-                                                        @if($permissionParents)
-                                                            @foreach($permissionParents as $data)
-                                                                <option value="{!! $data->id !!}">{!! $data->display_name !!}</option>
-                                                            @endforeach
-                                                        @endif
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <label for="childPermission">Child Permission</label>
-                                                    <select class="form-control" id="childPermission" multiple="multiple" name="childPermission[]">
-                                                        <option value="none">1. None</option>
-                                                    </select>
-                                                    <sub>Multiple Option choice-able  <span class="badge bg-secondary">Ctrl + </span> OR <span class="badge bg-primary">Shift + </span></sub>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <button class="btn btn-primary btn-chl float-end" id="perAdding" name="perAdding" type="submit" onclick="return confirm('Are you sure!')"><i class="fas fa-plus"></i> Add</button>
-                                                </div>
+                            @if(strtolower($roleNew) == strtolower('superadmin'))
+                                <div class="col-md-12">
+                                    <strong class="text-center text-info">Super Admin has all the permissions by default! </strong>
+                                </div>
+                            @else
+                                <div class="col-md-12">
+                                    @if(!($user))
+                                        <div class="row">
+                                            <div class="col-md-12 text-center text-danger">
+                                                Not Found!
                                             </div>
-                                        </form>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <br>
-                                            <table id="datatablesSimple">
-                                                <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Parent Permission Name</th>
-                                                    <th>Child Permission Name</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                                </thead>
-                                                <tfoot>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Parent Permission Name</th>
-                                                    <th>Child Permission Name</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                                </tfoot>
-                                                <tbody>
-                                                @if(count($userPermissions))
-                                                    @php
-                                                        $i=1;
-                                                    @endphp
-                                                    @foreach($userPermissions as $p)
-                                                        <tr>
-                                                            <td>{!! $i++ !!}</td>
-                                                            <td>
+                                        </div>
+                                    @else
+
+                                        <div class="row">
+                                            <form action="{!! route('add.user.permission') !!}" method="post">
+                                                @csrf
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <label for="user">For User</label>
+                                                        <select class="form-control" id="user" name="user_id">
+                                                            <option value="{!! $user->id !!}" selected>{!! $user->name !!}</option>
+                                                        </select>
+
+                                                        <label for="parentPermission">Parent Permission</label>
+                                                        <select class="form-control" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
+                                                            <option value="">--Select Option--</option>
+                                                            @if($permissionParents)
+                                                                @foreach($permissionParents as $data)
+                                                                    <option value="{!! $data->id !!}">{!! $data->display_name !!}</option>
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <label for="childPermission">Child Permission</label>
+                                                        <select class="form-control" id="childPermission" multiple="multiple" name="childPermission[]">
+                                                            <option value="none">1. None</option>
+                                                        </select>
+                                                        <sub>Multiple Option choice-able  <span class="badge bg-secondary">Ctrl + </span> OR <span class="badge bg-primary">Shift + </span></sub>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <button class="btn btn-primary btn-chl float-end" id="perAdding" name="perAdding" type="submit" onclick="return confirm('Are you sure!')"><i class="fas fa-plus"></i> Add</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <br>
+                                                <table id="datatablesSimple">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Parent Permission Name</th>
+                                                        <th>Child Permission Name</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Parent Permission Name</th>
+                                                        <th>Child Permission Name</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    </tfoot>
+                                                    <tbody>
+                                                    @if(count($userPermissions))
+                                                        @php
+                                                            $i=1;
+                                                        @endphp
+                                                        @foreach($userPermissions as $p)
+                                                            <tr>
+                                                                <td>{!! $i++ !!}</td>
+                                                                <td>
                                                                 <span class="text-capitalize">
                                                                     {!! $p->permissionParent->display_name !!}
                                                                 </span>
-                                                            </td>
-                                                            <td>
+                                                                </td>
+                                                                <td>
                                                                 <span class="text-capitalize">
                                                                     @if($p->is_parent == null) {!! /*str_replace('_',' ',$p->permission_name)*/ $p->permission_name!!}@endif
                                                                 </span>
-                                                            </td>
+                                                                </td>
 
-                                                            <td class="">
-                                                                <form action="{!! route('remove.user.permission') !!}" class="display-inline" method="post">
-                                                                    @method('delete')
-                                                                    @csrf
-                                                                    <input type="hidden" name="user_id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($user->id) !!}">
-                                                                    <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($p->id) !!}">
-                                                                    <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this permission?')"><i class="fas fa-trash"></i></button>
-                                                                </form>
+                                                                <td class="">
+                                                                    <form action="{!! route('remove.user.permission') !!}" class="display-inline" method="post">
+                                                                        @method('delete')
+                                                                        @csrf
+                                                                        <input type="hidden" name="user_id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($user->id) !!}">
+                                                                        <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($p->id) !!}">
+                                                                        <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this permission?')"><i class="fas fa-trash"></i></button>
+                                                                    </form>
 
-                                                            </td>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    @else
+                                                        <tr>
+                                                            <td colspan="4" class="text-center text-danger">Not found!</td>
                                                         </tr>
-                                                    @endforeach
-                                                @else
-                                                    <tr>
-                                                        <td colspan="4" class="text-center text-danger">Not found!</td>
-                                                    </tr>
-                                                @endif
-                                                </tbody>
-                                            </table>
+                                                    @endif
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
-                                @endif
-                            </div>
+                                    @endif
+                                </div>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -318,31 +338,7 @@
                                     @if(strtolower($roleNew) == strtolower('superadmin'))
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <table class="table">
-                                                    <thead>
-                                                    <tr>
-                                                        <th>No</th>
-                                                        <th>Directory</th>
-                                                        <th>Permission</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr class="table-secondary">
-                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>
-                                                        </tr>
-                                                        @if(@$fileManagers && count($fileManagers))
-                                                            @foreach($fileManagers as $file)
-                                                                <tr>
-                                                                    <td>#</td>
-                                                                    <td>{!! $file !!}</td>
-                                                                    <td>Red/Write/Delete</td>
-                                                                    <td>Locked</td>
-                                                                </tr>
-                                                            @endforeach
-                                                        @endif
-                                                    </tbody>
-                                                </table>
+                                                <strong class="text-center text-info">Super Admin has all the permissions by default! </strong>
                                             </div>
                                         </div>
                                     @else
@@ -383,70 +379,6 @@
                                                     <tbody id="f-p-list">
                                                     @include("back-end.user._file-permission-list")
                                                     </tbody>
-{{--                                                    <tbody>--}}
-{{--                                                    @if(strtolower($user->display_name) == strtolower('admin'))--}}
-{{--                                                        <tr class="table-secondary">--}}
-{{--                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>--}}
-{{--                                                        </tr>--}}
-{{--                                                        <tr>--}}
-{{--                                                            <td>#</td>--}}
-{{--                                                            <td>admin</td>--}}
-{{--                                                            <td>Red/Write</td>--}}
-{{--                                                            <td>Locked</td>--}}
-{{--                                                        </tr>--}}
-{{--                                                        <tr>--}}
-{{--                                                            <td>#</td>--}}
-{{--                                                            <td>user</td>--}}
-{{--                                                            <td>Red/Write</td>--}}
-{{--                                                            <td>Locked</td>--}}
-{{--                                                        </tr><tr>--}}
-{{--                                                            <td>#</td>--}}
-{{--                                                            <td>common</td>--}}
-{{--                                                            <td>Red/Write</td>--}}
-{{--                                                            <td>Locked</td>--}}
-{{--                                                        </tr><tr>--}}
-{{--                                                            <td>#</td>--}}
-{{--                                                            <td>gest</td>--}}
-{{--                                                            <td>Red/Write</td>--}}
-{{--                                                            <td>Locked</td>--}}
-{{--                                                        </tr>--}}
-{{--                                                        @elseif (strtolower($user->display_name) == strtolower('user'))--}}
-{{--                                                        <tr class="table-secondary">--}}
-{{--                                                            <td colspan="4" class="text-center">{{$user->display_name}} Default Permission</td>--}}
-{{--                                                        </tr>--}}
-{{--                                                        <tr>--}}
-{{--                                                            <td>#</td>--}}
-{{--                                                            <td>user</td>--}}
-{{--                                                            <td>Red/Write</td>--}}
-{{--                                                            <td>Locked</td>--}}
-{{--                                                        </tr>--}}
-{{--                                                        <tr>--}}
-{{--                                                            <td>#</td>--}}
-{{--                                                            <td>common</td>--}}
-{{--                                                            <td>Red/Write</td>--}}
-{{--                                                            <td>Locked</td>--}}
-{{--                                                        </tr>--}}
-{{--                                                        <tr>--}}
-{{--                                                            <td>#</td>--}}
-{{--                                                            <td>gest</td>--}}
-{{--                                                            <td>Red/Write</td>--}}
-{{--                                                            <td>Locked</td>--}}
-{{--                                                        </tr>--}}
-{{--                                                    @else--}}
-{{--                                                        <tr>--}}
-{{--                                                            <td>#</td>--}}
-{{--                                                            <td>common</td>--}}
-{{--                                                            <td>Only View</td>--}}
-{{--                                                            <td>Locked</td>--}}
-{{--                                                        </tr>--}}
-{{--                                                        <tr>--}}
-{{--                                                            <td>#</td>--}}
-{{--                                                            <td>gest</td>--}}
-{{--                                                            <td>Only View</td>--}}
-{{--                                                            <td>Locked</td>--}}
-{{--                                                        </tr>--}}
-{{--                                                    @endif--}}
-{{--                                                    </tbody>--}}
                                                 </table>
                                             </div>
                                         </div>

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('transfer_user_id');
             $table->unsignedBigInteger('new_branch_id');
-            $table->unsignedBigInteger('from_branch_id');
-            $table->unsignedBigInteger('transfer_by');
+            $table->unsignedBigInteger('from_branch_id')->nullable();
+            $table->unsignedBigInteger('transfer_by')->nullable();
             $table->timestamps();
         });
     }

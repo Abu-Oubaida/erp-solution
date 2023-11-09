@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UsersSalaryCertificateDataExport;
 use App\Models\Account_voucher;
 use App\Models\User;
 use App\Models\UserSalaryCertificateData;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AccountVoucherController extends Controller
 {
@@ -426,5 +428,9 @@ class AccountVoucherController extends Controller
         {
             return back()->with('error',$exception->getMessage());
         }
+    }
+    public function exportUserSalaryPrototype()
+    {
+        return Excel::download(new UsersSalaryCertificateDataExport,'salary certificate input data.xlsx');
     }
 }

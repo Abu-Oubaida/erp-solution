@@ -106,11 +106,50 @@ if(window.location.port)
                 reader.readAsBinaryString(file)
             }
         });
+
+        $('#employee_file_upload').on('change',function (e){
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader()
+                reader.onload = function (e) {
+                    const data = e.target.result
+                    const workbook = XLSX.read(data, { type: "binary" })
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 })
+                    if(jsonData[0].length !== 10)
+                    {
+                        alert('Invalid input data! Please flowing the prototype of data format!')
+                        return false
+                    }
+                    if (!((jsonData[0][0] === 'Employee Name*' || jsonData[0][0] === 'Employee Name') && (jsonData[0][1] === 'Department') && (jsonData[0][2] === 'Department Code*') && (jsonData[0][2] === 'Department Code' || jsonData[0][3] === 'Designation*' ) && (jsonData[0][3] === 'Designation' || jsonData[0][4] === 'Branch' ) && (jsonData[0][5] === 'Joining Date*' || jsonData[0][5] === 'Joining Date' ) && (jsonData[0][6] === 'Phone') && (jsonData[0][7] === 'Email') && (jsonData[0][8] === 'Status') && (jsonData[0][9] === 'Blood Group')))
+                    {
+                        alert('Invalid input data! Please flowing the prototype of data format!')
+                        return false
+                    }
+                    for (let i = 0; i < jsonData.length; i++) {
+                        let zero = jsonData[0].length
+                        for (let j = 0; j < zero; j++) {
+                            if(typeof jsonData[i][j] === 'undefined')
+                            {
+                                jsonData[i][j] = null
+                            }
+                            else if (i !== 0 && j === 5)
+                            {
+                                jsonData[i][j] = ExcelDateToJSDate(jsonData[i][j])
+                            }
+                        }
+                    }
+                    employeeDatas.push(jsonData)
+                    showModal(employeeDatas,file.name);
+                };
+                reader.readAsBinaryString(file)
+            }
+        });
         // Function to display the modal
         function showModal(data,fileName) {
             const modal = document.getElementById("myModal");
             const modelTitle = document.getElementById("userDataModelLabel")
-            const dataTable = document.getElementById("data-table");
+            const dataTable = document.getElementById("datatablesSimple");
             while (dataTable.firstChild) {
                 dataTable.removeChild(dataTable.firstChild)
             }
@@ -156,7 +195,10 @@ if(window.location.port)
             modelTitle.innerText = fileName
             $('#myModal').modal('show')
         }
-
+        function ExcelDateToJSDate(serial) {
+            const dateToString = d => `${('00' + d.getDate()).slice(-2)}-${('00' + (d.getMonth() + 1)).slice(-2)}-${d.getFullYear()}`
+            return dateToString(new Date(Math.round((serial - 25569)*86400*1000)));
+        }
         Obj = {
             fiendPermissionChild : function (e,actionID) {
                 let id = $(e).val()

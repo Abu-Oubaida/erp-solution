@@ -1,5 +1,5 @@
 @if(auth()->user()->hasPermission('add_user') || auth()->user()->hasPermission('list_user') || auth()->user()->hasPermission('view_user') || auth()->user()->hasPermission('edit_user'))
-    @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'edit.user')
+    @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'user.edit')
         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#users" aria-expanded="true" aria-controls="users">
             <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
             Users
@@ -36,7 +36,7 @@
                 @endif
                 @if(auth()->user()->hasPermission('edit_user'))
                     @if(Route::currentRouteName() == 'user.edit')
-                        <a class="nav-link" href="{{route("user.edit",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
+                        <a class="nav-link" href="{{route("user.edit",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> User Profile</a>
                     @endif
                 @endif
             </nav>
