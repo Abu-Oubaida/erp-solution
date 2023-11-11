@@ -21,7 +21,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = ['id', 'employee_id', 'name', 'phone', 'email', 'dept_id', 'status', 'designation_id', 'branch_id', 'joining_date','birthdate', 'profile_pic', 'email_verified_at', 'password', 'remember_token', 'created_at', 'updated_at','blood_id','phone_2','email_2','father_name','mother_name','home_no','village','word_no','union','city','sub-district','district','division','capital','country'];
+    protected $fillable = ['id', 'employee_id','employee_id_hidden', 'name', 'phone', 'email', 'dept_id', 'status', 'designation_id', 'branch_id', 'joining_date','birthdate', 'profile_pic', 'email_verified_at', 'password', 'remember_token', 'created_at', 'updated_at','blood_id','phone_2','email_2','father_name','mother_name','home_no','village','word_no','union','city','sub-district','district','division','capital','country'];
 
     /**
      * The attributes that should be hidden for serialization.

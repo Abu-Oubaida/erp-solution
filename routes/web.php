@@ -79,6 +79,7 @@ Route::group(['middleware' => ['auth']],function (){
 # 3.3.1 Add user
         Route::middleware(['permission:add_user'])->group(function (){
             Route::match(['post','get'],'add-user','create')->name('add.user');
+            Route::match(['post'],'add-user-excel','excelStore');
         });//3.3.1 End
 # 3.3.2 User List
         Route::middleware(['permission:list_user'])->group(function (){

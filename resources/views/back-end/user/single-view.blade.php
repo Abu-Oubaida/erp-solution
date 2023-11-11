@@ -55,6 +55,10 @@
                                                     <td>{!! $user->name !!}</td>
                                                 </tr>
                                                 <tr>
+                                                    <th>Joining Date:</th>
+                                                    <td>{!! date('d-M-Y',strtotime($user->joining_date)) !!}</td>
+                                                </tr>
+                                                <tr>
                                                     <th>Employee ID:</th>
                                                     <td>{!! $user->employee_id !!}</td>
                                                 </tr>

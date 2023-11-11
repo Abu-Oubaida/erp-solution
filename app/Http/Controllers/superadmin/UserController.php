@@ -6,6 +6,7 @@ use App\Exports\EmployeeListPrototypeDataExport;
 use App\Exports\UsersSalaryCertificateDataExport;
 use App\Exports\UsersSalaryDataExport1;
 use App\Http\Controllers\Controller;
+use App\Models\BloodGroup;
 use App\Models\branch;
 use App\Models\department;
 use App\Models\Designation;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Maatwebsite\Excel\Facades\Excel;
@@ -75,15 +77,12 @@ class UserController extends Controller
 //                dd($request->post());
                 extract($request->post());
                 $dept = department::where('id',$dept)->first();
-                $joining_year = date('y',strtotime($joining_date));
-                $joining_month = date('m',strtotime($joining_date));
-                $countOfEmployee = User::where('dept_id',$dept->id)->count();
-                $fourDigit = str_pad($countOfEmployee, 4, "0", STR_PAD_LEFT);
-                $eid = $joining_year.$joining_month.$dept->dept_code.$fourDigit;
+                $eid = $this->getEid($dept, $joining_date);
                 $roles = Role::where('id',$roll)->first();
 //                dd($roles);
                 $user = User::create([
-                    'employee_id' => $eid,
+                    'employee_id' => $eid[1],
+                    'employee_id_hidden'    => $eid[0],
                     'name' => $name,
                     'phone' => $phone,
                     'email' => $email,
@@ -106,11 +105,120 @@ class UserController extends Controller
 
     }
 
+    public function excelStore(Request $request)
+    {
+        try {
+            $input = $request->post()['input'];
+            unset($input[0]);
+            $rules = [
+                '*.0'   =>  ['required','string'],
+                '*.1'   =>  ['required','exists:departments,dept_name'],
+                '*.2'   =>  ['required','exists:departments,dept_code'],
+                '*.3'   =>  ['required','exists:designations,title'],
+                '*.4'   =>  ['required','exists:branches,branch_name'],
+                '*.5'   =>  ['required','date'],
+                '*.6'   =>  ['required','numeric','unique:users,phone',],
+                '*.7'   =>  ['required','email','unique:users,email'],
+                '*.8'   =>  ['sometimes','nullable','numeric'],
+                '*.9'   =>  ['sometimes','nullable','exists:blood_groups,blood_type'],
+            ];
+            $customMessages = [
+                '*.1.exists' => 'The department name does not exist in the Database.',
+                '*.2.exists' => 'The department code does not exist in the Database.',
+                '*.3.exists' => 'The designations title does not exist in the Database.',
+                '*.4.exists' => 'The branches name does not exist in the Database.',
+                '*.6.unique' => 'The phone number already exist in the Database.',
+                '*.7.unique' => 'The email address already exist in the Database.',
+                '*.9.exists' => 'The blood group does not exist in the Database.',
+            ];
+            $validator = Validator::make($input,$rules,$customMessages);
+            // Check if validation fails
+            if ($validator->fails()) {
+                // Return an error response in JSON format
+                $errors = $validator->errors();
+                $response = [
+                    'error' => true,
+                    'message' => 'Validation failed',
+                    'errors' => $errors,
+                ];
+            }else{
+                // Return a success response in JSON format
+                $unStored=[];
+                $alreadyHave=[];
+                $stored=[];
+                foreach ($input as $key=>$data)
+                {
+                    $dept = department::where('dept_name',$data[1])->where('dept_code',$data[2])->first();
+                    $designation = Designation::where('title',$data[3])->first();
+                    $branch = branch::where('branch_name',$data[4])->first();
+                    $blood = BloodGroup::where('blood_type',$data[9])->first();
+                    ($blood)? $b_id = $blood->id:$b_id = null;
+                    ($data[8])?$status = $data[8]:$status = 0;
+                    $eid = $this->getEid($dept, $data[5]);
+                    $alreadyInDB = User::where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
+                    if (!$alreadyInDB)
+                    {
+                        $user = User::create([
+                            'employee_id' => $eid[1],
+                            'employee_id_hidden'    => $eid[0],
+                            'name' => $data[0],
+                            'phone' => $data[6],
+                            'email' => $data[7],
+                            'dept_id' => $dept->id,
+                            'status' => $status,
+                            'designation_id' => $designation->id,
+                            'branch_id' => $branch->id,
+                            'joining_date' => $data[5],
+                            'password' => Hash::make('12345'),
+                            'blood_id' => $b_id,
+                        ]);
+                        if ($user)
+                        {
+                            $user->attachRole('user');
+                            $stored[$key] = [
+                                'Employee Name'  =>  $data[0],
+                                'phone'  =>  $data[6],
+                                'email'  =>  $data[7],
+                            ];
+                        }
+                        else{
+                            $unStored[$key] = [
+                                'Employee Name'  =>  $data[0],
+                                'phone'  =>  $data[6],
+                                'email'  =>  $data[7],
+                            ];
+                        }
+                    }else{
+                        $alreadyHave[$key] = [
+                            'Employee Name'  =>  $data[0],
+                            'phone'  =>  $data[6],
+                            'email'  =>  $data[7],
+                        ];
+                    }
+                }
+                $response = [
+                    'error' => false,
+                    'errorMessage' => $unStored? $unStored:null,
+                    'successMessage' => $stored? $stored:null,
+                    'alreadyHasMessage' => $alreadyHave? $alreadyHave:null,
+                ];
+            }
+            return response()->json($response, 200);
+        }catch (\Throwable $exception)
+        {
+            $response = [
+                'error' => true,
+                'code' => $exception->getCode(), // You can use any appropriate error code
+                'message' => $exception->getMessage(),
+            ];
+            return response()->json($response, 200);
+        }
+    }
+
     public function show()
     {
         try {
             $users = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.status','!=',5)->get();
-//            dd($users);
             return view('back-end/user/list',compact('users'));
         }catch (\Throwable $exception)
         {
@@ -135,7 +243,6 @@ class UserController extends Controller
             $designations = Designation::where('status',1)->get();
             $branches = branch::where('status',1)->get();
             $user = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.id',$userID)->first();
-//        dd($designations);
             return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','permissionParents','userPermissions','designations','branches'));
         }catch (\Throwable $exception)
         {
@@ -261,12 +368,18 @@ class UserController extends Controller
             try {
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                if($role_users = DB::table('role_user')->where('role_id',$user_role)->first())
+                if(DB::table('role_user')->where('user_id',$userId)->first())
                 {
                     DB::table('role_user')->where('user_id',$userId)->update(['role_id'=>$user_role]);
                 }
+                else{
+                    DB::table('role_user')->create([
+                        'role_id'=>$user_role,
+                        'user_id'=>$userId,
+                        'user_type'=>'App\Models\User'
+                    ]);
+                }
                 return back()->with('success','Data update successfully');
-
             }catch (\Throwable $exception)
             {
                 return back()->with('error',$exception->getMessage());
@@ -304,12 +417,25 @@ class UserController extends Controller
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
                 $oldData = User::where('id',$userId)->first();
-                if(department::where('id',$dept_id)->first())
+                if (!($oldData->joining_date))
                 {
+                    return back()->with('error','Empty employee joining date');
+                }
+                if ($oldData->dept_id == $dept_id)
+                {
+                    return back()->with('warning','Old and New department value are same!');
+                }
+                if($dept = department::where('id',$dept_id)->first())
+                {
+                    $eid = $this->getEid($dept,$oldData->joining_date);
                     User::where('id',$userId)->update([
-                        "dept_id" => $dept_id
+                        "dept_id" => $dept_id,
+                        'employee_id' => $eid[1],
+                        'employee_id_hidden'    => $eid[0],
                     ]);
                     DB::table('department_transfer_histories')->insert([
+                        'new_employee_id'=>$eid[1],
+                        'old_employee_id'=>$oldData->employee_id,
                         'transfer_user_id'=>$userId,
                         'new_dept_id'=>$dept_id,
                         'from_dept_id'=>$oldData->dept_id,
@@ -394,12 +520,8 @@ class UserController extends Controller
                 $this->UserUpdate($request);
             }
             $userID = Crypt::decryptString($id);
-            $depts = department::where('status',1)->get();
-            $roles = Role::get();
-            $branches = branch::where('status',1)->get();
-            $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$userID)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
-//            dd($user->phone);
-            return view('back-end.user.edit',compact('user','roles','depts','branches'));
+            $user = User::where('users.id',$userID)->first();
+            return view('back-end.user.edit',compact('user'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -413,50 +535,14 @@ class UserController extends Controller
                 'name'  => ['required', 'string', 'max:255'],
                 'phone' => ['required', 'numeric', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
                 'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
-//                'dept'  => ['required', 'exists:departments,id'],
-//                'branch'  => ['required', 'exists:branches,id'],
-//                'roll'  => ['required','numeric', 'exists:roles,id'],
             ]);
             extract($request->post());
             $UserID = Crypt::decryptString($id);
             $user = User::where('id',$UserID)->first();
-//            $depts = department::where('id',$dept)->first();
-//            $branches = branch::where('id',$branch)->first();
-//            if (!$depts)
-//            {
-//                return back()->with('error','Department not found!')->withInput();
-//            }
-//            if (!$branches)
-//            {
-//                return back()->with('error','Branches not found!')->withInput();
-//            }
-//
-//            if ($user->dept_id != $dept)
-//            {
-//                DB::table('department_transfer_histories')->insert([
-//                    'transfer_user_id'=>$UserID,
-//                    'new_dept_id'=>$dept,
-//                    'from_dept_id'=>$user->dept_id,
-//                    'transfer_by'=>Auth::user()->id,
-//                    'created_at'=>now(),
-//                ]);
-//            }
-//            if ($user->branch_id != $branch)
-//            {
-//                DB::table('branch_transfer_histories')->insert( [
-//                    'transfer_user_id'=>$UserID,
-//                    'new_branch_id'=>$branch,
-//                    'from_branch_id'=>$user->branch_id,
-//                    'transfer_by'=>Auth::user()->id,
-//                    'created_at'=>now(),
-//                ]);
-//            }
             User::where('id',$UserID)->update([
                 'name' => $name,
                 'phone' => $phone,
                 'email' => $email,
-//                'dept_id' => $depts->id,
-//                'branch_id' => $branches->id,
 
             ]);
             return back()->with('success','Data update successfully!');
@@ -470,6 +556,29 @@ class UserController extends Controller
     public function exportEmployeeDataPrototype()
     {
         return Excel::download(new EmployeeListPrototypeDataExport,'employee.xlsx');
+    }
+
+    /**
+     * @param $dept
+     * @param string $joining_year
+     * @param string $joining_month
+     * @return string[]
+     */
+    public function getEid($dept, string $joining_date): array
+    {
+        $joining_year = date('y',strtotime($joining_date));
+        $joining_month = date('m',strtotime($joining_date));
+        $countOfEmployee = User::where('dept_id', $dept->id)->count();
+        $nextEmployee = $countOfEmployee + 1;
+        $fourDigit = str_pad($nextEmployee, 4, "0", STR_PAD_LEFT);
+        $eid =  $dept->dept_code . $fourDigit;
+        while (User::where('employee_id_hidden', $eid)->count()) {
+            $nextEmployee++;
+            $fourDigit = str_pad($nextEmployee, 4, "0", STR_PAD_LEFT);
+            $eid =  $dept->dept_code . $fourDigit;
+        }
+        $fullEID = $joining_year . $joining_month . $eid;
+        return [$eid, $fullEID];
     }
 
 }

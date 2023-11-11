@@ -162,11 +162,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.reload()"></button>
                 </div>
                 <div class="modal-body">
-                    <table id="datatablesSimple" class="table"></table>
+                    <table id="data-table" class="table"></table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.location.reload()">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="return confirm('Are you sure?'), Obj.employeeDataSubmit(this)">Save changes</button>
+                    <button type="button" class="btn btn-primary" onclick="return confirm('Are you sure?'), Obj.userExcelFileSubmit(this)">Save changes</button>
                 </div>
             </div>
         </div>

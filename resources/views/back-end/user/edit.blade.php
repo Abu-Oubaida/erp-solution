@@ -56,47 +56,6 @@
                                 <label for="email">Email address <span class="text-danger">*</span></label>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <select class="form-control text-capitalize" id="branch" name="branch">
-                                    @if(isset($branches) || (count($branches) > 0))
-                                        <option value="0">--Select please--</option>
-                                        @foreach($branches as $b)
-                                            <option value="{{$b->id}}" @if((old('branch') == $b->id) || ($b->id == $user->branch_id)) selected @endif>{{$b->branch_name}}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <label for="branch">Branch Name</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <select class="form-control" id="to" name="dept">
-                                    <option value=""></option>
-                                    @if(isset($depts) || (count($depts) > 0))
-                                        <option value="0">--Select please--</option>
-                                        @foreach($depts as $d)
-                                            <option value="{{$d->id}}" @if((old('dept') == $d->id) || ($d->id == $user->dept_id)) selected @endif>{{$d->dept_name}}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <label for="priority">To Department <span class="text-danger">*</span></label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <select class="form-control" id="roll" name="roll">
-                                    <option value=""></option>
-                                    @if(isset($roles) || (count($roles) > 0))
-                                        <option value="0">--Select please--</option>
-                                        @foreach($roles as $r)
-                                            <option value="{{$r->id}}" @if((old('roll') == $r->id) || ($r->id == $user->role_id)) selected @endif>{{$r->display_name}}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <label for="roll">User Roll <span class="text-danger">*</span></label>
-                            </div>
-                        </div>
 
                         <div class="col-md-12">
                             <div class="form-floating mb-3 float-end">

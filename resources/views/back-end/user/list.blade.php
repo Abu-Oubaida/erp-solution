@@ -32,6 +32,7 @@
                         <th>No</th>
                         <th>Employee ID</th>
                         <th>Name</th>
+                        <th>Joining Date</th>
                         <th>Phone</th>
                         <th>Email</th>
                         <th>Dept.</th>
@@ -46,6 +47,7 @@
                         <th>No</th>
                         <th>Employee ID</th>
                         <th>Name</th>
+                        <th>Joining Date</th>
                         <th>Phone</th>
                         <th>Email</th>
                         <th>Dept.</th>
@@ -65,6 +67,7 @@
                                 <td>{!! $i++ !!}</td>
                                 <td>{!! $u->employee_id !!}</td>
                                 <td>{!! $u->name !!}</td>
+                                <td>{!! date('d-M-y',strtotime($u->joining_date)) !!}</td>
                                 <td>{!! $u->phone !!}</td>
                                 <td>{!! $u->email !!}</td>
                                 <td>{!! $u->getDepartment->dept_name !!}</td>

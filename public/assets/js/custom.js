@@ -149,7 +149,7 @@ if(window.location.port)
         function showModal(data,fileName) {
             const modal = document.getElementById("myModal");
             const modelTitle = document.getElementById("userDataModelLabel")
-            const dataTable = document.getElementById("datatablesSimple");
+            const dataTable = document.getElementById("data-table");
             while (dataTable.firstChild) {
                 dataTable.removeChild(dataTable.firstChild)
             }
@@ -295,6 +295,72 @@ if(window.location.port)
                                 for (let key in data.alreadyHasMessage) {
                                     let employee = data.alreadyHasMessage[key]
                                     alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`
+                                }
+                            }
+                            alert(alertMessage)
+                            window.location.reload()
+                            return true
+                        }
+                    }
+                })
+            },
+            userExcelFileSubmit:function (e) {
+                if (employeeDatas[0].length <= 1)
+                {
+                    alert('Empty data set please upload your excel file on the input field!')
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/add-user-excel";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    contentType: 'application/json',
+                    url: url,
+                    type: "POST",
+                    data: JSON.stringify({'input': employeeDatas[0]}),
+                    success:function (data)
+                    {
+                        // console.log(data)
+                        if (data.error) {
+                            let alertMessage = data.message + '\nErrors:\n'
+                            if (data.errors)
+                            {
+                                for (let field in data.errors) {
+                                    if (data.errors.hasOwnProperty(field)) {
+                                        alertMessage += field + ': ' + data.errors[field].join(', ') + '\n'
+                                    }
+                                }
+                            }
+                            alert(alertMessage)
+                            return false
+                        } else {
+                            // Handle success
+                            // console.log("Success: " + data)
+                            let alertMessage = ''
+                            if (data.errorMessage)
+                            {
+                                // Extract and display the Error Message
+                                alertMessage += "Error! This Data Are Added not Possible:\n"
+                                for (let key in data.errorMessage) {
+                                    let employee = data.errorMessage[key]
+                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`
+                                }
+                            }
+                            if (data.successMessage)
+                            {
+                                // Extract and display the Success Message
+                                alertMessage += "This Data Are Added Successfully:\n"
+                                for (let key in data.successMessage) {
+                                    let employee = data.successMessage[key]
+                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`
+                                }
+                            }
+                            if (data.alreadyHasMessage)
+                            {
+                                // Extract and display the alreadyHasMessage
+                                alertMessage += "This Data are Already Exists in DB:\n"
+                                for (let key in data.alreadyHasMessage) {
+                                    let employee = data.alreadyHasMessage[key]
+                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`
                                 }
                             }
                             alert(alertMessage)
