@@ -37,6 +37,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'ce9671a430e4846b44e1c68c7611f9f5' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         '320163ac6b93aebe3dc25b60a0533d56' => __DIR__ . '/..' . '/spatie/laravel-ignition/src/helpers.php',
+        '6e5215af46428c2048ab39443a118ce2' => __DIR__ . '/../..' . '/app/helper/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -97,6 +98,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         ),
         'R' => 
         array (
+            'Rmunate\\Utilities\\' => 18,
             'Ramsey\\Uuid\\' => 12,
             'Ramsey\\Collection\\' => 18,
         ),
@@ -361,6 +363,10 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'Spatie\\Backtrace\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/backtrace/src',
+        ),
+        'Rmunate\\Utilities\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/rmunate/spell-number/src',
         ),
         'Ramsey\\Uuid\\' => 
         array (
@@ -4171,6 +4177,8 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'Maatwebsite\\Excel\\Console\\WithModelStub' => __DIR__ . '/..' . '/maatwebsite/excel/src/Console/WithModelStub.php',
         'Maatwebsite\\Excel\\DefaultValueBinder' => __DIR__ . '/..' . '/maatwebsite/excel/src/DefaultValueBinder.php',
         'Maatwebsite\\Excel\\DelegatedMacroable' => __DIR__ . '/..' . '/maatwebsite/excel/src/DelegatedMacroable.php',
+        'Maatwebsite\\Excel\\Events\\AfterBatch' => __DIR__ . '/..' . '/maatwebsite/excel/src/Events/AfterBatch.php',
+        'Maatwebsite\\Excel\\Events\\AfterChunk' => __DIR__ . '/..' . '/maatwebsite/excel/src/Events/AfterChunk.php',
         'Maatwebsite\\Excel\\Events\\AfterImport' => __DIR__ . '/..' . '/maatwebsite/excel/src/Events/AfterImport.php',
         'Maatwebsite\\Excel\\Events\\AfterSheet' => __DIR__ . '/..' . '/maatwebsite/excel/src/Events/AfterSheet.php',
         'Maatwebsite\\Excel\\Events\\BeforeExport' => __DIR__ . '/..' . '/maatwebsite/excel/src/Events/BeforeExport.php',
@@ -4507,6 +4515,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'Nette\\Utils\\Html' => __DIR__ . '/..' . '/nette/utils/src/Utils/Html.php',
         'Nette\\Utils\\IHtmlString' => __DIR__ . '/..' . '/nette/utils/src/compatibility.php',
         'Nette\\Utils\\Image' => __DIR__ . '/..' . '/nette/utils/src/Utils/Image.php',
+        'Nette\\Utils\\ImageColor' => __DIR__ . '/..' . '/nette/utils/src/Utils/ImageColor.php',
         'Nette\\Utils\\ImageException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
         'Nette\\Utils\\ImageType' => __DIR__ . '/..' . '/nette/utils/src/Utils/ImageType.php',
         'Nette\\Utils\\Json' => __DIR__ . '/..' . '/nette/utils/src/Utils/Json.php',
@@ -4515,6 +4524,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'Nette\\Utils\\Paginator' => __DIR__ . '/..' . '/nette/utils/src/Utils/Paginator.php',
         'Nette\\Utils\\Random' => __DIR__ . '/..' . '/nette/utils/src/Utils/Random.php',
         'Nette\\Utils\\Reflection' => __DIR__ . '/..' . '/nette/utils/src/Utils/Reflection.php',
+        'Nette\\Utils\\ReflectionMethod' => __DIR__ . '/..' . '/nette/utils/src/Utils/ReflectionMethod.php',
         'Nette\\Utils\\RegexpException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
         'Nette\\Utils\\Strings' => __DIR__ . '/..' . '/nette/utils/src/Utils/Strings.php',
         'Nette\\Utils\\Type' => __DIR__ . '/..' . '/nette/utils/src/Utils/Type.php',
@@ -6133,6 +6143,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'Ramsey\\Uuid\\UuidInterface' => __DIR__ . '/..' . '/ramsey/uuid/src/UuidInterface.php',
         'Ramsey\\Uuid\\Validator\\GenericValidator' => __DIR__ . '/..' . '/ramsey/uuid/src/Validator/GenericValidator.php',
         'Ramsey\\Uuid\\Validator\\ValidatorInterface' => __DIR__ . '/..' . '/ramsey/uuid/src/Validator/ValidatorInterface.php',
+        'Rmunate\\Utilities\\SpellNumber' => __DIR__ . '/..' . '/rmunate/spell-number/src/SpellNumber.php',
         'SebastianBergmann\\CliParser\\AmbiguousOptionException' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/AmbiguousOptionException.php',
         'SebastianBergmann\\CliParser\\Exception' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/Exception.php',
         'SebastianBergmann\\CliParser\\OptionDoesNotAllowArgumentException' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/OptionDoesNotAllowArgumentException.php',

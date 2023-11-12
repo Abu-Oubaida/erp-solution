@@ -71,7 +71,10 @@
                 <td>{!! ($d->updatedBY)? $d->updatedBY->name:'-' !!}</td>
             @endif
                 <td>
-                    {{--                                            <a href="{{route('edit.voucher.type',["voucherTypeID"=>\Illuminate\Support\Facades\Crypt::encryptString($vt->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>--}}
+                    <div class="text-center">
+                        <a href="{{route('salary.certificate.view',["salaryInfoID"=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)])}}" class="text-success" title="View"><i class='fas fa-eye'></i></a>
+                    </div>
+
                     {{--                                            <form action="{{route('delete.voucher.type')}}" class="display-inline" method="post">--}}
                     {{--                                                @method('delete')--}}
                     {{--                                                @csrf--}}

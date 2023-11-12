@@ -433,4 +433,12 @@ class AccountVoucherController extends Controller
     {
         return Excel::download(new UsersSalaryCertificateDataExport,'salary certificate input data.xlsx');
     }
+
+    public function salaryCertificateView($id)
+    {
+
+        $id = Crypt::decryptString($id);
+        $data = UserSalaryCertificateData::with('userInfo')->where('status',1)->where('id',$id)->first();
+        return view('back-end.account-voucher.salary.input-certificate-view',compact('data'));
+    }
 }

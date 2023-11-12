@@ -49,7 +49,7 @@ class User extends Authenticatable
 
     public function defaultPermissions()
     {
-        return $this->hasMany(RoleWiseDefaultPermission::class);
+        return $this->hasMany(RoleWiseDefaultPermission::class,'role_id');
     }
 
     public function hasPermission($permission)

@@ -178,6 +178,9 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:salary_certificate_input'])->group(function () {
             Route::get('export-user-salary-prototype','exportUserSalaryPrototype')->name('export.user.salary.prototype');
         });
+        Route::middleware(['permission:salary_certificate_view'])->group(function () {
+            Route::match(['get'],'salary-certificate-view/{salaryInfoID}','salaryCertificateView')->name('salary.certificate.view');
+        });//3.7.8
 
     });//3.7 End
 
