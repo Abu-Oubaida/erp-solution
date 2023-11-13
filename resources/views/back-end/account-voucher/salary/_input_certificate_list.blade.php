@@ -73,6 +73,7 @@
                 <td>
                     <div class="text-center">
                         <a href="{{route('salary.certificate.view',["salaryInfoID"=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)])}}" class="text-success" title="View"><i class='fas fa-eye'></i></a>
+                        <a href="{!! route('salary.certificate.print',['salaryInfoID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}"><i class="fas fa-print"></i></a>
                     </div>
 
                     {{--                                            <form action="{{route('delete.voucher.type')}}" class="display-inline" method="post">--}}

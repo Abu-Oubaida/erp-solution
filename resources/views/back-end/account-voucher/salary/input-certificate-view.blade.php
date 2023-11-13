@@ -25,7 +25,14 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
-                    <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                    <div class="col">
+                        <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                    </div>
+                    @if($data)
+                        <div class="col">
+                            <a href="{!! route('salary.certificate.print',['salaryInfoID'=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)]) !!}" class="btn btn-sm btn-outline-info float-end" > <i class="fas fa-print"></i> Print</a>
+                        </div>
+                    @endif
                 </div>
                 <div class="row">
                     <div class="col-md-12">
@@ -100,6 +107,82 @@
                                     <th>Tk. {!! ($total = $data->basic + $data->house_rent + $data->conveyance + $data->medical_allowance + $data->festival_bonus + $data->others) !!}/=
                                         <br> ({!! amountToWords(($total),'Taka','Paisa','BDT') !!} Only)</th>
                                 </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-8">
+                        <form action="{!! route('transaction.submit') !!}" method="post">
+                            @csrf
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-floating mb-3">
+                                    <input class="form-control" id="dated" name="dated" type="date" placeholder="Dated" value="{{old('dated')}}"/>
+                                    <label for="dated">Dated <span class="text-danger">*</span></label>
+                                </div>
+                            </div>
+                            <input type="hidden" name="user_salary_certificate_data_id" value="{!! $data->id !!}">
+                            <div class="col-md-2">
+                                <div class="form-floating mb-3">
+                                    <input class="form-control" id="amount" name="amount" type="number" placeholder="Amount" value="{{old('amount')}}"/>
+                                    <label for="amount">Amount <span class="text-danger">*</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <input class="form-control" id="challan_no" name="challan_no" type="text" placeholder="Challan number" value="{{old('challan_no')}}"/>
+                                    <label for="challan_no">Challan number <span class="text-danger">*</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-floating mb-3">
+                                    <select class="form-control" name="type" id="type">
+                                        <option value="bank" {!! (old('type') == 'bank')?'selected':'' !!}>Bank</option>
+                                        <option value="cash" {!! (old('type') == 'cash')?'selected':'' !!}>Cash</option>
+                                    </select>
+                                    <label for="type">Type <span class="text-danger">*</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="bank_name" name="bank_name" placeholder="Bank Name">
+                                    <label for="bank_name">Bank Name </label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <button class="btn btn-chl-outline float-end"><i class="fas fa-plus"></i> Add</button>
+                            </div>
+                        </div>
+                        </form>
+
+                        <h3>List of Transaction</h3>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr class="table-secondary">
+                                <th>SL</th>
+                                <th>Dated</th>
+                                <th>Challan No.</th>
+                                <th>Amount</th>
+                                <th><div class="text-center">Action</div></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @php($totalT = 0)
+                            @php($sl = 1)
+                            @if($transactions && count($transactions))
+                                @foreach($transactions as $transaction)
+                                <tr>
+                                    <td>{!! $sl++ !!}</td>
+                                    <td>{!! $transaction->dated !!}</td>
+                                    <td>{!! $transaction->challan_no !!}</td>
+                                    <td>Tk. {!! $totalT += $transaction->amount !!}/=</td>
+                                    <td><div class="text-center"><i class="fas fa-trash text-danger"></i></div></td>
+                                </tr>
+                                @endforeach
+                            @endif
+                            <tr class="table-danger">
+                                <th colspan="3">Total</th>
+                                <th colspan="2">Tk. {!! $totalT !!}/= <br>({!! amountToWords(($totalT),'Taka','Paisa','BDT') !!})</th>
+                            </tr>
                             </tbody>
                         </table>
                     </div>

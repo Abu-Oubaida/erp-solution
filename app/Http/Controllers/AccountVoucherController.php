@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Exports\UsersSalaryCertificateDataExport;
 use App\Models\Account_voucher;
+use App\Models\SalaryCertificateTransection;
 use App\Models\User;
 use App\Models\UserSalaryCertificateData;
 use App\Models\VoucherDocument;
 use App\Models\VoucherType;
-use http\Env\Response;
+
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -436,9 +438,53 @@ class AccountVoucherController extends Controller
 
     public function salaryCertificateView($id)
     {
+        try {
+            $id = Crypt::decryptString($id);
+            $data = UserSalaryCertificateData::with('userInfo')->where('status',1)->where('id',$id)->first();
+            $transactions = SalaryCertificateTransection::where('user_salary_certificate_data_id',$id)->get();
+            return view('back-end.account-voucher.salary.input-certificate-view',compact('data','transactions'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
 
-        $id = Crypt::decryptString($id);
-        $data = UserSalaryCertificateData::with('userInfo')->where('status',1)->where('id',$id)->first();
-        return view('back-end.account-voucher.salary.input-certificate-view',compact('data'));
+    public function salaryCertificatePrint($id)
+    {
+        try {
+            $id = Crypt::decryptString($id);
+            $data = UserSalaryCertificateData::with('userInfo')->where('status',1)->where('id',$id)->first();
+            if (!$data) {
+                abort(404); // or handle the not found case as needed
+            }
+            $transactions = SalaryCertificateTransection::where('user_salary_certificate_data_id',$id)->get();
+//            dd($data);
+            $pdf = Pdf::loadView('back-end/account-voucher/salary/input-certificate-print', compact('data','transactions'));
+            return $pdf->download("salary_certificate_for_{$data->userInfo->name}.pdf");
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function transactionSubmit(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'user_salary_certificate_data_id' =>  ['required','numeric','exists:user_salary_certificate_data,id'],
+                'dated' =>  ['required','date'],
+                'amount' =>  ['required','numeric'],
+                'challan_no' =>  ['required','string','unique:salary_certificate_transections,challan_no'],
+                'type' =>  ['sometimes','nullable','string'],
+                'bank_name' =>  ['sometimes','nullable','string'],
+            ]);
+            $validated['created_by']=Auth::user()->id;
+            extract($request->post());
+            SalaryCertificateTransection::create($validated);
+            return back()->with('success','Data add successfully!');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
     }
 }
