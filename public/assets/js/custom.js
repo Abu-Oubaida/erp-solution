@@ -87,7 +87,7 @@ if(window.location.port)
                         alert('Invalid input data! Please flowing the prototype of data format!')
                         return false
                     }
-                    if (!((jsonData[0][0] === 'Employee ID*' || jsonData[0][0] === 'Employee ID') && (jsonData[0][1] === 'Name') && (jsonData[0][2] === 'Department') && (jsonData[0][3] === 'Financial Year From*' || jsonData[0][3] === 'Financial Year From' ) && (jsonData[0][4] === 'Financial Year To*' || jsonData[0][4] === 'Financial Year To' ) && (jsonData[0][5] === 'Basic*' || jsonData[0][5] === 'Basic' ) && (jsonData[0][6] === 'House Rent*' || jsonData[0][6] === 'House Rent' ) && (jsonData[0][7] === 'Conveyance*' || jsonData[0][7] === 'Conveyance' ) && (jsonData[0][8] === 'Medical Allowance*' || jsonData[0][8] === 'Medical Allowance' ) && (jsonData[0][9] === 'Festival Bonus*' || jsonData[0][9] === 'Festival Bonus' ) && (jsonData[0][10] === 'Others' ) && (jsonData[0][11] === 'Total' ) && (jsonData[0][12] === 'Remarks' ) ))
+                    if (!((jsonData[0][0] === 'Employee ID*' || jsonData[0][0] === 'Employee ID') && (jsonData[0][1] === 'Name') && (jsonData[0][2] === 'Department') && (jsonData[0][3] === 'Financial Year From*' || jsonData[0][3] === 'Financial Year From' ) && (jsonData[0][4] === 'Financial Year To*' || jsonData[0][4] === 'Financial Year To' ) && (jsonData[0][5] === 'Basic*' || jsonData[0][5] === 'Basic' ) && (jsonData[0][6] === 'House Rent*' || jsonData[0][6] === 'House Rent' ) && (jsonData[0][7] === 'Conveyance*' || jsonData[0][7] === 'Conveyance' ) && (jsonData[0][8] === 'Medical Allowance*' || jsonData[0][8] === 'Medical Allowance' ) && (jsonData[0][9] === 'Total' ) && (jsonData[0][10] === 'Festival Bonus*' || jsonData[0][10] === 'Festival Bonus' ) && (jsonData[0][11] === 'Others' ) && (jsonData[0][12] === 'Remarks' ) ))
                     {
                         alert('Invalid input data! Please flowing the prototype of data format!')
                         return false
@@ -97,6 +97,21 @@ if(window.location.port)
                             if(typeof jsonData[i][j] === 'undefined')
                             {
                                 jsonData[i][j] = 0
+                            }
+                            if (i > 0)
+                            {
+                                if (typeof jsonData[0][9] !== 'undefined' && jsonData[0][9] !== null)
+                                {
+                                    let total = parseInt(jsonData[i][9])
+                                    jsonData[i][5] = ((total * 60)/100)
+                                    jsonData[i][6] = ((total * 30)/100)
+                                    jsonData[i][7] = ((total * 5)/100)
+                                    jsonData[i][8] = ((total * 5)/100)
+                                }
+                                if ( j === 3 || j === 4)
+                                {
+                                    jsonData[i][j] = ExcelDateToJSFinancialDate(jsonData[i][j])
+                                }
                             }
                         }
                     }
@@ -198,6 +213,27 @@ if(window.location.port)
         function ExcelDateToJSDate(serial) {
             const dateToString = d => `${('00' + d.getDate()).slice(-2)}-${('00' + (d.getMonth() + 1)).slice(-2)}-${d.getFullYear()}`
             return dateToString(new Date(Math.round((serial - 25569)*86400*1000)));
+        }
+        function ExcelDateToJSFinancialDate(serial) {
+            if (typeof serial !== 'number')
+            {
+                return serial
+            }
+            const dateToString = d => {
+                const months = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+                const monthsShort = [
+                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                ];
+
+                const monthName = monthsShort[d.getMonth()];
+                return `${monthName}-${d.getFullYear()}`;
+            };
+
+            return dateToString(new Date(Math.round((serial - 25569) * 86400 * 1000)));
         }
         Obj = {
             fiendPermissionChild : function (e,actionID) {
@@ -303,6 +339,27 @@ if(window.location.port)
                         }
                     }
                 })
+            },
+            salaryDistribute:function (e){
+                let total = $('#total').val()
+                if (total.length)
+                {
+                    total = parseInt(total)
+                    let basic = ((total*60) / 100)
+                    let house_rent = ((total*30) / 100)
+                    let conveyance = ((total*5) / 100)
+                    let ma = ((total*5) / 100)
+                    $('#basic').val(basic).attr('readonly','readonly')
+                    $('#house_rent').val(house_rent).attr('readonly','readonly')
+                    $('#conveyance').val(conveyance).attr('readonly','readonly')
+                    $('#medical').val(ma).attr('readonly','readonly')
+                }
+                else {
+                    $('#basic').val('').removeAttr('readonly')
+                    $('#house_rent').val('').removeAttr('readonly')
+                    $('#conveyance').val('').removeAttr('readonly')
+                    $('#medical').val('').removeAttr('readonly')
+                }
             },
             userExcelFileSubmit:function (e) {
                 if (employeeDatas[0].length <= 1)

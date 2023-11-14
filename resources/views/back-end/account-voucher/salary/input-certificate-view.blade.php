@@ -15,11 +15,19 @@
                 </ol>
             </div>
             <div class="col-md-2">
-                <div class="float-end">
-                    @if(auth()->user()->hasPermission('salary_certificate_input'))
-                        <a class="btn btn-success btn-sm" href="{{route("input.salary.certificate")}}"><i class="fas fa-upload" aria-hidden="true"></i> Input Option</a>
-                    @endif
+                <div class="row">
+                    <div class="col-md-5 col-sm-6">
+                        @if(auth()->user()->hasPermission('salary_certificate_list'))
+                            <a class="btn btn-success btn-sm" href="{{route("salary.certificate.list")}}"><i class="fas fa-list-check"></i> List View</a>
+                        @endif
+                    </div>
+                    <div class="col-md-7 col-sm-6">
+                        @if(auth()->user()->hasPermission('salary_certificate_input'))
+                            <a class="btn btn-success btn-sm" href="{{route("input.salary.certificate")}}"><i class="fas fa-upload" aria-hidden="true"></i> Input Option</a>
+                        @endif
+                    </div>
                 </div>
+
             </div>
         </div>
         <div class="card mb-4">
@@ -29,8 +37,11 @@
                         <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
                     </div>
                     @if($data)
+{{--                        <div class="col">--}}
+{{--                            <a href="{!! route('salary.certificate.download',['salaryInfoID'=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)]) !!}" class="btn btn-sm btn-outline-success float-end" target="_blank"> <i class="fas fa-download"></i> Download</a>--}}
+{{--                        </div>--}}
                         <div class="col">
-                            <a href="{!! route('salary.certificate.print',['salaryInfoID'=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)]) !!}" class="btn btn-sm btn-outline-info float-end" > <i class="fas fa-print"></i> Print</a>
+                            <a href="{!! route('salary.certificate.preview',['salaryInfoID'=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)]) !!}" class="btn btn-sm btn-outline-info float-end" target="_blank"> <i class="fas fa-print"></i> Print</a>
                         </div>
                     @endif
                 </div>

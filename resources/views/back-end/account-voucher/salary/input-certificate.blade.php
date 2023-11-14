@@ -42,82 +42,83 @@
                 <form action="{{ route('input.salary.certificate') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
-                        <div class="col-md-2">
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="officer" name="officer" type="text" placeholder="Enter officer name" value="{{old('officer')}}" list="officer-list" required/>
-                                <datalist id="officer-list">
-                            @if(count($users))
-                                @foreach($users as $user)
-                                    <option value="{!! $user->name !!}">{!! $user->employee_id !!}, {!! $user->getDepartment->dept_name !!} , {!! $user->getBranch->branch_name !!} </option>
-                                @endforeach
-                            @endif
-                                </datalist>
-                                <label for="officer">Officer Name<span class="text-danger">*</span></label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="officer" name="officer" type="text" placeholder="Enter officer name" value="{{old('officer')}}" list="officer-list" required/>
+                                        <datalist id="officer-list">
+                                            @if(count($users))
+                                                @foreach($users as $user)
+                                                    <option value="{!! $user->name !!}">{!! $user->employee_id !!}, {!! $user->getDepartment->dept_name !!} , {!! $user->getBranch->branch_name !!} </option>
+                                                @endforeach
+                                            @endif
+                                        </datalist>
+                                        <label for="officer">Officer Name<span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="from" name="from" type="month" placeholder="Enter Financial Year From" value="{{old('from')}}" required/>
                                         <label for="voucher_date">Financial Year From <span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="to" name="to" type="month" placeholder="Enter Financial Year To" value="{{old('to')}}" required/>
                                         <label for="to">Financial Year To <span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="basic" name="basic" type="number" placeholder="Enter basic salary" value="{{old('basic')}}" title="Basic salary amount" required/>
-                                <label for="to">Basic<span class="text-danger">*</span></label>
-                            </div>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="row">
                                 <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="total" type="number" placeholder="Enter total salary" value="{{old('total')}}" title="Total salary amount" required onchange="return Obj.salaryDistribute(this)"/>
+                                        <label for="total">Total</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="basic" name="basic" type="number" placeholder="Enter basic salary" value="{{old('basic')}}" title="Basic salary amount" required />
+                                        <label for="to">Basic<span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="house_rent" name="house_rent" type="number" placeholder="Enter house rent" value="{{old('house_rent')}}" title="House Rent amount" required/>
                                         <label for="to">House Rent<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="conveyance" name="conveyance" type="number" placeholder="Enter conveyance" value="{{old('conveyance')}}" title="Conveyance amount" required/>
                                         <label for="to">Conveyance<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="medical" name="medical" type="number" placeholder="Enter medical amount" value="{{old('medical')}}" title="Medical allowance" required/>
                                         <label for="medical"> Medical Allow. <span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="bonus" name="bonus" type="number" placeholder="Enter basic salary" value="{{old('bonus')}}" title="Festival bonus amount" required/>
                                         <label for="bonus">Festival Bonus<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
+                                <div class="col-md-2">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="others" name="others" type="number" placeholder="Enter basic salary" value="{{old('others')}}"/>
+                                        <label for="others" >Others</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-1">
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="others" name="others" type="number" placeholder="Enter basic salary" value="{{old('others')}}"/>
-                                <label for="others" >Others</label>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-floating mb-3">
-                                <textarea class="form-control" id="remarks" name="remarks" > </textarea>
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label for="remarks" >Remarks</label>
+                                <textarea class="form-control" id="remarks" name="remarks" rows="4" placeholder="Remarks"> </textarea>
                             </div>
                         </div>
-
                         <div class="col-md-12">
                             <div class="form-floating mb-3 float-end">
                                 <button type="submit" class="btn btn-chl-outline"><i class="fa-regular fa-floppy-disk"></i> Save</button>

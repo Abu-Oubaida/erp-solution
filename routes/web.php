@@ -181,7 +181,8 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:salary_certificate_view'])->group(function () {
             Route::match(['get'],'salary-certificate-view/{salaryInfoID}','salaryCertificateView')->name('salary.certificate.view');
             Route::post('transaction-submit','transactionSubmit')->name('transaction.submit');
-            Route::get('salary-certificate-print/{salaryInfoID}','salaryCertificatePrint')->name('salary.certificate.print');
+            Route::get('salary-certificate-print/{salaryInfoID}','salaryCertificatePrint')->name('salary.certificate.download');
+            Route::get('salary-certificate-preview/{salaryInfoID}','previewPdf')->name('salary.certificate.preview');
         });//3.7.8
 
     });//3.7 End

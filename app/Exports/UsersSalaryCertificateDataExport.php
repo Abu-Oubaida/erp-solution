@@ -21,9 +21,9 @@ class UsersSalaryCertificateDataExport implements FromCollection
                 'House Rent*',
                 'Conveyance*',
                 'Medical Allowance*',
+                'Total',
                 'Festival Bonus*',
                 'Others',
-                'Total',
                 'Remarks'
             ]
         ];

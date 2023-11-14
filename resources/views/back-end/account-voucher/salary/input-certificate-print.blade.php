@@ -14,6 +14,10 @@
         body {
             /*font-family: Arial, sans-serif;*/
             padding-top: 3cm;
+            font-family: "Times New Roman";
+        }
+        @font-face {
+            font-family: "Times New Roman";
         }
 
     </style>
@@ -114,5 +118,6 @@
     </div>
 </div>
 <x-back-end._footer-script/>
+{{--<script src="https://cdn.jsdelivr.net/npm/@canvas-fonts/times-new-roman@1.0.4/index.min.js"></script>--}}
 </body>
 </html>

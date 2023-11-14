@@ -277,7 +277,7 @@ class AccountVoucherController extends Controller
             $rules = [
                 '*.*' => ['required'],
                 '*.0' => ['exists:users,employee_id'],
-                '*.1' => ['exists:users,name'],
+                '*.1' => ['string'],
                 '*.3' => ['date'],
                 '*.4' => ['date','after:*.3'],
                 '*.5' => ['numeric'],
@@ -285,6 +285,7 @@ class AccountVoucherController extends Controller
                 '*.7' => ['numeric'],
                 '*.8' => ['numeric'],
                 '*.9' => ['numeric'],
+                '*.10' => ['numeric'],
                 '*.11' => ['numeric'],
                 '*.12' => ['string'],
             ];
@@ -314,24 +315,26 @@ class AccountVoucherController extends Controller
                 $stroed=[];
                 foreach ($input as $key=>$data)
                 {
+                    $financial_yer_from = $data[3];
+                    $financial_yer_to = $data[4];
 //                    $stroed[$key]= $key;
                     $user = User::where('employee_id',$data[0])->first();
                     if ($user)
                     {
-                        $checkData = UserSalaryCertificateData::where('financial_yer_from',$data[3])->where('financial_yer_to',$data[4])->where('user_id',$user->id)->first();
+                        $checkData = UserSalaryCertificateData::where('financial_yer_from',$financial_yer_from)->where('financial_yer_to',$financial_yer_to)->where('user_id',$user->id)->first();
                         if (!$checkData)
                         {
                             $insert = UserSalaryCertificateData::create([
                                 'status'=>1,
                                 'user_id'=>$user->id,
-                                'financial_yer_from'=>$data[3],//From year
-                                'financial_yer_to'=>$data[4],//To year
+                                'financial_yer_from'=>$financial_yer_from,//From year
+                                'financial_yer_to'=>$financial_yer_to,//To year
                                 'basic'=>$data[5],//Basic
                                 'house_rent'=>$data[6],//House Rent
                                 'conveyance'=>$data[7],//Conveyance
                                 'medical_allowance'=>$data[8],//Medical allowance
-                                'festival_bonus'=>$data[9],//Festival Bonus
-                                'others'=>$data[10],//Others
+                                'festival_bonus'=>$data[10],//Festival Bonus
+                                'others'=>$data[11],//Others
                                 'remarks'=>$data[12],//Remarks
                                 'created_by'=>Auth::user()->id,
                                 'updated_by'=>null
@@ -458,9 +461,24 @@ class AccountVoucherController extends Controller
                 abort(404); // or handle the not found case as needed
             }
             $transactions = SalaryCertificateTransection::where('user_salary_certificate_data_id',$id)->get();
-//            dd($data);
             $pdf = Pdf::loadView('back-end/account-voucher/salary/input-certificate-print', compact('data','transactions'));
             return $pdf->download("salary_certificate_for_{$data->userInfo->name}.pdf");
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+    public function previewPdf($id)
+    {
+        try {
+            $id = Crypt::decryptString($id);
+            $data = UserSalaryCertificateData::with('userInfo')->where('status',1)->where('id',$id)->first();
+            if (!$data) {
+                abort(404); // or handle the not found case as needed
+            }
+            $transactions = SalaryCertificateTransection::where('user_salary_certificate_data_id',$id)->get();
+            $pdf = Pdf::loadView('back-end/account-voucher/salary/input-certificate-print', compact('data','transactions'));
+            return $pdf->stream("preview_salary_certificate_for_{$data->userInfo->name}.pdf");
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
