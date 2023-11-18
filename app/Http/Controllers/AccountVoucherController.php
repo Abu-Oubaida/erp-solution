@@ -410,7 +410,9 @@ class AccountVoucherController extends Controller
         try {
             extract($validator->getData());
             $user = User::where('name',$officer)->first();
-            $checkData = UserSalaryCertificateData::where('financial_yer_from',$from)->where('financial_yer_to',$to)->where('user_id',$user->id)->first();
+            $fromDate = date('M-Y',strtotime($from));
+            $toDate = date('M-Y',strtotime($to));
+            $checkData = UserSalaryCertificateData::where('financial_yer_from',$fromDate)->where('financial_yer_to',$toDate)->where('user_id',$user->id)->first();
             if ($checkData)
             {
                 return back()->with('warning',"This financial years data already has in DB, Can't add new, Please try to edit")->withInput();

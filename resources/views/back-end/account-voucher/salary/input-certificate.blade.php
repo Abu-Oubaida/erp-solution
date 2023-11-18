@@ -71,7 +71,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="total" type="number" placeholder="Enter total salary" value="{{old('total')}}" title="Total salary amount" required onchange="return Obj.salaryDistribute(this)"/>
+                                        <input class="form-control" id="total" type="number" placeholder="Enter total salary" value="{{old('total')}}" title="Total salary amount" onchange="return Obj.salaryDistribute(this)"/>
                                         <label for="total">Total</label>
                                     </div>
                                 </div>
