@@ -11,7 +11,7 @@
     <x-back-end._header-link/>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 </head>
-<body class="sb-nav-fixed">
+<body class="sb-nav-fixed" style="margin: 0 auto;padding: 0; width: 80%;">
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-chl-white">
     <!-- Navbar Brand-->
     <a class="navbar-brand ps-3" href="{{route('root')}}"><img src="{{url("image/logo/chl_logo.png")}}" width="70%" alt="Credence Housing Limited"></a>
