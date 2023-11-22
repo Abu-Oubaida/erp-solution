@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('email')->unique()->nullable();
             $table->integer('status')->default('1')->comment('1=active, 0=inactive, 4=cool');
             $table->bigInteger('dept_id')->nullable();
-            $table->bigInteger('designation')->nullable();
+            $table->bigInteger('designation_id')->nullable();
             $table->bigInteger('branch_id')->nullable();
             $table->string('joining_date')->nullable();
             $table->text('profile_pic')->nullable();
