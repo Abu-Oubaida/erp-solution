@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'CHL Complain Portal'),
+    'name' => env('APP_NAME', 'CHL 360'),
 
     /*
     |--------------------------------------------------------------------------
@@ -57,7 +57,7 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
 
     'asset_url' => env('ASSET_URL', null),
-    'file_manager_url'=>env('APP_FILE_MANAGER','E:/LocalServer/htdocs/chl/public/file-manager'),
+    'file_manager_url'=>env('APP_FILE_MANAGER','G:\localhost\htdocs\chl\public\file-manager'),
 
     /*
     |--------------------------------------------------------------------------

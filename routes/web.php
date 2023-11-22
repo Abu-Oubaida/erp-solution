@@ -128,7 +128,7 @@ Route::group(['middleware' => ['auth']],function (){
 
 # 3.6 File Manager Controller
     Route::middleware(['permission:file_manager'])->group(function (){
-        Route::get("file-manager", [FileManagerController::class,'index'])->name('file-manager');
+        Route::get("file_manager", [FileManagerController::class,'index'])->name('file-manager');
     });//3.6 End
 
 # 3.7 Accounts File Manager Controller

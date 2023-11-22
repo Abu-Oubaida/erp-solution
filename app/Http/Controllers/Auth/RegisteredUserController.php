@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\superadmin\UserController;
 use App\Models\branch;
 use App\Models\department;
 use App\Models\User;
@@ -52,33 +53,39 @@ class RegisteredUserController extends Controller
         try {
             $deptInfo = department::where('id',$dept)->first();
             $branch = branch::where('id',$branch)->first();
-            if ($branch->branch_type == 'head office') $header = 'H'; else $header = "P";
-            $priviusUsers = User::where('status',1)->where('dept_id',$dept)->get();
-            $priviusUserCount = count($priviusUsers);
-//            dd($priviusUserCount >= 10 && $priviusUserCount < 100);
-            if ($priviusUserCount < 10)
-            {
-                $priviusUserCount++;
-                $empID = ($header.$deptInfo->dept_code."00").$priviusUserCount;
-            }
-            elseif ($priviusUserCount >= 10 && $priviusUserCount < 100)
-            {
-                $priviusUserCount++;
-                $empID = ($header.$deptInfo->dept_code."0").$priviusUserCount;
-            }
-            else {
-                $priviusUserCount++;
-                $empID = $header.$deptInfo->dept_code.$priviusUserCount;
-            }
+            $dept = department::where('id',$dept)->first();
+            $userController = new UserController();
+            $joining_date = date(now());
+            $eid = $userController->getEid($dept,$joining_date);
+//            if ($branch->branch_type == 'head office') $header = 'H'; else $header = "P";
+//            $priviusUsers = User::where('status',1)->where('dept_id',$dept)->get();
+//            $priviusUserCount = count($priviusUsers);
+////            dd($priviusUserCount >= 10 && $priviusUserCount < 100);
+//            if ($priviusUserCount < 10)
+//            {
+//                $priviusUserCount++;
+//                $empID = ($header.$deptInfo->dept_code."00").$priviusUserCount;
+//            }
+//            elseif ($priviusUserCount >= 10 && $priviusUserCount < 100)
+//            {
+//                $priviusUserCount++;
+//                $empID = ($header.$deptInfo->dept_code."0").$priviusUserCount;
+//            }
+//            else {
+//                $priviusUserCount++;
+//                $empID = $header.$deptInfo->dept_code.$priviusUserCount;
+//            }
 
             $user = User::create([
-                'employee_id' => $empID,
+                'employee_id' => $eid[1],
+                'employee_id_hidden'    => $eid[0],
                 'name' => $name,
                 'phone' => $phone,
                 'email' => $email,
                 'dept_id' => $deptInfo->id,
                 'status' => 0,
                 'branch_id' => $branch->id,
+                'joining_date' => date('y-m-d',strtotime($joining_date)),
                 'password' => Hash::make($request->password),
             ]);
 
@@ -95,4 +102,5 @@ class RegisteredUserController extends Controller
         }
 
     }
+
 }
