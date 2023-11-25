@@ -26,7 +26,7 @@
                 {{str_replace('.', ' ', \Route::currentRouteName())}}
             </div>
             <div class="card-body">
-                <table id="datatablesSimple">
+                <table id="permissionstable">
                     <thead>
                     <tr>
                         <th>No</th>

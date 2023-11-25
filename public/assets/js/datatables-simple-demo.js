@@ -5,6 +5,7 @@ window.addEventListener('DOMContentLoaded', event => {
     const permission = document.getElementById('permissionstable');
     const datatablesSimple = document.getElementById('datatablesSimple');
     const datatablesSimple2 = document.getElementById('datatablesSimple2');
+    const dataTableModal = document.getElementById('data-table');
     if (permission) {
         new simpleDatatables.DataTable(permission,{
             perPageSelect: [10, 25, 50,100, ["All", -1]],
@@ -60,6 +61,21 @@ window.addEventListener('DOMContentLoaded', event => {
             ]
         });
     }
+    // if (dataTableModal) {
+    //     new simpleDatatables.DataTable(dataTableModal,{
+    //         perPageSelect: [10, 25, 50,100, ["All", -1]],
+    //         columns: [
+    //             {
+    //                 select: 2,
+    //                 sortSequence: ["desc", "asc"]
+    //             },
+    //             {
+    //                 select: 3,
+    //                 sortSequence: ["desc"]
+    //             },
+    //         ]
+    //     });
+    // }
     if (datatablesSimple2) {
         new simpleDatatables.DataTable(datatablesSimple2,{
             perPageSelect: [10, 25, 50,100, ["All", -1]],

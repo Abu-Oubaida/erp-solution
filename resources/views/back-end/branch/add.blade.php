@@ -57,8 +57,7 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-floating mb-4">
-                                        <textarea class="form-control" id="remarks" name="remarks" required>
-                                        </textarea>
+                                        <textarea class="form-control" id="remarks" name="remarks"> {{old('remarks')}}</textarea>
                                         <label for="remarks">Remarks<span class="text-danger">*</span></label>
                                     </div>
                                 </div>

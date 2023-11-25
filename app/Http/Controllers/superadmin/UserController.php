@@ -112,13 +112,14 @@ class UserController extends Controller
             unset($input[0]);
             $rules = [
                 '*.0'   =>  ['required','string'],
-                '*.1'   =>  ['required','exists:departments,dept_name'],
+//                '*.1'   =>  ['required','exists:departments,dept_name'],
+                '*.1'   =>  ['sometimes','nullable','string'],
                 '*.2'   =>  ['required','exists:departments,dept_code'],
                 '*.3'   =>  ['required','exists:designations,title'],
                 '*.4'   =>  ['required','exists:branches,branch_name'],
                 '*.5'   =>  ['required','date'],
                 '*.6'   =>  ['required','numeric','unique:users,phone',],
-                '*.7'   =>  ['required','email','unique:users,email'],
+                '*.7'   =>  ['sometimes','nullable','email','unique:users,email'],
                 '*.8'   =>  ['sometimes','nullable','numeric'],
                 '*.9'   =>  ['sometimes','nullable','exists:blood_groups,blood_type'],
             ];
@@ -148,7 +149,8 @@ class UserController extends Controller
                 $stored=[];
                 foreach ($input as $key=>$data)
                 {
-                    $dept = department::where('dept_name',$data[1])->where('dept_code',$data[2])->first();
+//                    $dept = department::where('dept_name',$data[1])->where('dept_code',$data[2])->first();
+                    $dept = department::where('dept_code',$data[2])->first();
                     $designation = Designation::where('title',$data[3])->first();
                     $branch = branch::where('branch_name',$data[4])->first();
                     $blood = BloodGroup::where('blood_type',$data[9])->first();

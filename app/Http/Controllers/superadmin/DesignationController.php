@@ -20,7 +20,7 @@ class DesignationController extends Controller
             {
                 return $this->store($request);
             }
-            $designations = Designation::all();
+            $designations = Designation::orderBY('priority','asc')->get();
             return view('back-end/designation/add',compact('designations'));
         }catch (\Throwable $exception)
         {
@@ -33,7 +33,7 @@ class DesignationController extends Controller
         try {
             $request->validate([
                 'title' =>  ['required','string','unique:designations,title',],
-                'priority' =>  ['required','numeric','unique:designations,priority',],
+                'priority' =>  ['required','numeric',],
                 'status' =>  ['required','numeric',],
                 'remarks' =>  ['sometimes','nullable','string',],
             ]);
