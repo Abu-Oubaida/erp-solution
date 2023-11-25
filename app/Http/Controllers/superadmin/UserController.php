@@ -220,7 +220,7 @@ class UserController extends Controller
     public function show()
     {
         try {
-            $users = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.status','!=',5)->get();
+            $users = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
             return view('back-end/user/list',compact('users'));
         }catch (\Throwable $exception)
         {
