@@ -184,6 +184,9 @@ Route::group(['middleware' => ['auth']],function (){
             Route::get('salary-certificate-print/{salaryInfoID}','salaryCertificatePrint')->name('salary.certificate.download');
             Route::get('salary-certificate-preview/{salaryInfoID}','previewPdf')->name('salary.certificate.preview');
         });//3.7.8
+        Route::middleware(['permission:add_voucher_document_individual'])->group(function (){
+            Route::post('add-voucher-document-individual','storeVoucherDocumentIndividual');
+        });
 
     });//3.7 End
 

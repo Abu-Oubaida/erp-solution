@@ -46,8 +46,11 @@
                             <a href="{!! route('view.voucher.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window"><i class="fa-solid fa-up-right-from-square"></i></a>
                             &nbsp;
                             <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)"><i class="fas fa-share"></i></a>
+                            <a href="" class="text-danger"><i class="fas fa-trash"></i></a>
+                            <hr>
                         </div>
                     @endforeach
+                    <a href="" class="text-end float-end badge bg-success text-decoration-none" onclick="Obj.addVoucherDocumentIndividual(this)" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($data->id) !!}"><i class="fas fa-plus"></i> Add New</a>
                 </td>
                 {{--                                        <td></td>--}}
                 {{--                                        <td></td>--}}

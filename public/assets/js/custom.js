@@ -247,25 +247,25 @@ if(window.location.port)
                         type: "POST",
                         data: {'pid':id},
                         success: function (data) {
-                            if (data.error){
-                                // throw data.error.msg
-                                let division = "<option></option>"
-                                $("#"+actionID).append(division)
-                                alert(data.error.msg)
-                            }else{
-                                // Parse the JSON string into an object
-                                let permissions = JSON.parse(data).results
-                                if ( permissions.length == 0 ) {
-                                    alert("No data found!")
-                                    let response = "<option value=\"none\">1. None</option>"
-                                    $("#"+actionID).html(response)
+                            if (data.error) {
+                                let division = "<option></option>";
+                                $("#" + actionID).append(division);
+                                alert(data.error.msg);
+                            } else {
+                                let permissions = data.results;
+
+                                if (!permissions || permissions.length === 0) {
+                                    alert("No data found!");
+                                    let response = "<option value=\"none\">1. None</option>";
+                                    $("#" + actionID).html(response);
+                                } else {
+                                    let counter = 2;
+                                    let response = "<option value=\"none\">1. None</option>";
+                                    permissions.forEach(function (permission) {
+                                        response += "<option value=\"" + permission.name + "\">" + counter++ + ". " + permission.display_name + "</option>";
+                                    });
+                                    $("#" + actionID).html(response);
                                 }
-                                let counter = 2
-                                let response = "<option value=\"none\">1. None</option>"
-                                permissions.forEach(function(permission) {
-                                    response += "<option value=\"" + permission.name + "\">"+ counter++ +". " + permission.display_name +"</option>"
-                                    $("#"+actionID).html(response)
-                                });
                             }
                         }
                     })
@@ -502,6 +502,25 @@ if(window.location.port)
                             while(tags.length > 0) {
                                 tags.pop();
                             }
+                            $('#model_dialog').html(data)
+                            $('#shareModel').modal('show')
+                        }
+                    }
+                })
+                return false
+            },
+            addVoucherDocumentIndividual:function (e){
+                let id = $(e).attr('ref')
+                let url = window.location.origin + sourceDir + "/add-voucher-document-individual";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'id':id},
+                    success: function(data){
+                        if (data.error){
+                            alert(data.error.msg)
+                        }else{
                             $('#model_dialog').html(data)
                             $('#shareModel').modal('show')
                         }

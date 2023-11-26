@@ -22,18 +22,14 @@ use Illuminate\Support\Str;
 class ajaxRequestController extends Controller
 {
     //
-    public function __construct()
-    {
-        header('Content-Type: application/json');
-    }
     public function findPermissionChild(Request $request)
     {
         try {
             extract($request->post());
             $results = Permission::where('parent_id',$pid)->get();
-            echo json_encode(array(
+            return array(
                 'results' => $results
-            ));
+            );
         }catch (\Throwable $exception)
         {
             echo json_encode(array(

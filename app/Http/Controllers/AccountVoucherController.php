@@ -8,6 +8,7 @@ use App\Models\SalaryCertificateTransection;
 use App\Models\User;
 use App\Models\UserSalaryCertificateData;
 use App\Models\VoucherDocument;
+use App\Models\VoucherDocumentShareEmailLink;
 use App\Models\VoucherType;
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -176,6 +177,7 @@ class AccountVoucherController extends Controller
             extract($request->post());
             $user = Auth::user();
 //            dd(count($request->file('voucher_file')));
+            $v_type = VoucherType::where('id',$voucher_type)->first();
             $firstInsert = DB::table('account_voucher_infos')->insertGetId([
                 'voucher_type_id'   =>  $voucher_type,
                 'voucher_number'    =>  $voucher_number,
@@ -193,7 +195,7 @@ class AccountVoucherController extends Controller
             if ($firstInsert && $request->hasFile('voucher_file')) {
                 foreach ($request->file('voucher_file') as $file) {
                     // Handle each file
-                    $fileName = $file->getClientOriginalName();
+                    $fileName = $voucher_number."_".$v_type->voucher_type_title."_".$file->getClientOriginalName();
                     $file_location = $file->move($this->accounts_document_path,$fileName); // Adjust the storage path as needed
                     if (!$file_location)
                     {
@@ -224,6 +226,28 @@ class AccountVoucherController extends Controller
             return redirect()->back()->with('error', 'An error occurred: ' . $exception->getMessage())->withInput();
         }
 
+    }
+
+    public function storeVoucherDocumentIndividual(Request $request)
+    {
+        if ($request->isMethod('post'))
+        {
+            try {
+                extract($request->post());
+                $id = Crypt::decryptString($id);
+                $results = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
+                return view('back-end/account-voucher/_share_document_model',compact('results','userEmails','shareData'));
+            }catch (\Throwable $exception)
+            {
+                echo json_encode(array(
+                    'error' => array(
+                        'msg' => $exception->getMessage(),
+                        'code' => $exception->getCode(),
+                    )
+                ));
+            }
+        }
+        return redirect()->back()->with('error', "request method {$request->method()} not supported")->withInput();
     }
 
     public function voucherList()
