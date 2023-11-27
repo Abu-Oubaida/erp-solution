@@ -8,9 +8,11 @@ use App\Models\SalaryCertificateTransection;
 use App\Models\User;
 use App\Models\UserSalaryCertificateData;
 use App\Models\VoucherDocument;
+use App\Models\VoucherDocumentIndividualDeletedHistory;
 use App\Models\VoucherDocumentShareEmailLink;
 use App\Models\VoucherType;
 
+use App\Rules\AccountVoucherInfoStatusRule;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -228,15 +230,17 @@ class AccountVoucherController extends Controller
 
     }
 
-    public function storeVoucherDocumentIndividual(Request $request)
+    public function createVoucherDocumentIndividual(Request $request)
     {
         if ($request->isMethod('post'))
         {
+            $request->validate([
+                'id'    => ['required','string', new AccountVoucherInfoStatusRule()],
+            ]);
             try {
                 extract($request->post());
-                $id = Crypt::decryptString($id);
-                $results = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-                return view('back-end/account-voucher/_share_document_model',compact('results','userEmails','shareData'));
+                $voucherInfo = Account_voucher::where('id',Crypt::decryptString($id))->first();
+                return view('back-end.account-voucher._create_voucher_document_individual_model',compact('voucherInfo'));
             }catch (\Throwable $exception)
             {
                 echo json_encode(array(
@@ -245,6 +249,41 @@ class AccountVoucherController extends Controller
                         'code' => $exception->getCode(),
                     )
                 ));
+            }
+        }
+        return redirect()->back()->with('error', "request method {$request->method()} not supported")->withInput();
+    }
+    public function storeVoucherDocumentIndividual(Request $request)
+    {
+        if ($request->isMethod('post'))
+        {
+            $request->validate([
+                'id'    => ['required','string', new AccountVoucherInfoStatusRule()],
+                'voucher_file.*'    =>  ['required','max:512000'],
+            ]);
+            try {
+                extract($request->post());
+                $user = Auth::user();
+                $voucherInfo = Account_voucher::with(['VoucherType'])->where('id',Crypt::decryptString($id))->first();
+                foreach ($request->file('voucher_file') as $file) {
+                    $fileName = $voucherInfo->voucher_number."_".$voucherInfo->VoucherType->voucher_type_title."_".$file->getClientOriginalName();
+                    $file_location = $file->move($this->accounts_document_path,$fileName); // Adjust the storage path as needed
+                    if (!$file_location)
+                    {
+                        return redirect()->back()->with('error', 'Data uploaded error.');
+                    }
+                    DB::table('voucher_documents')->insert([
+                        'voucher_info_id'   =>  $voucherInfo->id,
+                        'document'          =>  $fileName,
+                        'filepath'          =>  $this->accounts_document_path,
+                        'created_by'        =>  $user->id,
+                        'created_at'        =>  now(),
+                    ]);
+                }
+                return redirect()->route('uploaded.voucher.list')->with('success','Data upload successfully on Voucher No:'.$voucherInfo->voucher_number);
+            }catch (\Throwable $exception)
+            {
+                return redirect()->route('uploaded.voucher.list')->with('error',$exception->getMessage());
             }
         }
         return redirect()->back()->with('error', "request method {$request->method()} not supported")->withInput();
@@ -526,6 +565,40 @@ class AccountVoucherController extends Controller
             extract($request->post());
             SalaryCertificateTransection::create($validated);
             return back()->with('success','Data add successfully!');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function deleteVoucherDocumentIndividual(Request $request)
+    {
+        try {
+            if ($request->isMethod('delete'))
+            {
+                $request->validate([
+                    'id'  =>    ['required','string']
+                ]);
+                extract($request->post());
+                $user = Auth::user();
+                $id = Crypt::decryptString($id);
+                $v_d = VoucherDocument::where('id',$id)->first();
+                if ($v_d)
+                {
+                    VoucherDocumentIndividualDeletedHistory::create([
+                        'voucher_info_id'   =>  $v_d->voucher_info_id,
+                        'document'          =>  $v_d->document,
+                        'filepath'          =>  $v_d->filepath,
+                        'created_by'        =>  $v_d->created_by,
+                        'updated_by'        =>  $v_d->updated_by,
+                        'deleted_by'        =>  $user->id,
+                        'created_at'        =>  now(),
+                    ]);
+                    VoucherDocument::where('id',$id)->delete();
+                    return back()->with('success','Data delete successfully');
+                }
+                return back()->with('error','Data not found on database!');
+            }
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

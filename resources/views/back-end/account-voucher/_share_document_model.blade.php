@@ -46,7 +46,7 @@
             </div>
             <div class="col-md-2">
                 <div class="form-group mb-3">
-                    <select class="form-control" name="voucher_type" id="voucher_type">
+                    <select class="form-control" name="voucher_type" id="voucher_type" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($results->id) !!}" onchange="return Obj.voucherShareType(this)">
                         <option value="0">--Select Option--</option>
                         <option value="1">Only view</option>
                         <option value="2">View/Download</option>
@@ -55,7 +55,7 @@
             </div>
             <div class="col-md-8">
                 <div class="form-group mb-3">
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control" readonly id="sharedLink">
                 </div>
             </div>
             <div class="col-md-2 text-end">

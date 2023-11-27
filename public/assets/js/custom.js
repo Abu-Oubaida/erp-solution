@@ -564,6 +564,25 @@ if(window.location.port)
                 }
                 $(event).remove();
             },
+            voucherShareType:function (e)
+            {
+                let value = $(e).val()
+                let refId = $(e).attr('ref');
+                if (value.length > 0)
+                {
+                    let url = window.location.origin + sourceDir + "/voucher-share-type";
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        data: {value: value, refId: refId},
+                        success: function(data) {
+                            $('#sharedLink').val(data)
+                        }
+                    });
+                }
+
+            },
             sendDocumentEmail:function (e)
             {
                 const url = window.location.origin + sourceDir + "/share-voucher-document-email";

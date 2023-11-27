@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentShareEmailLink;
 use App\Models\VoucherDocumentShareEmailList;
+use App\Models\VoucherDocumentShareLink;
 use App\Models\VoucherType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -233,6 +234,44 @@ class ajaxRequestController extends Controller
                     )
                 ));
             }
+        }catch (\Throwable $exception)
+        {
+            echo json_encode(array(
+                'error' => array(
+                    'msg' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                )
+            ));
+        }
+    }
+    public function voucherShareType(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'refId' => 'required','string',
+            'value' => 'required','numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 200);
+        }
+        try {
+            extract($request->post());
+            $id = Crypt::decryptString($refId);
+            $link_data = VoucherDocumentShareLink::where('share_document_id',$id)->where('share_type',$value)->first();
+            if (!($link_data))
+            {
+                $user = Auth::user();
+                $share_id = $this->generateUniqueId();
+                $link_data = VoucherDocumentShareLink::create([
+                    'share_id'=>$share_id,
+                    'share_type'=>$value,
+                    'share_document_id'=>$id,
+                    'status'=>1,
+                    'shared_by'=>$user->id,
+                ]);
+            }
+            $shareLink = route('voucher.document.view',['document'=>Crypt::encryptString($link_data->share_document_id),'share'=>$link_data->share_id]);
+            return $shareLink;
         }catch (\Throwable $exception)
         {
             echo json_encode(array(

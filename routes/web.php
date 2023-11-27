@@ -39,7 +39,11 @@ Route::controller(ajaxRequestController::class)->group(function (){
 # 2.2 Fiend voucher document for preview this document on pop-up modal
     Route::post('fiend-voucher-document','findVoucherDocument')->name('fien.voucher.document');
 # 2.3 Fiend voucher document info for sharing
-    Route::post('fiend-voucher-document-info','findVoucherDocumentInfo')->name('fien.voucher.document.info');
+    Route::middleware(['permission:share_voucher_document_individual'])->group(function (){
+        Route::post('fiend-voucher-document-info','findVoucherDocumentInfo')->name('fien.voucher.document.info');
+        Route::post('voucher-share-type','voucherShareType')->name('voucher.share.type');
+
+    });
 });//2.0 End
 
 # 3.0 All with Auth
@@ -51,8 +55,10 @@ Route::group(['middleware' => ['auth']],function (){
     });//3.1 End
 # 3.2 Send mail for document sharing
     Route::controller(ajaxRequestController::class)->group(function (){
-        Route::post('share-voucher-document-email','shareVoucherDocumentEmail')->name('share.voucher.document');
-        Route::post('email-link-status-change','emailLinkStatusChange')->name('email.link.status.change');
+        Route::middleware(['permission:share_voucher_document_individual'])->group(function (){
+            Route::post('share-voucher-document-email','shareVoucherDocumentEmail')->name('share.voucher.document');
+            Route::post('email-link-status-change','emailLinkStatusChange')->name('email.link.status.change');
+        });
     });//3.2 End
 
 # 3.2 Super Admin Controller
@@ -185,7 +191,11 @@ Route::group(['middleware' => ['auth']],function (){
             Route::get('salary-certificate-preview/{salaryInfoID}','previewPdf')->name('salary.certificate.preview');
         });//3.7.8
         Route::middleware(['permission:add_voucher_document_individual'])->group(function (){
-            Route::post('add-voucher-document-individual','storeVoucherDocumentIndividual');
+            Route::post('add-voucher-document-individual','createVoucherDocumentIndividual');
+            Route::post('store-voucher-document-individual','storeVoucherDocumentIndividual')->name('store.voucher.document.individual');
+        });
+        Route::middleware(['permission:delete_voucher_document_individual'])->group(function (){
+            Route::delete('delete-voucher-document-individual','deleteVoucherDocumentIndividual')->name('delete.voucher.document.individual');
         });
 
     });//3.7 End
@@ -275,5 +285,11 @@ Route::group(['middleware' => ['auth']],function (){
 # 4.0 Share Document View
 Route::controller(ShareDocumentViewController::class)->group(function (){
     Route::get('voucher-document-view','voucherDocumentView')->name('voucher.document.view');
+});
+Route::controller(AccountVoucherController::class)->group(function (){
+    Route::middleware(['permission:add_voucher_document_individual'])->group(function (){
+        Route::post('add-voucher-document-individual','createVoucherDocumentIndividual');
+        Route::post('store-voucher-document-individual','storeVoucherDocumentIndividual')->name('store.voucher.document.individual');
+    });
 });
 require __DIR__.'/auth.php';

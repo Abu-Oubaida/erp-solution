@@ -1,4 +1,4 @@
-<table id="datatablesSimple">
+<table id="permissionstable">
     <thead>
     <tr>
         <th>SL</th>
@@ -43,14 +43,26 @@
                         <div>
                             <strong>{!! $x++ !!}.</strong> {!! $d->document !!} &nbsp; <a href="" title="Quick View" vtype="{!! $data->VoucherType->voucher_type_title !!}" vno="{!! $data->voucher_number !!}" path="{!! \Illuminate\Support\Facades\Crypt::encryptString(url($d->filepath.$d->document)) !!}" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','v_type','v_no')"> <i class="fa-solid fa-eye"></i></a>
                             &nbsp;
-                            <a href="{!! route('view.voucher.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window"><i class="fa-solid fa-up-right-from-square"></i></a>
-                            &nbsp;
-                            <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)"><i class="fas fa-share"></i></a>
-                            <a href="" class="text-danger"><i class="fas fa-trash"></i></a>
+                            <a href="{!! route('view.voucher.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
+                            &nbsp
+                            @if(auth()->user()->hasPermission('share_voucher_document_individual'))
+                            <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fas fa-share"></i></a>
+                            @endif
+                            &nbsp
+                            @if(auth()->user()->hasPermission('delete_voucher_document_individual'))
+                                <form action="{{route('delete.voucher.document.individual')}}" class="display-inline" method="post">
+                                    @method('delete')
+                                    @csrf
+                                    <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}">
+                                    <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this?')" title="Delete"><i class="fas fa-trash"></i></button>
+                                </form>
+                            @endif
                             <hr>
                         </div>
                     @endforeach
-                    <a href="" class="text-end float-end badge bg-success text-decoration-none" onclick="Obj.addVoucherDocumentIndividual(this)" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($data->id) !!}"><i class="fas fa-plus"></i> Add New</a>
+                @if(auth()->user()->hasPermission('add_voucher_document_individual'))
+                    <a href="" class="text-end float-end badge bg-success text-decoration-none" onclick="return Obj.addVoucherDocumentIndividual(this)" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($data->id) !!}"><i class="fas fa-plus"></i> Add New</a>
+                @endif
                 </td>
                 {{--                                        <td></td>--}}
                 {{--                                        <td></td>--}}
