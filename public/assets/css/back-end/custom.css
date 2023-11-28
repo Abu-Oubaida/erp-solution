@@ -111,3 +111,16 @@
     height: 100%;
     margin: 0 auto;
 }
+#fixedDiv {
+    margin-left: 0px;
+    width: 84.7%;
+    transition: background-color 0.3s ease-in-out;
+}
+
+#fixedDiv.fixed {
+    position: fixed;
+    top: 60px;
+    padding: 5px 0;
+    background-color: rgba(121, 121, 121, 0.64); /* Change background color when fixed */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow when fixed */
+}

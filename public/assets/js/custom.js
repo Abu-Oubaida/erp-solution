@@ -160,6 +160,33 @@ if(window.location.port)
                 reader.readAsBinaryString(file)
             }
         });
+        let fixedDiv = $('#fixedDiv');
+        if (typeof (fixedDiv.offset()) !== 'undefined')
+        {
+            let initialOffset = fixedDiv.offset().top;
+
+            $(window).scroll(function() {
+                var scrollPos = $(window).scrollTop();
+
+                if (scrollPos > initialOffset) {
+                    fixedDiv.addClass('fixed');
+                } else {
+                    fixedDiv.removeClass('fixed');
+                }
+            });
+        }
+
+        // Select All checkbox
+        $('#select_all').change(function() {
+            $('.check-box').prop('checked', this.checked);
+        });
+
+        // Individual checkboxes
+        $('.check-box').change(function() {
+            if (!this.checked) {
+                $('#select_all').prop('checked', false);
+            }
+        });
         // Function to display the modal
         function showModal(data,fileName) {
             const modal = document.getElementById("myModal");
@@ -582,6 +609,27 @@ if(window.location.port)
                     });
                 }
 
+            },
+            copyDocumentShareLink:function (e)
+            {
+                let sharedLink = $("#sharedLink")
+                console.log(sharedLink.val().length)
+                if (sharedLink.val().length <= 0)
+                {
+                    return false
+                }
+                else {
+                    sharedLink.select()
+                    try {
+                        // Execute the copy command
+                        document.execCommand('copy');
+                        $(e).html('<i class="fa-solid fa-clipboard"></i> Copied!')
+                        // $(e).remove('class','btn-success')
+                        $(e).addClass('btn-info')
+                    } catch (err) {
+                        alert('Unable to copy link:'+err);
+                    }
+                }
             },
             sendDocumentEmail:function (e)
             {

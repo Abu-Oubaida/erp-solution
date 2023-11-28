@@ -197,6 +197,9 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:delete_voucher_document_individual'])->group(function (){
             Route::delete('delete-voucher-document-individual','deleteVoucherDocumentIndividual')->name('delete.voucher.document.individual');
         });
+        Route::middleware(['permission:multiple_voucher_operation'])->group(function (){
+//            Route::delete('delete-voucher','deleteVoucherMultiple')->name('delete.voucher.multiple');
+        });
 
     });//3.7 End
 

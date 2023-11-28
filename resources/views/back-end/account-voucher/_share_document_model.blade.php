@@ -59,7 +59,7 @@
                 </div>
             </div>
             <div class="col-md-2 text-end">
-                <button class="btn btn-success"><i class="fa-solid fa-link"></i> Copy link</button>
+                <button class="btn btn-success" onclick="return Obj.copyDocumentShareLink(this)"><i class="fa-regular fa-copy"></i> Copy link</button>
             </div>
             <div class="col-md-12">
                 <span><i class="fa-regular fa-envelope"></i> This document share via email list</span>
