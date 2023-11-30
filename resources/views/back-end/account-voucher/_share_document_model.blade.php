@@ -29,7 +29,7 @@
             </div>
             <div class="col-md-12">
                 <div class="form-floating mb-3 float-end">
-                    <button class="btn btn-success" id="submit-tags" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($results->id) !!}" onclick="return Obj.sendDocumentEmail(this)"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
+                    <button class="btn btn-success" id="submit-tags" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($results->id) !!}" onclick="return Obj.sendDocumentEmail(this)" type="button"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
                 </div>
             </div>
 
@@ -59,7 +59,7 @@
                 </div>
             </div>
             <div class="col-md-2 text-end">
-                <button class="btn btn-success" onclick="return Obj.copyDocumentShareLink(this)"><i class="fa-regular fa-copy"></i> Copy link</button>
+                <button class="btn btn-success" onclick="return Obj.copyDocumentShareLink(this)" type="button"><i class="fa-regular fa-copy"></i> Copy link</button>
             </div>
             <div class="col-md-12">
                 <span><i class="fa-regular fa-envelope"></i> This document share via email list</span>

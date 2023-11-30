@@ -604,4 +604,14 @@ class AccountVoucherController extends Controller
             return back()->with('error',$exception->getMessage());
         }
     }
+
+    public function voucherMultipleSubmit(Request $request)
+    {
+        if ($request->isMethod('post'))
+        {
+            $submitButtonName = $request->input('submit_selected');
+            $selectedCheckboxes = $request->input('selected', []);
+            dd($selectedCheckboxes);
+        }
+    }
 }

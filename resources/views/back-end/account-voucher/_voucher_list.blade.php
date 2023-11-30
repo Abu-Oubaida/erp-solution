@@ -1,9 +1,12 @@
-<form action="">
+{{--<form action="{!! route('voucher.multiple.submit') !!}" method="post">--}}
+{{--<form>--}}
+{{--    @csrf--}}
+
 <div class="row" id="fixedDiv">
     <div class="col-md-10">
         <input type="checkbox" name="" id="select_all">
         <label for="select_all">Select All</label>
-        <button class="btn btn-outline-danger btn-sm"> <i class="fas fa-trash"></i> Delete</button>
+        <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete"> <i class="fas fa-trash"></i> Delete</button>
         <button class="btn btn-outline-primary btn-sm"><i class="fa-regular fa-file-zipper"></i> Download Zip</button>
     </div>
 
@@ -44,7 +47,7 @@
         @endphp
         @foreach($voucherInfos as $data)
             <tr>
-                <th><input class="check-box" type="checkbox" name="select" id="select_{!! $data->id !!}"></th>
+                <th><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $data->id !!}" value="{!! $data->id !!}"></th>
                 <td>{!! $no++ !!}</td>
                 <td>{!! date('d-M-y', strtotime($data->voucher_date)) !!}</td>
                 <td>{!! $data->voucher_number !!}</td>
@@ -99,7 +102,8 @@
     @endif
     </tbody>
 </table>
-</form>
+    @method('post')
+{{--</form>--}}
 <!-- Modal For Preview -->
 <div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
