@@ -572,11 +572,11 @@ class UserController extends Controller
         $joining_month = date('m',strtotime($joining_date));
         $countOfEmployee = User::where('dept_id', $dept->id)->count();
         $nextEmployee = $countOfEmployee + 1;
-        $fourDigit = str_pad($nextEmployee, 4, "0", STR_PAD_LEFT);
+        $fourDigit = str_pad($nextEmployee, 3, "0", STR_PAD_LEFT);
         $eid =  $dept->dept_code . $fourDigit;
         while (User::where('employee_id_hidden', $eid)->count()) {
             $nextEmployee++;
-            $fourDigit = str_pad($nextEmployee, 4, "0", STR_PAD_LEFT);
+            $fourDigit = str_pad($nextEmployee, 3, "0", STR_PAD_LEFT);
             $eid =  $dept->dept_code . $fourDigit;
         }
         $fullEID = $joining_year . $joining_month . $eid;

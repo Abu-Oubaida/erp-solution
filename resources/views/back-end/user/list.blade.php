@@ -42,21 +42,6 @@
                         <th>Action</th>
                     </tr>
                     </thead>
-                    <tfoot>
-                    <tr>
-                        <th>No</th>
-                        <th>Employee ID</th>
-                        <th>Name</th>
-                        <th>Joining Date</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Dept.</th>
-                        <th>Designation</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                    </tfoot>
                     <tbody>
                     @if(count($users))
                         @php
