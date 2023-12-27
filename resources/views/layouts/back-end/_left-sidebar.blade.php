@@ -180,6 +180,7 @@
         </div>
         <div class="small">Logged in
             as: {!! \Illuminate\Support\Facades\Auth::user()->roles->first()->display_name !!}</div>
-        {{config('app.name')}}
+        <a href="https://github.com/abuoubaida" class="text-decoration-none text-chl" title="Abu Oubaida, MIS Dept.">Oubaida ❤️
+        </a>{{config('app.name')}}˚ {{date('Y')}}
     </div>
 </nav>
