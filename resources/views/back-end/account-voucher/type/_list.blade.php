@@ -12,18 +12,18 @@
             <th>Action</th>
         </tr>
         </thead>
-        <tfoot>
-        <tr>
-            <th>No</th>
-            <th>Voucher type title</th>
-            <th>Status</th>
-            <th>Code</th>
-            <th>Remarks</th>
-            <th>Created By</th>
-            <th>Updated By</th>
-            <th>Action</th>
-        </tr>
-        </tfoot>
+{{--        <tfoot>--}}
+{{--        <tr>--}}
+{{--            <th>No</th>--}}
+{{--            <th>Voucher type title</th>--}}
+{{--            <th>Status</th>--}}
+{{--            <th>Code</th>--}}
+{{--            <th>Remarks</th>--}}
+{{--            <th>Created By</th>--}}
+{{--            <th>Updated By</th>--}}
+{{--            <th>Action</th>--}}
+{{--        </tr>--}}
+{{--        </tfoot>--}}
         <tbody>
         @if(isset($voucherTypes) && count($voucherTypes))
             @php
@@ -36,8 +36,8 @@
                     <td>@if($vt->status ==1) Active @else Inactive @endif</td>
                     <td>{!! $vt->code !!}</td>
                     <td>{!! $vt->remarks !!}</td>
-                    <td>{!! $vt->createdBY->name !!}</td>
-                    <td>{!! $vt->updatedBY->name !!}</td>
+                    <td>{!! ($vt->createdBY)? $vt->createdBY->name:'-' !!}</td>
+                    <td>{!! ($vt->updatedBY)? $vt->updatedBY->name:'-' !!}</td>
                     <td>
                         @if(auth()->user()->hasPermission('edit_voucher_type'))
                         <a href="{{route('edit.voucher.type',["voucherTypeID"=>\Illuminate\Support\Facades\Crypt::encryptString($vt->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>

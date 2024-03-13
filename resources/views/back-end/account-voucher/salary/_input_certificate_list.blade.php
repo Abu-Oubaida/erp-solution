@@ -22,29 +22,29 @@
         <th>Action</th>
     </tr>
     </thead>
-    <tfoot>
-    <tr>
-        <th>SL</th>
-        <th>Employee ID</th>
-        <th>Name</th>
-        <th>Department (Branch)</th>
-        <th><span title="Financial Year From">F.Y. From</span></th>
-        <th><span title="Financial Year To">F.Y. To</span></th>
-        <th>Basic</th>
-        <th>House Rent</th>
-        <th>Conveyance</th>
-        <th>Medical Allowance</th>
-        <th>Festival Bonus</th>
-        <th>Others</th>
-        <th>Total</th>
-        <th>Remarks</th>
-    @if(Route::currentRouteName() == 'salary.certificate.list')
-        <th>Created By</th>
-        <th>Updated By</th>
-    @endif
-        <th>Action</th>
-    </tr>
-    </tfoot>
+{{--    <tfoot>--}}
+{{--    <tr>--}}
+{{--        <th>SL</th>--}}
+{{--        <th>Employee ID</th>--}}
+{{--        <th>Name</th>--}}
+{{--        <th>Department (Branch)</th>--}}
+{{--        <th><span title="Financial Year From">F.Y. From</span></th>--}}
+{{--        <th><span title="Financial Year To">F.Y. To</span></th>--}}
+{{--        <th>Basic</th>--}}
+{{--        <th>House Rent</th>--}}
+{{--        <th>Conveyance</th>--}}
+{{--        <th>Medical Allowance</th>--}}
+{{--        <th>Festival Bonus</th>--}}
+{{--        <th>Others</th>--}}
+{{--        <th>Total</th>--}}
+{{--        <th>Remarks</th>--}}
+{{--    @if(Route::currentRouteName() == 'salary.certificate.list')--}}
+{{--        <th>Created By</th>--}}
+{{--        <th>Updated By</th>--}}
+{{--    @endif--}}
+{{--        <th>Action</th>--}}
+{{--    </tr>--}}
+{{--    </tfoot>--}}
     <tbody>
     @if(isset($datas) && count($datas))
         @php

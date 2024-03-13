@@ -26,20 +26,20 @@
         <th>Action</th>
     </tr>
     </thead>
-    <tfoot>
-    <tr>
-        <th>Select</th>
-        <th>SL</th>
-        <th>Date</th>
-        <th>Voucher Number</th>
-        <th>Voucher Type</th>
-        <th>Remarks</th>
-        <th>Document</th>
-        <th>Created By</th>
-        <th>Updated By</th>
-        <th>Action</th>
-    </tr>
-    </tfoot>
+{{--    <tfoot>--}}
+{{--    <tr>--}}
+{{--        <th>Select</th>--}}
+{{--        <th>SL</th>--}}
+{{--        <th>Date</th>--}}
+{{--        <th>Voucher Number</th>--}}
+{{--        <th>Voucher Type</th>--}}
+{{--        <th>Remarks</th>--}}
+{{--        <th>Document</th>--}}
+{{--        <th>Created By</th>--}}
+{{--        <th>Updated By</th>--}}
+{{--        <th>Action</th>--}}
+{{--    </tr>--}}
+{{--    </tfoot>--}}
     <tbody>
     @if(isset($voucherInfos) && count($voucherInfos))
         @php

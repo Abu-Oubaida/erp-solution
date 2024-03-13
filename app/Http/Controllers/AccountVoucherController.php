@@ -35,6 +35,7 @@ class AccountVoucherController extends Controller
                 return $this->storeVoucherType($request);
             }
             $voucherTypes = $this->voucherTypeList();
+//            dd($voucherTypes);
             return view('back-end/account-voucher/type/add',compact('voucherTypes'));
         }catch (\Throwable $exception)
         {
@@ -90,7 +91,7 @@ class AccountVoucherController extends Controller
 
     private function voucherTypeList()
     {
-        return VoucherType::get();
+        return VoucherType::with(['createdBY','updatedBY'])->get();
     }
     private function updateVoucherType(Request $request,$voucherTypeID)
     {

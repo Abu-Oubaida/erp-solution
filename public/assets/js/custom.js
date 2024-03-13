@@ -176,6 +176,23 @@ if(window.location.port)
             });
         }
 
+        $('#selected-delete').click(function (){
+            if (confirm("Are you sure?"))
+            {
+                // Create an array to store the checked values
+                let checkedValues = [];
+
+                // Use the :checked selector to get all checked checkboxes
+                $('input[type="checkbox"]:checked').each(function () {
+                    // Add the value of each checked checkbox to the array
+                    checkedValues.push($(this).val());
+                });
+
+                // Display the result (you can modify this part based on your needs)
+                alert('Checked values: ' + checkedValues.join(', '));
+            }
+        })
+
         // Select All checkbox
         $('#select_all').change(function() {
             $('.check-box').prop('checked', this.checked);
