@@ -163,6 +163,43 @@
                 @endif
             </group7>{{--#2.5    Mobile Sim section End--}}
 
+            {{--#2.6    Sales Interface section Start--}}
+            <group8>
+                {{--#2.6.1  Permission Chck Sales Interface section Start--}}
+                @if(auth()->user()->hasPermission('sales_interface'))
+                    <subgroup1>
+                        @if(Route::currentRouteName() == 'sales.dashboard.interface')
+                            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#salesInterfaceLayouts"
+                               aria-expanded="true" aria-controls="salesInterfaceLayouts">
+                                <div class="sb-nav-link-icon"><i class="fas fa-solid fa-magnifying-glass-dollar"></i></div>
+                                Sales CRM
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse show" id="salesInterfaceLayouts" aria-labelledby="headingOne"
+                                 data-bs-parent="#sidenavAccordion">
+                        @else
+                            <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse"
+                               data-bs-target="#salesInterfaceLayouts" aria-expanded="false" aria-controls="salesInterfaceLayouts">
+                                <div class="sb-nav-link-icon"><i class="fas fa-solid fa-magnifying-glass-dollar"></i></div>
+                                Sales CRM
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="salesInterfaceLayouts" aria-labelledby="headingOne"
+                                 data-bs-parent="#sidenavAccordion">
+                        @endif
+                                <nav class="sb-sidenav-menu-nested nav ">
+                                    {{--Sales Interface dashboard here--}}
+                                    @include('layouts.back-end.sidebar-components.interface.sales._dashboard')
+                                    {{--Sales Interface dashboard is here--}}
+                                </nav>
+                            </div>
+                    </subgroup1>
+                    {{--#2.6.1.1   Route/URL Chck and set navigation header Sales Dashboard here--}}
+{{--                    @if(auth()->user()->hasPermission('sales_dashboard_interface') )--}}
+{{--                    @endif--}}
+                @endif
+            </group8>{{--#2.6    Mobile Sim section End--}}
+
             {{--            <div class="sb-sidenav-menu-heading">Addons</div>--}}
             {{--            <a class="nav-link text-chl" href="charts.html">--}}
             {{--                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>--}}
@@ -180,7 +217,8 @@
         </div>
         <div class="small">Logged in
             as: {!! \Illuminate\Support\Facades\Auth::user()->roles->first()->display_name !!}</div>
-        <a href="https://github.com/abuoubaida" class="text-decoration-none text-chl" title="Abu Oubaida, MIS Dept.">Oubaida ❤️
+        <a href="https://github.com/abuoubaida" class="text-decoration-none text-chl" title="Abu Oubaida, MIS Dept.">Oubaida
+            ❤️
         </a>{{config('app.name')}}˚ {{date('Y')}}
     </div>
 </nav>

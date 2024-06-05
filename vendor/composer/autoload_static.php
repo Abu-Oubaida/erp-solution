@@ -782,6 +782,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\file_uploading_history' => __DIR__ . '/../..' . '/app/Models/file_uploading_history.php',
         'App\\Models\\filemanager_permission' => __DIR__ . '/../..' . '/app/Models/filemanager_permission.php',
         'App\\Models\\priority' => __DIR__ . '/../..' . '/app/Models/priority.php',
+        'App\\Models\\sales_interface' => __DIR__ . '/../..' . '/app/Models/sales_interface.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',

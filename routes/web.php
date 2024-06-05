@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SalesInterfaceController;
 use App\Http\Controllers\ShareDocumentViewController;
 use App\Http\Controllers\superadmin\ajaxRequestController;
 use App\Http\Controllers\superadmin\DepartmentController;
@@ -295,5 +296,11 @@ Route::controller(AccountVoucherController::class)->group(function (){
         Route::post('add-voucher-document-individual','createVoucherDocumentIndividual');
         Route::post('store-voucher-document-individual','storeVoucherDocumentIndividual')->name('store.voucher.document.individual');
     });
-});
+});//4.0 End
+# 5.0 Sales Interface
+Route::controller(SalesInterfaceController::class)->group(function (){
+    Route::middleware(['permission:sales_dashboard_interface'])->group(function (){
+        Route::match(['get','post'],'sales-dashboard','index')->name('sales.dashboard.interface');
+    });
+});//5.0 End
 require __DIR__.'/auth.php';

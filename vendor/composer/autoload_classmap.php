@@ -123,6 +123,7 @@ return array(
     'App\\Models\\file_uploading_history' => $baseDir . '/app/Models/file_uploading_history.php',
     'App\\Models\\filemanager_permission' => $baseDir . '/app/Models/filemanager_permission.php',
     'App\\Models\\priority' => $baseDir . '/app/Models/priority.php',
+    'App\\Models\\sales_interface' => $baseDir . '/app/Models/sales_interface.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
     'App\\Providers\\AuthServiceProvider' => $baseDir . '/app/Providers/AuthServiceProvider.php',
     'App\\Providers\\BroadcastServiceProvider' => $baseDir . '/app/Providers/BroadcastServiceProvider.php',
