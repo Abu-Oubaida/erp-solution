@@ -302,5 +302,11 @@ Route::controller(SalesInterfaceController::class)->group(function (){
     Route::middleware(['permission:sales_dashboard_interface'])->group(function (){
         Route::match(['get','post'],'sales-dashboard','index')->name('sales.dashboard.interface');
     });
+    Route::middleware(['permission:add_sales_lead'])->group(function (){
+        Route::match(['get','post'],'add-lead','addLead')->name('add.sales.lead');
+    });
+    Route::middleware(['permission:sales_lead_list'])->group(function (){
+        Route::match(['get','post'],'list-lead','leadList')->name('sales.lead.list');
+    });
 });//5.0 End
 require __DIR__.'/auth.php';

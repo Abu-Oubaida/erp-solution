@@ -168,7 +168,7 @@
                 {{--#2.6.1  Permission Chck Sales Interface section Start--}}
                 @if(auth()->user()->hasPermission('sales_interface'))
                     <subgroup1>
-                        @if(Route::currentRouteName() == 'sales.dashboard.interface')
+                        @if(Route::currentRouteName() == 'sales.dashboard.interface' || Route::currentRouteName() == 'add.sales.lead'|| Route::currentRouteName() == 'sales.lead.list')
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#salesInterfaceLayouts"
                                aria-expanded="true" aria-controls="salesInterfaceLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-solid fa-magnifying-glass-dollar"></i></div>
@@ -190,6 +190,7 @@
                                 <nav class="sb-sidenav-menu-nested nav ">
                                     {{--Sales Interface dashboard here--}}
                                     @include('layouts.back-end.sidebar-components.interface.sales._dashboard')
+                                    @include('layouts.back-end.sidebar-components.interface.sales._lead_menu_submenu')
                                     {{--Sales Interface dashboard is here--}}
                                 </nav>
                             </div>
