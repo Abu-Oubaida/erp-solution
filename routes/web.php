@@ -5,6 +5,7 @@ use App\Http\Controllers\BloodGroupController;
 use App\Http\Controllers\BrachController;
 use App\Http\Controllers\BranchTypeController;
 use App\Http\Controllers\ComplainController;
+use App\Http\Controllers\ControlPanelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
@@ -286,6 +287,24 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['delete'],'delete-blood-group','destroy')->name('delete.blood.group');
         });
     });// 3.11 End
+    # 3.12 Sales Interface
+    Route::controller(SalesInterfaceController::class)->group(function (){
+        Route::middleware(['permission:sales_dashboard_interface'])->group(function (){
+            Route::match(['get','post'],'sales-dashboard','index')->name('sales.dashboard.interface');
+        });
+        Route::middleware(['permission:add_sales_lead'])->group(function (){
+            Route::match(['get','post'],'add-lead','addLead')->name('add.sales.lead');
+        });
+        Route::middleware(['permission:sales_lead_list'])->group(function (){
+            Route::match(['get','post'],'list-lead','leadList')->name('sales.lead.list');
+        });
+    });//3.12 End
+    # 3.13 Control Panel
+    Route::controller(ControlPanelController::class)->group(function (){
+        Route::middleware(['permission:control_panel'])->prefix('control-panel')->group(function (){
+            Route::match(['get','post'],'index','index')->name('control.panel');
+        });
+    });//3.13 End
 });//3.0 End
 # 4.0 Share Document View
 Route::controller(ShareDocumentViewController::class)->group(function (){
@@ -297,16 +316,4 @@ Route::controller(AccountVoucherController::class)->group(function (){
         Route::post('store-voucher-document-individual','storeVoucherDocumentIndividual')->name('store.voucher.document.individual');
     });
 });//4.0 End
-# 5.0 Sales Interface
-Route::controller(SalesInterfaceController::class)->group(function (){
-    Route::middleware(['permission:sales_dashboard_interface'])->group(function (){
-        Route::match(['get','post'],'sales-dashboard','index')->name('sales.dashboard.interface');
-    });
-    Route::middleware(['permission:add_sales_lead'])->group(function (){
-        Route::match(['get','post'],'add-lead','addLead')->name('add.sales.lead');
-    });
-    Route::middleware(['permission:sales_lead_list'])->group(function (){
-        Route::match(['get','post'],'list-lead','leadList')->name('sales.lead.list');
-    });
-});//5.0 End
 require __DIR__.'/auth.php';

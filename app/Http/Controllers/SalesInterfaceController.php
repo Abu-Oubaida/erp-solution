@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\branch;
+use App\Models\department;
 use Illuminate\Http\Request;
 
 class SalesInterfaceController extends Controller
@@ -19,7 +21,10 @@ class SalesInterfaceController extends Controller
             {
                 return $this->storeLead($request);
             }
-            return view('back-end/sales/add-lead');
+            $depts = department::where('status',1)->get();
+            $branches = branch::where('status',1)->get();
+//            dd($depts);
+            return view('back-end/sales/add-lead',compact('depts','branches'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
