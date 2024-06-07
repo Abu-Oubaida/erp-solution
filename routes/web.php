@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesInterfaceController;
 use App\Http\Controllers\ShareDocumentViewController;
 use App\Http\Controllers\superadmin\ajaxRequestController;
+use App\Http\Controllers\superadmin\CompanySetup;
 use App\Http\Controllers\superadmin\DepartmentController;
 use App\Http\Controllers\superadmin\MobileSIMController;
 use App\Http\Controllers\superadmin\prorammerController;
@@ -64,7 +65,7 @@ Route::group(['middleware' => ['auth']],function (){
     });//3.2 End
 
 # 3.2 Super Admin Controller
-    Route::group(['middleware'=>['auth','role:superadmin']],function (){
+    Route::group(['middleware'=>['auth','role:superadmin'],'prefix'=>'super-admin'],function (){
 # 3.2.1 Only for programmer
         Route::controller(prorammerController::class)->group(function (){
             Route::match(['post','get'],'permission-input','create')->name('permission.input');
@@ -80,6 +81,10 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('user-per-add','UserPerSubmit');
             Route::post('user-per-delete','UserPerDelete');
         });//3.2.3 End
+# 3.2.4 Company Setup
+        Route::controller(CompanySetup::class)->group(function (){
+            Route::match(['get','post'],'company-setup','index')->name('company.setup');
+        });
     });//3.2 End
 
 # 3.3 User Management Controller
