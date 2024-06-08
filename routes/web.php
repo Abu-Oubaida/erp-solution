@@ -84,6 +84,10 @@ Route::group(['middleware' => ['auth']],function (){
 # 3.2.4 Company Setup
         Route::controller(CompanySetup::class)->group(function (){
             Route::match(['get','post'],'company-setup','index')->name('company.setup');
+            Route::match(['get','post'],'company-add','companyAdd')->name('add.company');
+            Route::match(['get','post'],'company-type-add','companyTypeAdd')->name('add.company.type');
+            Route::match(['put','get'],'company-type-edit/{companyTypeID}','companyTypeEdit')->name('edit.company.type');
+            Route::delete('company-type-delete','companyTypeDelete')->name('delete.company.type');
         });
     });//3.2 End
 
