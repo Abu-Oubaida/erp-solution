@@ -14,9 +14,9 @@
         <div class="col-md-7">
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5># Add New Company</h5>
+                    <h5># Edit Company</h5>
                     <hr>
-                    <form action="{!! route('add.company') !!}" method="POST">
+                    <form action="{!! route('edit.company') !!}" method="POST">
                         @csrf
                         <div class="row">
                             <div class="col-md-3">
@@ -50,55 +50,11 @@
 
                             <div class="col-md-12">
                                 <div class="form-floating mb-3 float-end">
-                                    <input type="submit" value="Add" class="btn btn-chl-outline" name="submit" >
+                                    <input type="submit" value="Update" class="btn btn-chl-outline" name="submit" >
                                 </div>
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-5">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5># Add New Company Type</h5>
-                    <hr>
-                    <form action="{!! route('add.company.type') !!}" method="POST">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="company-type-title" name="company_type_title" required="required" placeholder="Company Name" value="{!! old('company_type_title') !!}">
-                                    <label for="company-type-title">Company Type Title<span class="text-danger">*</span></label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <select name="company_type_status" id="company_type_status" class="form-control">
-                                        <option value="1" @if(old('company_type_status') == 1) selected @endif>Active</option>
-                                        <option value="0" @if(old('company_type_status') == 0) selected @endif>Inactive</option>
-                                    </select>
-                                    <label for="company_type_status">Company Type Status<span class="text-danger">*</span></label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="form-floating mb-3">
-                                    <textarea class="form-control" id="description" name="description"> {!! old('description') !!}</textarea>
-                                    <label for="remarks">Description</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="form-floating mb-3 float-end">
-                                    <input type="submit" value="Add Type" class="btn btn-chl-outline" name="submit" >
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                    <h5># Company Type list</h5>
-                    <hr>
-                    @include("back-end.programmer._company-type-edit-list")
                 </div>
             </div>
         </div>
