@@ -5,6 +5,10 @@
         <th>Company Type</th>
         <th>Status</th>
         <th>Remarks</th>
+        <th>Created By</th>
+        <th>Created Time</th>
+        <th>Updated By</th>
+        <th>Updated Time</th>
         <th>Action</th>
     </tr>
     </thead>
@@ -17,6 +21,10 @@
                 <td>{!! $companyType->company_type_title !!}</td>
                 <td>@if($companyType->status == 1) {!! '<span class="text-success">Active</span>' !!} @elseif($companyType->status == 3) {!! '<span class="text-warning">Deleted</span>' !!}  @else {!! '<span class="text-danger">Inactive</span>' !!} @endif</td>
                 <td>{!! $companyType->remarks !!}</td>
+                <td>{!! ($companyType->createdBY)?$companyType->createdBY->name:'-' !!}</td>
+                <td>{!! $companyType->created_at !!}</td>
+                <td>{!! ($companyType->updatedBY)?$companyType->updatedBY->name:"-" !!}</td>
+                <td>{!! $companyType->updated_at !!}</td>
                 <td>
                     <a href="{{route('edit.company.type',["companyTypeID"=>\Illuminate\Support\Facades\Crypt::encryptString($companyType->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
                     <form action="{{route('delete.company.type')}}" class="display-inline" method="post">
