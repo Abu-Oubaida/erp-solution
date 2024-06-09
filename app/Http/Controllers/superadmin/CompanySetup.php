@@ -116,6 +116,14 @@ class CompanySetup extends Controller
             $request->validate([
                 'id'    =>  ['string','required'],
             ]);
+            extract($request->post());
+            $deleteID = Crypt::decryptString($id);
+            $company = company_type::with(['companies'])->find($deleteID);
+            if($company->companies != null)
+            {
+                return back()->with('error','A relationship exists between other tables. Data delete not possible');
+            }
+            dd("not found");
         }catch (\Throwable $exception)
         {
             return back()->with('error', $exception->getMessage());
