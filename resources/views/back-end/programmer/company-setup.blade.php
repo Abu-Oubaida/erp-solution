@@ -120,6 +120,9 @@
                             </div>
                         </div>
                     </form>
+                    <h5># Companies List</h5>
+                    <hr>
+                    @include("back-end.programmer._company-list")
                 </div>
             </div>
         </div>
