@@ -232,9 +232,9 @@ class UserController extends Controller
     {
         try {
             $userID = Crypt::decryptString($id);
-            $dir = config('app.file_manager_url');
-            dd($dir);
-            $fileManagers = (scandir($dir))?scandir($dir):null;
+            $dir = (config('app.file_manager_url'))?config('app.file_manager_url'):url('file-manager');
+
+            $fileManagers = scandir($dir);
             unset($fileManagers[0]);
             unset($fileManagers[1]);
             $permissionParents = Permission::where('parent_id',null)->orWhere('is_parent',1)->get();
