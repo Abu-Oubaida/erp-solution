@@ -233,7 +233,7 @@ class UserController extends Controller
         try {
             $userID = Crypt::decryptString($id);
             $dir = config('app.file_manager_url');
-
+            dd($dir);
             $fileManagers = (scandir($dir))?scandir($dir):null;
             unset($fileManagers[0]);
             unset($fileManagers[1]);
