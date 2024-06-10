@@ -2,7 +2,7 @@
     <thead>
     <tr>
         <th>SL</th>
-        <th>Name</th>
+        <th width="15%">Name</th>
         <th>Status</th>
         <th>Type</th>
         <th>Code</th>
