@@ -1,8 +1,9 @@
-<table id="datatablesSimple">
+<table id="datatablesSimple2">
     <thead>
     <tr>
         <th>SL</th>
-        <th width="15%">Name</th>
+        <th width="10%">Logo</th>
+        <th>Name</th>
         <th>Status</th>
         <th>Type</th>
         <th>Code</th>
@@ -11,6 +12,10 @@
         <th>Contract Person</th>
         <th>Contract Mobile</th>
         <th>Location</th>
+        <th>Created By</th>
+        <th>Created Time</th>
+        <th>Updated By</th>
+        <th>Updated Time</th>
         <th>Action</th>
     </tr>
     </thead>
@@ -20,7 +25,8 @@
         @foreach($companies as $company)
             <tr class="{!! (isset($editID) && $company->id == $editID->id)?'text-primary':'' !!}">
                 <td>{!! $i++ !!}</td>
-                <td><img class="img-thumbnail w-25" src="{!! url($company->logo) !!}" alt="{!! $company->company_code !!}">{!! $company->company_name !!}</td>
+                <td><img class="img-thumbnail w-75" src="{!! url($company->logo) !!}" alt="{!! $company->company_code !!}"></td>
+                <td>{!! $company->company_name !!}</td>
                 <td>@if($company->status == 1) {!! '<span class="text-success">Active</span>' !!} @elseif($company->status == 3) {!! '<span class="text-warning">Deleted</span>' !!}  @else {!! '<span class="text-danger">Inactive</span>' !!} @endif</td>
                 <td>{!! $company->companyType->company_type_title !!}</td>
                 <td>{!! $company->company_code !!}</td>
@@ -29,6 +35,10 @@
                 <td>{!! $company->contract_person_name !!}</td>
                 <td>{!! $company->contract_person_phone !!}</td>
                 <td>{!! $company->location !!}</td>
+                <td>{!! ($company->createdBY)?$company->createdBY->name:'-' !!}</td>
+                <td>{!! $company->created_at !!}</td>
+                <td>{!! ($company->updatedBY)?$company->updatedBY->name:"-" !!}</td>
+                <td>{!! $company->updated_at !!}</td>
                 <td>
                     <a href="{{route('edit.company',["companyID"=>\Illuminate\Support\Facades\Crypt::encryptString($company->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
                     <form action="{{route('delete.company')}}" class="display-inline" method="post">
@@ -42,7 +52,7 @@
         @endforeach
     @else
         <tr>
-            <td colspan="11" class="text-center text-danger">Not found!</td>
+            <td colspan="16" class="text-center text-danger">Not found!</td>
         </tr>
     @endif
 
