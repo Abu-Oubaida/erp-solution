@@ -27,7 +27,7 @@ class ajaxRequestController extends Controller
     {
         try {
             extract($request->post());
-            $results = Permission::where('parent_id',$pid)->get();
+            $results = Permission::where('parent_id',$pid)->orWhere('id',$pid)->get();
             return array(
                 'results' => $results
             );
