@@ -20,7 +20,7 @@ class CompanySetup extends Controller
     {
         try {
             $companyTypes = company_type::with(['createdBY','updatedBY'])->get();
-            $companies = company_info::with(['createdBY','updatedBY','companyType'])->get();
+            $companies = Company_info::with(['createdBY','updatedBY','companyType'])->get();
             return view('back-end/programmer/company-setup',compact('companyTypes','companies'));
         }catch (\Throwable $exception)
         {
