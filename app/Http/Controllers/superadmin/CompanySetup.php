@@ -220,4 +220,52 @@ class CompanySetup extends Controller
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
+
+    public function companyEdit(Request $request, $companyID)
+    {
+        try {
+            if ($request->isMethod('put'))
+            {
+                $this->companyUpdate($request, $companyID);
+            }
+            $companyTypes = company_type::where('status',1)->get();
+            $companies = company_info::with(['createdBY','updatedBY','companyType'])->get();
+            $c_id = Crypt::decryptString($companyID);
+            $edit_company = company_info::where('id',$c_id)->first();
+            if (!$edit_company)
+            {
+                return back()->with('error','Company Not Found!');
+            }
+            return view('back-end/programmer/company-edit',compact('edit_company','companies','companyTypes'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+    }
+
+    private function companyUpdate(Request $request, $companyID)
+    {
+        $id = Crypt::decryptString($companyID);
+        $request->validate([
+            'company_name'  => ['required', 'string', 'max:255',Rule::unique('company_infos','company_name')->ignore($id)],
+            'company_short_name' => ['required', 'string','regex:/(^[A-Za-z0-9 ]+$)+/',Rule::unique('company_infos','company_code')->ignore($id)],
+            'company_type_id'   =>  ['required', 'numeric','exists:company_types,id'],
+            'contract_person' => ['string', 'required','max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('company_infos','email')->ignore($id)],
+            'contract_person_phone' => ['required', 'numeric'],
+            'company_phone' => ['sometimes','nullable', 'numeric', Rule::unique('company_infos','phone')->ignore($id)],
+            'logo'    =>  ['sometimes','nullable','max:2048'],
+            'logo_sm'    =>  ['sometimes','nullable','max:1024'],
+            'logo_icon'    =>  ['sometimes','nullable','max:1024'],
+            'cover'    =>  ['sometimes','nullable','max:2048'],
+            'location'    =>  ['sometimes','nullable','string'],
+            'remarks'    =>  ['sometimes','nullable','string'],
+        ]);
+        try {
+            
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+    }
 }
