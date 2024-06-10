@@ -234,7 +234,7 @@ class UserController extends Controller
             $userID = Crypt::decryptString($id);
             $dir = config('app.file_manager_url');
 
-            $fileManagers = scandir($dir);
+            $fileManagers = (scandir($dir))?scandir($dir):null;
             unset($fileManagers[0]);
             unset($fileManagers[1]);
             $permissionParents = Permission::where('parent_id',null)->orWhere('is_parent',1)->get();
