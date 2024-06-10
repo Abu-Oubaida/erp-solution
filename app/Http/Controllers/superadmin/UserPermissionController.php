@@ -60,7 +60,7 @@ class UserPermissionController extends Controller
                     {
                         if (!($data == 'none'))
                         {
-                            $permissionChild = Permission::where('parent_id',$parentPermission)->where('name',$data)->first();
+                            $permissionChild = Permission::where('parent_id',$parentPermission)->orWhere('id',$parentPermission)->where('name',$data)->first();
                             if (!$permissionChild)
                             {
                                 return back()->with('error','Invalid child permission ('.$data.')');
