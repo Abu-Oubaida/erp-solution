@@ -9,6 +9,7 @@ use App\Http\Controllers\ControlPanelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
+use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesInterfaceController;
 use App\Http\Controllers\ShareDocumentViewController;
@@ -316,6 +317,22 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get','post'],'index','index')->name('control.panel');
         });
     });//3.13 End
+    # 3.14 Fixed Asset
+    Route::controller(FixedAssetController::class)->group(function (){
+        Route::middleware(['permission:fixed_asset'])->prefix('fixed-asset')->group(function (){
+            Route::match(['get','post'],'index','index')->name('fixed.asset');
+            Route::middleware(['permission:add_fixed_asset'])->group(function (){
+                Route::match(['post','get'],'add-fixed-asset','create')->name('fixed.asset.add');
+            });
+            Route::middleware(['permission:fixed_asset_list'])->group(function (){
+                Route::get('show-fixed-asset-list','showFixedAssetList')->name('fixed.asset.show');
+            });
+            Route::middleware(['permission:fixed_asset_edit'])->group(function (){
+                Route::match(['post','get'],'edit/{fixedAssetID}','edit')->name('fixed.asset.edit');
+            });
+
+        });
+    });
 });//3.0 End
 # 4.0 Share Document View
 Route::controller(ShareDocumentViewController::class)->group(function (){

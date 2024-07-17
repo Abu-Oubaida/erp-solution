@@ -262,7 +262,55 @@ class CompanySetup extends Controller
             'remarks'    =>  ['sometimes','nullable','string'],
         ]);
         try {
-            
+            extract($request->post());
+            $user = Auth::user();
+            $company = company_info::where('id',$c_id)->first();
+            if ($request->hasFile('logo'))
+            {
+                $file = $request->file('logo');
+                $logo_name = $company_short_name."_logo_".$file->getClientOriginalName();
+                $logo_location = $file->move($this->imagePath,$logo_name);
+
+            }
+            if ($request->hasFile('logo_sm'))
+            {
+                $file = $request->file('logo_sm');
+                $logo_sm_name = $company_short_name."_logo_sm_".$file->getClientOriginalName();
+                $logo_sm_location = $file->move($this->imagePath,$logo_sm_name);
+
+            }
+            if ($request->hasFile('logo_icon'))
+            {
+                $file = $request->file('logo_icon');
+                $logo_icon_name = $company_short_name."_logo_icon_".$file->getClientOriginalName();
+                $logo_icon_location = $file->move($this->imagePath,$logo_icon_name);
+            }
+            if ($request->hasFile('cover'))
+            {
+                $file = $request->file('cover');
+                $cover_name = $company_short_name."_cover_".$file->getClientOriginalName();
+                $cover_location = $file->move($this->imagePath,$cover_name); // Adjust the
+
+            }
+            company_info::create([
+                'status'=>1,
+                'company_name'=>$company_name,
+                'company_type_id'=>$company_type_id,
+                'contract_person_name'=>$contract_person,
+                'company_code'=>$company_short_name,
+                'phone'=>$company_phone,
+                'contract_person_phone'=>$contract_person_phone,
+                'email'=>$email,
+                'location'=>$location,
+                'remarks'=>$remarks,
+                'logo'=>isset($logo_name)?$this->imagePath.$logo_name:'',
+                'logo_sm'=>isset($logo_sm_name)?$this->imagePath.$logo_sm_name:'',
+                'logo_icon'=>isset($logo_icon_name)?$this->imagePath.$logo_icon_name:'',
+                'cover'=>isset($cover_name)?$this->imagePath.$cover_name:'',
+                'created_by'=>$user->id,
+                'created_at'=>now(),
+            ]);
+            return back()->with('success','Data add successfully.');
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();

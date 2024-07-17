@@ -201,6 +201,44 @@
                 @endif
             </group8>{{--#2.6    Mobile Sim section End--}}
 
+            {{--#2.7    Fixed asset section Start--}}
+            <group9>
+                {{--#2.6.1  Permission Chck Sales Interface section Start--}}
+                @if(auth()->user()->hasPermission('fixed_asset_interface'))
+                    <subgroup1>
+                        @if(Request::segment(1) == "fixed-asset" )
+                            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#AssetInterfaceLayouts"
+                               aria-expanded="true" aria-controls="AssetInterfaceLayouts">
+                                <div class="sb-nav-link-icon"><i class="fas fa-solid fa-a"></i><i class="fas fa-solid fa-m"></i></div>
+                                Asset Management
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse show" id="AssetInterfaceLayouts" aria-labelledby="headingOne"
+                                 data-bs-parent="#sidenavAccordion">
+                        @else
+                            <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse"
+                               data-bs-target="#AssetInterfaceLayouts" aria-expanded="false" aria-controls="AssetInterfaceLayouts">
+                                <div class="sb-nav-link-icon"><i class="fas fa-solid fa-a"></i><i class="fas fa-solid fa-m"></i></div>
+                                Asset Management
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="AssetInterfaceLayouts" aria-labelledby="headingOne"
+                                 data-bs-parent="#sidenavAccordion">
+                        @endif
+                                <nav class="sb-sidenav-menu-nested nav ">
+                                    {{--Sales Interface dashboard here--}}
+{{--                                    @include('layouts.back-end.sidebar-components.interface.sales._dashboard')--}}
+                                    @include('layouts.back-end.sidebar-components.interface._asset_menu_submenu')
+                                    {{--Sales Interface dashboard is here--}}
+                                </nav>
+                            </div>
+                    </subgroup1>
+                    {{--#2.6.1.1   Route/URL Chck and set navigation header Sales Dashboard here--}}
+{{--                    @if(auth()->user()->hasPermission('sales_dashboard_interface') )--}}
+{{--                    @endif--}}
+                @endif
+            </group9>{{--#2.6    Mobile Sim section End--}}
+
             {{--            <div class="sb-sidenav-menu-heading">Addons</div>--}}
             {{--            <a class="nav-link text-chl" href="charts.html">--}}
             {{--                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>--}}
