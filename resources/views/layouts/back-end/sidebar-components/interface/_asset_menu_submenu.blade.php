@@ -1,6 +1,6 @@
 @if(auth()->user()->hasPermission('fixed_asset') )
 
-    @if(Request::segment(1) == "super-admin" )
+    @if(Request::segment(1) == "fixed-asset" )
         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#fixedAssetOption" aria-expanded="true" aria-controls="fixedAssetOption">
             <div class="sb-nav-link-icon"><i class="fas fa-solid fa-f"></i><i class="fas fa-solid fa-a"></i></div>
             Fixed Asset

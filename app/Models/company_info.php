@@ -22,4 +22,13 @@ class company_info extends Model
     {
         return $this->belongsTo(company_type::class,'company_type_id');
     }
+    public function users()
+    {
+        return $this->hasMany(User::class,'company_id');
+    }
+
+    public function fixedAsste()
+    {
+        return $this->hasMany(fixed_asset::class,'company_id');
+    }
 }

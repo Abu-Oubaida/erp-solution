@@ -726,6 +726,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Http\\Controllers\\ControlPanelController' => __DIR__ . '/../..' . '/app/Http/Controllers/ControlPanelController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
+        'App\\Http\\Controllers\\FixedAssetController' => __DIR__ . '/../..' . '/app/Http/Controllers/FixedAssetController.php',
         'App\\Http\\Controllers\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProfileController.php',
         'App\\Http\\Controllers\\RoleWiseDefaultPermissionController' => __DIR__ . '/../..' . '/app/Http/Controllers/RoleWiseDefaultPermissionController.php',
         'App\\Http\\Controllers\\SalesInterfaceController' => __DIR__ . '/../..' . '/app/Http/Controllers/SalesInterfaceController.php',

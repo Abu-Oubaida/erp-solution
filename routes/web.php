@@ -325,7 +325,7 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::match(['post','get'],'add-fixed-asset','create')->name('fixed.asset.add');
             });
             Route::middleware(['permission:fixed_asset_list'])->group(function (){
-                Route::get('show-fixed-asset-list','showFixedAssetList')->name('fixed.asset.show');
+                Route::get('show-fixed-asset-list','show')->name('fixed.asset.show');
             });
             Route::middleware(['permission:fixed_asset_edit'])->group(function (){
                 Route::match(['post','get'],'edit/{fixedAssetID}','edit')->name('fixed.asset.edit');

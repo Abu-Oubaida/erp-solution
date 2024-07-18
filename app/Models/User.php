@@ -98,6 +98,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserSalaryCertificateData::class,'updated_by');
     }
+    public function company()
+    {
+        return $this->belongsTo(company_info::class,'company_id');
+    }
 //    public function voucherTypeCreate()
 //    {
 //        return $this->hasMany(VoucherType::class,'created_by');
