@@ -34,6 +34,9 @@
                     @endif
                 @endif
 {{--            List of Lead Permission Check End--}}
+                @if(Route::currentRouteName() == 'fixed.asset.edit')
+                    <a class="nav-link" href="{{route('fixed.asset.edit',['fixedAssetID'=>\Illuminate\Support\Facades\Request::route('fixedAssetID')])}}"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div> Edit Materials</a>
+                @endif
             </nav>
         </div>
 @endif {{--Upload Option End Here--}}

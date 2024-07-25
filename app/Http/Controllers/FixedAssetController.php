@@ -11,6 +11,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Validation\Rule;
 
 class FixedAssetController extends Controller
 {
@@ -37,11 +39,11 @@ class FixedAssetController extends Controller
             }
             else{
                 $user = Auth::user();
-                $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->get();
+                $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('created_by',$user->id)->where('status','<=',2)->get();
                 return view('back-end.asset.fixed-asset-add',compact('fixed_assets'));
             }
         }catch (\Throwable $exception){
-            return back()->with('error',$exception->getMessage());
+            return back()->with('error',$exception->getMessage())->withInput();
         }
     }
 
@@ -54,12 +56,12 @@ class FixedAssetController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'recourse_code' => ['string','required','unique:fixed_assets,recourse_code'],
-            'materials' => ['string','required','unique:fixed_assets,materials_name'],
+            'recourse_code' => ['string','required',Rule::unique('fixed_assets','recourse_code')->ignore(3,'status')],
+            'materials' => ['string','required',Rule::unique('fixed_assets','materials_name')->ignore(3,'status')],
             'rate'  =>  ['numeric','required'],
             'unit'  =>  ['string','required'],
             'status'  =>  ['numeric','required','between:0,1'],
-            'depreciation'  =>  ['numeric','sometimes','nullable'],
+            'depreciation'  =>  ['string','sometimes','nullable'],
             'remarks'   =>  ['string','nullable'],
         ]);
         try {
@@ -92,7 +94,7 @@ class FixedAssetController extends Controller
     {
         try {
             $user = Auth::user();
-            $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->get();
+            $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status','<=',2)->get();
             return view('back-end.asset.fixed-asset-list',compact('fixed_assets'));
         }catch (\Throwable $exception){
             return back()->with('error',$exception->getMessage());
@@ -102,34 +104,81 @@ class FixedAssetController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Fixed_asset  $fixed_asset
-     * @return Response
+     * @return Application|Factory|View|RedirectResponse|Response
      */
-    public function edit(Fixed_asset $fixed_asset)
+    public function edit(Request $request, $fixedAssetID)
     {
-        //
+        try {
+            $user = Auth::user();
+            $id = Crypt::decryptString($fixedAssetID);
+            if ($request->isMethod('put')) {
+                return $this->update($request, $id);
+            }
+            $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status','<=',2)->get();
+            $fixed_asset = Fixed_asset::where('company_id',$user->company_id)->where('status','<=',2)->where('id',$id)->first();
+            return view('back-end.asset.fixed-asset-edit',compact('fixed_assets','fixed_asset'));
+        }catch (\Throwable $exception){
+            return back()->with('error',$exception->getMessage());
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Fixed_asset  $fixed_asset
-     * @return Response
-     */
-    public function update(Request $request, Fixed_asset $fixed_asset)
+    public function update(Request $request,$fixedAssetID)
     {
-        //
+        $request->validate([
+            'recourse_code' => ['string','required', Rule::unique('fixed_assets','recourse_code')->ignore($fixedAssetID,'id')],
+            'materials' => ['string','required',Rule::unique('fixed_assets','materials_name')->ignore($fixedAssetID,'id')],
+            'rate'  =>  ['numeric','required'],
+            'unit'  =>  ['string','required'],
+            'status'  =>  ['numeric','required','between:0,1'],
+            'depreciation'  =>  ['string','sometimes','nullable'],
+            'remarks'   =>  ['string','nullable'],
+        ]);
+        try {
+            $user = Auth::user();
+            extract($request->post());
+            Fixed_asset::where('company_id',$user->company_id)->where('id',$fixedAssetID)->update([
+                'recourse_code' =>  $recourse_code,
+                'materials_name'    =>  $materials,
+                'rate'  =>  $rate,
+                'unit'  =>  $unit,
+                'depreciation'  => $depreciation,
+                'status'    =>  $status,
+                'remarks'   =>  $remarks,
+                'updated_by'=>  $user->id,
+                'updated_at'=>  now(),
+            ]);
+            return back()->with('success','Fixed Asset Updated Successfully');
+        }catch (\Throwable $exception){
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Fixed_asset  $fixed_asset
-     * @return Response
+     * @return RedirectResponse|Response
      */
-    public function destroy(Fixed_asset $fixed_asset)
+    public function destroy(Request $request)
     {
-        //
+        try {
+            $user = Auth::user();
+            $request->validate([
+                'id'    =>  ['string','required'],
+            ]);
+            extract($request->post());
+            $deleteID = Crypt::decryptString($id);
+//            $company = Fixed_asset::with(['companies'])->find($deleteID);
+//            if(count($company->companies))
+//            {
+//                return back()->with('error','A relationship exists between other tables. Data delete not possible');
+//            }
+//            Fixed_asset::where('id',$deleteID)->where('company_id',$user->company_id)->update(['status'=>3]);
+            Fixed_asset::where('id',$deleteID)->where('company_id',$user->company_id)->delete();
+            return redirect(route('fixed.asset.show'))->with('success','Data deleted successfully.');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error', $exception->getMessage());
+        }
     }
 }

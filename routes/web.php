@@ -328,7 +328,10 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::get('show-fixed-asset-list','show')->name('fixed.asset.show');
             });
             Route::middleware(['permission:fixed_asset_edit'])->group(function (){
-                Route::match(['post','get'],'edit/{fixedAssetID}','edit')->name('fixed.asset.edit');
+                Route::match(['put','get'],'edit/{fixedAssetID}','edit')->name('fixed.asset.edit');
+            });
+            Route::middleware(['permission:fixed_asset_delete'])->group(function (){
+                Route::match(['delete'],'delete','destroy')->name('fixed.asset.delete');
             });
 
         });

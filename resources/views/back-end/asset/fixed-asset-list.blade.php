@@ -20,7 +20,7 @@
             <div class="col-md-12">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <a href="" class="btn btn-outline-primary btn-sm float-end"><i class="fa fa-plus"></i> Add Fixed Asset</a>
+                        <a href="{{route('fixed.asset.add')}}" class="btn btn-outline-primary btn-sm float-end"><i class="fa fa-plus"></i> Add Fixed Asset</a>
                         @include('back-end.asset._fixed-asset-list')
                     </div>
                 </div>
