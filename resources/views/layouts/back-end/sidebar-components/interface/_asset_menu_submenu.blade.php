@@ -16,7 +16,6 @@
         <div class="collapse" id="fixedAssetOption" aria-labelledby="headingOne" data-bs-parent="#fixedAssetOption">
    @endif
             <nav class="sb-sidenav-menu-nested nav">
-{{--            Add Lead Permission Check Start--}}
                 @if(auth()->user()->hasPermission('add_fixed_asset'))
                     @if(Route::currentRouteName() == 'fixed.asset.add')
                         <a class="nav-link" href="{{route('fixed.asset.add')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div> Add Materials</a>
@@ -24,8 +23,6 @@
                         <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div> Add Materials</a>
                     @endif
                 @endif
-{{--             Add Lead Permission Check End--}}
-{{--            List of Lead Permission Check Start--}}
                 @if(auth()->user()->hasPermission('fixed_asset_list'))
                     @if(Route::currentRouteName() == 'fixed.asset.show')
                         <a class="nav-link" href="{{route('fixed.asset.show')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-list"></i></div> Materials List</a>
@@ -33,10 +30,75 @@
                         <a class="nav-link text-chl" href="{{route('fixed.asset.show')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-list"></i></div> Materials List</a>
                     @endif
                 @endif
-{{--            List of Lead Permission Check End--}}
                 @if(Route::currentRouteName() == 'fixed.asset.edit')
                     <a class="nav-link" href="{{route('fixed.asset.edit',['fixedAssetID'=>\Illuminate\Support\Facades\Request::route('fixedAssetID')])}}"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div> Edit Materials</a>
                 @endif
             </nav>
-        </div>
-@endif {{--Upload Option End Here--}}
+            <nav class="sb-sidenav-menu-nested nav ">
+                @if(auth()->user()->hasPermission('fixed_asset_distribution') )
+
+                    @if(Request::segment(1) == "fixed-asset-distribution" )
+                        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#fixedAssetDistribution" aria-expanded="true" aria-controls="fixedAssetDistribution" title="Fixed Asset Distribution">
+                            <div class="sb-nav-link-icon"><i class="fas fa-solid fa-d"></i><sup><i class="fas fa-plus"></i></sup></div>
+                            Distribution
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse show" id="fixedAssetDistribution" aria-labelledby="headingOne" data-bs-parent="#fixedAssetDistribution">
+                    @else
+                        <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#fixedAssetDistribution" aria-expanded="false" aria-controls="fixedAssetDistribution" title="Fixed Asset Distribution">
+                            <div class="sb-nav-link-icon"><i class="fas fa-solid fa-d"></i><sup><i class="fas fa-plus"></i></sup></div>
+                            Distribution
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="fixedAssetDistribution" aria-labelledby="headingOne" data-bs-parent="#fixedAssetDistribution">
+                    @endif
+                            <nav class="sb-sidenav-menu-nested nav">
+                                @if(auth()->user()->hasPermission('distribution_fixed_asset_opening'))
+                                    @if(Route::currentRouteName() == 'fixed.asset.add')
+                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Distribute Fixed Asset Opening Balance"><div class="sb-nav-link-icon">FA</div> Opening</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Fixed Asset Opening Balance"><div class="sb-nav-link-icon">FA</div> Opening</a>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->hasPermission('damage_fixed_asset'))
+                                    @if(Route::currentRouteName() == 'fixed.asset.add')
+                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->hasPermission('issue_fixed_asset'))
+                                    @if(Route::currentRouteName() == 'fixed.asset.add')
+                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Issue Fixed Asset"><div class="sb-nav-link-icon">FA</div> Issue</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Issue Fixed Asset"><div class="sb-nav-link-icon">FA</div> Issue</a>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->hasPermission('issue_return_fixed_asset'))
+                                    @if(Route::currentRouteName() == 'fixed.asset.add')
+                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Fixed Asset Issue Return"><div class="sb-nav-link-icon">FAI</div> Return</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Fixed Asset Issue Return"><div class="sb-nav-link-icon">FAI</div> Return</a>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->hasPermission('distribution_fixed_asset_mrf'))
+                                    @if(Route::currentRouteName() == 'fixed.asset.add')
+                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Distribute Fixed Asset Via Materials Purchase Requisition (MRF) Reference"><div class="sb-nav-link-icon">MRF</div> Reference</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Distribute Fixed Asset Via Materials Purchase Requisition (MRF) Reference"><div class="sb-nav-link-icon">MRF</div> Reference</a>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->hasPermission('distribution_fixed_asset_gp'))
+                                    @if(Route::currentRouteName() == 'fixed.asset.add')
+                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Distribute Fixed Asset Via Gate Pass (GP) Reference"><div class="sb-nav-link-icon">GP</div> Reference</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Distribute Fixed Asset Via Gate Pass (GP) Reference"><div class="sb-nav-link-icon">GP</div> Reference</a>
+                                    @endif
+                                @endif
+                            </nav>
+                        </div>
+                    @endif
+
+            </nav>
+@endif
+

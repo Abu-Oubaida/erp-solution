@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fixed_asset;
+use App\Models\Fixed_asset_delete_history;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -174,7 +175,27 @@ class FixedAssetController extends Controller
 //                return back()->with('error','A relationship exists between other tables. Data delete not possible');
 //            }
 //            Fixed_asset::where('id',$deleteID)->where('company_id',$user->company_id)->update(['status'=>3]);
-            Fixed_asset::where('id',$deleteID)->where('company_id',$user->company_id)->delete();
+            $fixed_asset_delete = Fixed_asset::where('id',$deleteID)->where('company_id',$user->company_id);
+            if ($f = $fixed_asset_delete->first())
+            {
+                Fixed_asset_delete_history::create([
+                    'old_asset_id'  =>  $f->id,
+                    'recourse_code' =>  $f->recourse_code,
+                    'materials_name'    =>  $f->materials_name,
+                    'rate'  =>  $f->rate,
+                    'unit'  =>  $f->unit,
+                    'depreciation'  => $f->depreciation,
+                    'status'    =>  $f->status,
+                    'remarks'   =>  $f->remarks,
+                    'company_id'=> $f->company_id,
+                    'old_created_time'  => $f->created_at,
+                    'old_updated_time'  =>  $f->updated_at,
+                    'old_created_by'    =>  $f->created_by,
+                    'old_updated_by'    =>  $f->updated_by,
+                    'created_by'=>  $user->id,
+                ]);
+            }
+            $fixed_asset_delete->delete();
             return redirect(route('fixed.asset.show'))->with('success','Data deleted successfully.');
         }catch (\Throwable $exception)
         {

@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('fixed_assets', function (Blueprint $table) {
+        Schema::create('fixed_asset_delete_histories', function (Blueprint $table) {
             $table->id();
-            $table->string('recourse_code')->unique();
-            $table->string('materials_name')->unique();
+            $table->unsignedBigInteger('old_asset_id');
+            $table->string('recourse_code');
+            $table->string('materials_name');
             $table->string('rate');
             $table->string('unit');
             $table->string('depreciation')->nullable();
@@ -25,6 +26,8 @@ return new class extends Migration
             $table->unsignedBigInteger('company_id')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('updated_by')->nullable();
+            $table->string('old_created_time')->nullable();
+            $table->string('old_updated_time')->nullable();
             $table->timestamps();
         });
     }
@@ -36,6 +39,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fixed_assets');
+        Schema::dropIfExists('fixed_asset_delete_histories');
     }
 };

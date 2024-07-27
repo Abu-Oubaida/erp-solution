@@ -763,6 +763,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\DesignationChangeHistory' => __DIR__ . '/../..' . '/app/Models/DesignationChangeHistory.php',
         'App\\Models\\Download_history' => __DIR__ . '/../..' . '/app/Models/Download_history.php',
         'App\\Models\\Fixed_asset' => __DIR__ . '/../..' . '/app/Models/Fixed_asset.php',
+        'App\\Models\\Fixed_asset_delete_history' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_delete_history.php',
         'App\\Models\\Permission' => __DIR__ . '/../..' . '/app/Models/Permission.php',
         'App\\Models\\PermissionUser' => __DIR__ . '/../..' . '/app/Models/PermissionUser.php',
         'App\\Models\\PermissionUserHistory' => __DIR__ . '/../..' . '/app/Models/PermissionUserHistory.php',

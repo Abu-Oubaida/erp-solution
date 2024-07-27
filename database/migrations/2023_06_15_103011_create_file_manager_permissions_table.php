@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('filemanager_permissions');
+        Schema::dropIfExists('file_manager_permissions');
     }
 };

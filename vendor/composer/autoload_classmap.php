@@ -104,6 +104,7 @@ return array(
     'App\\Models\\DesignationChangeHistory' => $baseDir . '/app/Models/DesignationChangeHistory.php',
     'App\\Models\\Download_history' => $baseDir . '/app/Models/Download_history.php',
     'App\\Models\\Fixed_asset' => $baseDir . '/app/Models/Fixed_asset.php',
+    'App\\Models\\Fixed_asset_delete_history' => $baseDir . '/app/Models/Fixed_asset_delete_history.php',
     'App\\Models\\Permission' => $baseDir . '/app/Models/Permission.php',
     'App\\Models\\PermissionUser' => $baseDir . '/app/Models/PermissionUser.php',
     'App\\Models\\PermissionUserHistory' => $baseDir . '/app/Models/PermissionUserHistory.php',
