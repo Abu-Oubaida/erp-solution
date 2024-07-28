@@ -52,15 +52,32 @@ class FixedAssetController extends Controller
     public function createSpecification(Request $request)
     {
         try {
+            $user = Auth::user();
             if ($request->isMethod('POST')) {
-                return $this->store($request);
+                if ($request->input('search') == 'search')
+                {
+                    $request->validate([
+                        'recourse_code' => ['string','required','exists:fixed_assets,recourse_code']
+                    ]);
+                    extract($request->post());
+                    return redirect(route('fixed.asset.specification',['fid'=>$recourse_code]))->withInput();
+                }
+                elseif ($request->input('addSpec') == 'addSpec')
+                {
+                    return $this->specificationStore($request,$user);
+                }
+                return back()->with('error','Invalid Request of Post Methode!');
             }
             else{
-//                extract($request->get());
-//                dd($request->get('hello'));
-                $user = Auth::user();
-                $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->get();
-                $fixed_asset_specifications = fixed_asset_specifications::with(['fixed_asset'])->where('status',1)->where('company_id',$user->company_id)->get();
+                $fixed_asset_specifications = fixed_asset_specifications::with(['fixed_asset','createdBy','createdBy'])->where('company_id',$user->company_id);
+                if ($request->get('fid'))
+                {
+                    $fid = $request->get('fid');
+                    $fixed_asset = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->where('recourse_code',$fid)->first();
+                    $fixed_asset_specifications = $fixed_asset_specifications->where('fixed_asset_id',$fixed_asset->id);
+                }
+                $fixed_asset_specifications = $fixed_asset_specifications->orderBy('created_at','DESC')->get();
+                $fixed_assets= Fixed_asset::where('company_id',$user->company_id)->where('status',1)->orderBy('materials_name','ASC')->get();
                 return view('back-end.asset.fixed-asset-specification-add',compact('fixed_assets','fixed_asset_specifications'));
             }
         }catch (\Throwable $exception){
@@ -105,9 +122,32 @@ class FixedAssetController extends Controller
         }
     }
 
-    private function specificationStore(Request $request)
+    private function specificationStore(Request $request,$user)
     {
-        $request->validate([]);
+        $request->validate([
+            'recourse_code' =>  ['required','string','exists:fixed_assets,recourse_code'],
+            'specification' =>  ['required','string','unique:fixed_asset_specifications,specification'],
+            'status'  =>  ['required','numeric','between:0,1'],
+        ]);
+        try {
+            extract($request->post());
+            $fixed_asset = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->where('recourse_code',$recourse_code)->first();
+            if ($fixed_asset)
+            {
+                fixed_asset_specifications::create([
+                    'fixed_asset_id'=>  $fixed_asset->id,
+                    'status'        =>  $status,
+                    'specification' =>  $specification,
+                    'company_id'    =>  $user->company_id,
+                    'created_by'    =>  $user->id,
+                    'created_at'    =>  now()
+                ]);
+                return back()->with('success','Data added successfully');
+            }
+            return back()->with('error','Materials Not Found!')->withInput();
+        }catch (\Throwable $exception){
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
     }
 
     /**

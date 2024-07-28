@@ -24,10 +24,10 @@
                     @endif
                 @endif
                 @if(auth()->user()->hasPermission('add_fixed_asset_specification'))
-                    @if(Route::currentRouteName() == 'add.fixed.asset.specification')
-                        <a class="nav-link" href="{{route('add.fixed.asset.specification')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div>Specification</a>
+                    @if(Route::currentRouteName() == 'fixed.asset.specification')
+                        <a class="nav-link" href="{{route('fixed.asset.specification')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div>Specification</a>
                     @else
-                        <a class="nav-link text-chl" href="{{route('add.fixed.asset.specification')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div>Specification</a>
+                        <a class="nav-link text-chl" href="{{route('fixed.asset.specification')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div>Specification</a>
                     @endif
                 @endif
                 @if(auth()->user()->hasPermission('fixed_asset_list'))
