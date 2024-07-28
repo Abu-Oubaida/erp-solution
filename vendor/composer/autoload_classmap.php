@@ -68,6 +68,7 @@ return array(
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
     'App\\Http\\Controllers\\DashboardController' => $baseDir . '/app/Http/Controllers/DashboardController.php',
     'App\\Http\\Controllers\\FixedAssetController' => $baseDir . '/app/Http/Controllers/FixedAssetController.php',
+    'App\\Http\\Controllers\\FixedAssetDistribution' => $baseDir . '/app/Http/Controllers/FixedAssetDistribution.php',
     'App\\Http\\Controllers\\ProfileController' => $baseDir . '/app/Http/Controllers/ProfileController.php',
     'App\\Http\\Controllers\\RoleWiseDefaultPermissionController' => $baseDir . '/app/Http/Controllers/RoleWiseDefaultPermissionController.php',
     'App\\Http\\Controllers\\SalesInterfaceController' => $baseDir . '/app/Http/Controllers/SalesInterfaceController.php',

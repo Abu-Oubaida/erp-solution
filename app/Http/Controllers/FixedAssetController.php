@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Fixed_asset;
 use App\Models\Fixed_asset_delete_history;
+use App\Models\fixed_asset_specifications;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -48,13 +49,32 @@ class FixedAssetController extends Controller
         }
     }
 
+    public function createSpecification(Request $request)
+    {
+        try {
+            if ($request->isMethod('POST')) {
+                return $this->store($request);
+            }
+            else{
+//                extract($request->get());
+//                dd($request->get('hello'));
+                $user = Auth::user();
+                $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->get();
+                $fixed_asset_specifications = fixed_asset_specifications::with(['fixed_asset'])->where('status',1)->where('company_id',$user->company_id)->get();
+                return view('back-end.asset.fixed-asset-specification-add',compact('fixed_assets','fixed_asset_specifications'));
+            }
+        }catch (\Throwable $exception){
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return RedirectResponse
      */
-    public function store(Request $request)
+    private function store(Request $request)
     {
         $request->validate([
             'recourse_code' => ['string','required',Rule::unique('fixed_assets','recourse_code')->ignore(3,'status')],
@@ -83,6 +103,11 @@ class FixedAssetController extends Controller
         }catch (\Throwable $exception){
             return back()->with('error',$exception->getMessage())->withInput();
         }
+    }
+
+    private function specificationStore(Request $request)
+    {
+        $request->validate([]);
     }
 
     /**

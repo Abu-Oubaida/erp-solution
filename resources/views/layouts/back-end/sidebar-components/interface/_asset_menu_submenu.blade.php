@@ -1,6 +1,6 @@
 @if(auth()->user()->hasPermission('fixed_asset') )
 
-    @if(Request::segment(1) == "fixed-asset" )
+    @if(Request::segment(1) == "fixed-asset" || Request::segment(1) == "fixed-asset-distribution")
         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#fixedAssetOption" aria-expanded="true" aria-controls="fixedAssetOption">
             <div class="sb-nav-link-icon"><i class="fas fa-solid fa-f"></i><i class="fas fa-solid fa-a"></i></div>
             Fixed Asset
@@ -21,6 +21,13 @@
                         <a class="nav-link" href="{{route('fixed.asset.add')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div> Add Materials</a>
                     @else
                         <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div> Add Materials</a>
+                    @endif
+                @endif
+                @if(auth()->user()->hasPermission('add_fixed_asset_specification'))
+                    @if(Route::currentRouteName() == 'add.fixed.asset.specification')
+                        <a class="nav-link" href="{{route('add.fixed.asset.specification')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div>Specification</a>
+                    @else
+                        <a class="nav-link text-chl" href="{{route('add.fixed.asset.specification')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div>Specification</a>
                     @endif
                 @endif
                 @if(auth()->user()->hasPermission('fixed_asset_list'))
@@ -53,14 +60,14 @@
                         <div class="collapse" id="fixedAssetDistribution" aria-labelledby="headingOne" data-bs-parent="#fixedAssetDistribution">
                     @endif
                             <nav class="sb-sidenav-menu-nested nav">
-                                @if(auth()->user()->hasPermission('distribution_fixed_asset_opening'))
-                                    @if(Route::currentRouteName() == 'fixed.asset.add')
-                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Distribute Fixed Asset Opening Balance"><div class="sb-nav-link-icon">FA</div> Opening</a>
+                                @if(auth()->user()->hasPermission('fixed_asset_opening_input'))
+                                    @if(Route::currentRouteName() == 'fixed.asset.distribution.opening.input')
+                                        <a class="nav-link" href="{{route('fixed.asset.distribution.opening.input')}}" title="Distribute Fixed Asset Opening Balance"><div class="sb-nav-link-icon">FA</div> Opening</a>
                                     @else
-                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Fixed Asset Opening Balance"><div class="sb-nav-link-icon">FA</div> Opening</a>
+                                        <a class="nav-link text-chl" href="{{route('fixed.asset.distribution.opening.input')}}" title="Fixed Asset Opening Balance"><div class="sb-nav-link-icon">FA</div> Opening</a>
                                     @endif
                                 @endif
-                                @if(auth()->user()->hasPermission('damage_fixed_asset'))
+                                @if(auth()->user()->hasPermission('fixed_asset_damage'))
                                     @if(Route::currentRouteName() == 'fixed.asset.add')
                                         <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>
                                     @else

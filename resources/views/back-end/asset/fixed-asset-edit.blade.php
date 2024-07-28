@@ -42,7 +42,7 @@
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="rate" name="rate" type="number" placeholder="Materials Rate" value="{{$fixed_asset->rate}}" required/>
+                                        <input class="form-control" id="rate" name="rate" type="text" placeholder="Materials Rate" value="{{$fixed_asset->rate}}" required/>
                                         <label for="rate">Materials Rate<span class="text-danger">*</span></label>
                                     </div>
                                 </div>

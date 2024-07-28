@@ -27,21 +27,47 @@
                             @csrf
                             <div class="row">
                                 <div class="col-md-2">
-                                    <div class="form-floating mb-">
-                                        <input class="form-control" id="recourse_code" name="recourse_code" type="text" placeholder="Enter Recourse Code" value="{{old('recourse_code')}}" required/>
-                                        <label for="recourse_code">Recourse Code<span class="text-danger">*</span></label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="materials" name="materials" type="text" placeholder="Materials Name" value="{{old('materials')}}" required/>
-                                        <label for="materials">Materials Name<span class="text-danger">*</span></label>
+                                        <input class="form-control" id="ref" name="ref" type="number" placeholder="Opening Reference No" value="{{old('ref')}}" required/>
+                                        <label for="ref">Opening Reference No<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
+                                    <div class="form-floating mb-">
+                                        <input class="form-control" list="projectList" id="project" name="project" type="text" placeholder="Enter Project Name" value="{{old('project')}}" required/>
+                                        <datalist id="projectList">
+                                            @if(count($projects))
+                                                @foreach($projects as $p)
+                                                    <option value="{!! $p->branch_name !!}">{!! $p->branch_name !!}</option>
+                                                @endforeach
+                                            @endif
+                                        </datalist>
+                                        <label for="project">Enter Project Name<span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-floating mb-">
+                                        <input class="form-control" id="recourse_code" list="recourse_code_list" name="recourse_code" type="text" placeholder="Enter Recourse Code" value="{{old('recourse_code')}}" required/>
+                                        <datalist id="recourse_code_list">
+                                            @if(count($fixed_assets))
+                                                @foreach($fixed_assets as $fx)
+                                                    <option value="{!! $fx->recourse_code !!}">{!! $fx->materials_name !!}</option>
+                                                @endforeach
+                                            @endif
+                                        </datalist>
+                                        <label for="recourse_code">Materials<span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="rate" name="rate" type="text" placeholder="Materials Rate" value="{{old('rate')}}" required/>
-                                        <label for="rate">Materials Rate<span class="text-danger">*</span></label>
+                                        <input class="form-control" id="unit" name="unit" type="text" placeholder="Uit" value="{{old('unit')}}" required/>
+                                        <label for="unit">Unit<span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rate" name="rate" type="number" placeholder="Rate" value="{{old('rate')}}" required/>
+                                        <label for="rate">Rate<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -87,7 +113,7 @@
             <div class="col-md-12">
                 <div class="card mb-4">
                     <div class="card-body">
-                        @include('back-end.asset._fixed-asset-list')
+{{--                        @include('back-end.asset._fixed-asset-list')--}}
                     </div>
                 </div>
             </div>

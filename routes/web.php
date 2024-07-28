@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\FixedAssetController;
+use App\Http\Controllers\FixedAssetDistribution;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesInterfaceController;
 use App\Http\Controllers\ShareDocumentViewController;
@@ -324,6 +325,9 @@ Route::group(['middleware' => ['auth']],function (){
             Route::middleware(['permission:add_fixed_asset'])->group(function (){
                 Route::match(['post','get'],'add-fixed-asset','create')->name('fixed.asset.add');
             });
+            Route::middleware(['permission:add_fixed_asset_specification'])->group(function (){
+                Route::match(['post','get'],'add-fixed-asset-specification','createSpecification')->name('add.fixed.asset.specification');
+            });
             Route::middleware(['permission:fixed_asset_list'])->group(function (){
                 Route::get('show-fixed-asset-list','show')->name('fixed.asset.show');
             });
@@ -334,6 +338,25 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::match(['delete'],'delete','destroy')->name('fixed.asset.delete');
             });
 
+        });
+    });
+    Route::controller(FixedAssetDistribution::class)->group(function (){
+        Route::middleware(['permission:fixed_asset_distribution'])->prefix('fixed-asset-distribution')->group(function (){
+            Route::match(['get','post'],'index','index')->name('fixed.asset.distribution');
+            Route::middleware(['permission:fixed_asset_opening_input'])->group(function (){
+                Route::match(['get','post'],'opening-input','openingInput')->name('fixed.asset.distribution.opening.input');
+            });
+            Route::middleware(['permission:fixed_asset_opening_list'])->group(function (){
+                Route::match(['get'],'opening-list','openingList')->name('fixed.asset.distribution.opening.list');
+            });
+            Route::middleware(['permission:fixed_asset_opening_report'])->group(function (){
+                Route::get('opening-report','openingReportView')->name('fixed.asset.distribution.opening.report.view');
+            });
+            Route::middleware(['permission:fixed_asset_mrf'])->group(function (){});
+            Route::middleware(['permission:fixed_asset_gp'])->group(function (){});
+            Route::middleware(['permission:fixed_asset_issue'])->group(function (){});
+            Route::middleware(['permission:fixed_asset_damage'])->group(function (){});
+            Route::middleware(['permission:fixed_asset_issue_return'])->group(function (){});
         });
     });
 });//3.0 End
