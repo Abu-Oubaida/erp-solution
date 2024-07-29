@@ -9,6 +9,9 @@
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
+                        <a href="{{route('fixed.asset.show')}}" class="text-capitalize text-chl">Fixed Asset</a>
+                    </li>
+                    <li class="breadcrumb-item">
                         <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
                     </li>
                 </ol>
