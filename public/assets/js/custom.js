@@ -18,7 +18,9 @@ if(window.location.port)
     $(document).ready(function(){
         const tags = [];
         const employeeDatas = [];
+        const materialsTempList = [];
         $('select').selectize({
+            // create: true,
             sortField: 'text'
         });
         $('#perAdd').click(function (){
@@ -708,18 +710,79 @@ if(window.location.port)
                     }
                 });
             },
-            // salaryCertificateDataRead:function (e,inputID){
-            //     if (!confirm('Are you sure!'))
-            //         return false
-            //
-            //
-            //     // const xmlFileInput = document.getElementById(inputID);
-            //     // if (xmlFileInput.files.length > 0) {
-            //     //     const xmlFile = xmlFileInput.files[0];
-            //     //     console.log(xmlFile)
-            //     //     // loadXmlFile(xmlFile);
-            //     // }
-            // },
+            getFixedAssetSpecification:function (e){
+                const value = $(e).val()
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/get-fixed-asset-spec";
+                $.ajax({
+                    url:url,
+                    method:'POST',
+                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data:{id:value},
+                    success: function (response){
+                        if (response.status === 'success')
+                        {
+                            const fixedAsset = response.data[0].fixed_asset
+                            updateSelectBox(response.data,'specification')
+                            $("#rate").val(fixedAsset.rate)
+                            $("#unite").val(fixedAsset.unit)
+                            $("#qty").val('')
+                            $("#total").val('')
+                        }else if (response.status === 'error')
+                        {
+                            // Handle error
+                            console.log('Error:', response.message)
+                        }
+                    },
+                    error: function (xhr)
+                    {
+                        // Handle general AJAX errors
+                        console.log('AJAX Error:', xhr.statusText);
+                    },
+                })
+            },
+            fixedAssetOpeningAddList:function (e){
+                const reference = $('#ref').val()
+                const project = $('#project').val()
+                const materials_id = $('#materials_id').val()
+                const specification = $('#specification').val()
+                if (reference.length === 0 || project.length === 0 || materials_id.length === 0 || specification.length === 0)
+                {
+                    alert('All field are required')
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/get-fixed-asset";
+                $.ajax({
+                    url:url,
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data: {'id':specification},
+                    success(response)
+                    {
+                        const fixedAsset = response.data.fixed_asset
+                        const spec = response.data
+                        const temp =[]
+                        temp[0] = {'reference':reference,'project_id':project,'materials':fixedAsset.materials_name,'specification':spec.specification}
+                        materialsTempList.push(temp)
+                        console.log(materialsTempList)
+                    },
+                    error(xhr)
+                    {
+                        // Handle general AJAX errors
+                        console.log('AJAX Error:', xhr.statusText);
+                    }
+                })
+            },
+            priceTotal:function (e,inputID,actionID)
+            {
+                const input = $("#"+inputID).val()
+                const output = $("#"+actionID)
+                const self = $(e).val()
+                if (input.length === 0 || self.length === 0)
+                {
+                    output.val('')
+                }
+                output.val((input*self))
+            },
         }
         function checkFileExists(url, callback) {
             const xhr = new XMLHttpRequest();
@@ -733,4 +796,14 @@ if(window.location.port)
         }
 
     })
+    function updateSelectBox(data,id) {
+        var selectize = $('#'+id)[0].selectize;
+        selectize.clearOptions(); // Clear existing options
+
+        data.forEach(function(item) {
+            selectize.addOption({value: item.id, text: item.specification});
+        });
+
+        selectize.refreshOptions(); // Refresh the options in the select box
+    }
 }(jQuery))

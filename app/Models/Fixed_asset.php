@@ -14,4 +14,8 @@ class Fixed_asset extends Model
     {
         return $this->belongsTo(company_info::class,'company_id');
     }
+    public function specifications()
+    {
+        return $this->hasMany(fixed_asset_specifications::class,'fixed_asset_id');
+    }
 }

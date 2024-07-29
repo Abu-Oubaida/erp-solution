@@ -355,6 +355,8 @@ Route::group(['middleware' => ['auth']],function (){
             Route::middleware(['permission:fixed_asset_opening_report'])->group(function (){
                 Route::get('opening-report','openingReportView')->name('fixed.asset.distribution.opening.report.view');
             });
+            Route::post('get-fixed-asset-spec','getFixedAssetSpecification');
+            Route::post('get-fixed-asset','getFixedAsset');
             Route::middleware(['permission:fixed_asset_mrf'])->group(function (){});
             Route::middleware(['permission:fixed_asset_gp'])->group(function (){});
             Route::middleware(['permission:fixed_asset_issue'])->group(function (){});
