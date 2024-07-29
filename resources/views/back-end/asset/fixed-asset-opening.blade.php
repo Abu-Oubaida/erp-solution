@@ -1,8 +1,7 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
-        <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
-        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
+        <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
         <div class="row">
             <div class="col-md-10">
                 <ol class="breadcrumb mb-4">
@@ -20,89 +19,57 @@
             <div class="col-md-12">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <div class="row">
-                            <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                        <div class="row md-2">
+                            <h4 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h4>
+                            <hr>
                         </div>
                         <form action="{{ route('fixed.asset.add') }}" method="POST">
                             @csrf
                             <div class="row">
                                 <div class="col-md-2">
-                                    <div class="form-floating mb-3">
-                                        <input class="form-control" id="ref" name="ref" type="number" placeholder="Opening Reference No" value="{{old('ref')}}" required/>
+                                    <div class="mb-3">
                                         <label for="ref">Opening Reference No<span class="text-danger">*</span></label>
+                                        <input class="form-control" id="ref" name="ref" type="number" placeholder="Opening Reference No" value="{{old('ref')}}" required/>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <div class="form-floating mb-">
-                                        <input class="form-control" list="projectList" id="project" name="project" type="text" placeholder="Enter Project Name" value="{{old('project')}}" required/>
-                                        <datalist id="projectList">
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label for="project">Enter Project Name<span class="text-danger">*</span></label>
+                                        <select placeholder="Pick a state..." id="project" name="project" class="cursor-pointer">
+                                            <option value="">Pick a state...</option>
                                             @if(count($projects))
                                                 @foreach($projects as $p)
                                                     <option value="{!! $p->branch_name !!}">{!! $p->branch_name !!}</option>
                                                 @endforeach
                                             @endif
-                                        </datalist>
-                                        <label for="project">Enter Project Name<span class="text-danger">*</span></label>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <div class="form-floating mb-">
-                                        <input class="form-control" id="recourse_code" list="recourse_code_list" name="recourse_code" type="text" placeholder="Enter Recourse Code" value="{{old('recourse_code')}}" required/>
-                                        <datalist id="recourse_code_list">
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label for="recourse_code">Materials<span class="text-danger">*</span></label>
+                                        <select id="recourse_code" name="recourse_code">
+                                            <option value="">Pick a state...</option>
                                             @if(count($fixed_assets))
                                                 @foreach($fixed_assets as $fx)
                                                     <option value="{!! $fx->recourse_code !!}">{!! $fx->materials_name !!}</option>
                                                 @endforeach
                                             @endif
-                                        </datalist>
-                                        <label for="recourse_code">Materials<span class="text-danger">*</span></label>
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="form-floating mb-3">
-                                        <input class="form-control" id="unit" name="unit" type="text" placeholder="Uit" value="{{old('unit')}}" required/>
-                                        <label for="unit">Unit<span class="text-danger">*</span></label>
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="form-floating mb-3">
-                                        <input class="form-control" id="rate" name="rate" type="number" placeholder="Rate" value="{{old('rate')}}" required/>
-                                        <label for="rate">Rate<span class="text-danger">*</span></label>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-floating mb-3">
-                                        <input class="form-control" id="unit" name="unit" type="text" placeholder="Materials Unit" value="{{old('unit')}}" required/>
-                                        <label for="unit">Materials Unit<span class="text-danger">*</span></label>
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="form-floating mb-3">
-                                        <select class="form-control" name="status" id="status" required>
-                                            <option value=""></option>
-                                            <option value="0" @if(old('status') == 0) selected @endif>Inactive</option>
-                                            <option value="1" @if(old('status') == 1) selected @endif>Active</option>
                                         </select>
-                                        <label for="status">Status<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <div class="form-floating mb-3">
-                                        <input class="form-control" id="depreciation" name="depreciation" type="text" placeholder="Depreciation Rate" value="{{old('depreciation')}}" />
-                                        <label for="depreciation">Depreciation Rate (%)</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-floating mb-3">
-                                        <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10">{{old('remarks')}}</textarea>
-                                        <label for="remarks">Remarks</label>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label for="specification">Specification<span class="text-danger">*</span></label>
+                                        <select id="specification" name="specification">
+                                            <option value="">Pick a state...</option>
+                                        </select>
                                     </div>
                                 </div>
 
-
-                                <div class="col-md-12">
-                                    <div class="form-floating mb-3 float-end">
-                                        <input type="submit" value="Submit" class="btn btn-chl-outline" name="submit" >
+                                <div class="col-md-1">
+                                    <div class="form-floating mb-3 mt-4 float-end">
+                                        <button class="btn btn-chl-outline btn-sm" > <i class="fas fa-plus"></i> Add</button>
                                     </div>
                                 </div>
                             </div>

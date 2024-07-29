@@ -18,6 +18,9 @@ if(window.location.port)
     $(document).ready(function(){
         const tags = [];
         const employeeDatas = [];
+        $('select').selectize({
+            sortField: 'text'
+        });
         $('#perAdd').click(function (){
             let per = $("#per").val()
             let dir = $("#dir").val()
