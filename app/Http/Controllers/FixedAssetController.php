@@ -15,6 +15,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
+use Throwable;
 
 class FixedAssetController extends Controller
 {
@@ -60,7 +62,8 @@ class FixedAssetController extends Controller
                         'recourse_code' => ['string','required','exists:fixed_assets,recourse_code']
                     ]);
                     extract($request->post());
-                    return redirect(route('fixed.asset.specification',['fid'=>$recourse_code]))->withInput();
+                    $fa = Fixed_asset::where('company_id',$user->company_id)->where('recourse_code',$recourse_code)->first();
+                    return redirect(route('fixed.asset.specification',['fid'=>$fa->id,'code'=>$fa->recourse_code,'name'=>$fa->materials_name]))->withInput();
                 }
                 elseif ($request->input('addSpec') == 'addSpec')
                 {
@@ -73,7 +76,7 @@ class FixedAssetController extends Controller
                 if ($request->get('fid'))
                 {
                     $fid = $request->get('fid');
-                    $fixed_asset = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->where('recourse_code',$fid)->first();
+                    $fixed_asset = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->where('id',$fid)->first();
                     $fixed_asset_specifications = $fixed_asset_specifications->where('fixed_asset_id',$fixed_asset->id);
                 }
                 $fixed_asset_specifications = $fixed_asset_specifications->orderBy('created_at','DESC')->get();
@@ -125,13 +128,13 @@ class FixedAssetController extends Controller
     private function specificationStore(Request $request,$user)
     {
         $request->validate([
-            'recourse_code' =>  ['required','string','exists:fixed_assets,recourse_code'],
-            'specification' =>  ['required','string','unique:fixed_asset_specifications,specification'],
+            'fixed_asset_id' =>  ['required','string','exists:fixed_assets,id'],
+            'specification' =>  ['required','string',Rule::unique('fixed_asset_specifications','specification')->where('fixed_asset_id',$request->input('fixed_asset_id'))],
             'status'  =>  ['required','numeric','between:0,1'],
         ]);
         try {
             extract($request->post());
-            $fixed_asset = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->where('recourse_code',$recourse_code)->first();
+            $fixed_asset = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->where('id',$fixed_asset_id)->first();
             if ($fixed_asset)
             {
                 fixed_asset_specifications::create([
@@ -188,7 +191,26 @@ class FixedAssetController extends Controller
         }
     }
 
-    public function update(Request $request,$fixedAssetID)
+    public function editSpecification(Request $request, $fasid)
+    {
+        try {
+            $user = Auth::user();
+            $id = Crypt::decryptString($fasid);
+            if ($request->isMethod('PUT')) {
+                $this->updateSpecefication($request, $id, $user);
+            }
+            $fas = fixed_asset_specifications::with('fixed_asset')->where('id',$id)->where('company_id',$user->company_id)->first();
+            $fixed_asset_specifications = fixed_asset_specifications::with(['fixed_asset','createdBy','createdBy'])->where('company_id',$user->company_id)->get();
+            if ($fas)
+                return view('back-end.asset.fixed-asset-specification-edit',compact('fas','fixed_asset_specifications'));
+            else
+                return back()->with('error','Data Not Found!')->withInput();
+        }catch (\Throwable $exception){
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    private function update(Request $request,$fixedAssetID)
     {
         $request->validate([
             'recourse_code' => ['string','required', Rule::unique('fixed_assets','recourse_code')->ignore($fixedAssetID,'id')],
@@ -212,6 +234,26 @@ class FixedAssetController extends Controller
                 'remarks'   =>  $remarks,
                 'updated_by'=>  $user->id,
                 'updated_at'=>  now(),
+            ]);
+            return back()->with('success','Fixed Asset Updated Successfully');
+        }catch (\Throwable $exception){
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+    }
+
+    private function updateSpecefication(Request $request,$fasid, $user)
+    {
+        $request->validate([
+            'fixed_asset_id' =>  ['required','string','exists:fixed_assets,id'],
+            'specification'  =>  ['required','string',Rule::unique('fixed_asset_specifications','specification')->where('fixed_asset_id',$request->input('fixed_asset_id'))->whereNot('id',$fasid)],
+            'status'         =>  ['required','numeric','between:0,1'],
+        ]);
+        try {
+            fixed_asset_specifications::where('id',$fasid)->update([
+                'specification' =>  $request->input('specification'),
+                'status'        =>  $request->input('status'),
+                'updated_by'    =>  $user->id,
+                'updated_at'    =>  now(),
             ]);
             return back()->with('success','Fixed Asset Updated Successfully');
         }catch (\Throwable $exception){

@@ -40,6 +40,9 @@
                 @if(Route::currentRouteName() == 'fixed.asset.edit')
                     <a class="nav-link" href="{{route('fixed.asset.edit',['fixedAssetID'=>\Illuminate\Support\Facades\Request::route('fixedAssetID')])}}"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div> Edit Materials</a>
                 @endif
+                @if(Route::currentRouteName() == 'edit.fixed.asset.specification')
+                    <a class="nav-link" href="{{route('edit.fixed.asset.specification',['fasid'=>\Illuminate\Support\Facades\Request::route('fasid')])}}" title="Edit Specification"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div> Edit Spec.</a>
+                @endif
             </nav>
             <nav class="sb-sidenav-menu-nested nav ">
                 @if(auth()->user()->hasPermission('fixed_asset_distribution') )

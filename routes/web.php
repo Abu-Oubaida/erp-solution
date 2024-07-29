@@ -326,7 +326,10 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::match(['post','get'],'add-fixed-asset','create')->name('fixed.asset.add');
             });
             Route::middleware(['permission:add_fixed_asset_specification'])->group(function (){
-                Route::match(['post','get'],'add-fixed-asset-specification','createSpecification')->name('fixed.asset.specification');
+                Route::match(['post','get'],'add-specification','createSpecification')->name('fixed.asset.specification');
+            });
+            Route::middleware(['permission:edit_fixed_asset_specification'])->group(function (){
+                Route::match(['put','get'],'edit-specification/{fasid}','editSpecification')->name('edit.fixed.asset.specification');
             });
             Route::middleware(['permission:fixed_asset_list'])->group(function (){
                 Route::get('show-fixed-asset-list','show')->name('fixed.asset.show');
