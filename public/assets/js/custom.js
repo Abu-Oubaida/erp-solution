@@ -725,8 +725,8 @@ if(window.location.port)
                             updateSelectBox(response.data,'specification')
                             $("#rate").val(fixedAsset.rate)
                             $("#unite").val(fixedAsset.unit)
-                            $("#qty").val('')
-                            $("#total").val('')
+                            $("#qty").val(1)
+                            $("#total").val(fixedAsset.rate)
                         }else if (response.status === 'error')
                         {
                             // Handle error
@@ -741,16 +741,21 @@ if(window.location.port)
                 })
             },
             fixedAssetOpeningAddList:function (e){
-                const reference = $('#ref').val()
-                const project = $('#project').val()
+                const opdate = $('#date').val()
+                const reference = $('#ref_hide').val()
+                const project_id = $('#project').val()
                 const materials_id = $('#materials_id').val()
                 const specification = $('#specification').val()
-                if (reference.length === 0 || project.length === 0 || materials_id.length === 0 || specification.length === 0)
+                const rate = $('#rate').val()
+                const qty = $('#qty').val()
+                const purpose = $('#purpose').val()
+                const remarks = $('#remarks').val()
+                if (opdate.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0)
                 {
                     alert('All field are required')
                     return false
                 }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/get-fixed-asset";
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/add-fixed-asset-opening";
                 $.ajax({
                     url:url,
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -774,15 +779,45 @@ if(window.location.port)
             },
             priceTotal:function (e,inputID,actionID)
             {
-                const input = $("#"+inputID).val()
+                const input = parseFloat($("#"+inputID).val())
                 const output = $("#"+actionID)
-                const self = $(e).val()
+                const self = parseFloat($(e).val())
                 if (input.length === 0 || self.length === 0)
                 {
                     output.val('')
                 }
-                output.val((input*self))
+                output.val(parseFloat(Number(input*self)))
             },
+            fixedAssetOpeningSearch:function (e, inputID, outputID)
+            {
+                const reference = $("#"+inputID).val()
+                if (reference.length === 0)
+                    return false
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/get-fixed-asset-opening"
+                $.ajax({
+                    url:url,
+                    method:'POST',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data:{'ref':reference},
+                    success:function(response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            $("#"+outputID).html(response.data)
+                            // Get the current URL
+                            var currentUrl = window.location.href;
+                            // Construct the new URL by appending the ref value
+                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference;
+                            // Change the URL without reloading the page
+                            history.pushState({ref: reference}, '', newUrl);
+                        }
+                    },
+                    error:function(xhr)
+                    {
+                        console.log('AJAX Error:', xhr.statusText);
+                    }
+                })
+            }
         }
         function checkFileExists(url, callback) {
             const xhr = new XMLHttpRequest();
