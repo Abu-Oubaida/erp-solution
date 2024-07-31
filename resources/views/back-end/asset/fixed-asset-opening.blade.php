@@ -25,7 +25,7 @@
                     <option value="">Pick a state...</option>
                     @if(count($projects))
                         @foreach($projects as $p)
-                            <option value="{!! $p->id !!}">{!! $p->branch_name !!}</option>
+                            <option @if(Request::get('project') !== null && Request::get('project') == $p->id)selected @endif value="{!! $p->id !!}">{!! $p->branch_name !!}</option>
                         @endforeach
                     @endif
                 </select>
@@ -34,13 +34,13 @@
                 <label for="ref">Reference No<span class="text-danger">*</span></label>
                 <input class="form-control" value="{!! Request::get('ref') !!}" type="text" placeholder="Reference number..." id="ref-src">
             </div>
-            <div class="col-md-1 mt-4">
+            <div class="col-md-2 mt-4">
                 <button class="btn btn-chl-outline" type="button" id="ref-src-btn" onclick="return Obj.fixedAssetOpeningSearch(this,'fixed-asset-body')">
                     <i class="fa fa-search"></i> search
                 </button>
             </div>
             <div id="fixed-asset-body">
-                @if(Request::get('ref'))
+                @if(isset($reference) || isset($branchName))
                     @include('back-end.asset._fixed_asset_opening_body')
                 @endif
             </div>

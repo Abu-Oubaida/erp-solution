@@ -29,7 +29,7 @@
                                 <input type="hidden" name="fixed_asset_id" value="{!! (isset($fas->fixed_asset_id))?$fas->fixed_asset_id:'' !!}">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-2">
-                                        <select class="form-control form-control-sm" id="fixed_asset_id" required disabled>
+                                        <select class="form-control form-control-sm select-search" id="fixed_asset_id" required disabled>
                                             <option value="{!! (isset($fas->fixed_asset_id))?$fas->fixed_asset_id:'' !!}" selected>{!! (isset($fas->fixed_asset->materials_name))?$fas->fixed_asset->materials_name:'' !!} ({!! (isset($fas->fixed_asset->recourse_code))?$fas->fixed_asset->recourse_code:'' !!})</option>
                                         </select>
                                         <label for="fixed_asset_id">Materials<span class="text-danger">*</span></label>

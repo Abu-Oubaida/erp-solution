@@ -9,48 +9,42 @@
 <div class="col-md-12">
     <div class="card mb-4">
         <div class="card-body" id="fixed-asset-body">
-            <div class="row md-1">
+            <div class="row">
                 <h5 class="text-capitalize">Fixed Asset Opening</h5>
+                <div class="col">
+                    <span class=""><strong>Reference: </strong>{!! isset($reference)?$reference: '' !!}</span>
+                    <span class="float-end"><strong>Project: </strong>{!! isset($branchName)?$branchName: '' !!}</span>
+                </div>
                 <hr>
             </div>
             <div class="row">
-                <strong>Reference Number:{!! isset($reference)?$reference:'' !!}</strong>
                 <div class="col-md-2">
                     <div class="mb-1">
                         <label for="date">Date<span class="text-danger">*</span></label>
                         <input class="form-control" id="date" name="date" type="date" placeholder="date" value="" required/>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="mb-1">
-
-                                <input type="hidden" id="ref_hide" value="{!! isset($reference)?$reference:'' !!}">
-                                <input type="hidden" id="project" value="{!! isset($project)?$project:'' !!}">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-1">
-                                <label for="recourse_code">Materials<span class="text-danger">*</span></label>
-                                <select class="select-search" id="materials_id" onchange="return Obj.getFixedAssetSpecification(this)">
-                                    <option value="">Pick a state...</option>
-                                    @if(count($fixed_assets))
-                                        @foreach($fixed_assets as $fx)
-                                            <option value="{!! $fx->id !!}">{!! $fx->materials_name !!} ({{$fx->recourse_code}})</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-1">
-                                <label for="specification">Specification<span class="text-danger">*</span></label>
-                                <select class="select-search" id="specification" >
-                                    <option value="">Pick a state...</option>
-                                </select>
-                            </div>
-                        </div>
+                <input type="hidden" id="ref_hide" value="{!! isset($reference)?$reference:'' !!}">
+                <input type="hidden" id="project" value="{!! isset($project)?$project:'' !!}">
+                <div class="col-md-3">
+                    <div class="mb-1">
+                        <label for="recourse_code">Materials<span class="text-danger">*</span></label>
+                        <select class="select-search" id="materials_id" onchange="return Obj.getFixedAssetSpecification(this)">
+                            <option value="">Pick a state...</option>
+                            @if(count($fixed_assets))
+                                @foreach($fixed_assets as $fx)
+                                    <option value="{!! $fx->id !!}">{!! $fx->materials_name !!} ({{$fx->recourse_code}})</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-1">
+                        <label for="specification">Specification<span class="text-danger">*</span></label>
+                        <select class="select-search" id="specification" >
+                            <option value="">Pick a state...</option>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-1">

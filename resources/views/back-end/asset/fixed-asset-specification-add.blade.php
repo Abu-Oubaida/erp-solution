@@ -27,16 +27,15 @@
                             @method('post')
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="form-floating mb-2">
-                                        <input class="form-control form-control-sm" id="recourse_code" list="recourse_code_list" name="recourse_code" type="text" placeholder="Enter Recourse Code or Name" value="{{Request::get('code')}}" required/>
-                                        <datalist id="recourse_code_list">
+                                    <div class="mb-3">
+                                        <label for="recourse_code">Materials Name<span class="text-danger">*</span></label>
+                                        <select class="select-search" name="recourse_code" id="recourse_code" required>
                                             @if(count($fixed_assets))
                                                 @foreach($fixed_assets as $fx)
                                                     <option value="{!! $fx->recourse_code !!}">{!! $fx->materials_name !!}</option>
                                                 @endforeach
                                             @endif
-                                        </datalist>
-                                        <label for="recourse_code">Materials Name<span class="text-danger">*</span></label>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-8">

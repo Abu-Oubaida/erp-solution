@@ -770,25 +770,18 @@ if(window.location.port)
                     {
                         if (response.status === 'success')
                         {
-                            if (response.attribute === 'create_new')
-                            {
-                                $('#opening-materials-list').html(response.data)
-                            }
-                            if (response.attribute === 'duplicate')
-                            {
-                                $('#opening-materials-list').html(response.data)
-                                alert("Warning:"+response.message)
-                            }
-                            if (response.attribute === 'previously_done')
-                            {
-                                $('#fixed-asset-body').html(response.data)
-                            }
-                            console.log(response.data)
-                        }else if (response.status === 'error')
+                            $('#opening-materials-list').html(response.data)
+                        }
+                        else if (response.status === 'warning')
                         {
-                            alert("Error:"+response.message)
+                            alert("Warning: "+response.message)
+                            console.log('Error:', response)
+                        }
+                        else if (response.status === 'error')
+                        {
+                            alert("Error: "+response.message)
                             // Handle error
-                            console.log('Error:', response.message)
+                            console.log('Error:', response)
                         }
                     },
                     error(xhr)
@@ -830,15 +823,16 @@ if(window.location.port)
                         {
                             $("#"+outputID).html(response.data)
                             // Get the current URL
-                            var currentUrl = window.location.href;
+                            var currentUrl = window.location.href
                             // Construct the new URL by appending the ref value
-                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference;
+                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference + '&project=' + project
                             // Change the URL without reloading the page
-                            history.pushState({ref: reference}, '', newUrl);
+                            history.pushState({ref: reference}, '', newUrl)
                         }
                         else if (response.status === 'warning')
                         {
                             alert("Warning:"+response.message)
+                            $("#"+outputID).html('')
                         }
                         else if (response.status === 'error')
                         {
