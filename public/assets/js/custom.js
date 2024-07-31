@@ -19,8 +19,12 @@ if(window.location.port)
         const tags = [];
         const employeeDatas = [];
         const materialsTempList = [];
-        $('select').selectize({
+        $('.select-search').selectize({
             // create: true,
+            sortField: 'text'
+        });
+        $('.select-search-with-create').selectize({
+            create: true,
             sortField: 'text'
         });
         $('#perAdd').click(function (){
@@ -729,6 +733,7 @@ if(window.location.port)
                             $("#total").val(fixedAsset.rate)
                         }else if (response.status === 'error')
                         {
+                            alert("Error:"+response.message)
                             // Handle error
                             console.log('Error:', response.message)
                         }
@@ -760,15 +765,31 @@ if(window.location.port)
                     url:url,
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     method: "POST",
-                    data: {'id':specification},
+                    data: {'opening_date':opdate,'reference':reference,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
                     success(response)
                     {
-                        const fixedAsset = response.data.fixed_asset
-                        const spec = response.data
-                        const temp =[]
-                        temp[0] = {'reference':reference,'project_id':project,'materials':fixedAsset.materials_name,'specification':spec.specification}
-                        materialsTempList.push(temp)
-                        console.log(materialsTempList)
+                        if (response.status === 'success')
+                        {
+                            if (response.attribute === 'create_new')
+                            {
+                                $('#opening-materials-list').html(response.data)
+                            }
+                            if (response.attribute === 'duplicate')
+                            {
+                                $('#opening-materials-list').html(response.data)
+                                alert("Warning:"+response.message)
+                            }
+                            if (response.attribute === 'previously_done')
+                            {
+                                $('#fixed-asset-body').html(response.data)
+                            }
+                            console.log(response.data)
+                        }else if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
+                            // Handle error
+                            console.log('Error:', response.message)
+                        }
                     },
                     error(xhr)
                     {
@@ -788,17 +809,21 @@ if(window.location.port)
                 }
                 output.val(parseFloat(Number(input*self)))
             },
-            fixedAssetOpeningSearch:function (e, inputID, outputID)
+            fixedAssetOpeningSearch:function (e, outputID)
             {
-                const reference = $("#"+inputID).val()
-                if (reference.length === 0)
+                const reference = $("#ref-src").val()
+                const project = $("#project").val()
+                if (reference.length === 0 && project.length === 0)
+                {
+                    alert('All Input are Required!')
                     return false
+                }
                 const url = window.location.origin + sourceDir + "/fixed-asset-distribution/get-fixed-asset-opening"
                 $.ajax({
                     url:url,
                     method:'POST',
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'ref':reference},
+                    data:{'ref':reference,'project':project},
                     success:function(response)
                     {
                         if (response.status === 'success')
@@ -810,6 +835,16 @@ if(window.location.port)
                             var newUrl = currentUrl.split('?')[0] + '?ref=' + reference;
                             // Change the URL without reloading the page
                             history.pushState({ref: reference}, '', newUrl);
+                        }
+                        else if (response.status === 'warning')
+                        {
+                            alert("Warning:"+response.message)
+                        }
+                        else if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
+                            // Handle error
+                            console.log('Error:', response.message)
                         }
                     },
                     error:function(xhr)

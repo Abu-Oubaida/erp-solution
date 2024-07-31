@@ -30,6 +30,6 @@ class Fixed_asset_opening_balance extends Model
     }
     public function withSpecifications()
     {
-        return $this->hasMany(Fixed_asset_opening_with_spec::class, 'fixed_asset_opening_id');
+        return $this->hasMany(Fixed_asset_opening_with_spec::class, 'opening_asset_id');
     }
 }

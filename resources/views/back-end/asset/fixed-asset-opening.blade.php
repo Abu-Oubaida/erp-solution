@@ -19,16 +19,25 @@
 
         </div>
         <div class="row">
-            <div class="col-md-3 mb-1">
+            <div class="col-md-2 mb-1">
+                <label for="project">Enter Project Name<span class="text-danger">*</span></label>
+                <select placeholder="Pick a state..." id="project" name="project" class="select-search cursor-pointer">
+                    <option value="">Pick a state...</option>
+                    @if(count($projects))
+                        @foreach($projects as $p)
+                            <option value="{!! $p->id !!}">{!! $p->branch_name !!}</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+            <div class="col-md-2 mb-1">
                 <label for="ref">Reference No<span class="text-danger">*</span></label>
-                <div class="input-group">
-                    <input class="form-control border-end-0 border" value="{!! Request::get('ref') !!}" type="text" placeholder="Reference number..." id="ref-src">
-                    <span class="input-group-append">
-                        <button class="btn btn-chl-outline bg-white border-start-0 border ms-n3" type="button" id="ref-src-btn" onclick="return Obj.fixedAssetOpeningSearch(this,'ref-src','fixed-asset-body')">
-                            <i class="fa fa-search"></i> search
-                        </button>
-                    </span>
-                </div>
+                <input class="form-control" value="{!! Request::get('ref') !!}" type="text" placeholder="Reference number..." id="ref-src">
+            </div>
+            <div class="col-md-1 mt-4">
+                <button class="btn btn-chl-outline" type="button" id="ref-src-btn" onclick="return Obj.fixedAssetOpeningSearch(this,'fixed-asset-body')">
+                    <i class="fa fa-search"></i> search
+                </button>
             </div>
             <div id="fixed-asset-body">
                 @if(Request::get('ref'))
