@@ -348,6 +348,13 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get','post'],'index','index')->name('fixed.asset.distribution');
             Route::middleware(['permission:fixed_asset_opening_input'])->group(function (){
                 Route::match(['get','post'],'opening-input','openingInput')->name('fixed.asset.distribution.opening.input');
+                Route::post('get-fixed-asset-spec','getFixedAssetSpecification');
+                Route::post('add-fixed-asset-opening','addFixedAssetOpening');
+                Route::post('get-fixed-asset-opening','getFixedAssetOpening');
+                Route::post('edit-fixed-asset-opening-spec','editFixedAssetOpeningSpec');
+                Route::post('update-fixed-asset-opening-spec','updateFixedAssetOpeningSpec');
+                Route::delete('delete-fixed-asset-opening-spec','deleteFixedAssetOpeningSpec');
+                Route::put('final-update-fixed-asset-opening-spec','finalUpdateFixedAssetOpeningSpec')->name('fixed.asset.distribution.update');
             });
             Route::middleware(['permission:fixed_asset_opening_list'])->group(function (){
                 Route::match(['get'],'opening-list','openingList')->name('fixed.asset.distribution.opening.list');
@@ -355,9 +362,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::middleware(['permission:fixed_asset_opening_report'])->group(function (){
                 Route::get('opening-report','openingReportView')->name('fixed.asset.distribution.opening.report.view');
             });
-            Route::post('get-fixed-asset-spec','getFixedAssetSpecification');
-            Route::post('add-fixed-asset-opening','addFixedAssetOpening');
-            Route::post('get-fixed-asset-opening','getFixedAssetOpening');
+
             Route::middleware(['permission:fixed_asset_mrf'])->group(function (){});
             Route::middleware(['permission:fixed_asset_gp'])->group(function (){});
             Route::middleware(['permission:fixed_asset_issue'])->group(function (){});

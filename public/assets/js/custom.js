@@ -819,6 +819,7 @@ if(window.location.port)
                     data:{'ref':reference,'project':project},
                     success:function(response)
                     {
+                        console.log(response)
                         if (response.status === 'success')
                         {
                             $("#"+outputID).html(response.data)
@@ -846,6 +847,103 @@ if(window.location.port)
                         console.log('AJAX Error:', xhr.statusText);
                     }
                 })
+            },
+            fixedAssetOpeningSpecEdit:function (e)
+            {
+                const id = $(e).attr('ref')
+                if (id.length === 0)
+                    return false
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/edit-fixed-asset-opening-spec"
+                $.ajax({
+                    url: url,
+                    method:'POST',
+                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data:{'id':id},
+                    success:function (response)
+                    {
+                        const view = response.data
+                        $('#fixed-asset-spec-edit').html(view)
+                        $('#editModal').modal('show')
+                    }
+
+                })
+            },
+            updateFixedAssetOpeningSpec:function (e)
+            {
+                const opdate = $('#edit-date').val()
+                const id = $('#edit-id').val()
+                const rate = $('#rate-edit').val()
+                const qty = $('#qty-edit').val()
+                const purpose = $('#edit-purpose').val()
+                const remarks = $('#edit-remarks').val()
+                if (opdate.length === 0 || id.length === 0 || rate.length === 0 || qty.length === 0)
+                {
+                    alert("Error: Empty Field Error!")
+                    return false;
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/update-fixed-asset-opening-spec"
+                $.ajax({
+                    url: url,
+                    method:'POST',
+                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data:{'id':id,'opening_date':opdate,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
+                    success:function (response)
+                    {
+                        const view = response.data
+                        if (response.status === 'success')
+                        {
+                            alert(response.message)
+                            $('#editModal').modal('hide')
+                            $('#opening-materials-list').html(view)
+                        }
+                        if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
+                            // Handle error
+                            console.log('Error:', response.message)
+                        }
+                        return false
+                    },
+                    error:function(xhr)
+                    {
+                        console.log('AJAX Error:', xhr.statusText);
+                    }
+
+                })
+            },
+            deleteFixedAssetOpeningSpec:function (e)
+            {
+                if (confirm('Are you sure delete this data?'))
+                {
+                    const id = $(e).attr('ref')
+                    if (id.length === 0)
+                        return false
+                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-opening-spec"
+                    $.ajax({
+                        url: url,
+                        method:'DELETE',
+                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        data:{'id':id},
+                        success:function (response)
+                        {
+                            if (response.status === 'success')
+                            {
+                                alert(response.message)
+                                const view = response.data
+                                $('#opening-materials-list').html(view)
+                            }
+                            if (response.status === 'error')
+                            {
+                                alert("Error:"+response.message)
+                                // Handle error
+                                console.log('Error:', response.message)
+                            }
+                            return false
+                        }
+
+                    })
+                }
+
             }
         }
         function checkFileExists(url, callback) {

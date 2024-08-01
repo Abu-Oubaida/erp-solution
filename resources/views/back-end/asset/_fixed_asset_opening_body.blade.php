@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-md-1">
                     <div class="mb-1">
-                        <label for="ref">Unite<span class="text-danger">*</span></label>
+                        <label for="unite">Unite<span class="text-danger">*</span></label>
                         <input class="form-control bg-secondary text-white" id="unite" type="text" placeholder="Unite" value="" required readonly/>
                     </div>
                 </div>
@@ -61,13 +61,13 @@
                 </div>
                 <div class="col-md-1">
                     <div class="mb-1">
-                        <label for="ref">Qty.<span class="text-danger">*</span></label>
+                        <label for="qty">Qty.<span class="text-danger">*</span></label>
                         <input class="form-control" onfocusout="return Obj.priceTotal(this, 'rate','total')" id="qty" type="text" placeholder="Qty" value="" required/>
                     </div>
                 </div>
                 <div class="col-md-1">
                     <div class="mb-1">
-                        <label for="ref">Total<span class="text-danger">*</span></label>
+                        <label for="total">Total<span class="text-danger">*</span></label>
                         <input class="form-control bg-secondary text-white" value="" id="total" type="text" placeholder="Total" required readonly step="100"/>
                     </div>
                 </div>

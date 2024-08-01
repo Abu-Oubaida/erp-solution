@@ -16,7 +16,7 @@ class Fixed_asset_opening_with_spec extends Model
     {
         return $this->belongsTo(Fixed_asset::class, 'asset_id');
     }
-    public function fixed_asset_opening_blance()
+    public function fixed_asset_opening_balance()
     {
         return $this->belongsTo(Fixed_asset_opening_balance::class, 'opening_asset_id');
     }

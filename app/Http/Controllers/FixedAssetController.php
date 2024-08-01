@@ -260,7 +260,6 @@ class FixedAssetController extends Controller
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
-
     /**
      * Remove the specified resource from storage.
      *

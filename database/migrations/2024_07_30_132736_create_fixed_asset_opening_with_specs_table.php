@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('fixed_asset_opening_with_specs', function (Blueprint $table) {
             $table->id();
-            $table->text('date')->nullable();
+            $table->date('date')->nullable();
             $table->unsignedBigInteger('opening_asset_id');
             $table->string('references');
             $table->unsignedBigInteger('company_id');

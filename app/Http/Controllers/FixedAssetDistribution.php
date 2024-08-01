@@ -9,6 +9,7 @@ use App\Models\Fixed_asset_opening_with_spec;
 use App\Models\fixed_asset_specifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Intervention\Image\Response;
 use Throwable;
 use function PHPUnit\Framework\isEmpty;
@@ -196,17 +197,8 @@ class FixedAssetDistribution extends Controller
             $user = Auth::user();
             $request->validate([
                 'ref'=>['sometimes','nullable','string',],
-                'project'=>['sometimes','nullable','string','exists:branches,id'],
+                'project'=>['sometimes','nullable','string',Rule::exists('branches','id')->where(function ($query) use ($request) {$query->where('status',1);})],
             ]);
-            $branchName = null;
-            $branch = branch::where('status',1)->where('company_id',$user->company_id)->where('id',$request->post('project'))->first();
-            if (is_null($branch))
-            {
-                return back()->with('error',"Invalid Project name");
-            }
-            else{
-                $branchName = $branch->branch_name;
-            }
             if ($request->isMethod('post'))
             {
                 extract($request->post());
@@ -214,10 +206,11 @@ class FixedAssetDistribution extends Controller
                 if (empty($ref))
                 {
                     return \response()->json([
-                        'status'=>'error',
-                        'message'=>'Reference is required!'
-                    ],500);
+                        'status'=>'warning',
+                        'message'=>'Work Processing..... when reference is null.',
+                    ],200);
                 }
+                $branchName = $project;
                 $fa_opening = Fixed_asset_opening_balance::with(['withSpecifications','branch'])->where('references',$reference)->where('company_id',$user->company_id)->where('branch_id',$project)->first();
                 $projects = branch::where('company_id',$user->company_id)->where('status',1)->get();
                 $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->get();
@@ -232,15 +225,7 @@ class FixedAssetDistribution extends Controller
                         $msg = 'This reference already exists for '.$ref_via_search->branch->branch_name;
                         if ($ref_via_search->branch_id == $project)
                         {
-                            $msg = 'Work Processing';
-
-
-
-
-
-
-
-
+                            $msg = 'Work Processing....... when reference already exists for selected project but status not equal to (5 or processing)';
                         }
                         return \response()->json([
                             'status'=>'warning',
@@ -269,5 +254,144 @@ class FixedAssetDistribution extends Controller
         }
     }
 
+    public function editFixedAssetOpeningSpec(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $request->validate([
+                'id'=>['required',Rule::exists('fixed_asset_opening_with_specs','id')],
+            ]);
+            if ($request->isMethod('post'))
+            {
+                extract($request->post());
+                $data = Fixed_asset_opening_with_spec::with(['asset','specification'])->where('company_id',$user->company_id)->whereId($id)->first();
+                $view = view('back-end.asset.__edit_fixed_asset_ope_spec',compact('data'))->render();
+                return \response()->json([
+                    'status'=>'success',
+                    'data'=>$view,
+                    'message'=>'Request processed successfully.'
+                ],200);
+            }
+            return \response()->json([
+                'status'=>'error',
+                'message'=>'Request not supported!'
+            ],500);
+        }catch (\Throwable $exception)
+        {
+            return \response()->json([
+                'status'=>'error',
+                'message'=> $exception->getMessage(),
+            ],500);
+        }
+    }
+
+    public function updateFixedAssetOpeningSpec(Request $request)
+    {
+        try {
+            $request->validate([
+                'opening_date'    => ['required','date'],
+                'id' => ['required','string','exists:fixed_asset_opening_with_specs,id'],
+                'rate'  =>  ['required','numeric'],
+                'qty'   =>  ['required','numeric'],
+                'purpose'=> ['sometimes','nullable','string'],
+                'remarks'=> ['sometimes','nullable','string'],
+            ]);
+            if ($request->isMethod('post'))
+            {
+                extract($request->post());
+                $user = Auth::user();
+                $update_data = Fixed_asset_opening_with_spec::where('id', $id)->first();
+
+                if ($update_data) {
+                    $update_data->update([
+                        'date' => $opening_date,
+                        'rate' => $rate,
+                        'qty' => $qty,
+                        'purpose' => $purpose,
+                        'remarks' => $remarks,
+                    ]);
+
+                    // Refresh the model instance to get the updated data
+                    $update_data = $update_data->fresh();
+                }
+                $final_opening = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('references',$update_data->references)->orderBy('created_at','DESC')->first();
+                $view = view('back-end.asset._fixed_asset_opening_body_list',compact('final_opening'))->render();
+                return \response()->json([
+                    'status'=>'success',
+                    'data'=>$view,
+                    'message'=>'Data update successfully.'
+                ],200);
+            }
+            return \response()->json([
+                'status'=>'error',
+                'message'=>'Request not supported!'
+            ],500);
+        }catch (\Throwable $exception)
+        {
+            return \response()->json([
+                'status'=>'error',
+                'message'=> $exception->getMessage(),
+            ],500);
+        }
+    }
+
+    public function deleteFixedAssetOpeningSpec(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => ['required','string','exists:fixed_asset_opening_with_specs,id'],
+            ]);
+            if ($request->isMethod('delete'))
+            {
+                extract($request->post());
+                $user = Auth::user();
+                $update_data = Fixed_asset_opening_with_spec::where('id', $id)->first();
+                $reference = $update_data->references;
+                if ($update_data) {
+                    $update_data->delete();
+
+                    // Refresh the model instance to get the updated data
+                    $update_data = $update_data->fresh();
+                }
+                $final_opening = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
+                $view = view('back-end.asset._fixed_asset_opening_body_list',compact('final_opening'))->render();
+                return \response()->json([
+                    'status'=>'success',
+                    'data'=>$view,
+                    'message'=>'Data deleted successfully.'
+                ],200);
+            }return \response()->json([
+                'status'=>'error',
+                'message'=>'Request not supported!'
+            ],500);
+        }catch (\Throwable $exception)
+        {
+            return \response()->json([
+                'status'=>'error',
+                'message'=> $exception->getMessage(),
+            ],500);
+        }
+    }
+    public function finalUpdateFixedAssetOpeningSpec(Request $request)
+    {
+        $request->validate([
+            'id' => ['required','string',Rule::exists('fixed_asset_opening_balances','id')->where('status',5)],
+        ]);
+        try {
+            if ($request->isMethod('put'))
+            {
+                extract($request->post());
+                $user = Auth::user();
+                Fixed_asset_opening_balance::where('id',$id)->update([
+                    'narration'=>$narration,
+                    'status'=>1,//1=active
+                ]);
+                return redirect(route('fixed.asset.distribution.opening.input'))->with('success','Data final update successfully.');
+            }
+        }catch (\Throwable $exception)
+        {
+            return back()->withErrors([$exception->getMessage()]);
+        }
+    }
 
 }

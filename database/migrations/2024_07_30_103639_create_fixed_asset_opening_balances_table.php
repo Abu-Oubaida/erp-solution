@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('fixed_asset_opening_balances', function (Blueprint $table) {
             $table->id();
-            $table->text('date')->nullable();
+            $table->date('date')->nullable();
             $table->string('references');
             $table->unsignedBigInteger('branch_id')->comment('project');
             $table->unsignedBigInteger('company_id');
