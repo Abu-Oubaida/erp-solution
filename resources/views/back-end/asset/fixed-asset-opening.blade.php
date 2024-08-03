@@ -40,7 +40,10 @@
                 </button>
             </div>
             <div id="fixed-asset-body">
-                @if(isset($reference) || isset($branchName))
+                @if(isset($project_wise_ref))
+                    @include('back-end.asset._fixed_asset_opening_project_wise_list')
+                @endif
+                @if((isset($reference) || isset($branchName)) && !(isset($project_wise_ref)))
                     @include('back-end.asset._fixed_asset_opening_body')
                 @endif
             </div>

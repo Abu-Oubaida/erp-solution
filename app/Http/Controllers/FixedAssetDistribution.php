@@ -58,7 +58,9 @@ class FixedAssetDistribution extends Controller
                 }
                 return view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','reference','branchName','final_opening'));
             }
-            dd("Work Processing");
+            $project_wise_ref = null;
+            $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy'])->where('references',$reference)->where('branch_id',$branch->id)->get();
+            return view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','reference','branchName','project_wise_ref'));
         }catch (Throwable $exception){
             return back()->with('error', $exception->getMessage());
         }
@@ -225,7 +227,13 @@ class FixedAssetDistribution extends Controller
                         $msg = 'This reference already exists for '.$ref_via_search->branch->branch_name;
                         if ($ref_via_search->branch_id == $project)
                         {
-                            $msg = 'Work Processing....... when reference already exists for selected project but status not equal to (5 or processing)';
+                            $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy'])->where('references',$reference)->where('branch_id',$project)->get();
+                            $view = view('back-end/asset/_fixed_asset_opening_project_wise_list',compact('project_wise_ref'))->render();
+                            return \response()->json([
+                                'status'=>'success',
+                                'data'=>$view,
+                                'message'=>'Request processed successfully.'
+                            ],200);
                         }
                         return \response()->json([
                             'status'=>'warning',
@@ -309,6 +317,8 @@ class FixedAssetDistribution extends Controller
                         'qty' => $qty,
                         'purpose' => $purpose,
                         'remarks' => $remarks,
+                        'updated_by' => $user->id,
+                        'updated_at' => \Carbon\Carbon::now(),
                     ]);
 
                     // Refresh the model instance to get the updated data
