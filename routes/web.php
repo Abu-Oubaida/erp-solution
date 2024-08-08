@@ -11,6 +11,7 @@ use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\FixedAssetDistribution;
+use App\Http\Controllers\OpReferenceTypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesInterfaceController;
 use App\Http\Controllers\ShareDocumentViewController;
@@ -92,6 +93,10 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get','post'],'company-type-add','companyTypeAdd')->name('add.company.type');
             Route::match(['put','get'],'company-type-edit/{companyTypeID}','companyTypeEdit')->name('edit.company.type');
             Route::delete('company-type-delete','companyTypeDelete')->name('delete.company.type');
+        });
+        # 3.2.5 Operation Reference Type
+        Route::controller(OpReferenceTypeController::class)->group(function (){
+            Route::match(['get','post'],'op-reference-type','index')->name('op.reference.type');
         });
     });//3.2 End
 

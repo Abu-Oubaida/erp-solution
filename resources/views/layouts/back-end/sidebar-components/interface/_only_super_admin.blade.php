@@ -27,5 +27,10 @@
             @else
                 <a class="nav-link text-chl" href="{!! route('permission.input') !!}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Permission Input</a>
             @endif
+            @if(Route::currentRouteName() == 'op.reference.type')
+                <a class="nav-link" href="{{route('op.reference.type')}}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa fa-o"></i><i class="fa fa-r"></i><i class="fa fa-t"></i></div> Op. Ref. Type</a>
+            @else
+                <a class="nav-link text-chl" href="{!! route('op.reference.type') !!}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa fa-o"></i><i class="fa fa-r"></i><i class="fa fa-t"></i></div> Op. Ref. Type</a>
+            @endif
         </nav>
     </div>
