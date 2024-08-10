@@ -97,6 +97,8 @@ Route::group(['middleware' => ['auth']],function (){
         # 3.2.5 Operation Reference Type
         Route::controller(OpReferenceTypeController::class)->group(function (){
             Route::match(['get','post'],'op-reference-type','index')->name('op.reference.type');
+            Route::match(['get','put'],'op-reference-type-edit/{typeID}','edit')->name('op.reference.type.edit');
+            Route::match(['delete'],'op-reference-type-delete','destroy')->name('op.reference.type.delete');
         });
     });//3.2 End
 

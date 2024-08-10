@@ -32,5 +32,8 @@
             @else
                 <a class="nav-link text-chl" href="{!! route('op.reference.type') !!}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa fa-o"></i><i class="fa fa-r"></i><i class="fa fa-t"></i></div> Op. Ref. Type</a>
             @endif
+            @if(Route::currentRouteName() == 'op.reference.type.edit')
+                <a class="nav-link" href="{{route('op.reference.type.edit',['typeID'=>\Illuminate\Support\Facades\Request::route('typeID')])}}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa fa-edit"></i></div> Op. Ref. Type Edit</a>
+            @endif
         </nav>
     </div>

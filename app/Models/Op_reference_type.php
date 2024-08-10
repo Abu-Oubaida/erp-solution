@@ -12,10 +12,10 @@ class Op_reference_type extends Model
 
     public function createdBy()
     {
-        $this->belongsTo(User::class, 'created_by', 'id');
+        return $this->belongsTo(User::class, 'created_by');
     }
     public function updatedBy()
     {
-        $this->belongsTo(User::class, 'updated_by', 'id');
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

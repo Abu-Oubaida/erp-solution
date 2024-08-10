@@ -67,48 +67,7 @@
             <div class="col-md-6">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <h3 class="text-capitalize">Operation Reference Type List</h3>
-                        <table id="datatablesSimple">
-                            <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Name</th>
-                                <th>Code</th>
-                                <th>Details</th>
-                                <th>Created By</th>
-                                <th>Updated By</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tfoot>
-                            <tr>
-                                <th>No</th>
-                                <th>Name</th>
-                                <th>Code</th>
-                                <th>Details</th>
-                                <th>Created By</th>
-                                <th>Updated By</th>
-                                <th>Action</th>
-                            </tr>
-                            </tfoot>
-                            <tbody>
-                    @if(isset($op_ref_types) && count($op_ref_types))
-                        @php($n=1)
-                        @foreach($op_ref_types as $type)
-                            <tr>
-                                <td>{!! $n++ !!}</td>
-                                <td>{!! $type->name !!}</td>
-                                <td>{!! $type->code !!}</td>
-                                <td>@if(isset($type->status) && $type->status == 1) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger"> Inactive</span> @endif</td>
-                                <td>{!! $type->description !!}</td>
-                                <td>{!! (isset($type->createdBy->name)?$type->createdBy->name:'-') !!}</td>
-                                <td>{!! (isset($type->updatedBy->name)?$type->createdBy->name:'-') !!}</td>
-                                <td></td>
-                            </tr>
-                        @endforeach
-                    @endif
-                            </tbody>
-                        </table>
+                        @include('back-end.programmer.__operation_ref_type_list')
                     </div>
                 </div>
             </div>
