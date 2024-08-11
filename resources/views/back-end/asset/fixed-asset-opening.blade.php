@@ -21,7 +21,7 @@
         <div class="row">
             <div class="col-md-2 mb-1">
                 <label for="project">Enter Project Name<span class="text-danger">*</span></label>
-                <select placeholder="Pick a state..." id="project" name="project" class="select-search cursor-pointer">
+                <select id="project" name="project" class="select-search cursor-pointer">
                     <option value="">Pick a state...</option>
                     @if(count($projects))
                         @foreach($projects as $p)
@@ -30,9 +30,22 @@
                     @endif
                 </select>
             </div>
+
             <div class="col-md-2 mb-1">
                 <label for="ref">Reference No<span class="text-danger">*</span></label>
                 <input class="form-control" value="{!! Request::get('ref') !!}" type="text" placeholder="Reference number..." id="ref-src">
+            </div>
+
+            <div class="col-md-2 mb-1">
+                <label for="r_type">Reference Type<span class="text-danger">*</span></label>
+                <select id="r_type" name="r_type" class="select-search cursor-pointer">
+                    <option value="">Pick a state...</option>
+                    @if(count($ref_types))
+                        @foreach($ref_types as $rt)
+                            <option @if(Request::get('rt') !== null && Request::get('rt') == $rt->id)selected @endif value="{!! $rt->id !!}">{!! $rt->name !!}</option>
+                        @endforeach
+                    @endif
+                </select>
             </div>
             <div class="col-md-2 mt-4">
                 <button class="btn btn-chl-outline" type="button" id="ref-src-btn" onclick="return Obj.fixedAssetOpeningSearch(this,'fixed-asset-body')">

@@ -10,7 +10,7 @@ class Fixed_asset_opening_balance extends Model
 {
     use HasFactory;
     protected $table = 'fixed_asset_opening_balances';
-    protected $fillable = ['date', 'references', 'branch_id', 'company_id', 'status', 'created_by', 'updated_by', 'narration'];
+    protected $fillable = ['date', 'references','ref_type_id', 'branch_id', 'company_id', 'status', 'created_by', 'updated_by', 'narration'];
 
     public function branch()
     {
@@ -31,5 +31,9 @@ class Fixed_asset_opening_balance extends Model
     public function withSpecifications()
     {
         return $this->hasMany(Fixed_asset_opening_with_spec::class, 'opening_asset_id');
+    }
+    public function refType()
+    {
+        return $this->belongsTo(Op_reference_type::class,'ref_type_id');
     }
 }

@@ -353,7 +353,7 @@ Route::group(['middleware' => ['auth']],function (){
     Route::controller(FixedAssetDistribution::class)->group(function (){
         Route::middleware(['permission:fixed_asset_distribution'])->prefix('fixed-asset-distribution')->group(function (){
             Route::match(['get','post'],'index','index')->name('fixed.asset.distribution');
-            Route::middleware(['permission:fixed_asset_opening_input'])->group(function (){
+            Route::middleware(['permission:fixed_asset_with_reference_input'])->group(function (){
                 Route::match(['get','post'],'opening-input','openingInput')->name('fixed.asset.distribution.opening.input');
                 Route::post('get-fixed-asset-spec','getFixedAssetSpecification');
                 Route::post('add-fixed-asset-opening','addFixedAssetOpening');

@@ -10,7 +10,7 @@
     <div class="card mb-4">
         <div class="card-body" id="fixed-asset-body">
             <div class="row">
-                <h5 class="text-capitalize">Fixed Asset Opening</h5>
+                <h5 class="text-capitalize">Fixed Asset Distribution</h5>
                 <div class="col">
                     <span class=""><strong>Reference: </strong>{!! isset($reference)?$reference: '' !!}</span>
                     <span class="float-end"><strong>Project: </strong>{!! isset($branchName)?$branchName: '' !!}</span>
@@ -26,6 +26,7 @@
                 </div>
                 <input type="hidden" id="ref_hide" value="{!! isset($reference)?$reference:'' !!}">
                 <input type="hidden" id="project" value="{!! isset($project)?$project:'' !!}">
+                <input type="hidden" id="r_type" value="{!! isset($r_type)?$r_type:'' !!}">
                 <div class="col-md-3">
                     <div class="mb-1">
                         <label for="recourse_code">Materials<span class="text-danger">*</span></label>

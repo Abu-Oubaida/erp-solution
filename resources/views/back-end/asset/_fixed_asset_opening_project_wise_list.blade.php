@@ -9,6 +9,7 @@
                         <tr>
                             <th>SL.</th>
                             <th>Date</th>
+                            <th>Reference Type</th>
                             <th>Reference</th>
                             <th>Project</th>
                             <th>Status</th>
@@ -28,6 +29,7 @@
                                 <tr>
                                     <td>{!! $n++ !!}</td>
                                     <td>{!! date('d-M-Y', strtotime($pwr->date)) !!}</td>
+                                    <td>{!! $pwr->refType->name !!}</td>
                                     <td>{!! $pwr->references !!}</td>
                                     <td>{!! $pwr->branch->branch_name !!})</td>
                                     <td>
@@ -54,7 +56,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="12">Not Found</td>
+                                <td colspan="13" class="text-center">Not Found</td>
                             </tr>
                         @endif
 

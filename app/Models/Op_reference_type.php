@@ -18,4 +18,8 @@ class Op_reference_type extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+    public function fixedAssetOpening()
+    {
+        return $this->hasMany(Fixed_asset_opening_balance::class,'ref_type_id','id');
+    }
 }

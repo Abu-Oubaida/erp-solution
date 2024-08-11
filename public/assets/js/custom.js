@@ -748,6 +748,7 @@ if(window.location.port)
             fixedAssetOpeningAddList:function (e){
                 const opdate = $('#date').val()
                 const reference = $('#ref_hide').val()
+                const r_type = $('#r_type').val()
                 const project_id = $('#project').val()
                 const materials_id = $('#materials_id').val()
                 const specification = $('#specification').val()
@@ -755,7 +756,7 @@ if(window.location.port)
                 const qty = $('#qty').val()
                 const purpose = $('#purpose').val()
                 const remarks = $('#remarks').val()
-                if (opdate.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0)
+                if (opdate.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || r_type.length === 0)
                 {
                     alert('All field are required')
                     return false
@@ -765,7 +766,7 @@ if(window.location.port)
                     url:url,
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     method: "POST",
-                    data: {'opening_date':opdate,'reference':reference,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
+                    data: {'opening_date':opdate,'reference':reference,'r_type':r_type,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
                     success(response)
                     {
                         if (response.status === 'success')
@@ -806,7 +807,8 @@ if(window.location.port)
             {
                 const reference = $("#ref-src").val()
                 const project = $("#project").val()
-                if (reference.length === 0 && project.length === 0)
+                const rt = $("#r_type").val()
+                if (reference.length === 0 && project.length === 0 && rt === 0)
                 {
                     alert('All Input are Required!')
                     return false
@@ -816,7 +818,7 @@ if(window.location.port)
                     url:url,
                     method:'POST',
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'ref':reference,'project':project},
+                    data:{'ref':reference,'project':project,'r_type':rt},
                     success:function(response)
                     {
                         console.log(response)
@@ -826,7 +828,7 @@ if(window.location.port)
                             // Get the current URL
                             var currentUrl = window.location.href
                             // Construct the new URL by appending the ref value
-                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference + '&project=' + project
+                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference + '&project=' + project + '&rt=' + rt
                             // Change the URL without reloading the page
                             history.pushState({ref: reference}, '', newUrl)
                         }

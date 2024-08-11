@@ -6,6 +6,7 @@ use App\Models\Op_reference_type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Throwable;
 
@@ -100,6 +101,43 @@ class OpReferenceTypeController extends Controller
             return back()->with('success', 'Data updated successful');
         }catch (\Throwable $exception){
             return back()->with('error', $exception->getMessage())->withInput();
+        }
+    }
+
+    public function destroy(Request $request)
+    {
+        try {
+            $request->validate([
+                'id'    =>  ['string','required'],
+            ]);
+            extract($request->post());
+            $id = Crypt::decryptString($id);
+            $data = Op_reference_type::with(['fixedAssetOpening'])->where('id',$id)->first();
+            if(count($data->fixedAssetOpening))
+            {
+                return back()->with('error', 'There exist some relation with fixed asset opening');
+            }
+            if ($data)
+            {
+                DB::table('op_reference_types_delete_histories')->insert([
+                    'old_id' => $data->id,
+                    'company_id' => $data->company_id,
+                    'name' => $data->name,
+                    'code' => $data->code,
+                    'description' => $data->description,
+                    'status' => $data->status,
+                    'created_by' => $data->created_by,
+                    'updated_by' => $data->updated_by,
+                    'deleted_by' => $this->user->id,
+                    'old_created_at'=> $data->created_at,
+                    'old_updated_at'=> $data->updated_at,
+                    'created_at' => now(),
+                ]);
+                $data->delete();
+                return back()->with('success', 'Data deleted successful');
+            }
+        }catch (\Throwable $exception){
+            return back()->with('error', $exception->getMessage());
         }
     }
 }
