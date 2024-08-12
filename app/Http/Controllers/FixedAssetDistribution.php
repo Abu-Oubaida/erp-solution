@@ -37,8 +37,9 @@ class FixedAssetDistribution extends Controller
             $reference = $request->get('ref');
             $branch = $request->get('project');
             $r_type = $request->get('rt');
+            $project_wise_ref = null;
 
-            if ($branch !== null || $reference !== null || $r_type !== null)
+            if (!empty($branch))
             {
                 $branch = branch::where('status',1)->where('company_id',$user->company_id)->where('id',$request->get('project'))->first();
                 if (is_null($branch))
@@ -53,8 +54,8 @@ class FixedAssetDistribution extends Controller
             }
             $projects = branch::where('company_id',$user->company_id)->where('status',1)->get();
             $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->get();
-            $ref_types = Op_reference_type::where('status',1)->get();
-            if (empty($final_opening) || $final_opening->status == 5)
+            $ref_types = Op_reference_type::where('status',1)->where('company_id',$user->company_id)->get();
+            if (!empty($final_opening) && $final_opening->status == 5)
             {
                 if (empty($final_opening) && Fixed_asset_opening_balance::where('references',$reference)->first())
                 {
@@ -62,8 +63,30 @@ class FixedAssetDistribution extends Controller
                 }
                 return view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','reference','branchName','final_opening','ref_types','r_type'));
             }
-            $project_wise_ref = null;
-            $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy'])->where('references',$reference)->where('branch_id',$branch->id)->get();
+            else {
+                if (!empty($r_type) && !empty($branch) && empty($reference))
+                {
+//                    dd($branch);
+                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('branch_id',$branch->id)->where('company_id',$user->company_id)->get();
+//                    dd($project_wise_ref);
+                }
+                else if (empty($r_type) && !empty($branch) && empty($reference))
+                {
+//                    dd('2');
+                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('branch_id',$branch->id)->where('company_id',$user->company_id)->get();
+                }
+                else if (!empty($r_type) && empty($branch) && empty($reference))
+                {
+//                    dd('3');
+                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('company_id',$user->company_id)->get();
+                }
+                else if (!empty($branch) && !empty($reference) && !empty($final_opening))
+                {
+//                    dd('4');
+                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy'])->where('references',$reference)->where('branch_id',$branch->id)->get();
+                }
+            }
+
             return view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','reference','branchName','project_wise_ref','ref_types','r_type'));
         }catch (Throwable $exception){
             return back()->with('error', $exception->getMessage());

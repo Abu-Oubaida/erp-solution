@@ -48,11 +48,11 @@ class OpReferenceTypeController extends Controller
                 ]);
                 extract($request->post());
                 Op_reference_type::create([
+                    'company_id' => $this->user->company_id,
                     'name' => $name,
                     'code' => $code,
                     'description' => $description,
                     'status' => $status,
-                    'company_id' => $this->company_id,
                     'created_by' => $this->user->id,
                     'created_at' => now(),
                 ]);

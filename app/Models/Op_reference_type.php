@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Op_reference_type extends Model
 {
     use HasFactory;
-    protected $fillable = [ 'name', 'code', 'description', 'status', 'created_by', 'updated_by'];
+    protected $fillable = [ 'company_id','name', 'code', 'description', 'status', 'created_by', 'updated_by'];
 
     public function createdBy()
     {
