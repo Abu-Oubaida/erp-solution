@@ -324,7 +324,12 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:control_panel'])->prefix('control-panel')->group(function (){
             Route::match(['get','post'],'index','index')->name('control.panel');
             Route::middleware(['permission:add_user_project_permission'])->group(function (){
-                Route::match(['get','post'],'add-user-project-permission','userProjectPermission')->name('add.user.project.permission');
+                Route::match(['get'],'user-project-permission','userProjectPermission')->name('user.project.permission');
+                Route::match(['post'],'user-project-permission-search','userProjectPermissionSearch')->name('search.user.project.permission');
+                Route::match(['post'],'user-project-permission-add','userProjectPermissionAdd')->name('add.user.project.permission');
+                Route::middleware(['permission:user_project_permission_delete'])->group(function (){
+                    Route::match(['delete','post'],'user-project-permission-delete','userProjectPermissionDelete')->name('user.project.permission.delete');
+                });
             });
         });
 

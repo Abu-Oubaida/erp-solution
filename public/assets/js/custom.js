@@ -945,8 +945,73 @@ if(window.location.port)
 
                     })
                 }
+            },
+            userProjectPermissionSearch:function (e)
+            {
+                const value = $('#user').val()
+                if (value.length === 0)
+                {
+                    return false;
+                }
+                const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-search"
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data: {'user':value},
+                    success:function (response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            // alert(response.message)
+                            const view = response.data
+                            $('#user-project-permission-add-list').html(view)
+                        }
+                        if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
+                            // Handle error
+                            console.log('Error:', response.message)
+                        }
+                        return false
 
-            }
+                    }
+                })
+            },
+            userProjectPermissionAdd:function (e)
+            {
+                const project_id = $('#project').val()
+                const user_id = $('#user_id').val()
+                if (project_id.length === 0 || user_id.length === 0)
+                {
+                    alert('All filed are required')
+                    return false;
+                }
+                const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-add"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    method: 'POST',
+                    data: {'project_id':project_id,'user_id':user_id},
+                    success:function (response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            alert(response.message)
+                            const view = response.data
+                            $('#user-permission-list').html(view)
+                        }
+                        if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
+                            // Handle error
+                            console.log('Error:', response.message)
+                        }
+                        return false
+                    }
+                })
+            },
+
         }
         function checkFileExists(url, callback) {
             const xhr = new XMLHttpRequest();

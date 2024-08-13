@@ -139,6 +139,7 @@ return array(
     'App\\Models\\fixed_asset_specifications' => $baseDir . '/app/Models/fixed_asset_specifications.php',
     'App\\Models\\priority' => $baseDir . '/app/Models/priority.php',
     'App\\Models\\sales_interface' => $baseDir . '/app/Models/sales_interface.php',
+    'App\\Models\\userProjectPermission' => $baseDir . '/app/Models/userProjectPermission.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
     'App\\Providers\\AuthServiceProvider' => $baseDir . '/app/Providers/AuthServiceProvider.php',
     'App\\Providers\\BroadcastServiceProvider' => $baseDir . '/app/Providers/BroadcastServiceProvider.php',

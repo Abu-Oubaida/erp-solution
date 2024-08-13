@@ -798,6 +798,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\fixed_asset_specifications' => __DIR__ . '/../..' . '/app/Models/fixed_asset_specifications.php',
         'App\\Models\\priority' => __DIR__ . '/../..' . '/app/Models/priority.php',
         'App\\Models\\sales_interface' => __DIR__ . '/../..' . '/app/Models/sales_interface.php',
+        'App\\Models\\userProjectPermission' => __DIR__ . '/../..' . '/app/Models/userProjectPermission.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
