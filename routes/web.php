@@ -329,56 +329,60 @@ Route::group(['middleware' => ['auth']],function (){
         });
 
     });//3.13 End
-    # 3.14 Fixed Asset
-    Route::controller(FixedAssetController::class)->group(function (){
-        Route::middleware(['permission:fixed_asset'])->prefix('fixed-asset')->group(function (){
-            Route::match(['get','post'],'index','index')->name('fixed.asset');
-            Route::middleware(['permission:add_fixed_asset'])->group(function (){
-                Route::match(['post','get'],'add-fixed-asset','create')->name('fixed.asset.add');
-            });
-            Route::middleware(['permission:add_fixed_asset_specification'])->group(function (){
-                Route::match(['post','get'],'add-specification','createSpecification')->name('fixed.asset.specification');
-            });
-            Route::middleware(['permission:edit_fixed_asset_specification'])->group(function (){
-                Route::match(['put','get'],'edit-specification/{fasid}','editSpecification')->name('edit.fixed.asset.specification');
-            });
-            Route::middleware(['permission:fixed_asset_list'])->group(function (){
-                Route::get('show-fixed-asset-list','show')->name('fixed.asset.show');
-            });
-            Route::middleware(['permission:fixed_asset_edit'])->group(function (){
-                Route::match(['put','get'],'edit/{fixedAssetID}','edit')->name('fixed.asset.edit');
-            });
-            Route::middleware(['permission:fixed_asset_delete'])->group(function (){
-                Route::match(['delete'],'delete','destroy')->name('fixed.asset.delete');
-            });
+    # 3.14 Asset Management
+    Route::middleware('permission:fixed_asset_interface')->group(function (){
+        # 3.14.1 Fixed Asset
+        Route::controller(FixedAssetController::class)->group(function (){
+            Route::middleware(['permission:fixed_asset'])->prefix('fixed-asset')->group(function (){
+                Route::match(['get','post'],'index','index')->name('fixed.asset');
+                Route::middleware(['permission:add_fixed_asset'])->group(function (){
+                    Route::match(['post','get'],'add-fixed-asset','create')->name('fixed.asset.add');
+                });
+                Route::middleware(['permission:add_fixed_asset_specification'])->group(function (){
+                    Route::match(['post','get'],'add-specification','createSpecification')->name('fixed.asset.specification');
+                });
+                Route::middleware(['permission:edit_fixed_asset_specification'])->group(function (){
+                    Route::match(['put','get'],'edit-specification/{fasid}','editSpecification')->name('edit.fixed.asset.specification');
+                });
+                Route::middleware(['permission:fixed_asset_list'])->group(function (){
+                    Route::get('show-fixed-asset-list','show')->name('fixed.asset.show');
+                });
+                Route::middleware(['permission:fixed_asset_edit'])->group(function (){
+                    Route::match(['put','get'],'edit/{fixedAssetID}','edit')->name('fixed.asset.edit');
+                });
+                Route::middleware(['permission:fixed_asset_delete'])->group(function (){
+                    Route::match(['delete'],'delete','destroy')->name('fixed.asset.delete');
+                });
 
+            });
         });
-    });
-    Route::controller(FixedAssetDistribution::class)->group(function (){
-        Route::middleware(['permission:fixed_asset_distribution'])->prefix('fixed-asset-distribution')->group(function (){
-            Route::match(['get','post'],'index','index')->name('fixed.asset.distribution');
-            Route::middleware(['permission:fixed_asset_with_reference_input'])->group(function (){
-                Route::match(['get','post'],'opening-input','openingInput')->name('fixed.asset.distribution.opening.input');
-                Route::post('get-fixed-asset-spec','getFixedAssetSpecification');
-                Route::post('add-fixed-asset-opening','addFixedAssetOpening');
-                Route::post('get-fixed-asset-opening','getFixedAssetOpening');
-                Route::post('edit-fixed-asset-opening-spec','editFixedAssetOpeningSpec');
-                Route::post('update-fixed-asset-opening-spec','updateFixedAssetOpeningSpec');
-                Route::delete('delete-fixed-asset-opening-spec','deleteFixedAssetOpeningSpec');
-                Route::put('final-update-fixed-asset-opening-spec','finalUpdateFixedAssetOpeningSpec')->name('fixed.asset.distribution.update');
-            });
-            Route::middleware(['permission:fixed_asset_opening_list'])->group(function (){
-                Route::match(['get'],'opening-list','openingList')->name('fixed.asset.distribution.opening.list');
-            });
-            Route::middleware(['permission:fixed_asset_opening_report'])->group(function (){
-                Route::get('opening-report','openingReportView')->name('fixed.asset.distribution.opening.report.view');
-            });
+        # 3.14.2 Fixed Asset Distribution
+        Route::controller(FixedAssetDistribution::class)->group(function (){
+            Route::middleware(['permission:fixed_asset_distribution'])->prefix('fixed-asset-distribution')->group(function (){
+                Route::match(['get','post'],'index','index')->name('fixed.asset.distribution');
+                Route::middleware(['permission:fixed_asset_with_reference_input'])->group(function (){
+                    Route::match(['get','post'],'opening-input','openingInput')->name('fixed.asset.distribution.opening.input');
+                    Route::post('get-fixed-asset-spec','getFixedAssetSpecification');
+                    Route::post('add-fixed-asset-opening','addFixedAssetOpening');
+                    Route::post('get-fixed-asset-opening','getFixedAssetOpening');
+                    Route::post('edit-fixed-asset-opening-spec','editFixedAssetOpeningSpec');
+                    Route::post('update-fixed-asset-opening-spec','updateFixedAssetOpeningSpec');
+                    Route::delete('delete-fixed-asset-opening-spec','deleteFixedAssetOpeningSpec');
+                    Route::put('final-update-fixed-asset-opening-spec','finalUpdateFixedAssetOpeningSpec')->name('fixed.asset.distribution.update');
+                });
+                Route::middleware(['permission:fixed_asset_opening_list'])->group(function (){
+                    Route::match(['get'],'opening-list','openingList')->name('fixed.asset.distribution.opening.list');
+                });
+                Route::middleware(['permission:fixed_asset_opening_report'])->group(function (){
+                    Route::get('opening-report','openingReportView')->name('fixed.asset.distribution.opening.report.view');
+                });
 
-            Route::middleware(['permission:fixed_asset_mrf'])->group(function (){});
-            Route::middleware(['permission:fixed_asset_gp'])->group(function (){});
-            Route::middleware(['permission:fixed_asset_issue'])->group(function (){});
-            Route::middleware(['permission:fixed_asset_damage'])->group(function (){});
-            Route::middleware(['permission:fixed_asset_issue_return'])->group(function (){});
+                Route::middleware(['permission:fixed_asset_mrf'])->group(function (){});
+                Route::middleware(['permission:fixed_asset_gp'])->group(function (){});
+                Route::middleware(['permission:fixed_asset_issue'])->group(function (){});
+                Route::middleware(['permission:fixed_asset_damage'])->group(function (){});
+                Route::middleware(['permission:fixed_asset_issue_return'])->group(function (){});
+            });
         });
     });
 });//3.0 End
