@@ -9,6 +9,15 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-4">
+                    @if(auth()->user()->hasPermission('control_panel'))
+                    <h5># Control Panel</h5>
+                    <ol>
+                        @if(auth()->user()->hasPermission('add_user_project_permission')) @endif
+                        <li><a class="text-decoration-none text-black" href="{!! route('add.user.project.permission') !!}">User Project Permission</a></li>
+                    </ol>
+                    @endif
+                </div>
+                <div class="col-md-4">
                     <h5># Sales Interface</h5>
                     <ol >
                     @if(auth()->user()->hasPermission('create_sales_team'))

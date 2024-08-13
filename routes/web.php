@@ -323,7 +323,11 @@ Route::group(['middleware' => ['auth']],function (){
     Route::controller(ControlPanelController::class)->group(function (){
         Route::middleware(['permission:control_panel'])->prefix('control-panel')->group(function (){
             Route::match(['get','post'],'index','index')->name('control.panel');
+            Route::middleware(['permission:add_user_project_permission'])->group(function (){
+                Route::match(['get','post'],'add-user-project-permission','userProjectPermission')->name('add.user.project.permission');
+            });
         });
+
     });//3.13 End
     # 3.14 Fixed Asset
     Route::controller(FixedAssetController::class)->group(function (){
