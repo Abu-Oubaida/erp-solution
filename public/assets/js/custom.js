@@ -35,7 +35,7 @@ if(window.location.port)
             // return false
             if (per.length > 0 && dir.length > 0)
             {
-                let url = window.location.origin + sourceDir + "/user-per-add";
+                let url = window.location.origin + sourceDir + "/super-admin/user-per-add";
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,
