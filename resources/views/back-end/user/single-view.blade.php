@@ -95,7 +95,7 @@
                                                         @csrf
                                                         <div class="input-group float-end">
                                                             <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
-                                                            <select class="form-control" name="user_status" id="forwaed">
+                                                            <select class="form-control select-search cursor-pointer" name="user_status" id="forwaed">
                                                                 <option value="">--Select Option--</option>
                                                                 <option value="1" @if($user->status) selected @endif>Active</option>
                                                                 <option value="0" @if(!($user->status)) selected @endif>Inactive</option>
@@ -109,7 +109,7 @@
                                                         @csrf
                                                         <div class="input-group float-end">
                                                             <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
-                                                            <select class="form-control" name="user_role" id="forwaed">
+                                                            <select class="form-control select-search cursor-pointer" name="user_role" id="forwaed">
                                                                 <option value="">--Select Option--</option>
                                                                 @if(isset($roles) && count($roles))
                                                                     @foreach($roles as $r)
@@ -130,7 +130,7 @@
                                                         @method('PUT')
                                                         <div class="input-group float-end">
                                                             <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
-                                                            <select class="form-control" name="designation_id" id="">
+                                                            <select class="form-control select-search cursor-pointer" name="designation_id" id="">
                                                                 <option value="">--Select Option--</option>
                                                                 @if(isset($designations) && count($designations))
                                                                     @foreach($designations as $dig)
@@ -149,7 +149,7 @@
                                                         @method('PUT')
                                                         <div class="input-group float-end">
                                                             <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
-                                                            <select class="form-control" name="dept_id" id="">
+                                                            <select class="form-control select-search cursor-pointer" name="dept_id" id="">
                                                                 <option value="">--Select Option--</option>
                                                                 @if(isset($deptLists) && count($deptLists))
                                                                     @foreach($deptLists as $d)
@@ -170,7 +170,7 @@
                                                         @method('PUT')
                                                         <div class="input-group float-end">
                                                             <input type="hidden" name="id" value="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
-                                                            <select class="form-control" name="branch_id" id="">
+                                                            <select class="form-control select-search cursor-pointer" name="branch_id" id="">
                                                                 <option value="">--Select Option--</option>
                                                                 @if(isset($branches) && count($branches))
                                                                     @foreach($branches as $branch)
@@ -236,7 +236,7 @@
                                                         </select>
 
                                                         <label for="parentPermission">Parent Permission</label>
-                                                        <select class="form-control" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
+                                                        <select class="form-control select-search cursor-pointer" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
                                                             <option value="">--Select Option--</option>
                                                             @if($permissionParents)
                                                                 @foreach($permissionParents as $data)
@@ -348,7 +348,7 @@
                                     @else
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <select class="form-control" id="per" ref="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
+                                                <select class="form-control select-search cursor-pointer" id="per" ref="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
                                                     <option value="">--Permission--</option>
                                                     <option value="1">View Only</option>
                                                     <option value="2">Read/Write</option>
@@ -356,7 +356,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-5">
-                                                <select class="form-control" id="dir">
+                                                <select class="form-control select-search cursor-pointer" id="dir">
                                                     <option value="">--Select folder--</option>
                                                     @if(@$fileManagers && count($fileManagers))
                                                         @foreach($fileManagers as $file)

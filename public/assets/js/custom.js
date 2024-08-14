@@ -902,7 +902,7 @@ if(window.location.port)
                         {
                             alert("Error:"+response.message)
                             // Handle error
-                            console.log('Error:', response.message)
+                            // console.log('Error:', response.message)
                         }
                         return false
                     },
@@ -938,7 +938,7 @@ if(window.location.port)
                             {
                                 alert("Error:"+response.message)
                                 // Handle error
-                                console.log('Error:', response.message)
+                                // console.log('Error:', response.message)
                             }
                             return false
                         }
@@ -971,7 +971,7 @@ if(window.location.port)
                         {
                             alert("Error:"+response.message)
                             // Handle error
-                            console.log('Error:', response.message)
+                            // console.log('Error:', response.message)
                         }
                         return false
 
@@ -1005,12 +1005,152 @@ if(window.location.port)
                         {
                             alert("Error:"+response.message)
                             // Handle error
-                            console.log('Error:', response.message)
+                            // console.log('Error:', response.message)
                         }
                         return false
                     }
                 })
             },
+            userProjectPermissionCopy:function (e)
+            {
+                if(confirm('Are you sure to copy all permissions?'))
+                {
+                    const copy_user = $('#copy_user').val()
+                    const user_id = $('#user_id').val()
+                    if (copy_user.length === 0 || user_id.length === 0)
+                    {
+                        alert('All filed are required')
+                        return false;
+                    }
+                    const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-copy"
+                    $.ajax({
+                        url: url,
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        method: 'POST',
+                        data: {'copy_user_id':copy_user,'user_id':user_id},
+                        success:function (response)
+                        {
+                            if (response.status === 'success')
+                            {
+                                alert(response.message)
+                                const view = response.data
+                                $('#user-permission-list').html(view)
+                            }
+                            if (response.status === 'error')
+                            {
+                                alert("Error:"+response.message)
+                            }
+                            return false
+                        }
+                    })
+                }
+            },
+            userProjectPermissionAddAll:function (e)
+            {
+                if(confirm('Are you sure add all project permission?'))
+                {
+                    const user_id = $('#user_id').val()
+                    if (user_id.length === 0)
+                    {
+                        alert('All filed are required')
+                        return false;
+                    }
+                    const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-add-all"
+                    $.ajax({
+                        url: url,
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        method: 'POST',
+                        data: {'user_id':user_id},
+                        success:function (response)
+                        {
+                            if (response.status === 'success')
+                            {
+                                alert(response.message)
+                                const view = response.data
+                                $('#user-permission-list').html(view)
+                            }
+                            if (response.status === 'error')
+                            {
+                                alert("Error:"+response.message)
+                                // Handle error
+                                // console.log('Error:', response.message)
+                            }
+                            return false
+                        }
+                    })
+                }
+                return false
+            },
+            userProjectPermissionDelete:function (e)
+            {
+                if(confirm('Are you sure delete this data?'))
+                {
+                    const value = $(e).attr('ref')
+                    if (value.length === 0)
+                    {
+                        return false
+                    }
+                    const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-delete"
+                    $.ajax({
+                        url: url,
+                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        method: 'POST',
+                        data: {'value':value},
+                        success:function (response)
+                        {
+                            if (response.status === 'success')
+                            {
+                                alert(response.message)
+                                const view = response.data
+                                $('#user-permission-list').html(view)
+                            }
+                            if (response.status === 'error')
+                            {
+                                alert("Error:"+response.message)
+                                // Handle error
+                                // console.log('Error:', response.message)
+                            }
+                            return false
+                        }
+                    })
+                }
+                return false
+            },
+            userProjectPermissionDeleteAll:function (e)
+            {
+                if(confirm('Are you sure to delete all permission for this user?'))
+                {
+                    const user_id = $('#user_id').val()
+                    if (user_id.length === 0)
+                    {
+                        return false
+                    }
+                    const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-delete-all"
+                    $.ajax({
+                        url: url,
+                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        method: 'POST',
+                        data: {'user_id':user_id},
+                        success:function (response)
+                        {
+                            if (response.status === 'success')
+                            {
+                                alert(response.message)
+                                const view = response.data
+                                $('#user-permission-list').html(view)
+                            }
+                            if (response.status === 'error')
+                            {
+                                alert("Error:"+response.message)
+                                // Handle error
+                                // console.log('Error:', response.message)
+                            }
+                            return false
+                        }
+                    })
+                }
+                return false
+            }
 
         }
         function checkFileExists(url, callback) {

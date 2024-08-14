@@ -19,7 +19,7 @@
                                 <option value="">Pick a state...</option>
                                 @if(count($employees))
                                     @foreach($employees as $e)
-                                        <option @if(Request::get('e') !== null && Request::get('e') == $e->id)selected @endif value="{!! $e->id !!}">{!! $e->name !!} ({!! $e->getDesignation->title !!}, {!! $e->getDepartment->dept_name !!})</option>
+                                        <option @if(Request::get('e') !== null && Request::get('e') == $e->id)selected @endif value="{!! $e->id !!}">{!! $e->name !!} (ID: {!! $e->employee_id !!}, {!! $e->getDesignation->title !!}, {!! $e->getDepartment->dept_name !!})</option>
                                     @endforeach
                                 @endif
                             </select>
@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="row" id="user-project-permission-add-list">
                     </div>
                 </div>

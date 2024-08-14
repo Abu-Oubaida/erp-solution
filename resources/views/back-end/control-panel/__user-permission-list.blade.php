@@ -7,7 +7,7 @@
         <thead>
         <tr>
             <th>SL.</th>
-            <th>User Name</th>
+{{--            <th>User Name</th>--}}
             <th>Project Name</th>
             <th>Action</th>
         </tr>
@@ -18,16 +18,12 @@
             @foreach($userProjectPermissions as $upp)
                 <tr>
                     <td>{!! $n++ !!}</td>
-                    <td>{!! $upp->user->name !!}</td>
+{{--                    <td>{!! $upp->user->name !!}</td>--}}
                     <td>{!! $upp->projects->branch_name !!}</td>
                     <td>
                         @if(auth()->user()->hasPermission('user_project_permission_delete'))
-                            <form action="{{route('user.project.permission.delete')}}" class="display-inline" method="post">
-                                @method('delete')
-                                @csrf
-                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($upp->id) !!}">
-                                <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
-                            </form>
+{{--                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($upp->id) !!}">--}}
+                                <button class="text-danger border-0 inline-block bg-none" ref="{!! $upp->id !!}" onclick="return Obj.userProjectPermissionDelete(this)"><i class="fas fa-trash"></i></button>
                         @endif
                     </td>
                 </tr>
