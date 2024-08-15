@@ -108,6 +108,7 @@ return array(
     'App\\Models\\Fixed_asset' => $baseDir . '/app/Models/Fixed_asset.php',
     'App\\Models\\Fixed_asset_delete_history' => $baseDir . '/app/Models/Fixed_asset_delete_history.php',
     'App\\Models\\Fixed_asset_opening_balance' => $baseDir . '/app/Models/Fixed_asset_opening_balance.php',
+    'App\\Models\\Fixed_asset_opening_balance_docment' => $baseDir . '/app/Models/Fixed_asset_opening_balance_docment.php',
     'App\\Models\\Fixed_asset_opening_with_spec' => $baseDir . '/app/Models/Fixed_asset_opening_with_spec.php',
     'App\\Models\\Op_reference_type' => $baseDir . '/app/Models/Op_reference_type.php',
     'App\\Models\\Permission' => $baseDir . '/app/Models/Permission.php',

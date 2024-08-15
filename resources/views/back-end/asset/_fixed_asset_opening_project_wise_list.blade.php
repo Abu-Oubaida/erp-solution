@@ -23,9 +23,9 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @if(count($project_wise_ref))
+                        @if(count($fixed_asset_with_ref_report_list))
                             @php($n=1)
-                            @foreach($project_wise_ref as $pwr)
+                            @foreach($fixed_asset_with_ref_report_list as $pwr)
                                 <tr>
                                     <td>{!! $n++ !!}</td>
                                     <td>{!! date('d-M-Y', strtotime($pwr->date)) !!}</td>

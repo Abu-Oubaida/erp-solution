@@ -26,15 +26,9 @@
                         </tr>
                         </thead>
                         <tbody>
-{{--                        @php--}}
-{{--                            foreach ($final_opening->withSpecifications as $opm)--}}
-{{--                            {--}}
-{{--                                var_dump((float)($opm->qty * $opm-->rate));--}}
-{{--                            }--}}
-{{--                        @endphp--}}
-                        @if(isset($final_opening->withSpecifications) && count($final_opening->withSpecifications))
+                        @if(isset($withRefData->withSpecifications) && count($withRefData->withSpecifications))
                             @php($n=1)
-                            @foreach($final_opening->withSpecifications as $opm)
+                            @foreach($withRefData->withSpecifications as $opm)
                                 <tr>
                                     <td>{!! $n++ !!}</td>
                                     <td>{!! date('d-M-Y', strtotime($opm->date)) !!}</td>
@@ -52,20 +46,28 @@
                                     </td>
                                 </tr>
                             @endforeach
+                        @else
+                            <tr>
+                                <td class="text-center" colspan="12">Not Found!</td>
+                            </tr>
                         @endif
                         </tbody>
                     </table>
                 </div>
-                <form action="{!! route('fixed.asset.distribution.update') !!}" method="post">
+                <form action="{!! route('fixed.asset.distribution.update') !!}" method="post" enctype="multipart/form-data">
                     @csrf
                     @method('put')
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-6">
                             <div>
                                 <label for="remarks">Narration:</label>
                                 <textarea class="form-control form-control-sm"  id="narration" name="narration">{!! (old('narration')?old('narration'):'') !!}</textarea>
-                                <input type="hidden" name="id" value="{!! $final_opening->id !!}">
+                                <input type="hidden" name="id" value="{!! $withRefData->id !!}">
                             </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="remarks">Attachments:</label>
+                            <input class="form-control" type="file" name="attachment" id="attachment" multiple>
                         </div>
                         <div class="col-md-4">
                             <button class="btn btn-lg btn-outline-success float-end mt-4" type="submit"><i class="fas fa-save"></i> Final Update</button>

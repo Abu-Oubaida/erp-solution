@@ -25,7 +25,7 @@
                     <option value="">Pick a state...</option>
                     @if(count($projects))
                         @foreach($projects as $p)
-                            <option @if(Request::get('project') !== null && Request::get('project') == $p->id)selected @endif value="{!! $p->id !!}">{!! $p->branch_name !!}</option>
+                            <option @if(Request::get('project') !== null && Request::get('project') == $p->projects->id)selected @endif value="{!! $p->projects->id !!}">{!! $p->projects->branch_name !!}</option>
                         @endforeach
                     @endif
                 </select>
@@ -53,10 +53,10 @@
                 </button>
             </div>
             <div id="fixed-asset-body">
-                @if(isset($project_wise_ref))
+                @if(isset($fixed_asset_with_ref_report_list))
                     @include('back-end.asset._fixed_asset_opening_project_wise_list')
                 @endif
-                @if((isset($reference) || isset($branchName)) && !(isset($project_wise_ref)))
+                @if((isset($fixed_assets) && isset($withRefData)) )
                     @include('back-end.asset._fixed_asset_opening_body')
                 @endif
             </div>

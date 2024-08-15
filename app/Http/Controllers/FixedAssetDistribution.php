@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\branch;
 use App\Models\Fixed_asset;
 use App\Models\Fixed_asset_opening_balance;
+use App\Models\Fixed_asset_opening_balance_document;
 use App\Models\Fixed_asset_opening_with_spec;
 use App\Models\fixed_asset_specifications;
 use App\Models\Op_reference_type;
+use App\Models\userProjectPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -17,86 +19,257 @@ use function PHPUnit\Framework\isEmpty;
 
 class FixedAssetDistribution extends Controller
 {
+    private $user;
+    private $document_path = "documents/fixed-asset/";
+    public function __construct(Request $request)
+    {
+        $this->middleware(function ($request, $next) {
+            $this->user= Auth::user();
+            return $next($request);
+        });
+    }
     //
-    public function index()
+
+    private function getUserWiseProjects($user_id)
     {
+        try {
+            return userProjectPermission::with(['projects'])->where('company_id',$this->user->company_id)->where('user_id',$user_id)->get();
+        }catch (\Throwable $exception) {
+            return [];
+        }
 
     }
-
-    public function fixedAssetDistribution(Request $request)
-    {
-
-    }
-
     public function openingInput(Request $request)
     {
         try {
-            $user = Auth::user();
-            $final_opening=null;
-            $branchName = null;
             $reference = $request->get('ref');
-            $branch = $request->get('project');
-            $r_type = $request->get('rt');
-            $project_wise_ref = null;
-
-            if (!empty($branch))
+            $branch_id = $request->get('project');
+            $r_type_id = $request->get('rt');
+            $projects = $this->getUserWiseProjects($this->user->id);
+            $ref_types = Op_reference_type::where('status',1)->where('company_id',$this->user->company_id)->get();
+            if (empty($reference) && empty($branch_id) && empty($r_type_id))
             {
-                $branch = branch::where('status',1)->where('company_id',$user->company_id)->where('id',$request->get('project'))->first();
-                if (is_null($branch))
+                return view('back-end.asset.fixed-asset-opening',compact('projects','ref_types'));
+            }
+            else
+            {
+                $fixed_asset_with_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('company_id',$this->user->company_id);
+                if (!empty($reference))
                 {
-                    return back()->with('error',"Invalid Project name");
+                    $withRefData = $fixed_asset_with_ref->where('references',$reference)->first();
+                    $fixed_assets = Fixed_asset::where('company_id',$this->user->company_id)->where('status',1)->get();
+                    if ($withRefData && $withRefData->status == 5)
+                    {
+                        $for_project_id = $withRefData->branch_id;
+                        $ref_type_id = $withRefData->ref_type_id;
+                        //Input-----------------
+                        return view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','ref_types','withRefData','reference','for_project_id','ref_type_id'));
+                    }
+                    else if (empty($withRefData))
+                    {
+                        if (empty($for_project_id) || empty($r_type_id))
+                        {
+                            return redirect()->back()->with('error','Project or Reference Type are required.');
+                        }
+                        $for_project_id = $branch_id;
+                        $ref_type_id = $r_type_id;
+                        //Input-----------------
+                        return view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','ref_types','withRefData','reference','for_project_id','ref_type_id'));
+                    }
+                    else{
+                        $fixed_asset_with_ref_report_list = $fixed_asset_with_ref->where('references',$reference)->get();
+                    }
                 }
                 else{
-                    $branchName = $branch->branch_name;
+                    if (empty($branch_id) && !empty($r_type_id))
+                    {
+                        $fixed_asset_with_ref_report_list = $fixed_asset_with_ref->where('ref_type_id',$r_type_id)->get();
+                    }
+                    else if (!empty($branch_id) && empty($r_type_id))
+                    {
+                        $fixed_asset_with_ref_report_list = $fixed_asset_with_ref->where('branch_id',$branch_id)->get();
+                    }
+                    else if (!empty($branch_id) && !empty($r_type_id))
+                    {
+                        $fixed_asset_with_ref_report_list = $fixed_asset_with_ref->where('branch_id',$branch_id)->where('ref_type_id',$r_type_id)->get();
+                    }
                 }
+                return view('back-end.asset.fixed-asset-opening',compact('projects','ref_types','fixed_asset_with_ref_report_list'));
 
-                $final_opening = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('branch_id',$branch->id)->where('references',$reference)->orderBy('created_at','DESC')->first();
-            }
-            $projects = branch::where('company_id',$user->company_id)->where('status',1)->get();
-            $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->get();
-            $ref_types = Op_reference_type::where('status',1)->where('company_id',$user->company_id)->get();
-            if (!empty($final_opening) && $final_opening->status == 5)
-            {
-                if (empty($final_opening) && Fixed_asset_opening_balance::where('references',$reference)->first())
-                {
-                    return redirect(route('fixed.asset.distribution.opening.input'))->with('warning','Duplicate reference number found!');
-                }
-                return view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','reference','branchName','final_opening','ref_types','r_type'));
-            }
-            else {
-                if (!empty($r_type) && !empty($branch) && empty($reference))
-                {
-//                    dd($branch);
-                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('branch_id',$branch->id)->where('company_id',$user->company_id)->get();
-//                    dd($project_wise_ref);
-                }
-                else if (empty($r_type) && !empty($branch) && empty($reference))
-                {
-//                    dd('2');
-                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('branch_id',$branch->id)->where('company_id',$user->company_id)->get();
-                }
-                else if (!empty($r_type) && empty($branch) && empty($reference))
-                {
-//                    dd('3');
-                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('company_id',$user->company_id)->get();
-                }
-                else if (!empty($branch) && !empty($reference) && !empty($final_opening))
-                {
-//                    dd('4');
-                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy'])->where('references',$reference)->where('branch_id',$branch->id)->get();
-                }
             }
 
-            return view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','reference','branchName','project_wise_ref','ref_types','r_type'));
+
+//            //old code
+//            if (!empty($branch))
+//            {
+//                $for_project = branch::where('status',1)->where('company_id',$user->company_id)->where('id',$request->get('project'))->first();
+//
+//                if (is_null($for_project))
+//                {
+//                    return back()->with('error',"Invalid Project name");
+//                }
+//                else{
+//                    $branchName = $for_project->branch_name;
+//                }
+//
+//                $final_opening = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('branch_id',$for_project->id)->where('references',$reference)->orderBy('created_at','DESC')->first();
+//
+//            }
+//            $projects = $this->getUserWiseProjects($this->user->id);
+//            $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->get();
+//            $ref_types = Op_reference_type::where('status',1)->where('company_id',$user->company_id)->get();
+//            if (!empty($final_opening) && $final_opening->status == 5)
+//            {
+//                //Input-----------------
+//                $reference_type_id = $final_opening->reference_type_id;
+//                if (empty($final_opening) && Fixed_asset_opening_balance::where('references',$reference)->first())
+//                {
+//                    return redirect(route('fixed.asset.distribution.opening.input'))->with('warning','Duplicate reference number found!');
+//                }
+//                return view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','reference','branchName','ref_types','r_type','for_project','reference_type_id'));
+//            }
+//            else {
+//                //Report------------------------
+//                if (!empty($r_type) && !empty($branch) && empty($reference))
+//                {
+//                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('branch_id',$for_project->id)->where('company_id',$user->company_id)->get();
+//                }
+//                else if (empty($r_type) && !empty($branch) && empty($reference))
+//                {
+//                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('branch_id',$for_project->id)->where('company_id',$user->company_id)->get();
+//                }
+//                else if (!empty($r_type) && empty($branch) && empty($reference))
+//                {
+//                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('company_id',$user->company_id)->get();
+//                }
+//                else if (!empty($branch) && !empty($reference) && !empty($final_opening))
+//                {
+//                    $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy'])->where('references',$reference)->where('branch_id',$for_project->id)->get();
+//                }
+//            }
+
+
         }catch (Throwable $exception){
             return back()->with('error', $exception->getMessage());
         }
     }
-
-    private function openingStore(Request $request)
+    public function getFixedAssetOpening(Request $request)
     {
+        try {
+            $user = Auth::user();
+            $request->validate([
+                'ref'=>['sometimes','nullable','string',],
+                'project'=>['sometimes','nullable','string',Rule::exists('branches','id')->where(function ($query) use ($request) {$query->where('status',1);})],
+                'r_type'=>['sometimes','nullable','string',Rule::exists('op_reference_types','id')->where(function ($query) use ($request) {$query->where('status',1);})],
+            ]);
+            if ($request->isMethod('post'))
+            {
+                extract($request->post());
+                $reference = $ref;
+                if (empty($ref))
+                {
+                    //Report-------------
+                    if (!empty($r_type) && !empty($project))
+                    {
+                        $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('branch_id',$project)->where('company_id',$user->company_id)->get();
+                        //View................List
+                        $view = view('back-end/asset/_fixed_asset_opening_project_wise_list',compact('project_wise_ref'))->render();
+                        return \response()->json([
+                            'status'=>'success',
+                            'data'=>$view,
+                            'message'=>'Request processed successfully.'
+                        ],200);
+                    }
+                    if (empty($r_type) && !empty($project))
+                    {
+                        $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('branch_id',$project)->where('company_id',$user->company_id)->get();
+                        //View................List
+                        $view = view('back-end/asset/_fixed_asset_opening_project_wise_list',compact('project_wise_ref'))->render();
+                        return \response()->json([
+                            'status'=>'success',
+                            'data'=>$view,
+                            'message'=>'Request processed successfully.'
+                        ],200);
+                    }
+                    if (!empty($r_type) && empty($project))
+                    {
+                        $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('company_id',$user->company_id)->get();
+                        //View................List
+                        $view = view('back-end/asset/_fixed_asset_opening_project_wise_list',compact('project_wise_ref'))->render();
+                        return \response()->json([
+                            'status'=>'success',
+                            'data'=>$view,
+                            'message'=>'Request processed successfully.'
+                        ],200);
+                    }
+                    return \response()->json([
+                        'status'=>'warning',
+                        'message'=>'Work Processing..... when reference is null.',
+                    ],200);
+                }
+                $for_project = branch::where('id',$project)->where('company_id',$user->company_id)->where('status',1)->first();
+                $branchName = $for_project->branch_name;
+                $fa_opening = Fixed_asset_opening_balance::with(['withSpecifications','branch'])->where('references',$reference)->where('company_id',$user->company_id)->where('branch_id',$project)->first();
+                $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->get();
+                if ($fa_opening && $fa_opening->status == 5)//processing
+                {
+                    //Input----------------
+//                    reference_type_id
+                    $final_opening = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('branch_id',$project)->where('references',$reference)->orderBy('created_at','DESC')->first();
+                    //View............Body
+                    $view = view('back-end.asset._fixed_asset_opening_body',compact('final_opening','fa_opening','reference','fixed_assets','branchName','r_type','for_project'))->render();
+                }
+                else{
+                    //Report--------------
+                    if ($ref_via_search = Fixed_asset_opening_balance::with(['branch'])->where('references',$reference)->where('company_id',$user->company_id)->first())
+                    {
+                        $msg = 'This reference already exists for '.$ref_via_search->branch->branch_name;
+                        if ($ref_via_search->branch_id == $project)
+                        {
+                            $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('references',$reference)->where('branch_id',$project)->where('company_id',$user->company_id)->get();
+                            //View................List
+                            $view = view('back-end/asset/_fixed_asset_opening_project_wise_list',compact('project_wise_ref'))->render();
+                            return \response()->json([
+                                'status'=>'success',
+                                'data'=>$view,
+                                'message'=>'Request processed successfully.'
+                            ],200);
+                        }
+                        return \response()->json([
+                            'status'=>'warning',
+                            'message'=>$msg,
+                        ],200);
+                    }
+                    if (empty($r_type))
+                    {
+                        return \response()->json([
+                            'status'=>'warning',
+                            'message'=>"Reference type not found.",
+                        ],200);
+                    }
+                    //View................Body
+                    $view = view('back-end.asset._fixed_asset_opening_body',compact('fa_opening','reference','fixed_assets','branchName','r_type','for_project'))->render();
+                }
 
+                return \response()->json([
+                    'status'=>'success',
+                    'data'=>$view,
+                    'message'=>'Request processed successfully.'
+                ],200);
+            }
+            return \response()->json([
+                'status'=>'error',
+                'message'=>'Request not supported!'
+            ],200);
+        }catch (\Throwable $exception)
+        {
+            return \response()->json([
+                'status'=>'error',
+                'message'=> $exception->getMessage(),
+            ],200);
+        }
     }
+
 
     public function getFixedAssetSpecification(Request $request)
     {
@@ -204,111 +377,6 @@ class FixedAssetDistribution extends Controller
 
                 $final_opening = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('branch_id',$project_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
                 $view = view('back-end.asset._fixed_asset_opening_body_list',compact('final_opening'))->render();
-                return \response()->json([
-                    'status'=>'success',
-                    'data'=>$view,
-                    'message'=>'Request processed successfully.'
-                ],200);
-            }
-            return \response()->json([
-                'status'=>'error',
-                'message'=>'Request not supported!'
-            ],200);
-        }catch (\Throwable $exception)
-        {
-            return \response()->json([
-                'status'=>'error',
-                'message'=> $exception->getMessage(),
-            ],200);
-        }
-    }
-    public function getFixedAssetOpening(Request $request)
-    {
-        try {
-            $user = Auth::user();
-            $request->validate([
-                'ref'=>['sometimes','nullable','string',],
-                'project'=>['sometimes','nullable','string',Rule::exists('branches','id')->where(function ($query) use ($request) {$query->where('status',1);})],
-                'r_type'=>['sometimes','nullable','string',Rule::exists('op_reference_types','id')->where(function ($query) use ($request) {$query->where('status',1);})],
-            ]);
-            if ($request->isMethod('post'))
-            {
-                extract($request->post());
-                $reference = $ref;
-                if (empty($ref))
-                {
-                    if (!empty($r_type) && !empty($project))
-                    {
-                        $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('branch_id',$project)->where('company_id',$user->company_id)->get();
-                        //View................List
-                        $view = view('back-end/asset/_fixed_asset_opening_project_wise_list',compact('project_wise_ref'))->render();
-                        return \response()->json([
-                            'status'=>'success',
-                            'data'=>$view,
-                            'message'=>'Request processed successfully.'
-                        ],200);
-                    }
-                    if (empty($r_type) && !empty($project))
-                    {
-                        $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('branch_id',$project)->where('company_id',$user->company_id)->get();
-                        //View................List
-                        $view = view('back-end/asset/_fixed_asset_opening_project_wise_list',compact('project_wise_ref'))->render();
-                        return \response()->json([
-                            'status'=>'success',
-                            'data'=>$view,
-                            'message'=>'Request processed successfully.'
-                        ],200);
-                    }
-                    if (!empty($r_type) && empty($project))
-                    {
-                        $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('ref_type_id',$r_type)->where('company_id',$user->company_id)->get();
-                        //View................List
-                        $view = view('back-end/asset/_fixed_asset_opening_project_wise_list',compact('project_wise_ref'))->render();
-                        return \response()->json([
-                            'status'=>'success',
-                            'data'=>$view,
-                            'message'=>'Request processed successfully.'
-                        ],200);
-                    }
-                    return \response()->json([
-                        'status'=>'warning',
-                        'message'=>'Work Processing..... when reference is null.',
-                    ],200);
-                }
-                $branchName = $project;
-                $fa_opening = Fixed_asset_opening_balance::with(['withSpecifications','branch'])->where('references',$reference)->where('company_id',$user->company_id)->where('branch_id',$project)->first();
-                $projects = branch::where('company_id',$user->company_id)->where('status',1)->get();
-                $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->get();
-                if ($fa_opening && $fa_opening->status == 5)//processing
-                {
-                    $final_opening = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('branch_id',$project)->where('references',$reference)->orderBy('created_at','DESC')->first();
-                    //View............Body
-                    $view = view('back-end.asset._fixed_asset_opening_body',compact('final_opening','fa_opening','reference','projects','fixed_assets','branchName','r_type'))->render();
-                }
-                else{
-                    if ($ref_via_search = Fixed_asset_opening_balance::with(['branch'])->where('references',$reference)->where('company_id',$user->company_id)->first())
-                    {
-                        $msg = 'This reference already exists for '.$ref_via_search->branch->branch_name;
-                        if ($ref_via_search->branch_id == $project)
-                        {
-                            $project_wise_ref = Fixed_asset_opening_balance::with(['withSpecifications','branch','createdBy','updatedBy','refType'])->where('references',$reference)->where('branch_id',$project)->where('company_id',$user->company_id)->get();
-                            //View................List
-                            $view = view('back-end/asset/_fixed_asset_opening_project_wise_list',compact('project_wise_ref'))->render();
-                            return \response()->json([
-                                'status'=>'success',
-                                'data'=>$view,
-                                'message'=>'Request processed successfully.'
-                            ],200);
-                        }
-                        return \response()->json([
-                            'status'=>'warning',
-                            'message'=>$msg,
-                        ],200);
-                    }
-                    //View................Body
-                    $view = view('back-end.asset._fixed_asset_opening_body',compact('fa_opening','reference','projects','fixed_assets','branchName','r_type'))->render();
-                }
-
                 return \response()->json([
                     'status'=>'success',
                     'data'=>$view,
@@ -452,16 +520,47 @@ class FixedAssetDistribution extends Controller
     {
         $request->validate([
             'id' => ['required','string',Rule::exists('fixed_asset_opening_balances','id')->where('status',5)],
+            'attachment.*' => ['sometimes','nullable','file','max:512000'],
         ]);
         try {
             if ($request->isMethod('put'))
             {
                 extract($request->post());
-                $user = Auth::user();
-                Fixed_asset_opening_balance::where('id',$id)->update([
+
+                if (Fixed_asset_opening_with_spec::where('opening_asset_id',$id)->where('company_id',$this->user->company_id)->count() <= 0)
+                {
+                    return back()->with('warning','There is no fixed asset opening balances for this reference.');
+                }
+                $insert = Fixed_asset_opening_balance::where('id',$id)->update([
                     'narration'=>$narration,
                     'status'=>1,//1=active
+                    'updated_by'=>$this->user->id,
+                    'updated_at'=>now(),
                 ]);
+                if ($insert)
+                {
+                    if ($request->hasFile('attachment'))
+                    {
+                        $f_a_o_b = Fixed_asset_opening_balance::with(['refType'])->where('id', $id)->first();
+                        $files = $request->file('attachment');
+                        foreach ($files as $file)
+                        {
+                            $fileName = $f_a_o_b->refType->name."_".$f_a_o_b->references."_".$file->getClientOriginalName();
+                            $file_location = $file->move($this->document_path,$fileName); // Adjust the storage path as needed
+                            if (!$file_location)
+                            {
+                                return redirect()->back()->with('error', 'Documents uploaded error.');
+                            }
+                            Fixed_asset_opening_balance_document::create([
+                                'company_id'=>$this->user->company_id,
+                                'opening_asset_id'=>$f_a_o_b->id,
+                                'document_name'=>$fileName,
+                                'document_url'=>$this->document_path,
+                                'created_by'=>$this->user->id,
+                            ]);
+                        }
+                    }
+                }
                 return redirect(route('fixed.asset.distribution.opening.input'))->with('success','Data final update successfully.');
             }
         }catch (\Throwable $exception)

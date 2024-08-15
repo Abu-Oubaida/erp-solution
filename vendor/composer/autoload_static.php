@@ -767,6 +767,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\Fixed_asset' => __DIR__ . '/../..' . '/app/Models/Fixed_asset.php',
         'App\\Models\\Fixed_asset_delete_history' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_delete_history.php',
         'App\\Models\\Fixed_asset_opening_balance' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_opening_balance.php',
+        'App\\Models\\Fixed_asset_opening_balance_docment' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_opening_balance_docment.php',
         'App\\Models\\Fixed_asset_opening_with_spec' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_opening_with_spec.php',
         'App\\Models\\Op_reference_type' => __DIR__ . '/../..' . '/app/Models/Op_reference_type.php',
         'App\\Models\\Permission' => __DIR__ . '/../..' . '/app/Models/Permission.php',
