@@ -4,6 +4,7 @@
 /public/image
 /public/image/*
 /public/file-manager/*
+/public/documents/*
 config/app.php
 /storage/*.key
 .env
