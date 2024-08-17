@@ -60,6 +60,9 @@
                                     <td>{!! date('d-M-Y', strtotime($pwr->updated_at)) !!}</td>
                                     <td>
                                         <button class="text-success border-0 inline-block bg-none" ref="" onclick=""><i class="fas fa-eye"></i></button>
+                                        @if($pwr->status == 5)
+                                            <a href="{!! url(route('fixed.asset.distribution.opening.input',['ref'=>$pwr->references,'project'=>$pwr->branch->id,'rt'=>$pwr->refType->id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>
+                                        @endif
 {{--                                        <button class="text-success border-0 inline-block bg-none" ref="{!! $opm->id !!}" onclick="return Obj.fixedAssetOpeningSpecEdit(this)"><i class="fas fa-edit"></i></button>--}}
 {{--                                        <button class="text-danger border-0 inline-block bg-none" ref="{!! $opm->id !!}" onclick="return Obj.deleteFixedAssetOpeningSpec(this)"><i class="fas fa-trash"></i></button>--}}
                                     </td>
