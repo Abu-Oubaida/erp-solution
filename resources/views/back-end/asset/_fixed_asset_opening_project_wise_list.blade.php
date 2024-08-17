@@ -1,7 +1,7 @@
 <div class="col-md-12">
     <div class="card mb-4">
         <div class="card-body">
-            @if(isset($project_wise_ref))
+            @if(isset($fixed_asset_with_ref_report_list))
             <div class="row">
                 <div class="col-md-12">
                     <table id="datatablesSimple" class="table table-hover table-bordered">
@@ -14,6 +14,7 @@
                             <th>Project</th>
                             <th>Status</th>
                             <th>Resource Count</th>
+                            <th>Documents</th>
                             <th>Narration</th>
                             <th>Created By</th>
                             <th>Created Date</th>
@@ -31,7 +32,7 @@
                                     <td>{!! date('d-M-Y', strtotime($pwr->date)) !!}</td>
                                     <td>{!! $pwr->refType->name !!}</td>
                                     <td>{!! $pwr->references !!}</td>
-                                    <td>{!! $pwr->branch->branch_name !!})</td>
+                                    <td>{!! $pwr->branch->branch_name !!}</td>
                                     <td>
                                         @if($pwr->status == 1) <span class="badge bg-success">Active</span>
                                         @elseif($pwr->status == 2) <span class="badge bg-info">Approved</span>
@@ -42,6 +43,16 @@
                                         @endif
                                     </td>
                                     <td>{!! count($pwr->withSpecifications) !!}</td>
+                                    <td>
+                                        @if(isset($pwr->attestedDocuments) && count($pwr->attestedDocuments))
+                                            @php($i = 1)
+                                            <ol>
+                                            @foreach($pwr->attestedDocuments as $d)
+                                                <li><a href="{!! url($d->document_url.$d->document_name) !!}" target="_blank">Document {!! $i++ !!}</a></li>
+                                            @endforeach
+                                            </ol>
+                                        @endif
+                                    </td>
                                     <td>{!! $pwr->narration !!}</td>
                                     <td>{!! (isset($pwr->createdBy->name))?$pwr->createdBy->name:'-' !!}</td>
                                     <td>{!! date('d-M-Y', strtotime($pwr->created_at)) !!}</td>

@@ -1,10 +1,10 @@
 let Obj = {};
-if(window.location.port)
+let hostname = window.location.hostname;
+if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 {
-    sourceDir = "";
+    sourceDir = "/chl/public"
 }else{
-    // sourceDir = "/chl/public";
-    sourceDir = "";
+    sourceDir = ""
 }
 (function ($){
     $(document).ajaxStop(function(){
@@ -42,7 +42,6 @@ if(window.location.port)
                     type: "POST",
                     data: {'per': per, 'dir': dir,'ref':ref},
                     success: function (data) {
-                        console.log(data)
                         try {
                             data = JSON.parse(data)
                             alert(data.error.msg)
@@ -70,12 +69,11 @@ if(window.location.port)
                     type: "POST",
                     data: {'ref':ref},
                     success: function (data) {
-                        console.log(data)
                         try {
                             data = JSON.parse(data)
                             alert(data.error.msg)
                         } catch (e) {
-                            alert('Data added successfully!')
+                            alert('Data delete successfully!')
                             window.location.reload()
                         }
                     }
@@ -357,7 +355,6 @@ if(window.location.port)
                             return false
                         } else {
                             // Handle success
-                            // console.log("Success: " + data)
                             let alertMessage = ''
                             if (data.errorMessage)
                             {
@@ -429,7 +426,6 @@ if(window.location.port)
                     data: JSON.stringify({'input': employeeDatas[0]}),
                     success:function (data)
                     {
-                        // console.log(data)
                         if (data.error) {
                             let alertMessage = data.message + '\nErrors:\n'
                             if (data.errors)
@@ -444,7 +440,6 @@ if(window.location.port)
                             return false
                         } else {
                             // Handle success
-                            // console.log("Success: " + data)
                             let alertMessage = ''
                             if (data.errorMessage)
                             {
@@ -589,7 +584,6 @@ if(window.location.port)
             },
             tagInput:function (event)
             {
-                // console.log(tags)
                 const value = $(event).val()
                 const regex = /\s|,/;
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -639,7 +633,6 @@ if(window.location.port)
             copyDocumentShareLink:function (e)
             {
                 let sharedLink = $("#sharedLink")
-                console.log(sharedLink.val().length)
                 if (sharedLink.val().length <= 0)
                 {
                     return false
@@ -734,8 +727,6 @@ if(window.location.port)
                         }else if (response.status === 'error')
                         {
                             alert("Error:"+response.message)
-                            // Handle error
-                            console.log('Error:', response.message)
                         }
                     },
                     error: function (xhr)
@@ -748,8 +739,8 @@ if(window.location.port)
             fixedAssetOpeningAddList:function (e){
                 const opdate = $('#date').val()
                 const reference = $('#ref_hide').val()
-                const r_type = $('#r_type').val()
-                const project_id = $('#project').val()
+                const r_type = $('#r_type_id_hide').val()
+                const project_id = $('#project_id_hide').val()
                 const materials_id = $('#materials_id').val()
                 const specification = $('#specification').val()
                 const rate = $('#rate').val()
@@ -818,10 +809,9 @@ if(window.location.port)
                     url:url,
                     method:'POST',
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'ref':reference,'project':project,'r_type':rt},
+                    data:{'reference':reference,'branch_id':project,'r_type_id':rt},
                     success:function(response)
                     {
-                        console.log(response)
                         if (response.status === 'success')
                         {
                             $("#"+outputID).html(response.data)
@@ -902,7 +892,6 @@ if(window.location.port)
                         {
                             alert("Error:"+response.message)
                             // Handle error
-                            // console.log('Error:', response.message)
                         }
                         return false
                     },
@@ -938,7 +927,6 @@ if(window.location.port)
                             {
                                 alert("Error:"+response.message)
                                 // Handle error
-                                // console.log('Error:', response.message)
                             }
                             return false
                         }
@@ -971,7 +959,6 @@ if(window.location.port)
                         {
                             alert("Error:"+response.message)
                             // Handle error
-                            // console.log('Error:', response.message)
                         }
                         return false
 
@@ -1005,7 +992,6 @@ if(window.location.port)
                         {
                             alert("Error:"+response.message)
                             // Handle error
-                            // console.log('Error:', response.message)
                         }
                         return false
                     }
@@ -1073,7 +1059,6 @@ if(window.location.port)
                             {
                                 alert("Error:"+response.message)
                                 // Handle error
-                                // console.log('Error:', response.message)
                             }
                             return false
                         }
@@ -1108,7 +1093,6 @@ if(window.location.port)
                             {
                                 alert("Error:"+response.message)
                                 // Handle error
-                                // console.log('Error:', response.message)
                             }
                             return false
                         }
@@ -1143,7 +1127,6 @@ if(window.location.port)
                             {
                                 alert("Error:"+response.message)
                                 // Handle error
-                                // console.log('Error:', response.message)
                             }
                             return false
                         }

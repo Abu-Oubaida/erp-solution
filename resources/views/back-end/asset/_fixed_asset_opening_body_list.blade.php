@@ -1,11 +1,11 @@
 <div class="col-md-12">
     <div class="card mb-4">
         <div class="card-body">
-            @if(isset($final_opening))
+            @if(isset($withRefData))
             <div class="row">
-                <div class="col"><strong>Date:</strong> {!! date('d-F-Y',strtotime($final_opening->date)) !!}</div>
-                <div class="col"><strong>Project:</strong> {!! $final_opening->branch->branch_name !!}</div>
-                <div class="col"><strong>References:</strong> {!! $final_opening->references !!}</div>
+                <div class="col"><strong>Date:</strong> {!! date('d-F-Y',strtotime($withRefData->date)) !!}</div>
+                <div class="col"><strong>Project:</strong> {!! $withRefData->branch->branch_name !!}</div>
+                <div class="col"><strong>References:</strong> {!! $withRefData->references !!}</div>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -67,7 +67,7 @@
                         </div>
                         <div class="col-md-2">
                             <label for="remarks">Attachments:</label>
-                            <input class="form-control" type="file" name="attachment" id="attachment" multiple>
+                            <input class="form-control" type="file" name="attachment[]" id="attachment" multiple>
                         </div>
                         <div class="col-md-4">
                             <button class="btn btn-lg btn-outline-success float-end mt-4" type="submit"><i class="fas fa-save"></i> Final Update</button>

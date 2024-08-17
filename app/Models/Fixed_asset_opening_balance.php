@@ -36,4 +36,8 @@ class Fixed_asset_opening_balance extends Model
     {
         return $this->belongsTo(Op_reference_type::class,'ref_type_id');
     }
+    public function attestedDocuments()
+    {
+        return $this->hasMany(Fixed_asset_opening_balance_document::class, 'opening_asset_id');
+    }
 }
