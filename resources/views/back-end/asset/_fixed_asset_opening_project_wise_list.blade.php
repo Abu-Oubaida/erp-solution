@@ -27,7 +27,7 @@
                         @if(count($fixed_asset_with_ref_report_list))
                             @php($n=1)
                             @foreach($fixed_asset_with_ref_report_list as $pwr)
-                                <tr>
+                                <tr class="text-center text-capitalize">
                                     <td>{!! $n++ !!}</td>
                                     <td>{!! date('d-M-Y', strtotime($pwr->date)) !!}</td>
                                     <td>{!! $pwr->refType->name !!}</td>
@@ -58,10 +58,15 @@
                                     <td>{!! date('d-M-Y', strtotime($pwr->created_at)) !!}</td>
                                     <td>{!! (isset($pwr->updatedBy->name))?$pwr->updatedBy->name:'-' !!}</td>
                                     <td>{!! date('d-M-Y', strtotime($pwr->updated_at)) !!}</td>
-                                    <td>
-                                        <button class="text-success border-0 inline-block bg-none" ref="" onclick=""><i class="fas fa-eye"></i></button>
+                                    <td class="text-center">
                                         @if($pwr->status == 5)
                                             <a href="{!! url(route('fixed.asset.distribution.opening.input',['ref'=>$pwr->references,'project'=>$pwr->branch->id,'rt'=>$pwr->refType->id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>
+                                            <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $pwr->id !!}" ><i class="fas fa-trash"></i></button>
+                                        @else
+                                            <a class="text-success border-0 inline-block bg-none" ref="" onclick=""><i class="fas fa-print"></i></a>
+                                            @if(auth()->user()->hasPermission('edit_fixed_asset_opening_balance'))
+                                                <a href="{!! route('edit.fixed.asset.opening.balance',['faobid'=>\Illuminate\Support\Facades\Crypt::encryptString($pwr->id)]) !!}" class="text-info"><i class="fas fa-edit"></i></a>
+                                            @endif
                                         @endif
 {{--                                        <button class="text-success border-0 inline-block bg-none" ref="{!! $opm->id !!}" onclick="return Obj.fixedAssetOpeningSpecEdit(this)"><i class="fas fa-edit"></i></button>--}}
 {{--                                        <button class="text-danger border-0 inline-block bg-none" ref="{!! $opm->id !!}" onclick="return Obj.deleteFixedAssetOpeningSpec(this)"><i class="fas fa-trash"></i></button>--}}

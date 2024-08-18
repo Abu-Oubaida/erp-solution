@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\branch;
 use App\Models\Fixed_asset;
 use App\Models\Fixed_asset_opening_balance;
+use App\Models\Fixed_asset_opening_balance_delete_history;
 use App\Models\Fixed_asset_opening_balance_document;
 use App\Models\Fixed_asset_opening_with_spec;
+use App\Models\Fixed_asset_opening_with_spec_delete_history;
 use App\Models\fixed_asset_specifications;
 use App\Models\Op_reference_type;
 use App\Models\userProjectPermission;
@@ -424,7 +426,7 @@ class FixedAssetDistribution extends Controller
                 $update_data = Fixed_asset_opening_with_spec::where('id', $id)->first();
                 $reference = $update_data->references;
                 if ($update_data) {
-                    $update_data->delete();
+                    $this->delete_fixed_asset_opening_balance_spec($update_data->id);
 
                     // Refresh the model instance to get the updated data
                     $update_data = $update_data->fresh();
@@ -434,6 +436,101 @@ class FixedAssetDistribution extends Controller
                 return \response()->json([
                     'status'=>'success',
                     'data'=>$view,
+                    'message'=>'Data deleted successfully.'
+                ],200);
+            }return \response()->json([
+                'status'=>'error',
+                'message'=>'Request not supported!'
+            ],500);
+        }catch (\Throwable $exception)
+        {
+            return \response()->json([
+                'status'=>'error',
+                'message'=> $exception->getMessage(),
+            ],500);
+        }
+    }
+    protected function delete_fixed_asset_opening_balance_spec($id)
+    {
+        try {
+            $data = Fixed_asset_opening_with_spec::where('id', $id)->first();
+            if ($data) {
+                Fixed_asset_opening_with_spec_delete_history::create([
+                    'old_id'=>$data->id,
+                    'date'=>$data->date,
+                    'opening_asset_id'=>$data->opening_asset_id,
+                    'references'=>$data->references,
+                    'company_id'=>$data->company_id,
+                    'asset_id'=>$data->asset_id,
+                    'spec_id'=>$data->spec_id,
+                    'rate'=>$data->rate,
+                    'qty'=>$data->qty,
+                    'purpose'=>$data->purpose,
+                    'remarks'=>$data->remarks,
+                    'created_by'=>$data->created_by,
+                    'updated_by'=>$data->updated_by,
+                    'old_created_at'=>$data->created_at,
+                    'old_updated_at'=>$data->updated_at,
+                    'deleted_by'=>$this->user->id
+                ]);
+                return $data->delete();
+            }
+            return false;
+        }catch (\Throwable $exception)
+        {
+            return $exception;
+        }
+    }
+    protected function delete_fixed_asset_opening_balance($id)
+    {
+        try {
+            $data = Fixed_asset_opening_balance::where('id', $id)->first();
+            if ($data) {
+                Fixed_asset_opening_balance_delete_history::create([
+                    'old_id'=>$data->id,
+                    'date'=>$data->date,
+                    'references'=>$data->references,
+                    'ref_type_id'=>$data->ref_type_id,
+                    'branch_id'=>$data->branch_id,
+                    'company_id'=>$data->company_id,
+                    'status'=>$data->status,
+                    'created_by'=>$data->created_by,
+                    'updated_by'=>$data->updated_by,
+                    'narration'=>$data->narration,
+                    'old_created_at'=>$data->created_at,
+                    'old_updated_at'=>$data->updated_at,
+                    'deleted_by'=>$this->user->id
+                ]);
+                return $data->delete();
+            }
+            return false;
+        }catch (\Throwable $exception)
+        {
+            return $exception;
+        }
+    }
+    public function deleteFixedAssetOpening(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => ['required','string','exists:fixed_asset_opening_balances,id'],
+            ]);
+            if ($request->isMethod('delete'))
+            {
+                extract($request->post());
+                $deleteData = Fixed_asset_opening_balance::with(['withSpecifications'])->where('id', $id)->where('company_id',$this->user->company_id)->first();
+                if ($deleteData) {
+                    if (count($deleteData->withSpecifications))
+                    {
+                        foreach ($deleteData->withSpecifications as $specification)
+                        {
+                            $this->delete_fixed_asset_opening_balance_spec($specification->id);
+                        }
+                        $this->delete_fixed_asset_opening_balance($deleteData->id);
+                    }
+                }
+                return \response()->json([
+                    'status'=>'success',
                     'message'=>'Data deleted successfully.'
                 ],200);
             }return \response()->json([
