@@ -67,6 +67,9 @@
                                             @if(auth()->user()->hasPermission('edit_fixed_asset_opening_balance'))
                                                 <a href="{!! route('edit.fixed.asset.opening.balance',['faobid'=>\Illuminate\Support\Facades\Crypt::encryptString($pwr->id)]) !!}" class="text-info"><i class="fas fa-edit"></i></a>
                                             @endif
+                                            @if(auth()->user()->hasPermission('delete_fixed_asset_opening_balance'))
+                                                <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $pwr->id !!}" ><i class="fas fa-trash"></i></button>
+                                            @endif
                                         @endif
 {{--                                        <button class="text-success border-0 inline-block bg-none" ref="{!! $opm->id !!}" onclick="return Obj.fixedAssetOpeningSpecEdit(this)"><i class="fas fa-edit"></i></button>--}}
 {{--                                        <button class="text-danger border-0 inline-block bg-none" ref="{!! $opm->id !!}" onclick="return Obj.deleteFixedAssetOpeningSpec(this)"><i class="fas fa-trash"></i></button>--}}
