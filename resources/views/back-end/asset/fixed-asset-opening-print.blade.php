@@ -12,36 +12,62 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <style>
         body {
-            /*font-family: Arial, sans-serif;*/
-            padding: 0.5cm; /* Adjust padding to better fit content in landscape */
+            padding: 0.5cm;
             font-family: "Times New Roman";
         }
         table {
             width: 100%;
             table-layout: auto;
+            border-collapse: collapse;
         }
         .container-fluid {
             width: 100%;
         }
-        @font-face {
-            font-family: "Times New Roman";
-        }
-
         @media print {
             @page {
-                size: A4 landscape; /* Ensure the page is set to landscape */
-                margin: 0; /* Optional: remove margins to utilize full page */
+                size: A4 landscape;
+                margin: 0;
+            }
+
+            body {
+                margin: 0;
+                padding: 0.5cm;
+            }
+
+            .print-header, .print-footer {
+                /*position: fixed;*/
+                width: 100%;
+                left: 0;
+                background: white;
+                box-sizing: border-box;
+            }
+
+            .print-header {
+                top: 0;
+            }
+
+            .print-body {
+                box-sizing: border-box;
+                margin-top: 10px;
+                margin-bottom: 40px;
+                padding-bottom: 10px;
+            }
+
+
+            .print-footer {
+                bottom: 0;
+                page-break-before: auto;
             }
         }
     </style>
 </head>
 <body class="sb-nav-fixed">
-{{--<buton onclick="return print('#layoutSidenav')">Print</buton>--}}
 <div id="layoutSidenav" class="bg-image-dashboard">
     <div class="container-fluid" style="width: 100%; padding: 1cm;">
-        <header class="row" style="margin-bottom: 15px; top: 0">
+        <header class="row print-header" style="margin-bottom: 15px;">
             <div class="col-md-3" style="width: 35%;">
                 <table class="table table-borderless text-left table-sm m-0 p-0">
+                    <!-- Header Information -->
                     <tr>
                         <th>Project Name</th>
                         <th>: </th>
@@ -65,7 +91,7 @@
                 </table>
             </div>
             <div class="col-md-6 text-center" style="width: 35%;">
-                <!-- Add content for letterhead/header here -->
+                <!-- Logo or Company Name -->
                 @if(isset($withRefData->company->logo))
                     <img src="{{url($withRefData->company->logo)}}" alt="Company Logo" style="max-height: 80px;">
                 @else
@@ -76,6 +102,7 @@
             </div>
             <div class="col-md-3" style="width: 30%;">
                 <table class="table table-borderless text-left table-sm m-0 p-0">
+                    <!-- Reference Information -->
                     <tr>
                         <th>Reference Type</th>
                         <th>: </th>
@@ -95,7 +122,7 @@
             </div>
         </header>
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 print-body">
                 <table class="table table-bordered" style="width: 100%; table-layout: auto">
                     <thead>
                     <tr>
@@ -116,10 +143,10 @@
                         @php
                             $n=1;
                             $total_qnt = 0;
-                            $total = 0
+                            $total = 0;
                         @endphp
                         @foreach($withRefData->withSpecifications as $opm)
-                            <tr>
+                            <tr style="page-break-inside: avoid;">
                                 <td>{!! $n++ !!}</td>
                                 <td>{!! date('d-M-Y', strtotime($opm->date)) !!}</td>
                                 <td>{!! $opm->asset->materials_name !!} ({!! $opm->asset->recourse_code !!})</td>
@@ -133,9 +160,10 @@
                             </tr>
                             @php
                                 $total_qnt += $opm->qty;
-                                $total += (float)($opm->qty * $opm->rate)
+                                $total += (float)($opm->qty * $opm->rate);
                             @endphp
                         @endforeach
+
                         <tr>
                             <th colspan="6">Total:</th>
                             <th>{!! $total_qnt !!}</th>
@@ -144,16 +172,17 @@
                         </tr>
                     @else
                         <tr>
-                            <td class="text-center" colspan="12">Not Found!</td>
+                            <td class="text-center" colspan="10">Not Found!</td>
                         </tr>
                     @endif
                     </tbody>
                 </table>
             </div>
         </div>
-        <footer class="row" style="bottom: 0;width: 100%; margin-top: 150px">
-            <div class="col-md-12" style="width: 100%">
+        <footer class="row print-footer" style="bottom: 0;width: 100%;">
+            <div class="col-md-12">
                 <div class="row">
+                    <!-- Footer Signatories -->
                     <div class="col text-center">
                         {!! (isset($withRefData->createdBy->name))?$withRefData->createdBy->name:'-' !!}
                         <hr style="margin: 0;padding: 0;border-style: dotted">
@@ -203,6 +232,5 @@
         window.print()
     })
 </script>
-{{--<script src="https://cdn.jsdelivr.net/npm/@canvas-fonts/times-new-roman@1.0.4/index.min.js"></script>--}}
 </body>
 </html>
