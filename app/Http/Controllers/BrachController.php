@@ -57,6 +57,7 @@ class BrachController extends Controller
                 'branch_name'   => ['required','string','unique:branches,branch_name'],
                 'branch_type'   => ['required','string','exists:branch_types,id'],
                 'branch_status'   => ['required','string'],
+                'address'   => ['sometimes','nullable','string'],
                 'remarks'   => ['sometimes','nullable','string'],
             ]);
             extract($request->post());
@@ -68,6 +69,7 @@ class BrachController extends Controller
                 'branch_name'   =>  $branch_name,
                 'branch_type'   =>  $branch_type,
                 'status'   =>  $status,
+                'address'   =>  $address,
                 'remarks'   =>  $remarks,
                 'created_by'   =>  Auth::user()->id,
             ]);
@@ -125,6 +127,7 @@ class BrachController extends Controller
                 'branch_name'   => ['required','string', Rule::unique('branches', 'branch_name')->ignore(Crypt::decryptString($id))],
                 'branch_type'   => ['required','string','exists:branch_types,id'],
                 'branch_status'   => ['required','string'],
+                'address'   => ['sometimes','nullable','string'],
                 'remarks'   => ['sometimes','nullable','string'],
             ]);
             extract($request->post());
@@ -137,6 +140,7 @@ class BrachController extends Controller
                 'branch_name'   =>  $branch_name,
                 'branch_type'   =>  $branch_type,
                 'status'   =>  $status,
+                'address'   =>  $address,
                 'remarks'   =>  $remarks,
                 'updated_by'   =>  Auth::user()->id,
             ]);

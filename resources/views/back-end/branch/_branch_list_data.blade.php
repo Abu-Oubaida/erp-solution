@@ -7,6 +7,7 @@
             <th>Branch Name</th>
             <th>Branch Type</th>
             <th>Status</th>
+            <th>Address</th>
             <th>Created By</th>
             <th>Updated By</th>
             <th>Remarks</th>
@@ -24,6 +25,7 @@
                     <td>{!! $br->branch_name !!}</td>
                     <td>{!! $br->branchType->title !!}</td>
                     <td>@if($br->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
+                    <td>{!! $br->address !!}</td>
                     <td>{!! ($br->createdBy)?$br->createdBy->name:'' !!}</td>
                     <td>{!! ($br->updatedBy)?$br->updatedBy->name:'' !!}</td>
                     <td>{!! $br->remarks !!}</td>

@@ -63,7 +63,7 @@
                                             <a href="{!! url(route('fixed.asset.distribution.opening.input',['ref'=>$pwr->references,'project'=>$pwr->branch->id,'rt'=>$pwr->refType->id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>
                                             <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $pwr->id !!}" ><i class="fas fa-trash"></i></button>
                                         @else
-                                            <a class="text-success border-0 inline-block bg-none" ref="" onclick=""><i class="fas fa-print"></i></a>
+                                            <a href="{!! route('fixed.asset.with.reference.print',['assetID'=>\Illuminate\Support\Facades\Crypt::encryptString($pwr->id)]) !!}" class="text-success border-0 inline-block bg-none" target="_blank"><i class="fas fa-print"></i></a>
                                             @if(auth()->user()->hasPermission('edit_fixed_asset_opening_balance'))
                                                 <a href="{!! route('edit.fixed.asset.opening.balance',['faobid'=>\Illuminate\Support\Facades\Crypt::encryptString($pwr->id)]) !!}" class="text-info"><i class="fas fa-edit"></i></a>
                                             @endif

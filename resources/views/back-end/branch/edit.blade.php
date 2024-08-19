@@ -58,7 +58,14 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-floating mb-4">
-                                        <textarea class="form-control" id="remarks" name="remarks" required>{!! $branch->remarks !!}
+                                        <textarea class="form-control" id="address" name="address" required>{!!$branch->address!!}
+                                        </textarea>
+                                        <label for="address">Address<span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-4">
+                                        <textarea class="form-control" id="remarks" name="remarks" required>{!!$branch->remarks!!}
                                         </textarea>
                                         <label for="remarks">Remarks<span class="text-danger">*</span></label>
                                     </div>
@@ -86,6 +93,7 @@
                                     <th>Branch Name</th>
                                     <th>Branch Type</th>
                                     <th>Status</th>
+                                    <th>Address</th>
                                     <th>Created By</th>
                                     <th>Updated By</th>
                                     <th>Remarks</th>
@@ -104,6 +112,7 @@
                                                 <td><b>{!! $br->branch_name !!}</b></td>
                                                 <td><b>{!! $br->branchType->title !!}</b></td>
                                                 <td>@if($br->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
+                                                <td><b>{!! $br->address !!}</b></td>
                                                 <td><b>{!! ($br->createdBy)?$br->createdBy->name:'' !!}</b></td>
                                                 <td><b>{!! ($br->updatedBy)?$br->updatedBy->name:'' !!}</b></td>
                                                 <td><b>{!! $br->remarks !!}</b></td>
@@ -125,6 +134,7 @@
                                                 <td>{!! $br->branch_name !!}</td>
                                                 <td>{!! $br->branchType->title !!}</td>
                                                 <td>@if($br->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
+                                                <td><b>{!! $br->address !!}</b></td>
                                                 <td>{!! ($br->createdBy)?$br->createdBy->name:'' !!}</td>
                                                 <td>{!! ($br->updatedBy)?$br->updatedBy->name:'' !!}</td>
                                                 <td>{!! $br->remarks !!}</td>

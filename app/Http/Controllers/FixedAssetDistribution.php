@@ -12,8 +12,11 @@ use App\Models\Fixed_asset_opening_with_spec_delete_history;
 use App\Models\fixed_asset_specifications;
 use App\Models\Op_reference_type;
 use App\Models\userProjectPermission;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 use Intervention\Image\Response;
 use Throwable;
@@ -594,6 +597,26 @@ class FixedAssetDistribution extends Controller
         }catch (\Throwable $exception)
         {
             return back()->withErrors([$exception->getMessage()]);
+        }
+    }
+
+    public function printFixedAssetWithReference($assetID)
+    {
+        try {
+            $id = Crypt::decryptString($assetID);
+            $withRefData = Fixed_asset_opening_balance::with(['withSpecifications','branch','refType','createdBy','updatedBy','company'])->where('id', $id)->first();
+//            dd($withRefData->branch);
+            if (!$withRefData) {
+                abort(404); // or handle the not found case as needed
+            }
+            $view = view('back-end.asset.fixed-asset-opening-print',compact('withRefData'))->render();
+            //required to pdf "C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+            $pdf = SnappyPdf::loadView('back-end.asset.fixed-asset-opening-print',compact('withRefData'))->setPaper('a4','landscape');
+//            return $pdf->download("salary_certificate_for_{$withRefData->refType->name}_{$withRefData->references}.pdf");
+            return $view;
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
         }
     }
 
