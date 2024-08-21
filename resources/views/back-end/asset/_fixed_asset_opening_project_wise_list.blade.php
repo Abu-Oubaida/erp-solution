@@ -84,6 +84,11 @@
 
                         </tbody>
                     </table>
+                    <button id="export-csv" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export CSV</button>
+{{--                    <button id="export-sql" class="btn btn-sm btn-outline-success">Export SQL</button>--}}
+                    <button id="export-txt" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export TXT</button>
+{{--                    <button id="export-json" class="btn btn-sm btn-outline-success">Export JSON</button>--}}
+                    <button id="export-custom" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export Custom</button>
                 </div>
             </div>
             @endif

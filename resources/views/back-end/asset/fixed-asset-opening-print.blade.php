@@ -49,12 +49,11 @@
             .print-body {
                 box-sizing: border-box;
                 margin-top: 10px;
-                margin-bottom: 40px;
-                padding-bottom: 10px;
             }
 
 
             .print-footer {
+                margin-top: 100px;
                 bottom: 0;
                 page-break-before: auto;
             }
@@ -145,6 +144,24 @@
                             $total_qnt = 0;
                             $total = 0;
                         @endphp
+                        @foreach($withRefData->withSpecifications as $opm)
+                            <tr style="page-break-inside: avoid;">
+                                <td>{!! $n++ !!}</td>
+                                <td>{!! date('d-M-Y', strtotime($opm->date)) !!}</td>
+                                <td>{!! $opm->asset->materials_name !!} ({!! $opm->asset->recourse_code !!})</td>
+                                <td>{!! $opm->specification->specification !!}</td>
+                                <td>{!! $opm->asset->unit !!}</td>
+                                <td>{!! $opm->rate !!}</td>
+                                <td>{!! $opm->qty !!}</td>
+                                <td>{!! (float)($opm->qty * $opm->rate) !!}</td>
+                                <td>{!! (isset($opm->purpose))?$opm->purpose:'' !!}</td>
+                                <td>{!! (isset($opm->remarks))?$opm->remarks:'' !!}</td>
+                            </tr>
+                            @php
+                                $total_qnt += $opm->qty;
+                                $total += (float)($opm->qty * $opm->rate);
+                            @endphp
+                        @endforeach
                         @foreach($withRefData->withSpecifications as $opm)
                             <tr style="page-break-inside: avoid;">
                                 <td>{!! $n++ !!}</td>
