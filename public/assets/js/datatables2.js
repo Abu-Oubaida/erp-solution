@@ -14,7 +14,13 @@
                     pageSize: 'A4', // A4 page size
                     title: 'My Table Export', // Optional: Custom title
                     exportOptions: {
-                        columns: ':visible' // Export only visible columns
+                        columns: ':visible', // Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                // Extract the header text from the <th> element, ignoring the input field
+                                return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                            }
+                        }
                     }
                 },
                 {
@@ -22,27 +28,51 @@
                     text: '<i class="fas fa-copy"></i> Copy',
                 },
                 {
-                    extend:'csv',
+                    extend: 'csv',
                     text: '<i class="fas fa-file-csv"></i> CSV',
+                    exportOptions: {
+                        columns: ':visible',
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    }
                 },
                 {
                     extend: 'excel',
                     text: '<i class="fas fa-file-excel"></i> Excel',
+                    exportOptions: {
+                        columns: ':visible',
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    }
                 },
                 {
                     extend: 'print',
                     text: '<i class="fas fa-print"></i> Print',
-                },
+                    exportOptions: {
+                        columns: ':visible',
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    }
+                }
             ],
             initComplete: function () {
-                // Add search inputs
+                // Add search inputs to header
                 $('#DataTable2 thead th').each(function() {
-                    var title = $('#DataTable2 tfoot th').eq($(this).index()).text();
+                    var title = $(this).text(); // Use the text content of the header cells
                     $(this).html('<input type="text" class="form-control" placeholder="Search ' + title + '" />');
                 });
 
                 // Apply the search
-                var table = $('#DataTable2').DataTable();
+                var table = this.api(); // Use the DataTables API instance
                 table.columns().eq(0).each(function(colIdx) {
                     $('input', table.column(colIdx).header()).on('keyup change', function() {
                         table.column(colIdx).search(this.value).draw();
@@ -63,24 +93,61 @@
                     pageSize: 'A4', // A4 page size
                     title: 'My Table Export', // Optional: Custom title
                     exportOptions: {
-                        columns: ':visible' // Export only visible columns
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
                     }
                 },
                 {
                     extend: 'copy',
                     text: '<i class="fas fa-copy"></i> Copy',
+                    exportOptions: {
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    },
                 },
                 {
                     extend:'csv',
                     text: '<i class="fas fa-file-csv"></i> CSV',
+                    exportOptions: {
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    },
                 },
                 {
                     extend: 'excel',
                     text: '<i class="fas fa-file-excel"></i> Excel',
+                    exportOptions: {
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    },
                 },
                 {
                     extend: 'print',
                     text: '<i class="fas fa-print"></i> Print',
+                    exportOptions: {
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    },
                 },
             ],
             initComplete: function () {

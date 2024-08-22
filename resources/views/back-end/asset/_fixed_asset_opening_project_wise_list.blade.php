@@ -99,7 +99,6 @@
                                 <td colspan="14" class="text-center">Not Found</td>
                             </tr>
                         @endif
-
                         </tbody>
                     </table>
 {{--                    <button id="export-csv" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export CSV</button>--}}
@@ -234,7 +233,22 @@
                     extend: 'print',
                     text: '<i class="fas fa-print"></i> Print',
                 },
-            ]
+            ],
+            initComplete: function () {
+                // Add search inputs
+                $('#DataTable2 thead th').each(function() {
+                    var title = $('#DataTable2 tfoot th').eq($(this).index()).text();
+                    $(this).html('<input type="text" class="form-control" placeholder="Search ' + title + '" />');
+                });
+
+                // Apply the search
+                var table = $('#DataTable2').DataTable();
+                table.columns().eq(0).each(function(colIdx) {
+                    $('input', table.column(colIdx).header()).on('keyup change', function() {
+                        table.column(colIdx).search(this.value).draw();
+                    });
+                });
+            }
         })
     })
 }(jQuery))
