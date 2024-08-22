@@ -68,7 +68,7 @@
                 // Add search inputs to header
                 $('#DataTable2 thead th').each(function() {
                     var title = $(this).text(); // Use the text content of the header cells
-                    $(this).html('<input type="text" class="form-control" placeholder="Search ' + title + '" />');
+                    $(this).html('<input type="text" class="form-control" placeholder="' + title + '..." />');
                 });
 
                 // Apply the search
@@ -154,7 +154,7 @@
                 // Add search inputs
                 $('#userTable thead th').each(function() {
                     var title = $('#userTable tfoot th').eq($(this).index()).text();
-                    $(this).html('<input type="text" class="form-control" placeholder="Search ' + title + '" />');
+                    $(this).html('<input type="text" class="form-control" placeholder="' + title + '..." />');
                 });
 
                 // Apply the search
