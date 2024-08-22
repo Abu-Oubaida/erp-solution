@@ -124,3 +124,26 @@
     background-color: rgba(121, 121, 121, 0.64); /* Change background color when fixed */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow when fixed */
 }
+.dataTables_filter {
+    display: block !important;
+}
+.dt-buttons {
+    float: right;
+    margin-left: 25%;
+}
+.dt-button {
+    background: none!important;
+    border: 0.5px solid #f47920!important;
+    color: #f47920!important;
+}
+.dt-button:hover {
+    background: #f47920!important;
+    color: black!important;
+}
+tfoot {
+    display: table-row-group;
+}
+.dataTables_wrapper {
+    width: 100%;
+    overflow-x: auto; /* Ensure horizontal scrolling if needed */
+}

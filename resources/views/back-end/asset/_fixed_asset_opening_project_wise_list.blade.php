@@ -4,7 +4,7 @@
             @if(isset($fixed_asset_with_ref_report_list))
             <div class="row">
                 <div class="col-md-12">
-                    <table id="datatablesSimple" class="table table-hover table-bordered">
+                    <table @if(count($fixed_asset_with_ref_report_list))id="DataTable2" class="display" @else class="table" @endif style="width: 100%">
                         <thead>
                         <tr>
                             <th>SL.</th>
@@ -23,6 +23,24 @@
                             <th>Action</th>
                         </tr>
                         </thead>
+                        <tfoot>
+                        <tr>
+                            <th>SL.</th>
+                            <th>Date</th>
+                            <th>Reference Type</th>
+                            <th>Reference</th>
+                            <th>Project</th>
+                            <th>Status</th>
+                            <th>Resource Count</th>
+                            <th>Documents</th>
+                            <th>Narration</th>
+                            <th>Created By</th>
+                            <th>Created Date</th>
+                            <th>Updated By</th>
+                            <th>Updated Date</th>
+                            <th>Action</th>
+                        </tr>
+                        </tfoot>
                         <tbody>
                         @if(count($fixed_asset_with_ref_report_list))
                             @php($n=1)
@@ -78,20 +96,147 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="13" class="text-center">Not Found</td>
+                                <td colspan="14" class="text-center">Not Found</td>
                             </tr>
                         @endif
 
                         </tbody>
                     </table>
-                    <button id="export-csv" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export CSV</button>
+{{--                    <button id="export-csv" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export CSV</button>--}}
 {{--                    <button id="export-sql" class="btn btn-sm btn-outline-success">Export SQL</button>--}}
-                    <button id="export-txt" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export TXT</button>
+{{--                    <button id="export-txt" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export TXT</button>--}}
 {{--                    <button id="export-json" class="btn btn-sm btn-outline-success">Export JSON</button>--}}
-                    <button id="export-custom" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export Custom</button>
+{{--                    <button id="export-custom" class="btn btn-sm btn-outline-success"> <i class="fas fa-download"></i> Export Custom</button>--}}
                 </div>
             </div>
             @endif
         </div>
     </div>
 </div>
+{{--<script type="module">--}}
+{{--    import {--}}
+{{--        DataTable,--}}
+{{--        exportJSON,--}}
+{{--        exportCSV,--}}
+{{--        exportTXT,--}}
+{{--        exportSQL--}}
+{{--    } from "https://fiduswriter.github.io/simple-datatables/demos/dist/module.js"--}}
+
+
+{{--    const exportCustomCSV = function(dataTable, userOptions = {}) {--}}
+{{--        // A modified CSV export that includes a row of minuses at the start and end.--}}
+{{--        const clonedUserOptions = {--}}
+{{--            ...userOptions--}}
+{{--        }--}}
+{{--        clonedUserOptions.download = false--}}
+{{--        const csv = exportCSV(dataTable, clonedUserOptions)--}}
+{{--        // If CSV didn't work, exit.--}}
+{{--        if (!csv) {--}}
+{{--            return false--}}
+{{--        }--}}
+{{--        const defaults = {--}}
+{{--            download: true,--}}
+{{--            lineDelimiter: "\n",--}}
+{{--            columnDelimiter: ";"--}}
+{{--        }--}}
+{{--        const options = {--}}
+{{--            ...defaults,--}}
+{{--            ...clonedUserOptions--}}
+{{--        }--}}
+{{--        const separatorRow = Array(dataTable.data.headings.filter((_heading, index) => !dataTable.columns.settings[index]?.hidden).length)--}}
+{{--            .fill("-")--}}
+{{--            .join(options.columnDelimiter)--}}
+{{--        const str = `${separatorRow}${options.lineDelimiter}${csv}${options.lineDelimiter}${separatorRow}`--}}
+{{--        if (userOptions.download) {--}}
+{{--            // Create a link to trigger the download--}}
+{{--            const link = document.createElement("a")--}}
+{{--            link.href = encodeURI(`data:text/csv;charset=utf-8,${str}`)--}}
+{{--            link.download = `${options.filename || "datatable_export"}.txt`--}}
+{{--            // Append the link--}}
+{{--            document.body.appendChild(link)--}}
+{{--            // Trigger the download--}}
+{{--            link.click()--}}
+{{--            // Remove the link--}}
+{{--            document.body.removeChild(link)--}}
+{{--        }--}}
+{{--        return str--}}
+{{--    }--}}
+
+{{--    const table = new DataTable("#datatablesSimple")--}}
+
+{{--    // Using jQuery to handle button clicks--}}
+{{--    $("#export-csv").click(() => {--}}
+{{--        exportCSV(table, {--}}
+{{--            download: true,--}}
+{{--            lineDelimiter: "\n",--}}
+{{--            columnDelimiter: ","--}}
+{{--        })--}}
+{{--    })--}}
+
+{{--    $("#export-sql").click(() => {--}}
+{{--        exportSQL(table, {--}}
+{{--            download: true,--}}
+{{--            tableName: "export_table"--}}
+{{--        })--}}
+{{--    })--}}
+
+{{--    $("#export-txt").click(() => {--}}
+{{--        exportTXT(table, {--}}
+{{--            download: true--}}
+{{--        })--}}
+{{--    })--}}
+
+{{--    $("#export-json").click(() => {--}}
+{{--        exportJSON(table, {--}}
+{{--            download: true,--}}
+{{--            space: 3--}}
+{{--        })--}}
+{{--    })--}}
+
+{{--    $("#export-custom").click(() => {--}}
+{{--        exportCustomCSV(table, {--}}
+{{--            download: true--}}
+{{--        })--}}
+{{--    })--}}
+{{--</script>--}}
+@if(count($fixed_asset_with_ref_report_list))
+<script>
+(function ($){
+    $(document).ready(function(){
+        $('#DataTable2').DataTable({
+            dom: 'lBfrtip', // 'l' includes the "length changing" input
+            lengthMenu: [[5, 10, 15, 25, 50, 100, -1],[5, 10, 15, 25, 50, 100, "ALL"]],
+            pageLength: 15,
+            buttons: [
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fas fa-file-pdf"></i> PDF',
+                    orientation: 'landscape', // Landscape orientation
+                    pageSize: 'A4', // A4 page size
+                    title: 'My Table Export', // Optional: Custom title
+                    exportOptions: {
+                        columns: ':visible' // Export only visible columns
+                    }
+                },
+                {
+                    extend: 'copy',
+                    text: '<i class="fas fa-copy"></i> Copy',
+                },
+                {
+                    extend:'csv',
+                    text: '<i class="fas fa-file-csv"></i> CSV',
+                },
+                {
+                    extend: 'excel',
+                    text: '<i class="fas fa-file-excel"></i> Excel',
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print"></i> Print',
+                },
+            ]
+        })
+    })
+}(jQuery))
+</script>
+@endif

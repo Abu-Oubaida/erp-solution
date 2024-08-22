@@ -44,6 +44,17 @@ class FixedAssetDistribution extends Controller
         }
 
     }
+    protected function fixedAssetOpeningBalances()
+    {
+        try {
+            $projectIds = $this->getUserWiseProjects($this->user->id)->pluck('projects.id')->flatten()->unique()->toArray();
+//            dd($projectIds);
+            return Fixed_asset_opening_balance::with(['withSpecifications','attestedDocuments','branch','createdBy','updatedBy','refType'])->where('company_id',$this->user->company_id)->whereIn('branch_id',$projectIds);
+        }catch (\Throwable $exception)
+        {
+            return $exception;
+        }
+    }
     protected function processFixedAssetOpening(Request $request, $isApiRequest = false)
     {
         if ($request->isMethod('post'))
@@ -74,7 +85,7 @@ class FixedAssetDistribution extends Controller
             return view('back-end.asset.fixed-asset-opening',compact('projects','ref_types'));
         }
         else{
-            $fixed_asset_with_ref = Fixed_asset_opening_balance::with(['withSpecifications','attestedDocuments','branch','createdBy','updatedBy','refType'])->where('company_id',$this->user->company_id);
+            $fixed_asset_with_ref = $this->fixedAssetOpeningBalances();
             if (!empty($reference))
             {
                 $withRefData = $fixed_asset_with_ref->where('references',$reference)->first();
@@ -171,7 +182,6 @@ class FixedAssetDistribution extends Controller
                 }
             }
         }
-
         if ($isApiRequest) {
             return response()->json([
                 'status' => 'success',
