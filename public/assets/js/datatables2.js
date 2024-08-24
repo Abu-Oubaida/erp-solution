@@ -2,6 +2,11 @@
 
 (function ($) {
     $(document).ready(function () {
+        $('#simpleDataTable2').DataTable({
+            dom: 'lfrtip',
+            lengthMenu: [[5, 10, 15, 25, 50, 100, -1],[5, 10, 15, 25, 50, 100, "ALL"]],
+            pageLength: 15,
+        })
         $('#DataTable2').DataTable({
             dom: 'lBfrtip', // 'l' includes the "length changing" input
             lengthMenu: [[5, 10, 15, 25, 50, 100, -1],[5, 10, 15, 25, 50, 100, "ALL"]],

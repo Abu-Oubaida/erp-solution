@@ -70,6 +70,11 @@
                                         <a class="nav-link text-chl" href="{{route('fixed.asset.distribution.opening.input')}}" title="Distribute Fixed Asset With Reference Number">With Reference</a>
                                     @endif
                                 @endif
+                                @if(auth()->user()->hasPermission('edit_fixed_asset_distribution_with_reference'))
+                                        @if(Route::currentRouteName() == 'edit.fixed.asset.distribution.with.reference.balance')
+                                            <a class="nav-link" href="{{route('edit.fixed.asset.distribution.with.reference.balance',['faobid'=>\Illuminate\Support\Facades\Request::route('faobid')])}}" title="Edit With Reference"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div> Edit With Reference</a>
+                                        @endif
+                                @endif
                                 @if(auth()->user()->hasPermission('fixed_asset_damage'))
                                     @if(Route::currentRouteName() == 'fixed.asset.add')
                                         <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>

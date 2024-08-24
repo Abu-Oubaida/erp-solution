@@ -100,7 +100,7 @@
                 </div>
             </div>
             <hr>
-            <div id="opening-materials-list">
+            <div>
                 @include('back-end.asset._fixed_asset_opening_body_list')
             </div>
         </div>
