@@ -382,6 +382,7 @@ Route::group(['middleware' => ['auth']],function (){
                 });
                 Route::middleware(['permission:edit_fixed_asset_distribution_with_reference'])->group(function (){
                     Route::match(['get','put'],'edit-fixed-asset-opening-balance/{faobid}','editFixedAssetOpening')->name('edit.fixed.asset.distribution.with.reference.balance');
+                    Route::delete('delete-fixed-asset-with-ref-document','destroyWithRefDocument')->name('fixed.asset.with.ref.document.delete');
                 });
                 Route::middleware(['permission:fixed_asset_opening_list'])->group(function (){
                     Route::match(['get'],'opening-list','openingList')->name('fixed.asset.distribution.opening.list');

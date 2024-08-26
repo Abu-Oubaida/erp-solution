@@ -25,11 +25,13 @@
                         <h5 class="text-capitalize"><i class="fas fa-edit"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h5>
                     </div>
                     <div class="card-body">
-                        <form action="">
+                        <form action="{!! route('edit.fixed.asset.distribution.with.reference.balance',['faobid'=>\Illuminate\Support\Facades\Crypt::encryptString($item->id)]) !!}" enctype="multipart/form-data" method="post">
+                            @csrf
+                            @method('put')
                             <div class="row">
                                 <div class="col-md-3 mb-1">
                                     <label for="project">Enter Project Name<span class="text-danger">*</span></label>
-                                    <select id="project" name="project" class="select-search cursor-pointer">
+                                    <select id="project" name="project_id" class="select-search cursor-pointer">
                                         <option value="">Pick a state...</option>
                                         @if(count($projects))
                                             @foreach($projects as $p)
@@ -41,7 +43,7 @@
 
                                 <div class="col-md-3 mb-1">
                                     <label for="ref">Reference No<span class="text-danger">*</span></label>
-                                    <input class="form-control" value="{!! $item->references !!}" type="text" placeholder="Reference number..." id="ref-src">
+                                    <input class="form-control" name="reference" value="{!! $item->references !!}" type="text" placeholder="Reference number..." id="ref-src">
                                 </div>
 
                                 <div class="col-md-3 mb-1">
@@ -229,7 +231,7 @@
                                         <td>{!! $d->document_name !!}</td>
                                         <td class="text-center">
                                             <a href="{!! url($d->document_url.$d->document_name) !!}" class="" target="_blank"><i class="fas fa-eye"></i></a>
-                                            <a href="" class="text-danger"><i class="fas fa-trash"></i></a>
+                                            <button class="text-danger border-0 inline-block bg-none" onclick="return Obj.deleteFixedAssetWithRefDocument(this)" ref="{!! $d->id !!}"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 @endforeach

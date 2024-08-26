@@ -10,6 +10,7 @@ use App\Models\Fixed_asset_opening_balance_document;
 use App\Models\Fixed_asset_opening_with_spec;
 use App\Models\Fixed_asset_opening_with_spec_delete_history;
 use App\Models\fixed_asset_specifications;
+use App\Models\Fixed_asset_with_ref_document_delete_history;
 use App\Models\Op_reference_type;
 use App\Models\userProjectPermission;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -366,15 +367,58 @@ class FixedAssetDistribution extends Controller
             $spec = $this->fixedAssetSpecifications($id)->get();
             if ($request->isMethod('PUT'))
             {
-                $projectIds = $this->getUserWiseProjects($this->user->id)->pluck('projects.id')->flatten()->unique()->toArray();
-                $request->validate([
-                    'faobid' => ['required', 'string', Rule::exists('fixed_asset_opening_balances')->where('id',$id)->where('company_id',$this->user->company_id)->whereIn('branch_id',$projectIds)],
-                ]);
-                extract($request->post());
+                return $this->updateFixedAssetOpening($request, $id);
             }
             $view = view('back-end.asset.edit-fixed-asset-opening',compact('id','projects','ref_types','fixed_assets','spec','item'))->render();
             return $view;
 
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+    protected function updateFixedAssetOpening(Request $request,$id)
+    {
+        try {
+            $projectIds = $this->getUserWiseProjects($this->user->id)->pluck('projects.id')->flatten()->unique()->toArray();
+            $request->validate([
+                'reference' => ['required','string',Rule::unique('fixed_asset_opening_balances','references')->ignore($id, 'id')],
+                'r_type' => ['required','string',Rule::exists('op_reference_types','id')->where(function ($query) use ($request) {$query->where('status',1);})],
+                'project_id'=>  ['required','string','exists:branches,id'],
+                'attachment.*' => ['sometimes','nullable','file','max:512000'],
+                'narration' => ['sometimes','nullable','string'],
+            ]);
+            extract($request->post());
+            $data = $this->fixedAssetOpeningBalances()->where('id',$id)->first();
+            $update = $this->fixedAssetOpeningBalances()->where('id',$id)->update([
+                'references'=>$reference,
+                'ref_type_id'=>$r_type,
+                'branch_id'=>$project_id,
+                'narration'=>$narration,
+                'updated_by'=>$this->user->id,
+                'updated_at'=>date('Y-m-d H:i:s')
+            ]);
+            if ($data->references != $reference)
+            {
+                Fixed_asset_opening_with_spec::where('opening_asset_id',$id)->update([
+                    'references'=>$reference,
+                    'updated_by'=>$this->user->id,
+                    'updated_at'=>date('Y-m-d H:i:s')
+                ]);
+            }
+            if ($update)
+            {
+                if ($request->hasFile('attachment'))
+                {
+                    $res = $this->fixed_asset_opening_balance_documents($request->file('attachment'),$id);
+                    if ($res)
+                    {
+                        return back()->with('success','Data updated successfully.');
+                    }
+                    return back()->with('warning','Data updated successfully. But some error occurred to upload documents.');
+                }
+            }
+            return back()->with('success','Data updated successfully.');
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -619,23 +663,12 @@ class FixedAssetDistribution extends Controller
                 {
                     if ($request->hasFile('attachment'))
                     {
-                        $f_a_o_b = Fixed_asset_opening_balance::with(['refType'])->where('id', $id)->first();
-                        foreach ($request->file('attachment') as $file)
+                        $res = $this->fixed_asset_opening_balance_documents($request->file('attachment'),$id);
+                        if ($res)
                         {
-                            $fileName = $f_a_o_b->refType->name."_".$f_a_o_b->references."_".$file->getClientOriginalName();
-                            $file_location = $file->move($this->document_path,$fileName); // Adjust the storage path as needed
-                            if (!$file_location)
-                            {
-                                return redirect()->back()->with('error', 'Documents uploaded error.');
-                            }
-                            Fixed_asset_opening_balance_document::create([
-                                'company_id'=>$this->user->company_id,
-                                'opening_asset_id'=>$f_a_o_b->id,
-                                'document_name'=>$fileName,
-                                'document_url'=>$this->document_path,
-                                'created_by'=>$this->user->id,
-                            ]);
+                            return back()->with('success','Data updated successfully.');
                         }
+                        return back()->with('warning','Data updated successfully. But some error occurred to upload documents.');
                     }
                 }
                 return redirect(route('fixed.asset.distribution.opening.input'))->with('success','Data final update successfully.');
@@ -645,7 +678,33 @@ class FixedAssetDistribution extends Controller
             return back()->withErrors([$exception->getMessage()]);
         }
     }
-
+    protected function fixed_asset_opening_balance_documents($documents,$ref_id)
+    {
+        try {
+            $id = $ref_id;
+            $f_a_o_b = Fixed_asset_opening_balance::with(['refType'])->where('id', $id)->first();
+            foreach ($documents as $file)
+            {
+                $fileName = $f_a_o_b->refType->name."_".$f_a_o_b->references."_".$file->getClientOriginalName();
+                $file_location = $file->move($this->document_path,$fileName); // Adjust the storage path as needed
+                if (!$file_location)
+                {
+                    return redirect()->back()->with('error', 'Documents uploaded error.');
+                }
+                Fixed_asset_opening_balance_document::create([
+                    'company_id'=>$this->user->company_id,
+                    'opening_asset_id'=>$f_a_o_b->id,
+                    'document_name'=>$fileName,
+                    'document_url'=>$this->document_path,
+                    'created_by'=>$this->user->id,
+                ]);
+            }
+            return Fixed_asset_opening_balance_document::where('company_id',$this->user->company_id)->where('opening_asset_id',$id)->get();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
     public function printFixedAssetWithReference($assetID)
     {
         try {
@@ -663,6 +722,34 @@ class FixedAssetDistribution extends Controller
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function destroyWithRefDocument(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => ['string','required','exists:fixed_asset_opening_balance_documents,id'],
+            ]);
+            extract($request->post());
+            $data = Fixed_asset_opening_balance_document::where('id',$id)->first();
+            Fixed_asset_with_ref_document_delete_history::create([
+                'old_id' => $data->id,
+                'company_id' => $data->company_id,
+                'opening_asset_id' => $data->opening_asset_id,
+                'document_name' => $data->document_name,
+                'document_url' => $data->document_url,
+                'created_by' => $data->created_by,
+                'updated_by' => $data->updated_by,
+                'old_created_at' => $data->created_at,
+                'old_updated_at' => $data->updated_at,
+                'deleted_by'  => $this->user->id,
+            ]);
+            $data->delete();
+            return response()->json(['status'=>'success','message'=>'Data deleted successfully.']);
+        }catch (\Throwable $exception)
+        {
+            return response()->json(['status'=>'error','message'=>$exception->getMessage()],200);
         }
     }
 

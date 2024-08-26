@@ -112,6 +112,7 @@ return array(
     'App\\Models\\Fixed_asset_opening_balance_document' => $baseDir . '/app/Models/Fixed_asset_opening_balance_document.php',
     'App\\Models\\Fixed_asset_opening_with_spec' => $baseDir . '/app/Models/Fixed_asset_opening_with_spec.php',
     'App\\Models\\Fixed_asset_opening_with_spec_delete_history' => $baseDir . '/app/Models/Fixed_asset_opening_with_spec_delete_history.php',
+    'App\\Models\\Fixed_asset_with_ref_document_delete_history' => $baseDir . '/app/Models/Fixed_asset_with_ref_document_delete_history.php',
     'App\\Models\\Op_reference_type' => $baseDir . '/app/Models/Op_reference_type.php',
     'App\\Models\\Permission' => $baseDir . '/app/Models/Permission.php',
     'App\\Models\\PermissionUser' => $baseDir . '/app/Models/PermissionUser.php',
