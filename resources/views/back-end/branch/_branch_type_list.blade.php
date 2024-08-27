@@ -5,6 +5,7 @@
         <tr>
             <th>No</th>
             <th>Title</th>
+            <th>Company</th>
             <th>Status</th>
             <th>Code</th>
             <th>Created By</th>
@@ -22,6 +23,7 @@
                 <tr>
                     <td>{!! $no++ !!}</td>
                     <td>{!! $b->title !!}</td>
+                    <td>{!! $b->company->company_name !!}</td>
                     <td>@if($b->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
                     <td>{!! $b->code !!}</td>
                     <td>{!! ($b->createdBy)?$b->createdBy->name:'' !!}</td>
@@ -44,7 +46,7 @@
             @endforeach
         @else
             <tr>
-                <td colspan="8" class="text-danger text-center">Not Found!</td>
+                <td colspan="9" class="text-danger text-center">Not Found!</td>
             </tr>
         @endif
         </tbody>

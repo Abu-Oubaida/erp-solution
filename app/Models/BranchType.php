@@ -22,4 +22,8 @@ class BranchType extends Model
     {
         return $this->hasMany(branch::class,'branch_type');
     }
+    public function company()
+    {
+        return $this->belongsTo(company_info::class,'company_id');
+    }
 }

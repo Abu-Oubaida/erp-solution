@@ -5,6 +5,7 @@
         <tr>
             <th>No</th>
             <th>Branch Name</th>
+            <th>Company</th>
             <th>Branch Type</th>
             <th>Status</th>
             <th>Address</th>
@@ -23,6 +24,7 @@
                 <tr>
                     <td>{!! $no++ !!}</td>
                     <td>{!! $br->branch_name !!}</td>
+                    <td>{!! $br->company->company_name !!}</td>
                     <td>{!! $br->branchType->title !!}</td>
                     <td>@if($br->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
                     <td>{!! $br->address !!}</td>
@@ -46,7 +48,7 @@
             @endforeach
         @else
             <tr>
-                <td colspan="3" class="text-danger text-center">Not Found!</td>
+                <td colspan="10" class="text-danger text-center">Not Found!</td>
             </tr>
         @endif
         </tbody>

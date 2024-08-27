@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AccountVoucherController;
 use App\Http\Controllers\BloodGroupController;
-use App\Http\Controllers\BrachController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\BranchTypeController;
 use App\Http\Controllers\ComplainController;
 use App\Http\Controllers\ControlPanelController;
@@ -283,7 +283,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['delete'],'delete-branch-type}','destroy')->name('delete.branch.type');
         });
     });
-    Route::controller(BrachController::class)->group(function (){
+    Route::controller(BranchController::class)->group(function (){
         Route::middleware(['permission:list_branch'])->group(function (){
             Route::match(['get'],'branch-list','index')->name('branch.list');
         });
