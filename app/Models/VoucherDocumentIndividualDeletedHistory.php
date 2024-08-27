@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class VoucherDocumentIndividualDeletedHistory extends Model
 {
     use HasFactory;
-    protected $fillable = ['voucher_info_id','document','filepath','created_by','updated_by','deleted_by','restored_by','restored_status'];
+    protected $fillable = ['company_id','voucher_info_id','document','filepath','created_by','updated_by','deleted_by','restored_by','restored_status'];
     public function accountVoucherInfo()
     {
         return $this->belongsTo(Account_voucher::class,'voucher_info_id');

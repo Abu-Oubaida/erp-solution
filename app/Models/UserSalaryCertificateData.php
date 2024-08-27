@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserSalaryCertificateData extends Model
 {
     use HasFactory;
-    protected $fillable = ['status','user_id','financial_yer_from','financial_yer_to','basic','house_rent','conveyance','medical_allowance','festival_bonus','others','remarks','created_by','updated_by'];
+    protected $fillable = ['company_id','status','user_id','financial_yer_from','financial_yer_to','basic','house_rent','conveyance','medical_allowance','festival_bonus','others','remarks','created_by','updated_by'];
 
     public function userInfo()
     {

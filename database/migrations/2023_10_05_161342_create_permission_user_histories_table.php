@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('permission_user_histories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('admin_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('permission_id')->nullable();

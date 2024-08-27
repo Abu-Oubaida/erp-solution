@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('voucher_types', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->integer('status');
             $table->string('voucher_type_title');
             $table->string('code')->nullable();

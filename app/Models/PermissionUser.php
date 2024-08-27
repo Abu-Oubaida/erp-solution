@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PermissionUser extends Model
 {
     use HasFactory;
-    protected $fillable = ['permission_name','parent_id'];
+    protected $fillable = ['company_id','permission_name','parent_id'];
     protected $table = 'permission_users';
     public function permissionParent()
     {

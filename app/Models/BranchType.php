@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class BranchType extends Model
 {
     use HasFactory;
-    protected $fillable = ['status','title','code','remarks','created_by','updated_by'];
+    protected $fillable = ['company_id','status','title','code','remarks','created_by','updated_by'];
 
     public function createdBy()
     {

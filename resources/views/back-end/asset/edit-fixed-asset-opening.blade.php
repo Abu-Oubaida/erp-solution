@@ -74,6 +74,45 @@
                         </form>
                     </div>
                 </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-list"></i> Attested Documents</h5>
+                    </div>
+                    <div class="card-body">
+                        <table @if(count($item->attestedDocuments))id="dataTableSmall" class="display table-sm" @else id="datatablesSimple" class="table table-sm" @endif>
+                            <thead>
+                            <tr>
+                                <th>SL.</th>
+                                <th>Name</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @if(count($item->attestedDocuments))
+                                @php($n=1)
+                                @foreach($item->attestedDocuments as $d)
+                                    <tr>
+                                        <td>{!! $n++ !!}</td>
+                                        <td>{!! $d->document_name !!}</td>
+                                        <td class="text-center">
+                                            <a href="{!! url($d->document_url.$d->document_name) !!}" class="" target="_blank"><i class="fas fa-eye"></i></a>
+                                            <button class="text-danger border-0 inline-block bg-none" onclick="return Obj.deleteFixedAssetWithRefDocument(this)" ref="{!! $d->id !!}"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="3">Not Found!</td>
+                                </tr>
+                            @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-2">
                 <div class="card">
                     <div class="card-header">
                         <h5><i class="fas fa-plus"></i> Add More Item on Reference No. ({!! isset($item->references)?$item->references:'' !!})</h5>
@@ -156,10 +195,10 @@
                                 </div>
                             </div>
                         </div>
-{{--                        @include('back-end.asset.__edit_fixed_asset_opening_body_list')--}}
+                        {{--                        @include('back-end.asset.__edit_fixed_asset_opening_body_list')--}}
                         <div class="col-md-12">
                             <div class="card-body" id="opening-materials-list">
-                                <table id="datatablesSimple" class="table table-hover table-bordered">
+                                <table @if(count($item->withSpecifications))id="simpleDataTable2" class="display" @else class="table" @endif style="width: 100%">
                                     <thead>
                                     <tr>
                                         <th>SL.</th>
@@ -205,43 +244,6 @@
                                 </table>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-list"></i> Attested Documents</h5>
-                    </div>
-                    <div class="card-body">
-                        <table @if(count($item->attestedDocuments))id="simpleDataTable2" class="display table-sm" @else id="datatablesSimple" class="table table-sm" @endif>
-                            <thead>
-                            <tr>
-                                <th>SL.</th>
-                                <th>Name</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @if(count($item->attestedDocuments))
-                                @php($n=1)
-                                @foreach($item->attestedDocuments as $d)
-                                    <tr>
-                                        <td>{!! $n++ !!}</td>
-                                        <td>{!! $d->document_name !!}</td>
-                                        <td class="text-center">
-                                            <a href="{!! url($d->document_url.$d->document_name) !!}" class="" target="_blank"><i class="fas fa-eye"></i></a>
-                                            <button class="text-danger border-0 inline-block bg-none" onclick="return Obj.deleteFixedAssetWithRefDocument(this)" ref="{!! $d->id !!}"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @else
-                                <tr>
-                                    <td colspan="3">Not Found!</td>
-                                </tr>
-                            @endif
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>

@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Rename_history extends Model
+class Material_type extends Model
 {
     use HasFactory;
-    protected $fillable = ['company_id','status','message','disk_name','old_name','new_name','created_by'];
+    protected $fillable = ['company_id','name','code','status','description','created_by','updated_by'];
 }

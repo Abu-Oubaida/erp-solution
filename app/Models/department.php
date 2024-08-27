@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class department extends Model
 {
     use HasFactory;
-    protected $fillable = ['dept_code', 'dept_name', 'status', 'remarks',];
+    protected $fillable = ['company_id','dept_code', 'dept_name', 'status', 'remarks',];
 
     public function getUsers()
     {

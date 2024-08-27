@@ -1,6 +1,6 @@
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-chl-white">
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="{{route('root')}}"><img src="{{url("image/logo/chl_logo.png")}}" width="70%" alt="Credence Housing Limited"></a>
+    <a class="navbar-brand ps-3" href="{{route('root')}}">@isset(\Illuminate\Support\Facades\Auth::user()->company->logo)<img src="{{isset(\Illuminate\Support\Facades\Auth::user()->company->logo)? \Illuminate\Support\Facades\Auth::user()->company->logo:\Illuminate\Support\Facades\Auth::user()->company->company_name}} Logo" width="70%" alt="Credence Housing Limited">@else <h2 class="text-chl">{!! \Illuminate\Support\Facades\Auth::user()->company->company_name !!}</h2> @endif</a>
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 text-chl-important" id="sidebarToggle"><i class="fas fa-bars"></i></button>
 {{--    <h3 class="mt-0 text-chl">{{str_replace('-', ' ', config('app.name'))}}</h3>--}}

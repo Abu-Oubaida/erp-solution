@@ -70,8 +70,8 @@
                                 <td>{!! date('d-M-y',strtotime($u->joining_date)) !!}</td>
                                 <td>{!! $u->phone !!}</td>
                                 <td>{!! $u->email !!}</td>
-                                <td>{!! $u->getDepartment->dept_name !!}</td>
-                                <td>{!! ($u->getDesignation != null)?$u->getDesignation->title:"N/A" !!}</td>
+                                <td>{!! isset($u->getDepartment->dept_name)?$u->getDepartment->dept_name:'N/A' !!}</td>
+                                <td>{!! isset($u->getDesignation)?$u->getDesignation->title:"N/A" !!}</td>
                                 <td>@foreach ($u->roles as $role)
                                         {{ $role->display_name }}
                                     @endforeach</td>

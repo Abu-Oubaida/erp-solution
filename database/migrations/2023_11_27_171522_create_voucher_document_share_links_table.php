@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('voucher_document_share_links', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->string('share_id')->nullable();
             $table->integer('share_type')->comment('1=only view, 2=view and download')->default(1);
             $table->unsignedBigInteger('share_document_id')->nullable();

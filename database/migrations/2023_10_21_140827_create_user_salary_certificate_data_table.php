@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('user_salary_certificate_data', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->integer('status')->default(1)->comment('1=active');
             $table->unsignedBigInteger('user_id');
             $table->string('financial_yer_from')->nullable();

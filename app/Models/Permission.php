@@ -8,7 +8,7 @@ class Permission extends LaratrustPermission
 {
     public $guarded = [];
 
-    protected $fillable = ['parent_id', 'name','is_parent', 'display_name', 'description'];
+    protected $fillable = ['company_id','parent_id', 'name','is_parent', 'display_name', 'description'];
 
     public function PermissionUser()
     {

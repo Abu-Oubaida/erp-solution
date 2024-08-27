@@ -37,6 +37,14 @@ use PhpParser\Node\Stmt\If_;
 
 class UserController extends Controller
 {
+    protected $user;
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->user= Auth::user();
+            return $next($request);
+        });
+    }
     //
     public function create(Request $request)
     {
@@ -49,7 +57,7 @@ class UserController extends Controller
                 $branches = branch::where('status',1)->get();
                 $roles = Role::get();
                 $designations = Designation::where('status',1)->get();
-                return view('back-end.user.add',compact('depts','branches','roles','designations'));
+                return view('back-end.user.add',compact('depts','branches','roles','designations'))->render();
             }
 
         }catch (\Throwable $exception)
@@ -81,6 +89,7 @@ class UserController extends Controller
                 $roles = Role::where('id',$roll)->first();
 //                dd($roles);
                 $user = User::create([
+                    'company_id' => $this->user->company_id,
                     'employee_id' => $eid[1],
                     'employee_id_hidden'    => $eid[0],
                     'name' => $name,
@@ -161,6 +170,7 @@ class UserController extends Controller
                     if (!$alreadyInDB)
                     {
                         $user = User::create([
+                            'company_id' => $this->user->company_id,
                             'employee_id' => $eid[1],
                             'employee_id_hidden'    => $eid[0],
                             'name' => $data[0],
@@ -221,7 +231,7 @@ class UserController extends Controller
     {
         try {
             $users = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
-            return view('back-end/user/list',compact('users'));
+            return view('back-end/user/list',compact('users'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -244,7 +254,7 @@ class UserController extends Controller
             $designations = Designation::where('status',1)->get();
             $branches = branch::where('status',1)->get();
             $user = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.id',$userID)->first();
-            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','permissionParents','userPermissions','designations','branches'));
+            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','permissionParents','userPermissions','designations','branches'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -279,7 +289,7 @@ class UserController extends Controller
                 ]);
             }
             $filPermission = filemanager_permission::where('status',1)->where('user_id',$id)->orderBy('id', 'DESC')->get();
-            return view("back-end.user._file-permission-list",compact('filPermission'));
+            return view("back-end.user._file-permission-list",compact('filPermission'))->render();
         }catch (\Throwable $exception)
         {
             echo json_encode(array(
@@ -301,7 +311,7 @@ class UserController extends Controller
                 $userID = filemanager_permission::where('id',$id)->select('user_id')->first();
                 filemanager_permission::where('id',$id)->update(['status'=>0]);
                 $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID->user_id)->orderBy('id', 'DESC')->get();
-                return view("back-end.user._file-permission-list",compact('filPermission'));
+                return view("back-end.user._file-permission-list",compact('filPermission'))->render();
             }
         }catch (\Throwable $exception)
         {
@@ -522,7 +532,7 @@ class UserController extends Controller
             }
             $userID = Crypt::decryptString($id);
             $user = User::where('users.id',$userID)->first();
-            return view('back-end.user.edit',compact('user'));
+            return view('back-end.user.edit',compact('user'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

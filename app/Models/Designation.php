@@ -9,7 +9,7 @@ class Designation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title','status','priority','remarks','created_by','updated_by'];
+    protected $fillable = ['company_id','title','status','priority','remarks','created_by','updated_by'];
 
     public function getUser()
     {

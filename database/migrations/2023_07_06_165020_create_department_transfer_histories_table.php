@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('department_transfer_histories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('transfer_user_id');
             $table->unsignedBigInteger('new_dept_id');
             $table->unsignedBigInteger('from_dept_id');

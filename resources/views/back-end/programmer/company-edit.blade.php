@@ -83,28 +83,28 @@
                                         <input type="file" class="form-control" id="logo" name="logo"  placeholder="logo">
                                         <label for="logo">Logo</label>
                                     </div>
-                                    <img src="{!! url($edit_company->logo) !!}" alt="{!! $edit_company->logo !!}" class="img-thumbnail" width="50%">
+                                    <img src="{!! isset($edit_company->logo)?url($edit_company->logo):'' !!}" alt="{!! $edit_company->logo !!}" class="img-thumbnail" width="50%">
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-floating mb-3">
                                         <input type="file" class="form-control" id="logo_sm" name="logo_sm"  placeholder="logo_sm">
                                         <label for="logo_sm">Logo Small</label>
                                     </div>
-                                    <img src="{!! url($edit_company->logo_sm) !!}" alt="{!! $edit_company->logo_sm !!}" class="img-thumbnail" width="50%">
+                                    <img src="{!! isset($edit_company->logo_sm)?url($edit_company->logo_sm):'' !!}" alt="{!! $edit_company->logo_sm !!}" class="img-thumbnail" width="50%">
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-floating mb-3">
                                         <input type="file" class="form-control" id="logo_icon" name="logo_icon"  placeholder="logo_icon">
                                         <label for="logo_icon">Logo Icon</label>
                                     </div>
-                                    <img src="{!! url($edit_company->logo_icon) !!}" alt="{!! $edit_company->logo_icon !!}" class="img-thumbnail" width="50%">
+                                    <img src="{!! isset($edit_company->logo_icon)?url($edit_company->logo_icon):'' !!}" alt="{!! $edit_company->logo_icon !!}" class="img-thumbnail" width="50%">
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-floating mb-3">
                                         <input type="file" class="form-control" id="cover" name="cover"  placeholder="cover">
                                         <label for="cover">Cover Image</label>
                                     </div>
-                                    <img src="{!! url($edit_company->cover) !!}" alt="{!! $edit_company->cover !!}" class="img-thumbnail" width="50%">
+                                    <img src="{!! isset($edit_company->cover)?url($edit_company->cover):'' !!}" alt="{!! $edit_company->cover !!}" class="img-thumbnail" width="50%">
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3 mt-3">

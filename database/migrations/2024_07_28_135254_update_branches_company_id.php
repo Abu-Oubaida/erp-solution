@@ -13,9 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('branches', function (Blueprint $table) {
-            $table->unsignedBigInteger('company_id')->nullable()->after('id');
-        });
+
     }
 
     /**

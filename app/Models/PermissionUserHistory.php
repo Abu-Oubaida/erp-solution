@@ -9,5 +9,5 @@ class PermissionUserHistory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['admin_id','user_id','permission_id','operation_name'];
+    protected $fillable = ['company_id','admin_id','user_id','permission_id','operation_name'];
 }

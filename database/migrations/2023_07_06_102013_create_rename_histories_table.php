@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('rename_histories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->string('status')->nullable();
             $table->string('message')->nullable();
             $table->string('disk_name')->nullable();

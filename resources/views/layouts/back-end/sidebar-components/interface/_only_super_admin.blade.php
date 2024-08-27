@@ -1,14 +1,14 @@
 @if(Request::segment(1) == "super-admin" )
     <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#programmerLayouts" aria-expanded="true" aria-controls="programmerLayouts">
         <div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div>
-        Super Admin
+        System Super Admin
         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
     </a>
     <div class="collapse show" id="programmerLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
 @else
     <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#programmerLayouts" aria-expanded="false" aria-controls="programmerLayouts">
         <div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div>
-        Super Admin
+        System Super Admin
         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
     </a>
     <div class="collapse" id="programmerLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">

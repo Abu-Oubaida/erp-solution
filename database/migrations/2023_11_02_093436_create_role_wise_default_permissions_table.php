@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('role_wise_default_permissions', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->integer('status')->default(1)->comment('1=active');
             $table->unsignedBigInteger('role_id');
             $table->string('role_name');

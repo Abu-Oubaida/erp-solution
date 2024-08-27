@@ -9,7 +9,7 @@ class VoucherType extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['status','voucher_type_title', 'code', 'remarks','created_by','updated_by'];
+    protected $fillable = ['company_id','status','voucher_type_title', 'code', 'remarks','created_by','updated_by'];
 
     public function createdBY()
     {

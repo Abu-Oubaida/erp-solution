@@ -21,7 +21,7 @@ class CompanySetup extends Controller
         try {
             $companyTypes = company_type::with(['createdBY','updatedBY'])->get();
             $companies = company_info::with(['createdBY','updatedBY','companyType'])->get();
-            return view('back-end/programmer/company-setup',compact('companyTypes','companies'));
+            return view('back-end/programmer/company-setup',compact('companyTypes','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -84,7 +84,7 @@ class CompanySetup extends Controller
                 return back()->with('error','Data Not Found!');
             }
             $companyTypes = company_type::with(['createdBY','updatedBY'])->get();
-            return view('back-end/programmer/company-type-edit',compact('editID','companyTypes'));
+            return view('back-end/programmer/company-type-edit',compact('editID','companyTypes'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -236,7 +236,7 @@ class CompanySetup extends Controller
             {
                 return back()->with('error','Company Not Found!');
             }
-            return view('back-end/programmer/company-edit',compact('edit_company','companies','companyTypes'));
+            return view('back-end/programmer/company-edit',compact('edit_company','companies','companyTypes'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();

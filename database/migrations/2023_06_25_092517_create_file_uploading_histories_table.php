@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('file_uploading_histories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->string('status');
             $table->string('message');
             $table->string('disk_name');

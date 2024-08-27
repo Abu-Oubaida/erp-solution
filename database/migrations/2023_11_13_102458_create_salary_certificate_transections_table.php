@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('salary_certificate_transections', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('user_salary_certificate_data_id');
             $table->string('dated')->nullable();
             $table->string('amount')->nullable();

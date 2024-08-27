@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('create_file_histories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->string('status');
             $table->string('message');
             $table->string('disk_name');

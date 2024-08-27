@@ -13,13 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('file_manager_permissions', function (Blueprint $table) {
+        Schema::create('material_types', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id');
-            $table->integer('status')->comment('1=active, 0=deleted');
-            $table->unsignedBigInteger('user_id');
-            $table->string('dir_name');
-            $table->integer('permission_type')->comment('1=only view, 2=read/write,3=read/write/delete');
+            $table->string('name');
+            $table->string('code');
+            $table->integer('status')->comment('1=active,0=inactive');
+            $table->text('description')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('file_manager_permissions');
+        Schema::dropIfExists('material_types');
     }
 };

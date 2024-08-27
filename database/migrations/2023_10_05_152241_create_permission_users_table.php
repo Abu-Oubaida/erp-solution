@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('permission_users', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('user_id');
             $table->string('permission_name');
 //            $table->integer('is_parent')->default(null)->nullable();

@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('voucher_document_share_email_links', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->string('share_id');
             $table->unsignedBigInteger('share_document_id');
             $table->integer('status')->comment('1=active, 2=inactive/delete');

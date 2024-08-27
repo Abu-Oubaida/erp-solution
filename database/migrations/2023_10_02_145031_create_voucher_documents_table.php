@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('voucher_documents', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('voucher_info_id');
             $table->text('document')->nullable();
             $table->text('filepath')->nullable();

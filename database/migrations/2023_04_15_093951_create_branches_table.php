@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->string('branch_name')->nullable();
             $table->string('branch_type')->nullable();
             $table->string('status')->default(1)->comment('1=active, 0=inactive');

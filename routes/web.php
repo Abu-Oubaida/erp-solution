@@ -68,7 +68,7 @@ Route::group(['middleware' => ['auth']],function (){
     });//3.2 End
 
 # 3.2 Super Admin Controller
-    Route::group(['middleware'=>['auth','role:superadmin'],'prefix'=>'super-admin'],function (){
+    Route::group(['middleware'=>['auth','role:systemsuperadmin'],'prefix'=>'super-admin'],function (){
 # 3.2.1 Only for programmer
         Route::controller(prorammerController::class)->group(function (){
             Route::match(['post','get'],'permission-input','create')->name('permission.input');

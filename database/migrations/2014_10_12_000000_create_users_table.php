@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->string('employee_id')->unique()->nullable();
             $table->string('name');
             $table->string('phone')->nullable();
@@ -24,10 +25,26 @@ return new class extends Migration
             $table->bigInteger('designation_id')->nullable();
             $table->bigInteger('branch_id')->nullable();
             $table->string('joining_date')->nullable();
+            $table->string('birthdate')->nullable();
             $table->text('profile_pic')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->unsignedBigInteger('blood_id')->nullable();
+            $table->string('phone_2')->nullable();
+            $table->string('email_2')->nullable();
+            $table->text('father_name')->nullable();
+            $table->text('mother_name')->nullable();
+            $table->text('home_no')->nullable();
+            $table->text('village')->nullable();
+            $table->text('word_no')->nullable();
+            $table->text('union')->nullable();
+            $table->text('city')->nullable();
+            $table->text('sub-district')->nullable();
+            $table->text('district')->nullable();
+            $table->text('division')->nullable();
+            $table->text('capital')->nullable();
+            $table->text('country')->nullable();
             $table->timestamps();
         });
     }

@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('voucher_document_share_email_lists', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->string('share_id')->comment('');
             $table->string('email');
             $table->timestamps();

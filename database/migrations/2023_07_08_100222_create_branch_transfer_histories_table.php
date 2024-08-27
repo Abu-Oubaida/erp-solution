@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('branch_transfer_histories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('transfer_user_id');
             $table->unsignedBigInteger('new_branch_id');
             $table->unsignedBigInteger('from_branch_id')->nullable();

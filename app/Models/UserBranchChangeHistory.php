@@ -9,7 +9,7 @@ class UserBranchChangeHistory extends Model
 {
     use HasFactory;
     protected $table = 'branch_transfer_histories';
-    protected $fillable = ['transfer_user_id','new_branch_id','from_branch_id','transfer_by'];
+    protected $fillable = ['company_id','transfer_user_id','new_branch_id','from_branch_id','transfer_by'];
     public function getTransferUser()
     {
         return $this->belongsTo(User::class,'transfer_user_id');

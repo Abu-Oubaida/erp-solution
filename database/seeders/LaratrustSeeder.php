@@ -85,13 +85,12 @@ class LaratrustSeeder extends Seeder
         Schema::disableForeignKeyConstraints();
 
         DB::table('permission_role')->truncate();
-        DB::table('permission_user')->truncate();
         DB::table('role_user')->truncate();
 
         if (Config::get('laratrust_seeder.truncate_tables')) {
             DB::table('roles')->truncate();
             DB::table('permissions')->truncate();
-            
+
             if (Config::get('laratrust_seeder.create_users')) {
                 $usersTable = (new \App\Models\User)->getTable();
                 DB::table($usersTable)->truncate();

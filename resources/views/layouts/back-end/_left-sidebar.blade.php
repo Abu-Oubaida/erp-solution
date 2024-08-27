@@ -14,7 +14,7 @@
 
             {{--#2.1 Super Admin Components Start--}}
             <group3>
-                @if(\Illuminate\Support\Facades\Auth::user()->hasRole('superadmin'))
+                @if(\Illuminate\Support\Facades\Auth::user()->hasRole('systemsuperadmin'))
                     @include('layouts.back-end.sidebar-components.interface._only_super_admin')
                 @endif
             </group3>{{--#2.1 Super Admin Components End--}}

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class VoucherDocumentShareEmailList extends Model
 {
     use HasFactory;
-    protected $fillable = ['share_id','email'];
+    protected $fillable = ['company_id','share_id','email'];
 
     public function ShareLink()
     {

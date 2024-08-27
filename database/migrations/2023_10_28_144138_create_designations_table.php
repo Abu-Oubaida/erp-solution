@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('designations', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->string('title');
             $table->integer('status');
             $table->integer('priority')->nullable();

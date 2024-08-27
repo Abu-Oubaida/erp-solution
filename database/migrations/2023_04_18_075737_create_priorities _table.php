@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('priorities', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->integer('status')->default(1)->comment('1=active, 0=inactive');
             $table->string('title')->nullable();
             $table->bigInteger('priority_number')->unique();

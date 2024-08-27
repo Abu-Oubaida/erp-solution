@@ -25,7 +25,7 @@
         @foreach($companies as $company)
             <tr class="{!! (isset($edit_company) && $company->id == $edit_company->id)?'text-primary':'' !!}">
                 <td>{!! $i++ !!}</td>
-                <td><img class="img-thumbnail w-75" src="{!! url($company->logo) !!}" alt="{!! $company->company_code !!}"></td>
+                <td><img class="img-thumbnail w-75" src="{!! isset($company->logo)?(url($company->logo)):'' !!}" alt="{!! $company->company_code !!}"></td>
                 <td>{!! $company->company_name !!}</td>
                 <td>@if($company->status == 1) {!! '<span class="text-success">Active</span>' !!} @elseif($company->status == 3) {!! '<span class="text-warning">Deleted</span>' !!}  @else {!! '<span class="text-danger">Inactive</span>' !!} @endif</td>
                 <td>{!! $company->companyType->company_type_title !!}</td>

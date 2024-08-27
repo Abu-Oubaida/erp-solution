@@ -9,7 +9,7 @@ class Account_voucher extends Model
 {
     protected $table = 'account_voucher_infos';
     use HasFactory;
-    protected $fillable = ['id', 'voucher_type_id', 'voucher_number', 'voucher_date', 'file_count','remarks', 'created_by', 'updated_by', 'created_at', 'updated_at'];
+    protected $fillable = ['id','company_id', 'voucher_type_id', 'voucher_number', 'voucher_date', 'file_count','remarks', 'created_by', 'updated_by', 'created_at', 'updated_at'];
 
     public function VoucherType()
     {

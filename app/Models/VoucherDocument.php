@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class VoucherDocument extends Model
 {
     use HasFactory;
-    protected $fillable = ['voucher_info_id','document','filepath','created_by','updated_by'];
+    protected $fillable = ['company_id','voucher_info_id','document','filepath','created_by','updated_by'];
 
     public function accountVoucherInfo()
     {
