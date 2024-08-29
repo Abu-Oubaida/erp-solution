@@ -293,6 +293,9 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:edit_branch'])->group(function (){
             Route::match(['put','get'],'edit-branch/{branchID}','edit')->name('edit.branch');
         });
+        Route::middleware(['permission:delete_branch'])->group(function (){
+            Route::match(['delete'],'delete-branch','destroy')->name('delete.branch');
+        });
 
     });// 3.10 End
 # 3.11 User Blood group

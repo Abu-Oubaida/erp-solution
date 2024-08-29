@@ -80,7 +80,7 @@ class BranchController extends Controller
                 $status = 1;
             else
                 $status = 0;
-            branch::create([
+            $this->getBranch()->create([
                 'company_id' => $this->user->company_id,
                 'branch_name'   =>  $branch_name,
                 'branch_type'   =>  $branch_type,
@@ -150,7 +150,7 @@ class BranchController extends Controller
                 $status = 1;
             else
                 $status = 0;
-            branch::where('id',$branchID)->update([
+            $this->getBranch()->where('id',$branchID)->update([
                 'branch_name'   =>  $branch_name,
                 'branch_type'   =>  $branch_type,
                 'status'   =>  $status,
@@ -168,11 +168,22 @@ class BranchController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        try {
+            if (request()->isMethod('delete'))
+            {
+                extract($request->post());
+                $id = Crypt::decryptString($id);
+                $this->getBranch()->where('id',$id)->delete();
+                return back()->with('success','Data deleted successfully!');
+            }
+            return back()->with('error','Requested method not allowed!');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
     }
 }

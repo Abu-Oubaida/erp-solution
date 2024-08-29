@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row">
@@ -58,13 +58,13 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mb-4">
                                         <textarea class="form-control" id="address" name="address"> {{old('address')}}</textarea>
-                                        <label for="address">Address<span class="text-danger">*</span></label>
+                                        <label for="address">Address</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-4">
                                         <textarea class="form-control" id="remarks" name="remarks"> {{old('remarks')}}</textarea>
-                                        <label for="remarks">Remarks<span class="text-danger">*</span></label>
+                                        <label for="remarks">Remarks</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -84,7 +84,7 @@
                 </div>
             </div>
             @if(auth()->user()->hasPermission('add_branch_type'))
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="row">
@@ -124,7 +124,7 @@
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-floating mb-3 float-end">
-                                            <input type="submit" value="Insert" class="btn btn-chl-outline" name="submit" >
+                                            <input type="submit" value="Add" class="btn btn-chl-outline" name="submit" >
                                         </div>
                                     </div>
                                 </div>
