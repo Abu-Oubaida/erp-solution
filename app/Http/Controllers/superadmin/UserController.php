@@ -22,6 +22,8 @@ use App\Rules\DepartmentStatusRule;
 use App\Rules\DesignationStatusRule;
 use App\Rules\RoleStatusRule;
 use App\Rules\UserStatusCheck;
+use App\Traits\BranchParent;
+use App\Traits\ParentTraitCompanyWise;
 use http\Exception\BadConversionException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -37,11 +39,11 @@ use PhpParser\Node\Stmt\If_;
 
 class UserController extends Controller
 {
-    protected $user;
+    use ParentTraitCompanyWise;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->user= Auth::user();
+            $this->setUser();
             return $next($request);
         });
     }
@@ -53,11 +55,12 @@ class UserController extends Controller
             {
                 return $this->store($request);
             }else{
-                $depts = department::where('status',1)->get();
-                $branches = branch::where('status',1)->get();
-                $roles = Role::get();
-                $designations = Designation::where('status',1)->get();
-                return view('back-end.user.add',compact('depts','branches','roles','designations'))->render();
+                $companies = $this->getCompany()->get();
+                $depts = $this->getDepartment()->where('status',1)->get();
+                $branches = $this->getBranch()->where('status',1)->get();
+                $roles = $this->getRole()->get();
+                $designations = $this->getDesignation()->where('status',1)->get();
+                return view('back-end.user.add',compact('depts','branches','roles','designations','companies'))->render();
             }
 
         }catch (\Throwable $exception)
@@ -73,6 +76,7 @@ class UserController extends Controller
                 'name'  => ['required', 'string', 'max:255'],
                 'phone' => ['required', 'numeric', 'unique:'.User::class],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+                'company'=> ['required', 'integer', 'exists:company_infos,id'],
                 'dept'  => ['required', 'integer', new DepartmentStatusRule],
                 'designation'  => ['required', 'integer', new DesignationStatusRule],
                 'branch'  => ['required', 'integer', new BranchStatusRule],
@@ -84,12 +88,15 @@ class UserController extends Controller
             {
 //                dd($request->post());
                 extract($request->post());
-                $dept = department::where('id',$dept)->first();
+                if ($company != $this->user->company_id || !$this->user->isSystemSuperAdmin())
+                {
+                    return redirect(route('dashboard'))->with('error','Company not allowed');
+                }
+                $dept = $this->getDepartment()->where('id',$dept)->first();
                 $eid = $this->getEid($dept, $joining_date);
-                $roles = Role::where('id',$roll)->first();
-//                dd($roles);
-                $user = User::create([
-                    'company_id' => $this->user->company_id,
+                $roles = $this->getRole()->where('id',$roll)->first();
+                $user = $this->getUser()->create([
+                    'company_id' => $company,
                     'employee_id' => $eid[1],
                     'employee_id_hidden'    => $eid[0],
                     'name' => $name,
@@ -102,7 +109,6 @@ class UserController extends Controller
                     'joining_date' => date('y-m-d',strtotime($joining_date)),
                     'password' => Hash::make($request->password),
                 ]);
-
                 $user->attachRole($roles->name);
                 event(new Registered($user));
                 return back()->with('success','Account create successfully');
@@ -159,17 +165,17 @@ class UserController extends Controller
                 foreach ($input as $key=>$data)
                 {
 //                    $dept = department::where('dept_name',$data[1])->where('dept_code',$data[2])->first();
-                    $dept = department::where('dept_code',$data[2])->first();
-                    $designation = Designation::where('title',$data[3])->first();
-                    $branch = branch::where('branch_name',$data[4])->first();
-                    $blood = BloodGroup::where('blood_type',$data[9])->first();
+                    $dept = $this->getDepartment()->where('dept_code',$data[2])->first();
+                    $designation = $this->getDesignation()->where('title',$data[3])->first();
+                    $branch = $this->getBranch()->where('branch_name',$data[4])->first();
+                    $blood = $this->getBloodGroup()->where('blood_type',$data[9])->first();
                     ($blood)? $b_id = $blood->id:$b_id = null;
                     ($data[8])?$status = $data[8]:$status = 0;
                     $eid = $this->getEid($dept, $data[5]);
-                    $alreadyInDB = User::where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
+                    $alreadyInDB = $this->getUser()->where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
                     if (!$alreadyInDB)
                     {
-                        $user = User::create([
+                        $user = $this->getUser()->create([
                             'company_id' => $this->user->company_id,
                             'employee_id' => $eid[1],
                             'employee_id_hidden'    => $eid[0],
@@ -230,7 +236,13 @@ class UserController extends Controller
     public function show()
     {
         try {
-            $users = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
+            if ($this->user->isSystemSuperAdmin())
+            {
+                $users = $this->getUser()->orderBy('dept_id','asc')->get();
+            }
+            else {
+                $users = $this->getUser()->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
+            }
             return view('back-end/user/list',compact('users'))->render();
         }catch (\Throwable $exception)
         {

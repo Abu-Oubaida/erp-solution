@@ -27,7 +27,7 @@ class company_info extends Model
         return $this->hasMany(User::class,'company_id');
     }
 
-    public function fixedAsste()
+    public function fixedAssets()
     {
         return $this->hasMany(fixed_asset::class,'company_id');
     }

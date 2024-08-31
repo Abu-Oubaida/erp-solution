@@ -108,6 +108,8 @@ class AppPermissionSeeder extends Seeder
             ['id' => '99','parent_id' => '80','name' => 'delete_fixed_asset_opening_balance','is_parent' => NULL,'display_name' => 'Delete Fixed Asset Opening Balance','description' => 'Delete Fixed Asset Opening Balance','created_at' => '2024-08-19 09:30:51','updated_at' => '2024-08-19 09:30:51'],
             ['id' => '100','parent_id' => '80','name' => 'edit_fixed_asset_distribution_with_reference','is_parent' => NULL,'display_name' => 'Edit Fixed Asset Distribution With Reference Balance','description' => 'Edit Fixed Asset Distribution With Reference Balance','created_at' => '2024-08-24 14:42:27','updated_at' => '2024-08-24 14:42:27'],
             ['id' => '101','parent_id' => '54','name' => 'delete_branch','is_parent' => NULL,'display_name' => 'Delete Branch','description' => 'Delete Branch','created_at' => '2023-11-19 04:26:57','updated_at' => '2023-11-19 04:26:57'],
+            ['id' => '102','parent_id' => '27','name' => 'edit_department','is_parent' => NULL,'display_name' => 'Edit Department','description' => 'Edit Department','created_at' => date(now()),'updated_at' => null],
+            ['id' => '103','parent_id' => '27','name' => 'delete_department','is_parent' => NULL,'display_name' => 'Delete Department','description' => 'Delete Department','created_at' => date(now()),'updated_at' => null],
         ];
         DB::table($table)->insert($permissions);
     }

@@ -1,10 +1,10 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
-        <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
-        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
+{{--        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>--}}
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-4">
+                <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
                 <ol class="breadcrumb mb-4">
                     <li class="breadcrumb-item">
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
@@ -14,8 +14,8 @@
                     </li>
                 </ol>
             </div>
-            <div class="col-md-6">
-                <div class="float-start">
+            <div class="col-md-8">
+                <div class="float-end">
                     <strong>For uploading your employee.xlsx use this section. <a href="{!! route('export.employee.data.prototype') !!}">Prototype is here</a> Please flowing the exact format</strong>
                     <div class="input-group mb-3">
                         <input type="file" class="form-control" id="employee_file_upload">
@@ -26,28 +26,32 @@
                     {{--                    </button>--}}
                 </div>
             </div>
-            <div class="col-md-6">
+        </div>
+        <div class="card mb-4">
+            <div class="card-header">
                 <div class="row">
-                    <div class="col">
-                        <a class="btn btn-success btn-sm float-end" href="{{route('add.department')}}"><i class="fa-solid fa-building-user"></i> Add Department</a>
+                    <div class="col-md-6">
+                        <h3 class="text-capitalize"><i class="fas fa-user-plus"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
                     </div>
-                    <div class="col">
-                        <a class="btn btn-success btn-sm float-end" href="{{route('add.designation')}}"><i class="fa-solid fa-user-tag"></i> Add Designation</a>
-                    </div>
-                    <div class="col">
-                        <a class="btn btn-success btn-sm float-end" href="{{route('add.branch')}}"><i class="fa-solid fa-code-branch"></i> Add Branch</a>
-                    </div>
-                    <div class="col">
-                        <a class="btn btn-info btn-sm float-end" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  User List</a>
+                    <div class="col-md-6">
+                        <div class="row mt-1">
+                            <div class="col">
+                                <a class="btn btn-success btn-sm float-end mb-1" href="{{route('add.department')}}"><i class="fa-solid fa-building-user"></i> Add Department</a>
+                            </div>
+                            <div class="col">
+                                <a class="btn btn-success btn-sm float-end mb-1" href="{{route('add.designation')}}"><i class="fa-solid fa-user-tag"></i> Add Designation</a>
+                            </div>
+                            <div class="col">
+                                <a class="btn btn-success btn-sm float-end mb-1" href="{{route('add.branch')}}"><i class="fa-solid fa-code-branch"></i> Add Branch</a>
+                            </div>
+                            <div class="col">
+                                <a class="btn btn-info btn-sm float-end mb-1" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  User List</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="card mb-4">
             <div class="card-body">
-                <div class="row">
-                    <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
-                </div>
                 <form action="{{ route('add.user') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
@@ -71,48 +75,65 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
-                                <select class="form-control text-capitalize" id="branch" name="branch">
+                                <input class="form-control" id="joining_date" name="joining_date" type="date" placeholder="Joining Date" value="{!! old('joining_date') !!}"/>
+                                <label for="joining_date">Joining Date <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-control mb-3">
+                                <label for="company">Company Name <span class="text-danger">*</span></label>
+                                <select class="text-capitalize select-search" id="company" name="company">
+                                    @if(isset($companies) || (count($companies) > 0))
+                                        @foreach($companies as $c)
+                                            <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-control mb-3">
+                                <label for="branch">Branch Name <span class="text-danger">*</span></label>
+                                <select class="text-capitalize select-search" id="branch" name="branch">
                                     @if(isset($branches) || (count($branches) > 0))
-                                        <option value="0">--Select please--</option>
+                                        <option value="0"></option>
                                         @foreach($branches as $b)
                                             <option value="{{$b->id}}" @if(old('branch') == $b->id) selected @endif>{{$b->branch_name}}</option>
                                         @endforeach
                                     @endif
                                 </select>
-                                <label for="branch">Branch Name <span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <div class="form-floating mb-3">
-                                <select class="form-control" id="to" name="dept">
+                            <div class="form-control mb-3">
+                                <label for="priority">To Department <span class="text-danger">*</span></label>
+                                <select class="select-search" id="to" name="dept">
                                     <option value=""></option>
                                     @if(isset($depts) || (count($depts) > 0))
-                                        <option value="0">--Select please--</option>
                                         @foreach($depts as $d)
                                             <option value="{{$d->id}}" @if(old('dept') == $d->id) selected @endif>{{$d->dept_name}}</option>
                                         @endforeach
                                     @endif
                                 </select>
-                                <label for="priority">To Department <span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <div class="form-floating mb-3">
-                                <select class="form-control" id="designation" name="designation">
+                            <div class="form-control mb-3">
+                                <label for="designation">Designation <span class="text-danger">*</span></label>
+                                <select class="select-search" id="designation" name="designation">
                                     <option value=""></option>
                                     @if(isset($designations) || (count($designations) > 0))
-                                        <option value="0">--Select please--</option>
                                         @foreach($designations as $d)
                                             <option value="{{$d->id}}" @if(old('designation') == $d->id) selected @endif>{{$d->title}}</option>
                                         @endforeach
                                     @endif
                                 </select>
-                                <label for="designation">Desingation <span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <div class="form-floating mb-3">
-                                <select class="form-control" id="roll" name="roll">
+                            <div class="form-control mb-3">
+                                <label for="roll">User Roll <span class="text-danger">*</span></label>
+                                <select class="select-search" id="roll" name="roll">
                                     <option value=""></option>
                                     @if(isset($roles) || (count($roles) > 0))
                                         <option value="0">--Select please--</option>
@@ -121,15 +142,9 @@
                                         @endforeach
                                     @endif
                                 </select>
-                                <label for="roll">User Roll <span class="text-danger">*</span></label>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="joining_date" name="joining_date" type="date" placeholder="Joining Date" value="{!! old('joining_date') !!}"/>
-                                <label for="joining_date">Joining Date <span class="text-danger">*</span></label>
-                            </div>
-                        </div>
+
                         <div class="col-md-2">
                             <div class="form-floating mb-3">
                                 <input class="form-control" id="pass" name="password" type="password" placeholder="Enter password" value=""/>
@@ -143,7 +158,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-12">
+                        <div class="col-md-8">
                             <div class="form-floating mb-3 float-end">
                                 <input type="submit" value="Insert User" class="btn btn-chl-outline" name="submit" >
                             </div>

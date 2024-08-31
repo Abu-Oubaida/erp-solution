@@ -2,8 +2,8 @@
 @section('mainContent')
     <div class="container-fluid px-4">
         <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
-        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
-        <a class="btn btn-primary btn-sm float-end" href="{{route('branch.list')}}"><i class="fas fa-list-check"></i>  Branch List</a>
+{{--        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>--}}
+        <a class="btn btn-primary btn-sm float-end mt-4" href="{{route('branch.list')}}"><i class="fas fa-list-check"></i>  Branch List</a>
         <div class="row">
             <div class="col-md-12">
                 <ol class="breadcrumb mb-4">

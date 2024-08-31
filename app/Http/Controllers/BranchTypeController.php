@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\branch;
 use App\Models\BranchType;
 use App\Traits\BranchParent;
+use App\Traits\ParentTraitCompanyWise;
 use http\Exception\BadConversionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,8 +15,7 @@ use Throwable;
 
 class BranchTypeController extends Controller
 {
-    use BranchParent;
-    protected $user;
+    use ParentTraitCompanyWise;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {

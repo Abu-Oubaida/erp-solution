@@ -44,13 +44,9 @@ class User extends Authenticatable
 
     public function permissions()
     {
-        return $this->hasMany(PermissionUser::class);
+        return $this->hasMany(PermissionUser::class,'user_id','id');
     }
 
-    public function defaultPermissions()
-    {
-        return $this->hasMany(RoleWiseDefaultPermission::class,'role_id');
-    }
 
     public function hasPermission($permission)
     {
@@ -77,15 +73,19 @@ class User extends Authenticatable
 
         return 'User'; // Default user type if no role is associated
     }
-    public function getDepartment()
+//    public function roles()
+//    {
+//        return $this->belongsToMany(Role::class,'role_user','user_id','role_id');
+//    }
+    public function department()
     {
         return $this->belongsTo(department::class,'dept_id');
     }
-    public function getDesignation()
+    public function designation()
     {
         return $this->belongsTo(Designation::class,'designation_id');
     }
-    public function getBranch()
+    public function branch()
     {
         return $this->belongsTo(branch::class,'branch_id');
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\branch;
 use App\Models\BranchType;
 use App\Traits\BranchParent;
+use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -12,12 +13,11 @@ use Illuminate\Validation\Rule;
 
 class BranchController extends Controller
 {
-    use BranchParent;
-    protected $user;
+    use ParentTraitCompanyWise;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->user= Auth::user();
+            $this->setUser();
             return $next($request);
         });
     }

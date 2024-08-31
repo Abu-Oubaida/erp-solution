@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>{{str_replace('-', ' | ', config('app.name'))}}</title>
+    <title style="">{{ucwords(str_replace('.', ' ', \Route::currentRouteName()))}} | {{str_replace('-', '-', config('app.name'))}}</title>
     <link rel="icon" href="{{url("image/logo/chl_logo.png")}}">
     <x-back-end._header-link/>
     <meta name="csrf-token" content="{{ csrf_token() }}" />

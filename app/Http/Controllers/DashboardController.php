@@ -3,15 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Traits\AuthTrait;
+use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use function App\View\Components\back\render;
 
 class DashboardController extends Controller
 {
+    use ParentTraitCompanyWise;
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->setUser();
+            return $next($request);
+        });
+    }
     /**
      * Display a listing of the resource.
      *
@@ -20,9 +31,11 @@ class DashboardController extends Controller
     public function index()
     {
         try {
-            $auth = Auth::user();
-            $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$auth->id)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
-            return view('back-end.index',compact('user'));
+            $auth = $this->user;
+            $user = $this->getUser()->where('id', $auth->id)->first();
+//            dd($user->roles->first()->name);
+//            $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$auth->id)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
+            return view('back-end.index',compact('user'))->render();
         }catch (\Throwable $exception)
         {
             return $exception->getMessage();

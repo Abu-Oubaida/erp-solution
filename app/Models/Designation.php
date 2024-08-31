@@ -11,8 +11,20 @@ class Designation extends Model
 
     protected $fillable = ['company_id','title','status','priority','remarks','created_by','updated_by'];
 
-    public function getUser()
+    public function getUsers()
     {
         $this->hasMany(User::class,'designation');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'created_by');
+    }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class,'updated_by');
+    }
+    public function company()
+    {
+        return $this->belongsTo(company_info::class,'company_id');
     }
 }

@@ -18,7 +18,7 @@ class BranchType extends Model
     {
         return $this->belongsTo(User::class,'updated_by');
     }
-    public function getBranch()
+    public function getBranches()
     {
         return $this->hasMany(branch::class,'branch_type');
     }

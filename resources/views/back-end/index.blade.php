@@ -39,12 +39,16 @@
                                         <td>{!! $user->employee_id !!}</td>
                                     </tr>
                                     <tr>
+                                        <th>Designation:</th>
+                                        <td>{!! isset($user->designation->title)?$user->designation->title:'' !!}</td>
+                                    </tr>
+                                    <tr>
                                         <th>Department:</th>
-                                        <td>{!! $user->dept_name !!}</td>
+                                        <td>{!! isset($user->department->dept_name)?$user->department->dept_name:'' !!}</td>
                                     </tr>
                                     <tr>
                                         <th>Access Role:</th>
-                                        <td>{!! $user->display_name !!}</td>
+                                        <td>{!! $user->roles->first()->name !!}</td>
                                     </tr>
                                     <tr>
                                         <th>Email:</th>

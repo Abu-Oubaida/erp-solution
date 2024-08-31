@@ -144,6 +144,12 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:add_department'])->group(function (){
             Route::match(['post','get'],'add-department','create')->name('add.department');
         });//3.4.1 End
+        Route::middleware(['permission:edit_department'])->group(function (){
+            Route::match(['get','put'],'department-edit/{departmentID}','edit')->name('edit.department');
+        });
+        Route::middleware(['permission:delete_department'])->group(function (){
+            Route::match(['delete'],'department-delete','destroy')->name('delete.department');
+        });
     });//3.4 End
 # 3.5 Mobile SIM Controller
     Route::controller(MobileSIMController::class)->group(function (){

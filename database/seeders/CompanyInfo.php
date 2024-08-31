@@ -20,7 +20,7 @@ class CompanyInfo extends Seeder
         $table = 'company_infos';
         $this->truncateLaratrustTables($table);
         DB::table($table)->insert([
-            ['status'=>1,'company_name'=>'System','company_type_id'=>1,'contract_person_name'=>'System Admin','company_code'=>'000','phone'=>'01778138129','contract_person_phone'=>'01778138129','email'=>'abuoubaida36@gmail.com','location'=>'Earth','remarks'=>null,'logo'=>null,'logo_sm'=>null,'logo_icon'=>null,'cover'=>null,'created_by'=>1,'updated_by'=>1,'created_at'=>date('Y-m-d H:i:s',strtotime(now())),'updated_at'=>date('Y-m-d H:i:s',strtotime(now()))]
+            ['status'=>1,'company_name'=>'System','company_type_id'=>1,'contract_person_name'=>'System Admin','company_code'=>'System','phone'=>'01778138129','contract_person_phone'=>'01778138129','email'=>'abuoubaida36@gmail.com','location'=>'Earth','remarks'=>null,'logo'=>null,'logo_sm'=>null,'logo_icon'=>null,'cover'=>null,'created_by'=>1,'updated_by'=>1,'created_at'=>date('Y-m-d H:i:s',strtotime(now())),'updated_at'=>date('Y-m-d H:i:s',strtotime(now()))]
         ]);
     }
 }
