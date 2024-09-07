@@ -35,7 +35,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             // return false
             if (per.length > 0 && dir.length > 0)
             {
-                let url = window.location.origin + sourceDir + "/super-admin/user-per-add";
+                let url = window.location.origin + sourceDir + "/system-super-admin/user-per-add";
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,
@@ -287,6 +287,47 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             return dateToString(new Date(Math.round((serial - 25569) * 86400 * 1000)));
         }
         Obj = {
+            permissionInput:function (e)
+            {
+                let is_parent = null
+                const permission_parent = $('#permission_parent').val()
+                const permission_name = $('#permission_name').val()
+                const permission_display_name = $('#permission_display_name').val()
+                const description = $('#description').val()
+                if($('#is_parent').is(':checked')) is_parent = 1
+                if (permission_parent.length === 0 || permission_display_name.length === 0 || permission_name.length === 0)
+                {
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/system-super-admin/permission-store";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'permission_parent':permission_parent,'permission_name':permission_name,'permission_display_name':permission_display_name,'is_parent':is_parent,'description':description},
+                    success: function(response){
+                        if (response.status === 'success')
+                        {
+                            alert(response.message)
+                            $('#permission-list').html(response.data)
+                            if (is_parent)window.location.reload()
+                        }
+                        if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
+                            // Handle error
+                        }
+                    }
+                })
+            },
+            authCompany: function (e){
+                const username = $("#email").val()
+                const password = $("#password").val()
+                if (username.length === 0 || username.length === 0)
+                {
+                    return false
+                }
+            },
             fiendPermissionChild : function (e,actionID) {
                 let id = $(e).val()
                 if (id)

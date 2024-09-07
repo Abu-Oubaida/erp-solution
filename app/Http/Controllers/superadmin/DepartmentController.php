@@ -5,6 +5,7 @@ namespace App\Http\Controllers\superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\department;
 use App\Models\User;
+use App\Rules\uniqueFixedAssetIDCheck;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -109,11 +110,23 @@ class DepartmentController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\department  $department
-     * @return \Illuminate\Http\Response
+     * @return string
      */
-    public function edit(department $department)
+    public function edit(Request $request,$id)
     {
-        //
+        try {
+            $id = Crypt::decryptString($id);
+            if ($request->isMethod('put'))
+            {
+                return $this->update($request,$id);
+            }
+            $companies = $this->getCompany()->get();
+            $deplist= $this->getDepartment()->get();
+            $department = $this->getDepartment()->find($id);
+            return view("back-end/department/edit",compact('department','companies','deplist'))->render();
+        }catch (\Throwable $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -121,11 +134,32 @@ class DepartmentController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\department  $department
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, department $department)
+    public function update(Request $request, $id)
     {
-        //
+        try {
+            $request->validate([
+                'dept_name'  => ['required', 'string', 'max:255',Rule::unique('departments')->ignore($id)],
+                'dept_code' => ['required', 'numeric', Rule::unique('departments')->ignore($id)],
+                'status' => ['required', 'string',],
+                'remarks'=> ['nullable','string'],
+                'company'=> ['required', 'integer', 'exists:company_infos,id'],
+            ]);
+            $this->getDepartment()->where("id",$id)->update([
+                'dept_name' => $request->post('dept_name'),
+                'dept_code' => $request->post('dept_code'),
+                'status' => $request->post('status'),
+                'remarks' => $request->post('remarks'),
+                'company_id' => $request->post('company'),
+                'updated_by' => $this->user->id,
+                'updated_at' => now(),
+            ]);
+            return back()->with('success','Data update successfully');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error', $exception->getMessage());
+        }
     }
 
     /**
@@ -143,7 +177,7 @@ class DepartmentController extends Controller
                 extract($request->post());
                 if (count($this->getDepartment()->where("id",$id)->first()->getUsers))
                 {
-                    return back()->with('error','Deletion not possible! A relationship exists.');
+                    return back()->with('warning','Deletion not possible! A relationship exists.');
                 }
                 $this->getDepartment()->where("id",$id)->delete();
                 return back()->with('success','Data deleted successfully');

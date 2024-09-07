@@ -26,19 +26,19 @@
                         <form action="{{ route('add.designation') }}" method="POST">
                             @csrf
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-floating mb-">
                                         <input class="form-control" id="title" name="title" type="text" placeholder="Enter title" value="{{old('title')}}" required/>
                                         <label for="name">Designation title<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="priority" name="priority" type="number" placeholder="Priority" value="{{old('priority')}}" required/>
                                         <label for="priority">Priority<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-floating mb-3">
                                         <select class="form-control" name="status" id="status" required>
                                             <option value=""></option>
@@ -46,6 +46,18 @@
                                             <option value="0" @if(old('status') == 0) selected @endif>Inactive</option>
                                         </select>
                                         <label for="status">Status<span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class=" mb-3">
+                                        <label for="company">Company Name <span class="text-danger">*</span></label>
+                                        <select class="text-capitalize select-search" id="company" name="company">
+                                            @if(isset($companies) || (count($companies) > 0))
+                                                @foreach($companies as $c)
+                                                    <option value="{{$c->id}}">{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -58,7 +70,7 @@
 
                                 <div class="col-md-12">
                                     <div class="form-floating mb-3 float-end">
-                                        <input type="submit" value="Insert Designation" class="btn btn-chl-outline" name="submit" >
+                                        <button type="submit" value="" class="btn btn-chl-outline" name="submit" > <i class="fas fa-save"></i> Save Designation</button>
                                     </div>
                                 </div>
                             </div>
@@ -90,7 +102,19 @@
                                         <td>{!! $d->title !!}</td>
                                         <td>{!! $d->priority !!}</td>
                                         <td>@if($d->status==1) Active @else Inactive @endif</td>
-                                        <td></td>
+                                        <td>
+                                            @if(auth()->user()->hasPermission('edit_designation'))
+                                                <a href="{!! route('edit.designation',['designationID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" class="text-success"><i class="fas fa-edit"></i></a>
+                                            @endif
+                                            @if(auth()->user()->hasPermission('delete_designation'))
+                                                <form action="{{route('delete.designation')}}" class="display-inline" method="post">
+                                                    @method('delete')
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{!! $d->id !!}">
+                                                    <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
+                                                </form>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             @else

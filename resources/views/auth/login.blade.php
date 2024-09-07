@@ -69,8 +69,14 @@
                                         <label for="email">Email address/Phone Number</label>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="password" type="password" placeholder="Password" name="password" value="{{old('password')}}"/>
+                                        <input class="form-control" id="password" type="password" placeholder="Password" name="password" value="" onfocusout="return Obj.authCompany(this)"/>
                                         <label for="password">Password</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" name="company_id" id="company_id">
+                                            <option value=""></option>
+                                        </select>
+                                        <label for="company_id">Select your company</label>
                                     </div>
                                     <div class="form-check mb-3">
                                         <input class="form-check-input" name="remember" id="remember_me" type="checkbox" value="" />
@@ -88,5 +94,4 @@
                         </div>
                     </div>
                 </div>
-
 @stop

@@ -4,6 +4,9 @@
 .text-chl {
     color: #f47920;
 }
+.text-active {
+    color: #0a53be;
+}
 .bg-chl {
     background: #f47920;
 }

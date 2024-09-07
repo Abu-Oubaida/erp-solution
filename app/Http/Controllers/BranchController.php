@@ -177,6 +177,10 @@ class BranchController extends Controller
             {
                 extract($request->post());
                 $id = Crypt::decryptString($id);
+                if (count($this->getBranch()->where('id',$id)->first()->getUsers())>0)
+                {
+                    return back()->with('warning','Deletion not possible! A relationship exists.');
+                }
                 $this->getBranch()->where('id',$id)->delete();
                 return back()->with('success','Data deleted successfully!');
             }

@@ -3,12 +3,21 @@
 namespace App\Http\Controllers\superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\Designation;
+use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DesignationController extends Controller
 {
-    //
+
+    use ParentTraitCompanyWise;
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->setUser();
+            return $next($request);
+        });
+    }
     public function index()
     {
 
@@ -21,7 +30,8 @@ class DesignationController extends Controller
                 return $this->store($request);
             }
             $designations = Designation::orderBY('priority','asc')->get();
-            return view('back-end/designation/add',compact('designations'));
+            $companies = $this->getCompany()->get();
+            return view('back-end/designation/add',compact('designations','companies'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();

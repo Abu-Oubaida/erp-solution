@@ -22,26 +22,26 @@ class prorammerController extends Controller
             }
             $permissions = Permission::with(['childPermission','parentName'])->where('parent_id',null)->orWhere('is_parent','!=',null)->orderBy('id','ASC')->get();
 //            dd($permissions);
-            return view('back-end/programmer/add',compact("permissions"));
+            return view('back-end.programmer.permission-input',compact("permissions"));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
 
-    private function store(Request $request)
+    protected function store(Request $request)
     {
-        $rules= [
-            'permission_parent'  => ['string','required', 'max:255','exists:permissions,id'],
-            'permission_name'  => ['string','required', 'max:255','regex:/^[a-z0-9_]+$/','unique:permissions,name'],
-            'permission_display_name'  => ['string','required', 'max:255','unique:permissions,display_name'],
-            'description'  => ['string','sometimes','nullable', 'max:255'],
-        ];
-        $customMessages = [
-            'custom_separator' => 'Without underscore "_" all separator are invalid!'
-        ];
-        $this->validate($request, $rules, $customMessages);
         try {
+            $rules= [
+                'permission_parent'  => ['string','required', 'max:255','exists:permissions,id'],
+                'permission_name'  => ['string','required', 'max:255','regex:/^[a-z0-9_]+$/','unique:permissions,name'],
+                'permission_display_name'  => ['string','required', 'max:255','unique:permissions,display_name'],
+                'description'  => ['string','sometimes','nullable', 'max:255'],
+            ];
+            $customMessages = [
+                'custom_separator' => 'Without underscore "_" all separator are invalid!'
+            ];
+            $this->validate($request, $rules, $customMessages);
             extract($request->post());
             if (Permission::where('id',$permission_parent)->where('name','none')->first())
             {
@@ -54,10 +54,20 @@ class prorammerController extends Controller
                 'display_name'=>  $permission_display_name,
                 'description'=>  $description,
             ]);
-            return back()->with('success','Data added successfully!');
+            $permissions = Permission::with(['childPermission','parentName'])->where('parent_id',null)->orWhere('is_parent','!=',null)->orderBy('id','ASC')->get();
+            $view   = view('back-end.programmer._permission-list',compact("permissions"))->render();
+            return response()->json([
+                'status' => 'success',
+                'data' => $view,
+                'parents' => $permissions,
+                'message' => 'Request processed successfully.',
+            ], 200);
         }catch (\Throwable $exception)
         {
-            return back()->with('error',$exception->getMessage())->withInput();
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ], 200);
         }
     }
 
@@ -76,6 +86,7 @@ class prorammerController extends Controller
                 return back()->with('warning','This data has relation between another table. Data delete not possible!');
             }
             Permission::where('id',$dataID)->delete();
+            Permission::where('parent_id',$dataID)->delete();
             return back()->with('success','Data delete successfully!');
         }catch (\Throwable $exception)
         {

@@ -1,4 +1,4 @@
-@if(Request::segment(1) == "super-admin" )
+@if(Request::segment(1) == "system-super-admin" )
     <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#programmerLayouts" aria-expanded="true" aria-controls="programmerLayouts">
         <div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div>
         System Super Admin

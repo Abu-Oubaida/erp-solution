@@ -67,11 +67,12 @@ Route::group(['middleware' => ['auth']],function (){
         });
     });//3.2 End
 
-# 3.2 Super Admin Controller
-    Route::group(['middleware'=>['auth','role:systemsuperadmin'],'prefix'=>'super-admin'],function (){
+# 3.2 System Admin Controller
+    Route::group(['middleware'=>['auth','role:systemsuperadmin'],'prefix'=>'system-super-admin'],function (){
 # 3.2.1 Only for programmer
         Route::controller(prorammerController::class)->group(function (){
-            Route::match(['post','get'],'permission-input','create')->name('permission.input');
+            Route::get('permission-input','create')->name('permission.input');
+            Route::post('permission-store','store')->name('permission.input.store');
             Route::delete('permission-input-delete','delete')->name('permission.input.delete');
         });//3.2.1 End
 # 3.2.2 User Screen Permission Controller
@@ -272,6 +273,12 @@ Route::group(['middleware' => ['auth']],function (){
     Route::controller(DesignationController::class)->group(function (){
         Route::middleware(['permission:add_designation'])->group(function (){
             Route::match(['post','get'],'add-designation','create')->name('add.designation');
+        });
+        Route::middleware(['permission:edit_designation'])->group(function (){
+            Route::match(['get','put'],'designation-edit/{designationID}','edit')->name('edit.designation');
+        });
+        Route::middleware(['permission:delete_designation'])->group(function (){
+            Route::match(['delete'],'designation-delete','destroy')->name('delete.designation');
         });
     });//3.8 End
 # 3.10 User Designation

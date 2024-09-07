@@ -144,7 +144,7 @@ class BranchTypeController extends Controller
             $branchTypeChild = $this->getBranchType()->where('id',Crypt::decryptString($id))->first();
             if(count($branchTypeChild->getBranch))
             {
-                return back()->with('warning','Data delete not possible! This data has relationship');
+                return back()->with('warning','Deletion not possible! A relationship exists.');
             }
             $this->getBranchType()->where('id',Crypt::decryptString($id))->delete();
             return redirect()->route('branch.list')->with('success','Data delete successfully');
