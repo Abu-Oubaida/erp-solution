@@ -6,9 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>{{str_replace('-', ' | ', config('app.name'))}} </title>
     <link rel="icon" href="{{url("image/logo/chl_logo.png")}}">
     <x-auth._header_link/>
+    <style>
+        button:disabled {
+            cursor: not-allowed!important; /* Show a "not-allowed" cursor */
+            opacity: 0.5!important; /* Optional: to make it look visually disabled */
+        }
+    </style>
 </head>
 <body class="bg-image" style="background-image: url({{url("image/bg/chl-2.jpg")}})">
 <div id="layoutAuthentication">
@@ -17,8 +24,10 @@
             <div class="container-fluid">
                 <div class="row justify-content-center">
                     <div class="col-md-11">
-
                         @yield('content')
+                        <div id='ajax_loader' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+                            <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+                        </div>
                     </div>
                 </div>
             </div>

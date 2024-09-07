@@ -1,13 +1,13 @@
 @extends('layouts.auth.main')
 @section('content')
                 <div class="row justify-content-right custom-m-5">
-                    <div class="col-lg-8"></div>
-                    <div class="col-lg-4">
-                        <div class="card border-0 rounded-lg mt-5 p-5">
+                    <div class="col-lg-8 col-md-7"></div>
+                    <div class="col-lg-4 col-md-5">
+                        <div class="card border-0 rounded-lg mt-4 mb-4">
                             <div class="card-header text-center">
                                 <a href="{{route('root')}}"><img src="{{url("image/logo/chl_logo.png")}}" alt="Credence Housing Limited" class="img-fluid" width="50%"></a>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body p-3">
                                 @if ($errors->any())
                                     <div class="col-12">
                                         <div class="alert alert-danger alert-dismissible fade show z-index-1 w-auto error-alert right-0" role="alert">
@@ -65,18 +65,17 @@
                                 <form action="{{ route('login.store') }}" method="POST">
                                     @csrf
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="email" name="email" type="text" placeholder="Enter Your Email or Phone" value="{{old('email')}}"/>
-                                        <label for="email">Email address/Phone Number</label>
+                                        <input class="form-control" id="email" name="email" type="text" placeholder="Enter Your Email or Phone" value="{{old('email')}}" onfocusout="return Obj.authCompany(this)"/>
+                                        <label for="email">Email address/Phone Number <span class="text-danger">*</span></label>
                                     </div>
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="password" type="password" placeholder="Password" name="password" value="" onfocusout="return Obj.authCompany(this)"/>
-                                        <label for="password">Password</label>
+                                        <label for="password">Password <span class="text-danger">*</span></label>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <select class="form-control" name="company_id" id="company_id">
-                                            <option value=""></option>
+                                        <select class="form-control" name="company_id" id="companySelect">
                                         </select>
-                                        <label for="company_id">Select your company</label>
+                                        <label for="company_id">Select your company <span class="text-danger">*</span></label>
                                     </div>
                                     <div class="form-check mb-3">
                                         <input class="form-check-input" name="remember" id="remember_me" type="checkbox" value="" />
@@ -84,7 +83,7 @@
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
                                         <a class="small text-chl" href="{{route('password.request')}}" >Forgot Password?</a>
-                                        <button class="btn btn-primary btn-bg-chl" type="submit">Login</button>
+                                        <button style="display: none" class="btn btn-primary btn-bg-chl" id="login" type="submit" disabled>Login</button>
                                     </div>
                                 </form>
                             </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\superadmin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ShareVoucherDocument;
+use App\Models\company_info;
 use App\Models\DocumentShareLinkEmail;
 use App\Models\Permission;
 use App\Models\User;
@@ -16,12 +17,50 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ajaxRequestController extends Controller
 {
+    public function companyCheckSet(Request $request)
+    {
+        try {
+            $request->validate([
+                'username'=> ['required','string'],
+                'password'=> ['required','string']
+            ]);
+            extract($request->post());
+            $users = User::where('email',$username)->orWhere('phone',$username)->get();
+            // Filter out users with correct password
+            $matchingUsers = $users->filter(function ($user) use ($request) {
+                return Hash::check($request->password, $user->password);
+            });
+            if ($matchingUsers->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid credentials'
+                ], 401);
+            }
+            // Extract companies associated with the matching users
+            $companies = $matchingUsers->map(function ($user){
+                return company_info::where('id',$user->company_id)->first();// assuming a relation with Company
+            });
+            // Return the list of companies to the frontend
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Credentials are correct',
+                'companies' => $companies
+            ], 200);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status'=>'error',
+                'message'=>$exception->getMessage(),
+            ],200);
+        }
+    }
     //
     public function findPermissionChild(Request $request)
     {

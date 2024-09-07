@@ -323,10 +323,44 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             authCompany: function (e){
                 const username = $("#email").val()
                 const password = $("#password").val()
-                if (username.length === 0 || username.length === 0)
+                if (username.length === 0 || password.length === 0)
                 {
                     return false
                 }
+                const url = window.location.origin + sourceDir + "/company-check-set"
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'username':username,'password':password},
+                    success: function (response) {
+                        if (response.status === 'error')
+                        {
+                            // alert('Error:'+response.message)
+                            $("#companySelect").html("<option></option>");
+                            $("#login").attr('disabled','disabled')
+                            $("#login").hide()
+                        }
+                        else {
+                            // Display the list of companies
+                            let companies = response.companies;
+                            let companySelect = $('#companySelect');
+                            companySelect.empty();
+                            $.each(companies, function (index, company) {
+                                companySelect.append(new Option(company.company_name, company.id));
+                            });
+                            $("#login").removeAttr('disabled')
+                            $("#login").show()
+
+                        }
+                    },
+                    error: function (error) {
+                        // alert(error.responseJSON.message);
+                        $("#companySelect").html("<option></option>");
+                        $("#login").attr('disabled','disabled')
+                        $("#login").hide()
+                    }
+                })
             },
             fiendPermissionChild : function (e,actionID) {
                 let id = $(e).val()

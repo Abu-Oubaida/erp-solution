@@ -50,6 +50,8 @@ Route::controller(ajaxRequestController::class)->group(function (){
         Route::post('voucher-share-type','voucherShareType')->name('voucher.share.type');
 
     });
+    # 2.4 For Auth user company check
+    Route::post('company-check-set','companyCheckSet');
 });//2.0 End
 
 # 3.0 All with Auth
