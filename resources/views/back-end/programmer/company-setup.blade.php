@@ -13,7 +13,7 @@
     <div class="row">
         <div class="col-md-12" id="company_section">
             <div class="card mb-4">
-                <div class="card-body">
+                <div class="card-header">
                     <div class="row">
                         <div class="col-md-8">
                             <h5># Add New Company</h5>
@@ -22,7 +22,8 @@
                             <a href="#company_type_setion" class="btn btn-sm btn-outline-secondary float-end"><i class="fas fa-solid fa-plus"></i> Add Company Type</a>
                         </div>
                     </div>
-                    <hr>
+                </div>
+                <div class="card-body">
                     <form action="{!! route('add.company') !!}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
@@ -128,7 +129,7 @@
         </div>
         <div class="col-md-12" id="company_type_setion">
             <div class="card mb-4">
-                <div class="card-body">
+                <div class="card-header">
                     <div class="row">
                         <div class="col-md-8">
                             <h5># Add New Company Type</h5>
@@ -137,8 +138,8 @@
                             <a href="#company_section" class="btn btn-sm btn-outline-secondary float-end"><i class="fas fa-solid fa-plus"></i> Add New Company</a>
                         </div>
                     </div>
-
-                    <hr>
+                </div>
+                <div class="card-body">
                     <form action="{!! route('add.company.type') !!}" method="POST">
                         @csrf
                         <div class="row">
