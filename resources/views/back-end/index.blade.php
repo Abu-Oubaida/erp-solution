@@ -67,8 +67,8 @@
                                 </div>
                             @endif
                         </div>
-                        <div class="card-footer">
-                            <h4 class="text-center"><img src="{{url("image/logo/default/icon/360.png")}}" alt="{{str_replace('-', '-', config('app.name'))}}" class="img-fluid" width="8%"> Thank you for using me.<img src="{{url("image/logo/default/icon/smile-icon.png")}}" alt=":)" width="10%"></h4>
+                        <div class="card-footer pb-1 pt-3">
+                            <h3 class="text-center"><img src="{{url("image/logo/default/icon/360.png")}}" alt="{{str_replace('-', '-', config('app.name'))}}" class="img-fluid float-start" width="9%"> Thank you for using me.<img class="float-end" src="{{url("image/logo/default/icon/smile-icon.png")}}" alt=":)" width="11%"></h3>
                         </div>
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                     <div class="card mb-4">
                         <div class="card-header">
                             <div class="col-md-12">
-                                <h3 class=""><i class="fas fa-key"></i> Change Password Here</h3>
+                                <h3 class=""><i class="fas fa-key"></i> Change password here</h3>
                             </div>
                         </div>
                         <form action="{!! route("change.password") !!}" method="post">
@@ -108,7 +108,7 @@
                             @endif
                         </div>
                         <div class="card-footer pt-3 pb-2">
-                            <img src="{{url("image/logo/default/icon/360.png")}}" alt="{{str_replace('-', '-', config('app.name'))}}" class="img-fluid mb-1" width="10%">
+                            <img src="{{url("image/logo/default/icon/360.png")}}" alt="{{str_replace('-', '-', config('app.name'))}}" class="img-fluid mb-2" width="9.5%">
                             <div class="form-floating float-end">
                                 <button type="submit" value="" onclick="return confirm('Are you sure to change the password?')" class="btn btn-chl-outline mt-1 mb-3" name="submit" ><i class="fas fa-save"></i> Update Password</button>
                             </div>
