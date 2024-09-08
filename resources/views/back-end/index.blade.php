@@ -38,16 +38,12 @@
                                                 <td>{!! $user->roles->first()->display_name !!}</td>
                                             </tr>
                                             <tr>
+                                                <th>Account Status:</th>
+                                                <td> @if($user->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
+                                            </tr>
+                                            <tr>
                                                 <th>Employee ID:</th>
                                                 <td>{!! $user->employee_id !!}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Designation:</th>
-                                                <td>{!! isset($user->designation->title)?$user->designation->title:'' !!}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Department:</th>
-                                                <td>{!! isset($user->department->dept_name)?$user->department->dept_name:'' !!}</td>
                                             </tr>
                                             <tr>
                                                 <th>Email:</th>
@@ -58,9 +54,14 @@
                                                 <td>{!! $user->phone !!}</td>
                                             </tr>
                                             <tr>
-                                                <th>Account Status:</th>
-                                                <td>@if($user->status) <span class="badge bg-success">Active</span>@else <span class="badge bg-danger">Inactive</span> @endif</td>
+                                                <th>Designation:</th>
+                                                <td>{!! isset($user->designation->title)?$user->designation->title:'' !!}</td>
                                             </tr>
+                                            <tr>
+                                                <th>Department:</th>
+                                                <td>{!! isset($user->department->dept_name)?$user->department->dept_name:'' !!}</td>
+                                            </tr>
+
                                             </tbody>
                                         </table>
                                     </div>
