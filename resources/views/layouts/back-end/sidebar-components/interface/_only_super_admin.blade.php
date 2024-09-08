@@ -14,7 +14,7 @@
     <div class="collapse" id="programmerLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
 @endif
         <nav class="sb-sidenav-menu-nested nav ">
-            @if(Route::currentRouteName() == 'add.company' || Route::currentRouteName() == 'company.setup' || Route::currentRouteName() == 'edit.company' || Route::currentRouteName() == 'list.company' || Route::currentRouteName() == 'add.company.type'  || Route::currentRouteName() == 'list.company.type' || Route::currentRouteName() == 'edit.company.type')
+            @if(Route::currentRouteName() == 'add.company' || Route::currentRouteName() == 'company.setup' || Route::currentRouteName() == 'edit.company' || Route::currentRouteName() == 'company.list' || Route::currentRouteName() == 'add.company.type'  || Route::currentRouteName() == 'company.type.list' || Route::currentRouteName() == 'edit.company.type')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#companies" aria-expanded="true" aria-controls="companies">
                     <div class="sb-nav-link-icon"><i class="fa-solid fa-city"></i></div>
                     Company Setup
@@ -35,26 +35,26 @@
                         @else
                             <a class="nav-link text-chl" href="{!! route('add.company') !!}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-file-circle-plus"></i></div> Add Company</a>
                         @endif
-                        @if(Route::currentRouteName() == 'list.company')
-                            <a class="nav-link" href="{{route('list.company')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-list"></i></div>Show List</a>
+                        @if(Route::currentRouteName() == 'company.list')
+                            <a class="nav-link" href="{{route('company.list')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-list"></i></div>Show List</a>
                         @else
-                            <a class="nav-link text-chl" href="{!! route('list.company') !!}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>Show List</a>
+                            <a class="nav-link text-chl" href="{!! route('company.list') !!}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>Show List</a>
+                        @endif
+                        @if(Route::currentRouteName() == 'edit.company')
+                            <a class="nav-link" href="{{route('edit.company',['companyID'=>\Illuminate\Support\Facades\Request::route('companyID')])}}"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div> Company Edit</a>
                         @endif
                         @if(Route::currentRouteName() == 'add.company.type')
                             <a class="nav-link" href="{{route('add.company.type')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div> Add Type</a>
                         @else
                             <a class="nav-link text-chl" href="{!! route('add.company.type') !!}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div> Add Type</a>
                         @endif
-                        @if(Route::currentRouteName() == 'list.company.type')
-                            <a class="nav-link" href="{{route('list.company.type')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-list"></i></div>Type List</a>
+                        @if(Route::currentRouteName() == 'company.type.list')
+                            <a class="nav-link" href="{{route('company.type.list')}}"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-list"></i></div>Type List</a>
                         @else
-                            <a class="nav-link text-chl" href="{!! route('list.company') !!}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>Type List</a>
-                        @endif
-                        @if(Route::currentRouteName() == 'edit.company')
-                            <a class="nav-link" href="{{route('edit.company',['companyID'=>\Illuminate\Support\Facades\Request::route('companyID')])}}"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div> Company Edit</a>
+                            <a class="nav-link text-chl" href="{!! route('company.type.list') !!}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>Type List</a>
                         @endif
                         @if(Route::currentRouteName() == 'edit.company.type')
-                            <a class="nav-link" href="{{route('edit.company.type',['companyTypeID'=>\Illuminate\Support\Facades\Request::route('companyTypeID')])}}"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div> Company Type Edit</a>
+                            <a class="nav-link" href="{{route('edit.company.type',['companyTypeID'=>\Illuminate\Support\Facades\Request::route('companyTypeID')])}}"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div>Type Edit</a>
                         @endif
                     </nav>
                 </div>

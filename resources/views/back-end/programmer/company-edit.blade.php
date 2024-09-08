@@ -1,7 +1,7 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
-        <h1 class="mt- text-capitalize">{{str_replace('-', ' ', config('app.name'))}} | {{str_replace('.', ' ', \Route::currentRouteName())}} Page</h1>
+{{--        <h1 class="mt- text-capitalize">{{str_replace('-', ' ', config('app.name'))}} | {{str_replace('.', ' ', \Route::currentRouteName())}} Page</h1>--}}
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item">
                 <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
@@ -16,10 +16,10 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-8">
-                                <h5># Edit Company</h5>
+                                <h5><i class="fas fa-edit"></i> Edit Company</h5>
                             </div>
                             <div class="col-md-4">
-                                <a href="{!! route('add.company') !!}" class="btn btn-sm btn-outline-secondary float-end"><i class="fas fa-solid fa-plus"></i> Add Company</a>
+                                <a href="{!! route('add.company') !!}" class="btn btn-sm btn-outline-info float-end"><i class="fas fa-solid fa-plus"></i> Add Company</a>
                             </div>
                         </div>
                         <hr>
@@ -125,7 +125,7 @@
                                 </div>
                             </div>
                         </form>
-                        <h5># Companies List</h5>
+                        <h5><i class="fas fa-list"></i> Companies List</h5>
                         <hr>
                         @include("back-end.programmer._company-list")
                     </div>

@@ -1,15 +1,13 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
-        <h1 class="mt- text-capitalize">{{str_replace('-', ' ', config('app.name'))}}
-            | {{str_replace('.', ' ', \Route::currentRouteName())}} Page</h1>
+{{--        <h1 class="mt- text-capitalize">{{str_replace('-', ' ', config('app.name'))}} | {{str_replace('.', ' ', \Route::currentRouteName())}} Page</h1>--}}
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item">
                 <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
             </li>
             <li class="breadcrumb-item">
-                <a href="{{route('company.setup')}}" class="text-capitalize text-chl text-decoration-none">Company
-                    Setup</a>
+                <a href="{{route('company.type.list')}}" class="text-capitalize text-chl text-decoration-none">Company Type List</a>
             </li>
             <li class="breadcrumb-item">
                 <a style="text-decoration: none;" href="#"
@@ -22,10 +20,10 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-8">
-                                <h5># Edit Company Type</h5>
+                                <h5><i class="fas fa-edit"></i> Edit Company Type</h5>
                             </div>
                             <div class="col-md-4">
-                                <a href="{!! route('company.setup') !!}" class="btn btn-sm btn-outline-secondary float-end"><i class="fas fa-solid fa-plus"></i> Add New Company</a>
+                                <a href="{!! route('add.company.type') !!}" class="btn btn-sm btn-outline-info float-end"><i class="fas fa-solid fa-plus"></i> Add Company Type</a>
                             </div>
                         </div>
                         <hr>
@@ -78,11 +76,8 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-8">
-                                <h5># Company Type list</h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{!! route('company.setup') !!}" class="btn btn-sm btn-outline-secondary float-end"><i class="fas fa-solid fa-plus"></i> Add New Company</a>
+                            <div class="col-md-12">
+                                <h5><i class="fas fa-list"></i> Company Type list</h5>
                             </div>
                         </div>
                         <hr>

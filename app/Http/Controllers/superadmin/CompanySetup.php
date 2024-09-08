@@ -22,9 +22,7 @@ class CompanySetup extends Controller
     public function index()
     {
         try {
-            $companyTypes = company_type::with(['createdBY','updatedBY'])->get();
-            $companies = company_info::with(['createdBY','updatedBY','companyType'])->get();
-            return view('back-end/programmer/company-setup',compact('companyTypes','companies'))->render();
+
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -38,13 +36,22 @@ class CompanySetup extends Controller
             {
                 $this->companyTypeStore($request);
             }
-            return $this->index();
+            return view('back-end/programmer/company-type-add')->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
-
+    public function companyTypeList()
+    {
+        try {
+            $companyTypes = company_type::with(['createdBY','updatedBY'])->get();
+            return view('back-end/programmer/company-type-list',compact('companyTypes'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+    }
     private function companyTypeStore(Request $request)
     {
         try {
@@ -146,7 +153,9 @@ class CompanySetup extends Controller
             {
                 $this->companyStore($request);
             }
-            return $this->index();
+            $companyTypes = company_type::with(['createdBY','updatedBY'])->get();
+            $companies = company_info::with(['createdBY','updatedBY','companyType'])->get();
+            return view('back-end/programmer/company-setup',compact('companyTypes','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -223,7 +232,17 @@ class CompanySetup extends Controller
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
+    public function companyList()
+    {
+        try {
+            $companies = company_info::with(['createdBY','updatedBY','companyType'])->get();
+            return view('back-end.programmer.company-list',compact('companies'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
 
+    }
     public function companyEdit(Request $request, $companyID)
     {
         try {
