@@ -6,14 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\company_info;
 use App\Models\company_type;
 use App\Models\User;
+use App\Traits\DeleteFileTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 use function PHPUnit\Framework\isEmpty;
+use Illuminate\Support\Facades\File;
 
 class CompanySetup extends Controller
 {
+    use DeleteFileTrait;
     private $imagePath = "image/logo/";
     //
     public function index()
@@ -264,11 +267,12 @@ class CompanySetup extends Controller
         try {
             extract($request->post());
             $user = Auth::user();
-            $company = company_info::where('id',$c_id)->first();
+            $company = company_info::where('id',$id)->first();
             if ($request->hasFile('logo'))
             {
                 $file = $request->file('logo');
                 $logo_name = $company_short_name."_logo_".$file->getClientOriginalName();
+                $this->deleteFile(public_path($this->imagePath.$logo_name));
                 $logo_location = $file->move($this->imagePath,$logo_name);
 
             }
@@ -276,6 +280,7 @@ class CompanySetup extends Controller
             {
                 $file = $request->file('logo_sm');
                 $logo_sm_name = $company_short_name."_logo_sm_".$file->getClientOriginalName();
+                $this->deleteFile(public_path($this->imagePath.$logo_sm_name));
                 $logo_sm_location = $file->move($this->imagePath,$logo_sm_name);
 
             }
@@ -283,16 +288,18 @@ class CompanySetup extends Controller
             {
                 $file = $request->file('logo_icon');
                 $logo_icon_name = $company_short_name."_logo_icon_".$file->getClientOriginalName();
+                $this->deleteFile(public_path($this->imagePath.$logo_icon_name));
                 $logo_icon_location = $file->move($this->imagePath,$logo_icon_name);
             }
             if ($request->hasFile('cover'))
             {
                 $file = $request->file('cover');
                 $cover_name = $company_short_name."_cover_".$file->getClientOriginalName();
+                $this->deleteFile(public_path($this->imagePath.$cover_name));
                 $cover_location = $file->move($this->imagePath,$cover_name); // Adjust the
 
             }
-            company_info::create([
+            company_info::where('id',$id)->update([
                 'status'=>1,
                 'company_name'=>$company_name,
                 'company_type_id'=>$company_type_id,
@@ -316,4 +323,30 @@ class CompanySetup extends Controller
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
+
+    public function companyDelete(Request $request)
+    {
+        try {
+            if ($request->isMethod('delete'))
+            {
+                $id = Crypt::decryptString($request->post('id'));
+                $company = company_info::with(['users'])->where('id',$id)->first();
+                if (count($company->users)>0)
+                {
+                    return back()->with('warning','A relationship exists between other tables. Data delete not possible');
+                }
+                $this->deleteFile(public_path($this->imagePath. $company->logo));
+                $this->deleteFile(public_path($this->imagePath . $company->logo_sm));
+                $this->deleteFile(public_path($this->imagePath . $company->logo_icon));
+                $this->deleteFile(public_path($this->imagePath . $company->cover));
+                $company->delete();
+                return back()->with('success','Data deleted successfully.');
+            }
+            return back()->with('error','Requested method not allowed.');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
+    }
+
 }

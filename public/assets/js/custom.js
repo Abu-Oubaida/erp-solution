@@ -325,6 +325,9 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 const password = $("#password").val()
                 if (username.length === 0 || password.length === 0)
                 {
+                    $("#companySelect").html("<option></option>");
+                    $("#login").attr('disabled','disabled')
+                    $("#login").hide()
                     return false
                 }
                 const url = window.location.origin + sourceDir + "/company-check-set"

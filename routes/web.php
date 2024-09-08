@@ -91,9 +91,12 @@ Route::group(['middleware' => ['auth']],function (){
         Route::controller(CompanySetup::class)->group(function (){
             Route::match(['get','post'],'company-setup','index')->name('company.setup');
             Route::match(['get','post'],'company-add','companyAdd')->name('add.company');
+            Route::match(['get'],'company-list','companyList')->name('list.company');
             Route::match(['put','get'],'company-edit/{companyID}','companyEdit')->name('edit.company');
             Route::delete('company-delete','companyDelete')->name('delete.company');
+
             Route::match(['get','post'],'company-type-add','companyTypeAdd')->name('add.company.type');
+            Route::match(['get'],'company-type-list','companyTypeList')->name('list.company.type');
             Route::match(['put','get'],'company-type-edit/{companyTypeID}','companyTypeEdit')->name('edit.company.type');
             Route::delete('company-type-delete','companyTypeDelete')->name('delete.company.type');
         });

@@ -1,9 +1,9 @@
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-chl-white">
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="{{route('root')}}">@isset(\Illuminate\Support\Facades\Auth::user()->company->logo)<img src="{{isset(\Illuminate\Support\Facades\Auth::user()->company->logo)? \Illuminate\Support\Facades\Auth::user()->company->logo:\Illuminate\Support\Facades\Auth::user()->company->company_name}} Logo" width="70%" alt="Credence Housing Limited">@else <h2 class="text-chl">{!! \Illuminate\Support\Facades\Auth::user()->company->company_name !!}</h2> @endif</a>
+    <a class="navbar-brand ps-3 text-black" href="{{route('root')}}"><h5><img src="{{url("image/logo/default/icon/360.png")}}" alt="{{str_replace('-', '-', config('app.name'))}}" class="img-fluid" width="20%"> Smart Solution</h5></a>
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 text-chl-important" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-{{--    <h3 class="mt-0 text-chl">{{str_replace('-', ' ', config('app.name'))}}</h3>--}}
+    @isset(\Illuminate\Support\Facades\Auth::user()->company->logo)<img src="{{isset(\Illuminate\Support\Facades\Auth::user()->company->logo)? url(\Illuminate\Support\Facades\Auth::user()->company->logo):\Illuminate\Support\Facades\Auth::user()->company->company_name}}" width="7%" alt="Credence Housing Limited">@else <h2 class="text-chl">{!! \Illuminate\Support\Facades\Auth::user()->company->company_name !!}</h2> @endif
     <!-- Navbar Search-->
     <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
         <div class="input-group">

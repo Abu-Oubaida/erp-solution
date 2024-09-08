@@ -7,7 +7,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title style="">{{ucwords(str_replace('.', ' ', \Route::currentRouteName()))}} | {{str_replace('-', '-', config('app.name'))}}</title>
-    <link rel="icon" href="{{url("image/logo/chl_logo.png")}}">
+    <link rel="icon" href="{{url("image/logo/default/icon/360.png")}}">
     <x-back-end._header-link/>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 </head>
