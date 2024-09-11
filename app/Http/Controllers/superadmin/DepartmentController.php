@@ -66,29 +66,30 @@ class DepartmentController extends Controller
         //
         try {
             $request->validate([
-                'dept_name'  => ['required', 'string', 'max:255',Rule::unique('departments')],
-                'dept_code' => ['required', 'numeric', Rule::unique('departments')],
-                'status' => ['required', 'string',],
+                'dept_name'  => ['required', 'string', 'max:255',Rule::unique('departments')->where(function ($query) use ($request) {
+                    return $query->where('company_id', $request->post('company'));
+                }),],
+                'dept_code' => ['required', 'numeric', Rule::unique('departments')->where(function ($query) use ($request) {
+                    return $query->where('company_id', $request->post('company'));
+                })],
+                'status' => ['required', 'string','between:0,1'],
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
                 'remarks'=> ['nullable','sometimes','string'],
             ]);
             extract($request->post());
-            if ($company != $this->user->company_id || !$this->user->isSystemSuperAdmin())
+            if ($company == $this->user->company_id || ($this->user->isSystemSuperAdmin()))
             {
-                return redirect(route('dashboard'))->with('error','Company not allowed');
+                $this->getDepartment()->create([
+                    'company_id'=> $company,
+                    'dept_name' => $dept_name,
+                    'dept_code' => $dept_code,
+                    'status'    =>  $status,
+                    'remarks'   =>  $remarks,
+                ]);
+                return back()->with('success','Data save successfully');
             }
-            if ($this->getDepartment()->where("dept_name",$dept_name)->orWhere('dept_code',$dept_code)->where('status',1)->first())
-            {
-                return back()->with('error','Department name or code already exist in System');
-            }
-            $this->getDepartment()->create([
-                'company_id'=> $this->user->company_id,
-                'dept_name' => $dept_name,
-                'dept_code' => $dept_code,
-                'status'    =>  $status,
-                'remarks'   =>  $remarks,
-            ]);
-            return back()->with('success','Data save successfully');
+            return redirect(route('dashboard'))->with('error','Company not allowed');
+
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -140,22 +141,32 @@ class DepartmentController extends Controller
     {
         try {
             $request->validate([
-                'dept_name'  => ['required', 'string', 'max:255',Rule::unique('departments')->ignore($id)],
-                'dept_code' => ['required', 'numeric', Rule::unique('departments')->ignore($id)],
-                'status' => ['required', 'string',],
+                'dept_name'  => ['required', 'string', 'max:255',Rule::unique('departments')->where(function ($query) use ($request) {
+                    return $query->where('company_id', $request->post('company'));
+                })->ignore($id)],
+                'dept_code' => ['required', 'numeric', Rule::unique('departments')->where(function ($query) use ($request) {
+                    return $query->where('company_id', $request->post('company'));
+                })->ignore($id)],
+                'status' => ['required', 'string','between:0,1'],
                 'remarks'=> ['nullable','string'],
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
             ]);
-            $this->getDepartment()->where("id",$id)->update([
-                'dept_name' => $request->post('dept_name'),
-                'dept_code' => $request->post('dept_code'),
-                'status' => $request->post('status'),
-                'remarks' => $request->post('remarks'),
-                'company_id' => $request->post('company'),
-                'updated_by' => $this->user->id,
-                'updated_at' => now(),
-            ]);
-            return back()->with('success','Data update successfully');
+            extract($request->post());
+            if ($company == $this->user->company_id || ($this->user->isSystemSuperAdmin()))
+            {
+                $this->getDepartment()->where("id",$id)->update([
+                    'dept_name' => $dept_name,
+                    'dept_code' => $dept_code,
+                    'status' => $status,
+                    'remarks' => $remarks,
+                    'company_id' => $company,
+                    'updated_by' => $this->user->id,
+                    'updated_at' => now(),
+                ]);
+                return back()->with('success','Data update successfully');
+            }
+            return redirect(route('dashboard'))->with('error','Company not allowed');
+
         }catch (\Throwable $exception)
         {
             return back()->with('error', $exception->getMessage());
@@ -180,7 +191,7 @@ class DepartmentController extends Controller
                     return back()->with('warning','Deletion not possible! A relationship exists.');
                 }
                 $this->getDepartment()->where("id",$id)->delete();
-                return back()->with('success','Data deleted successfully');
+                return redirect(route('add.department'))->with('success','Data deleted successfully');
             }
             return back()->with('error','Requested Method Not Allowed');
         }catch (\Throwable $exception)

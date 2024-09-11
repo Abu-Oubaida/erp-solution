@@ -1,5 +1,5 @@
-@if(auth()->user()->hasPermission('add_designation'))
-    @if(Route::currentRouteName() == 'add.designation')
+@if(auth()->user()->hasPermission('add_designation') || auth()->user()->hasPermission('list_designation'))
+    @if(Route::currentRouteName() == 'add.designation' || Route::currentRouteName() == 'designation.list')
         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#designation" aria-expanded="true" aria-controls="designation">
             <div class="sb-nav-link-icon"><i class="fa-solid fa-user-tag"></i></div>
             Designation
@@ -17,9 +17,16 @@
             <nav class="sb-sidenav-menu-nested nav">
                 @if(auth()->user()->hasPermission('add_designation'))
                     @if(Route::currentRouteName() == 'add.designation')
-                        <a class="nav-link" href="{{route("add.designation")}}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> Add New</a>
+                        <a class="nav-link" href="{{route("add.designation")}}"><div class="sb-nav-link-icon"><i class="fas fa-plus"></i></div> Add New</a>
                     @else
-                        <a class="nav-link text-chl" href="{{route("add.designation")}}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> Add New</a>
+                        <a class="nav-link text-chl" href="{{route("add.designation")}}"><div class="sb-nav-link-icon"><i class="fas fa-plus"></i></div> Add New</a>
+                    @endif
+                @endif
+                @if(auth()->user()->hasPermission('list_designation'))
+                    @if(Route::currentRouteName() == 'designation.list')
+                        <a class="nav-link" href="{{route("designation.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> List Show</a>
+                    @else
+                        <a class="nav-link text-chl" href="{{route("designation.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> List Show</a>
                     @endif
                 @endif
             </nav>

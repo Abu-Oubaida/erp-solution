@@ -279,6 +279,9 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:add_designation'])->group(function (){
             Route::match(['post','get'],'add-designation','create')->name('add.designation');
         });
+        Route::middleware(['permission:list_designation'])->group(function (){
+            Route::match(['get'],'designation-list','show')->name('designation.list');
+        });
         Route::middleware(['permission:edit_designation'])->group(function (){
             Route::match(['get','put'],'designation-edit/{designationID}','edit')->name('edit.designation');
         });

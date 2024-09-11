@@ -13,7 +13,7 @@ class Designation extends Model
 
     public function getUsers()
     {
-        $this->hasMany(User::class,'designation');
+        return $this->hasMany(User::class,'designation_id');
     }
     public function createdBy()
     {
