@@ -1,5 +1,5 @@
-@if(auth()->user()->hasPermission('add_designation') || auth()->user()->hasPermission('list_designation'))
-    @if(Route::currentRouteName() == 'add.designation' || Route::currentRouteName() == 'designation.list')
+@if(auth()->user()->hasPermission('add_designation') || auth()->user()->hasPermission('list_designation') || auth()->user()->hasPermission('edit_designation'))
+    @if(Route::currentRouteName() == 'add.designation' || Route::currentRouteName() == 'designation.list' || Route::currentRouteName() == 'edit.designation')
         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#designation" aria-expanded="true" aria-controls="designation">
             <div class="sb-nav-link-icon"><i class="fa-solid fa-user-tag"></i></div>
             Designation
@@ -27,6 +27,11 @@
                         <a class="nav-link" href="{{route("designation.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> List Show</a>
                     @else
                         <a class="nav-link text-chl" href="{{route("designation.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> List Show</a>
+                    @endif
+                @endif
+                @if(auth()->user()->hasPermission('edit_designation'))
+                    @if(Route::currentRouteName() == 'edit.designation')
+                        <a class="nav-link" href="{{route("edit.designation",['designationID'=>\Illuminate\Support\Facades\Request::route('designationID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Edit Designation</a>
                     @endif
                 @endif
             </nav>

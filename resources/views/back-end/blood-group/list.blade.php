@@ -1,8 +1,8 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
-        <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
-        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
+        <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
+{{--        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>--}}
         <div class="row">
             <div class="col-md-10">
                 <ol class="breadcrumb mb-4">
@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-2">
                 <div class="float-end">
-                    <a class="btn btn-success btn-sm" href="{{route('blood.group.list')}}"><i class="fa-solid fa-circle-plus"></i> Add New</a>
+                    <a class="btn btn-success btn-sm" href="{{route('add.blood.group')}}"><i class="fa-solid fa-circle-plus"></i> Add New</a>
                 </div>
             </div>
         </div>

@@ -30,49 +30,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <table class="table table-sm" id="datatablesSimple">
-                            <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Name</th>
-                                <th>Priority</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @if(isset($designations) && count($designations))
-                                @php
-                                    $no= 1;
-                                @endphp
-                                @foreach($designations as $d)
-                                    <tr>
-                                        <td>{!! $no++ !!}</td>
-                                        <td>{!! $d->title !!}</td>
-                                        <td>{!! $d->priority !!}</td>
-                                        <td>@if($d->status==1) Active @else Inactive @endif</td>
-                                        <td>
-                                            @if(auth()->user()->hasPermission('edit_designation'))
-                                                <a href="{!! route('edit.designation',['designationID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" class="text-success"><i class="fas fa-edit"></i></a>
-                                            @endif
-                                            @if(auth()->user()->hasPermission('delete_designation'))
-                                                <form action="{{route('delete.designation')}}" class="display-inline" method="post">
-                                                    @method('delete')
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{!! $d->id !!}">
-                                                    <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
-                                                </form>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @else
-                                <tr>
-                                    <td colspan="5" class="text-danger text-center">Not Found!</td>
-                                </tr>
-                            @endif
-                            </tbody>
-                        </table>
+                        @include('back-end.designation._list')
                     </div>
                 </div>
             </div>

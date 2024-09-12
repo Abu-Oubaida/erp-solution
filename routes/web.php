@@ -20,6 +20,7 @@ use App\Http\Controllers\superadmin\CompanySetup;
 use App\Http\Controllers\superadmin\DepartmentController;
 use App\Http\Controllers\superadmin\MobileSIMController;
 use App\Http\Controllers\superadmin\prorammerController;
+use App\Http\Controllers\superadmin\RoleController;
 use App\Http\Controllers\superadmin\UserController;
 use App\Http\Controllers\superadmin\UserPermissionController;
 use App\Http\Controllers\superadmin\DesignationController;
@@ -105,6 +106,25 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get','post'],'op-reference-type','index')->name('op.reference.type');
             Route::match(['get','put'],'op-reference-type-edit/{typeID}','edit')->name('op.reference.type.edit');
             Route::match(['delete'],'op-reference-type-delete','destroy')->name('op.reference.type.delete');
+        });
+        # 3.2.6 User Blood group
+        Route::controller(BloodGroupController::class)->group(function (){
+            Route::middleware(['permission:list_blood_group'])->group(function (){
+                Route::match(['get'],'blood-group-list','index')->name('blood.group.list');
+            });
+            Route::middleware(['permission:add_blood_group'])->group(function (){
+                Route::match(['post','get'],'add-blood-group','create')->name('add.blood.group');
+            });
+            Route::middleware(['permission:delete_blood_group'])->group(function (){
+                Route::match(['delete'],'delete-blood-group','destroy')->name('delete.blood.group');
+            });
+        });// 3.2.6 End
+        # 3.2.7 Role Management
+        Route::controller(RoleController::class)->group(function (){
+            Route::middleware(['permission:add_role'])->group(function (){
+                Route::match(['post','get'],'role-list','index')->name('role.list');
+                Route::match(['post','get'],'role-add','create')->name('add.role');
+            });
         });
     });//3.2 End
 
@@ -283,7 +303,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get'],'designation-list','show')->name('designation.list');
         });
         Route::middleware(['permission:edit_designation'])->group(function (){
-            Route::match(['get','put'],'designation-edit/{designationID}','edit')->name('edit.designation');
+            Route::match(['get','put'],'edit-designation/{designationID}','edit')->name('edit.designation');
         });
         Route::middleware(['permission:delete_designation'])->group(function (){
             Route::match(['delete'],'designation-delete','destroy')->name('delete.designation');
@@ -319,18 +339,6 @@ Route::group(['middleware' => ['auth']],function (){
         });
 
     });// 3.10 End
-# 3.11 User Blood group
-    Route::controller(BloodGroupController::class)->group(function (){
-        Route::middleware(['permission:list_blood_group'])->group(function (){
-            Route::match(['get'],'blood-group-list','index')->name('blood.group.list');
-        });
-        Route::middleware(['permission:add_blood_group'])->group(function (){
-            Route::match(['post','get'],'add-blood-group','create')->name('add.blood.group');
-        });
-        Route::middleware(['permission:delete_blood_group'])->group(function (){
-            Route::match(['delete'],'delete-blood-group','destroy')->name('delete.blood.group');
-        });
-    });// 3.11 End
     # 3.12 Sales Interface
     Route::controller(SalesInterfaceController::class)->group(function (){
         Route::middleware(['permission:sales_dashboard_interface'])->group(function (){

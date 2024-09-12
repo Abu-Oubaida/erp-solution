@@ -98,7 +98,7 @@
                                     @if(isset($branches) || (count($branches) > 0))
                                         <option value="0"></option>
                                         @foreach($branches as $b)
-                                            <option value="{{$b->id}}" @if(old('branch') == $b->id) selected @endif>{{$b->branch_name}}</option>
+                                            <option value="{{$b->id}}" @if(old('branch') == $b->id) selected @endif>{{$b->branch_name}} ({!! $b->company->company_name !!})</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -111,7 +111,7 @@
                                     <option value=""></option>
                                     @if(isset($depts) || (count($depts) > 0))
                                         @foreach($depts as $d)
-                                            <option value="{{$d->id}}" @if(old('dept') == $d->id) selected @endif>{{$d->dept_name}}</option>
+                                            <option value="{{$d->id}}" @if(old('dept') == $d->id) selected @endif>{{$d->dept_name}} ({!! $d->company->company_name !!})</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -124,7 +124,7 @@
                                     <option value=""></option>
                                     @if(isset($designations) || (count($designations) > 0))
                                         @foreach($designations as $d)
-                                            <option value="{{$d->id}}" @if(old('designation') == $d->id) selected @endif>{{$d->title}}</option>
+                                            <option value="{{$d->id}}" @if(old('designation') == $d->id) selected @endif>{{$d->title}} ({!! $d->company->company_name !!})</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -132,13 +132,13 @@
                         </div>
                         <div class="col-md-2">
                             <div class="form-control mb-3">
-                                <label for="roll">User Roll <span class="text-danger">*</span></label>
+                                <label for="roll">User Role <span class="text-danger">*</span></label>
                                 <select class="select-search" id="roll" name="roll">
                                     <option value=""></option>
                                     @if(isset($roles) || (count($roles) > 0))
                                         <option value="0">--Select please--</option>
                                         @foreach($roles as $r)
-                                            <option value="{{$r->id}}" @if(old('roll') == $r->id) selected @endif>{{$r->display_name}}</option>
+                                            <option value="{{$r->id}}" @if(old('roll') == $r->id) selected @endif>{{$r->display_name}} ({!! $d->company->company_name !!})</option>
                                         @endforeach
                                     @endif
                                 </select>

@@ -71,5 +71,29 @@
             @if(Route::currentRouteName() == 'op.reference.type.edit')
                 <a class="nav-link" href="{{route('op.reference.type.edit',['typeID'=>\Illuminate\Support\Facades\Request::route('typeID')])}}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa fa-edit"></i></div> Op. Ref. Type Edit</a>
             @endif
+            @include('layouts.back-end.sidebar-components.interface._blood_group_menu_submenu')
+            @if(Route::currentRouteName() == 'add.role' || Route::currentRouteName() == 'edit.role' || Route::currentRouteName() == 'delete.role' || Route::currentRouteName() == 'role.list')
+                <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#roles" aria-expanded="true" aria-controls="roles">
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-city"></i></div>
+                    Roles
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse show" id="companies" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+            @else
+                <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#roles" aria-expanded="false" aria-controls="roles">
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-city"></i></div>
+                    Roles
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="roles" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+            @endif
+                    <nav class="sb-sidenav-menu-nested nav">
+                        @if(Route::currentRouteName() == 'add.role')
+                            <a class="nav-link" href="{{route('add.role')}}"><div class="sb-nav-link-icon"><i class="fas fa-users"></i></div> Add Role</a>
+                        @else
+                            <a class="nav-link text-chl" href="{!! route('add.role') !!}"><div class="sb-nav-link-icon"><i class="fas fa-users"></i></div> Add Role</a>
+                        @endif
+                    </nav>
+                </div>
         </nav>
     </div>

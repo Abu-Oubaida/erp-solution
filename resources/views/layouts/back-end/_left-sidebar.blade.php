@@ -24,7 +24,7 @@
                 @if(auth()->user()->hasPermission('user_management'))
                     {{--#2.2.1.1   Route/URL Chck and set navigation header User Management Start--}}
                     <subgroup1>
-                        @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department'|| Route::currentRouteName() == 'user.edit' || Route::currentRouteName() == 'add.designation' || Route::currentRouteName() == 'designation.list' || Route::currentRouteName() == 'add.blood.group'|| Route::currentRouteName() == 'add.branch'|| Route::currentRouteName() == 'edit.branch' || Route::currentRouteName() == 'blood.group.list' || Route::currentRouteName() == 'branch.list' || Route::currentRouteName() == 'branch.type.list' || Route::currentRouteName() == 'add.branch.type' || Route::currentRouteName() == 'edit.branch.type' || Route::currentRouteName() == 'edit.department')
+                        @if(Route::currentRouteName() == 'add.user'|| Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'add.department'|| Route::currentRouteName() == 'user.edit' || Route::currentRouteName() == 'add.designation' || Route::currentRouteName() == 'edit.designation' || Route::currentRouteName() == 'designation.list' || Route::currentRouteName() == 'add.branch'|| Route::currentRouteName() == 'edit.branch' || Route::currentRouteName() == 'branch.list' || Route::currentRouteName() == 'branch.type.list' || Route::currentRouteName() == 'add.branch.type' || Route::currentRouteName() == 'edit.branch.type' || Route::currentRouteName() == 'edit.department')
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts"
                                aria-expanded="true" aria-controls="userLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>
@@ -51,7 +51,6 @@
                                             {{--                    Only Designaton Related Menu and Submenu is here--}}
                                             @include('layouts.back-end.sidebar-components.interface._designation_menu_submenu')
                                             @include('layouts.back-end.sidebar-components.interface._branch_menu_submenu')
-                                            @include('layouts.back-end.sidebar-components.interface._blood_group_menu_submenu')
                                         </nav>
                                     </div>
                     </subgroup1>{{--#2.2.1.1   Route/URL Chck and set navigation header User Management End--}}
