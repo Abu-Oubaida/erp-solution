@@ -121,9 +121,17 @@ Route::group(['middleware' => ['auth']],function (){
         });// 3.2.6 End
         # 3.2.7 Role Management
         Route::controller(RoleController::class)->group(function (){
-            Route::middleware(['permission:add_role'])->group(function (){
+            Route::middleware(['permission:role_list'])->group(function (){
                 Route::match(['post','get'],'role-list','index')->name('role.list');
+            });
+            Route::middleware(['permission:add_role'])->group(function (){
                 Route::match(['post','get'],'role-add','create')->name('add.role');
+            });
+            Route::middleware(['permission:edit_role'])->group(function (){
+                Route::match(['put','get'],'role-edit/{roleID}','edit')->name('edit.role');
+            });
+            Route::middleware(['permission:delete_role'])->group(function (){
+                Route::match(['delete'],'delete-role','destroy')->name('delete.role');
             });
         });
     });//3.2 End

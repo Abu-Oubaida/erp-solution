@@ -64,9 +64,9 @@
                 <a class="nav-link text-chl" href="{!! route('permission.input') !!}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Permission Input</a>
             @endif
             @if(Route::currentRouteName() == 'op.reference.type')
-                <a class="nav-link" href="{{route('op.reference.type')}}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa fa-o"></i><i class="fa fa-r"></i><i class="fa fa-t"></i></div> Op. Ref. Type</a>
+                <a class="nav-link" href="{{route('op.reference.type')}}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa-solid fa-icons"></i></div> Op. Ref. Type</a>
             @else
-                <a class="nav-link text-chl" href="{!! route('op.reference.type') !!}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa fa-o"></i><i class="fa fa-r"></i><i class="fa fa-t"></i></div> Op. Ref. Type</a>
+                <a class="nav-link text-chl" href="{!! route('op.reference.type') !!}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa-solid fa-icons"></i></div> Op. Ref. Type</a>
             @endif
             @if(Route::currentRouteName() == 'op.reference.type.edit')
                 <a class="nav-link" href="{{route('op.reference.type.edit',['typeID'=>\Illuminate\Support\Facades\Request::route('typeID')])}}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa fa-edit"></i></div> Op. Ref. Type Edit</a>
@@ -74,14 +74,14 @@
             @include('layouts.back-end.sidebar-components.interface._blood_group_menu_submenu')
             @if(Route::currentRouteName() == 'add.role' || Route::currentRouteName() == 'edit.role' || Route::currentRouteName() == 'delete.role' || Route::currentRouteName() == 'role.list')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#roles" aria-expanded="true" aria-controls="roles">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-city"></i></div>
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-users-gear"></i></div>
                     Roles
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse show" id="companies" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
             @else
                 <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#roles" aria-expanded="false" aria-controls="roles">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-city"></i></div>
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-users-gear"></i></div>
                     Roles
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
@@ -89,9 +89,17 @@
             @endif
                     <nav class="sb-sidenav-menu-nested nav">
                         @if(Route::currentRouteName() == 'add.role')
-                            <a class="nav-link" href="{{route('add.role')}}"><div class="sb-nav-link-icon"><i class="fas fa-users"></i></div> Add Role</a>
+                            <a class="nav-link" href="{{route('add.role')}}"><div class="sb-nav-link-icon"><i class="fas fa-plus"></i></div> Add Role</a>
                         @else
-                            <a class="nav-link text-chl" href="{!! route('add.role') !!}"><div class="sb-nav-link-icon"><i class="fas fa-users"></i></div> Add Role</a>
+                            <a class="nav-link text-chl" href="{!! route('add.role') !!}"><div class="sb-nav-link-icon"><i class="fas fa-plus"></i></div> Add Role</a>
+                        @endif
+                        @if(Route::currentRouteName() == 'role.list')
+                            <a class="nav-link" href="{{route('role.list')}}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> Role List</a>
+                        @else
+                            <a class="nav-link text-chl" href="{!! route('role.list') !!}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> Role List</a>
+                        @endif
+                        @if(Route::currentRouteName() == 'edit.role')
+                            <a class="nav-link" href="{{route('edit.role')}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Edit Role</a>
                         @endif
                     </nav>
                 </div>
