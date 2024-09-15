@@ -100,6 +100,8 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get'],'company-type-list','companyTypeList')->name('company.type.list');
             Route::match(['put','get'],'company-type-edit/{companyTypeID}','companyTypeEdit')->name('edit.company.type');
             Route::delete('company-type-delete','companyTypeDelete')->name('delete.company.type');
+
+            Route::match(['post','get'],'user-company-permission/{companyID}','userCompanyPermission')->name('user.company.permission');
         });
         # 3.2.5 Operation Reference Type
         Route::controller(OpReferenceTypeController::class)->group(function (){

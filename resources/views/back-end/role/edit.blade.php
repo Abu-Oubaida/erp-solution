@@ -31,14 +31,14 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('edit.role') }}" method="POST">
+                        <form action="{{ route('edit.role',['roleID'=>\Illuminate\Support\Facades\Crypt::encryptString($role->id)]) }}" method="POST">
                             @csrf
                             @method('put')
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-4 mb-2">
                                     <div class="form-floating mb-">
                                         <input class="form-control" id="name" name="name" type="text" placeholder="Enter role name" value="{{$role->name}}" required/>
-                                        <label for="name">Role Name<span class="text-danger">*</span></label>
+                                        <label for="name">Role Name<span class="text-danger">*</span> <small>[ Only acceptable character are " a-z and 0-9_ " ]</small></label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -66,8 +66,6 @@
                                         <label for="remarks">Description</label>
                                     </div>
                                 </div>
-
-
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3 float-end">
                                         <button  type="submit" value="" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Update Role</button>

@@ -603,5 +603,4 @@ class UserController extends Controller
         $fullEID = $joining_year . $joining_month . $eid;
         return [$eid, $fullEID];
     }
-
 }

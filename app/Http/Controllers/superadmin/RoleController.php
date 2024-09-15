@@ -50,10 +50,14 @@ class RoleController extends Controller
     {
         try {
             $id = Crypt::decryptString($id);
-            if ($request->isMethod('post'))
+            if ($request->isMethod('put'))
             {
                 return $this->update($request,$id);
             }
+            $roles = $this->getRole()->get();
+            $role = $this->getRole()->where('id',$id)->first();
+            $companies = $this->getCompany()->get();
+            return view('back-end.role.edit',compact('role','roles','companies',))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -63,9 +67,9 @@ class RoleController extends Controller
     {
         try {
             $request->validate([
-                'name' => ['required', 'string', 'max:255',Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})],
+                'name' => ['required', 'string', 'max:255','regex:/^[a-z0-9_]+$/',Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})],
                 'display_name' => ['required', 'string', 'max:255',Rule::unique('roles','display_name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})],
-                'company' => ['required', 'string', 'max:255','exists:companies,id'],
+                'company' => ['required', 'string', 'max:255','exists:company_infos,id'],
                 'description' => ['nullable','sometimes','string','max:255'],
             ]);
             extract($request->post());
@@ -87,9 +91,9 @@ class RoleController extends Controller
     {
         try {
             $request->validate([
-                'name' => ['required', 'string', 'max:255',Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})->ignore($id,'id')],
+                'name' => ['required', 'string', 'max:255','regex:/^[a-z0-9_]+$/', Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})->ignore($id,'id')],
                 'display_name' => ['required', 'string', 'max:255',Rule::unique('roles','display_name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})->ignore($id,'id')],
-                'company' => ['required', 'string', 'max:255','exists:companies,id'],
+                'company' => ['required', 'string', 'max:255','exists:company_infos,id'],
                 'description' => ['nullable','sometimes','string','max:255'],
             ]);
             extract($request->post());
@@ -105,6 +109,24 @@ class RoleController extends Controller
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
+        }
+    }
+    public function destroy(Request $request)
+    {
+        try {
+            $request->validate([
+                'id'    =>  ['string','required',Rule::exists('roles','id')],
+            ]);
+            extract($request->post());
+            if (count($this->getRole()->where('id',$id)->first()->getUsers))
+            {
+                return back()->with('warning','This data has relation between another table. Data delete not possible!');
+            }
+            $this->getRole()->where('id',$id)->delete();
+            return redirect(route('role.list'))->with('success','Role deleted successfully');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
         }
     }
 }

@@ -40,7 +40,7 @@
                                 <div class="col-md-4">
                                     <div class="form-floating mb-">
                                         <input class="form-control" id="name" name="name" type="text" placeholder="Enter role name" value="{{old('name')}}" required/>
-                                        <label for="name">Role Name<span class="text-danger">*</span></label>
+                                        <label for="name">Role Name<span class="text-danger">*</span> <small>[ Only acceptable character are " a-z and 0-9_ " ]</small></label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">

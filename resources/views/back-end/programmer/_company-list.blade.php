@@ -39,7 +39,7 @@
                 <td>{!! $company->created_at !!}</td>
                 <td>{!! ($company->updatedBY)?$company->updatedBY->name:"-" !!}</td>
                 <td>{!! $company->updated_at !!}</td>
-                <td>
+                <td class="text-center">
                     <a href="{{route('edit.company',["companyID"=>\Illuminate\Support\Facades\Crypt::encryptString($company->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
                     <form action="{{route('delete.company')}}" class="display-inline" method="post">
                         @method('delete')
@@ -47,6 +47,14 @@
                         <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($company->id) !!}">
                         <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the Company Type?')"><i class="fas fa-trash"></i></button>
                     </form>
+                    <div class="dropdown">
+                        <button class="border-0 inline-block bg-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            More
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="{!! route('user.company.permission',['companyID'=> \Illuminate\Support\Facades\Crypt::encryptString($company->id)]) !!}" class="dropdown-item" type="button"><i class="fa-solid fa-user-shield"></i> User Permission</a></li>
+                        </ul>
+                    </div>
                 </td>
             </tr>
         @endforeach

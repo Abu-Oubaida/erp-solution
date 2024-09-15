@@ -7,6 +7,7 @@ use App\Models\company_info;
 use App\Models\company_type;
 use App\Models\User;
 use App\Traits\DeleteFileTrait;
+use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -16,7 +17,14 @@ use Illuminate\Support\Facades\File;
 
 class CompanySetup extends Controller
 {
-    use DeleteFileTrait;
+    use DeleteFileTrait, ParentTraitCompanyWise;
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->setUser();
+            return $next($request);
+        });
+    }
     private $imagePath = "image/logo/";
     //
     public function index()
@@ -367,5 +375,16 @@ class CompanySetup extends Controller
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
-
+    public function userCompanyPermission(Request $request,$companyID)
+    {
+        try {
+            $cID = Crypt::decryptString($companyID);
+            $company = $this->getCompany()->where('id',$cID)->first();
+            $users = $this->getUser()->where('status',1)->get();
+            return view('back-end.control-panel.company.user-permission.add-permission',compact('users','company'))->render();
+        } catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
 }

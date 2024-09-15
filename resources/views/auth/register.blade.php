@@ -2,11 +2,12 @@
 @section('content')
                 <div class="row justify-content-center custom-m-5">
                     <div class="col-lg-6">
-                        <div class="card border-0 rounded-lg mt-4 p-5">
+                        <div class="card border-0 rounded-lg mt-4">
                             <div class="card-header text-center">
-                                <a href="{{route('root')}}"><img src="{{url("image/logo/chl_logo.png")}}" alt="Credence Housing Limited" class="img-fluid" width="50%"></a>
+{{--                                <a href="{{route('root')}}"><img src="{{url("image/logo/chl_logo.png")}}" alt="Credence Housing Limited" class="img-fluid" width="50%"></a>--}}
+                                <h2 class="m-0 p-0"><a href="{{route('root')}}"><img src="{{url("image/logo/default/icon/360.png")}}" alt="{{str_replace('-', '-', config('app.name'))}}" class="img-fluid" width="7%"></a> Register Here</h2>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body p-5">
                                 @if ($errors->any())
                                     <div class="col-12">
                                         <div class="alert alert-danger alert-dismissible fade show z-index-1 w-auto error-alert right-0" role="alert">

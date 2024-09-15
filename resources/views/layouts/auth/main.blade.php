@@ -7,7 +7,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <title>{{str_replace('-', ' | ', config('app.name'))}} </title>
+    <title>{{(\Route::currentRouteName() == 'root')?'Home Page':ucwords(str_replace('.', ' ', \Route::currentRouteName()))}} | {{str_replace('-', '-', config('app.name'))}}</title>
     <link rel="icon" href="{{url("image/logo/default/icon/360.png")}}">
     <x-auth._header_link/>
     <style>
