@@ -12,7 +12,7 @@
             <div class="col-md-7">
                 <label for="project">Project Name<span class="text-danger">*</span></label>
                 <select id="project" name="project" class="select-search cursor-pointer" multiple="multiple">
-                    <option value="">Pick a state...</option>
+                    <option value="">Pick options...</option>
                     @if(count($projects))
                         @foreach($projects as $p)
                             <option value="{!! $p->id !!}">{!! $p->branch_name !!}</option>
@@ -42,7 +42,7 @@
             <div class="col-md-8">
                 <label for="copy_user">Copy User Name<span class="text-danger">*</span></label>
                 <select id="copy_user" name="copy_user" class="select-search cursor-pointer">
-                    <option value="">Pick a state...</option>
+                    <option value="">Pick options...</option>
                     @if(count($permission_users))
                         @foreach($permission_users as $p_user)
                             <option value="{!! $p_user->user_id !!}">{!! $p_user->user->name !!} (ID: {!! $p_user->user->employee_id !!})</option>

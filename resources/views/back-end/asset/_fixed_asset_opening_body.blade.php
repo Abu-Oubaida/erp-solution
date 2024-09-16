@@ -40,7 +40,7 @@
                     <div class="mb-1">
                         <label for="recourse_code">Materials<span class="text-danger">*</span></label>
                         <select class="select-search" id="materials_id" onchange="return Obj.getFixedAssetSpecification(this)">
-                            <option value="">Pick a state...</option>
+                            <option value="">Pick options...</option>
                             @if(count($fixed_assets))
                                 @foreach($fixed_assets as $fx)
                                     <option value="{!! $fx->id !!}">{!! $fx->materials_name !!} ({{$fx->recourse_code}})</option>
@@ -53,7 +53,7 @@
                     <div class="mb-1">
                         <label for="specification">Specification<span class="text-danger">*</span></label>
                         <select class="select-search" id="specification" >
-                            <option value="">Pick a state...</option>
+                            <option value="">Pick options...</option>
                         </select>
                     </div>
                 </div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\company_info;
 use App\Models\company_type;
 use App\Models\User;
+use App\Models\UserCompanyPermission;
 use App\Traits\DeleteFileTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
@@ -379,9 +380,39 @@ class CompanySetup extends Controller
     {
         try {
             $cID = Crypt::decryptString($companyID);
+            if ($request->isMethod('post'))
+            {
+                return $this->userCompanyPermissionStore($request, $cID);
+            }
             $company = $this->getCompany()->where('id',$cID)->first();
             $users = $this->getUser()->where('status',1)->get();
             return view('back-end.control-panel.company.user-permission.add-permission',compact('users','company'))->render();
+        } catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+    public function userCompanyPermissionStore(Request $request,$companyID)
+    {
+        try {
+            $request->validate([
+                'users' => ['required','array'],
+                'users.*' => ['nullable','string','exists:users,id'],
+            ]);
+            extract($request->post());
+            foreach ($users as $user)
+            {
+                if (!(UserCompanyPermission::where('user_id',$user)->where('company_id',$companyID)->exists()))
+                {
+                    UserCompanyPermission::create([
+                        'user_id'=>$user,
+                        'company_id'=>$companyID,
+                        'created_at'=>now(),
+                        'created_by'=>$this->user->id,
+                    ]);
+                }
+            }
+            return back()->with('success','Data added successfully.');
         } catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

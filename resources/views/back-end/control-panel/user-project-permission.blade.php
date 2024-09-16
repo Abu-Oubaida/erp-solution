@@ -16,7 +16,7 @@
                         <div class="col-md-9 mb-1">
                             <label for="user">User Name<span class="text-danger">*</span></label>
                             <select id="user" name="user" class="select-search cursor-pointer">
-                                <option value="">Pick a state...</option>
+                                <option value="">Pick options...</option>
                                 @if(count($employees))
                                     @foreach($employees as $e)
                                         <option @if(Request::get('e') !== null && Request::get('e') == $e->id)selected @endif value="{!! $e->id !!}">{!! $e->name !!} (ID: {!! $e->employee_id !!}, {!! $e->getDesignation->title !!}, {!! $e->getDepartment->dept_name !!})</option>

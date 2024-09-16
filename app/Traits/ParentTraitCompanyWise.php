@@ -83,7 +83,7 @@ trait ParentTraitCompanyWise
 
     protected function getCompany()
     {
-        $object = company_info::with(['createdBy','updatedBy','users','companyType','fixedAssets']);
+        $object = company_info::with(['createdBy','updatedBy','users','companyType','fixedAssets','permissionUsers']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;

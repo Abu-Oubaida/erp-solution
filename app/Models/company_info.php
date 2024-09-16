@@ -26,7 +26,10 @@ class company_info extends Model
     {
         return $this->hasMany(User::class,'company_id');
     }
-
+    public function permissionUsers()
+    {
+        return $this->belongsToMany(User::class,'user_company_permissions','company_id','user_id');
+    }
     public function fixedAssets()
     {
         return $this->hasMany(fixed_asset::class,'company_id');

@@ -22,7 +22,7 @@
             <div class="col-md-2 mb-1">
                 <label for="project">Enter Project Name<span class="text-danger">*</span></label>
                 <select id="project" name="project" class="select-search cursor-pointer">
-                    <option value="">Pick a state...</option>
+                    <option value="">Pick options...</option>
                     @if(count($projects))
                         @foreach($projects as $p)
                             <option @if(Request::get('project') !== null && Request::get('project') == $p->projects->id)selected @endif value="{!! $p->projects->id !!}">{!! $p->projects->branch_name !!}</option>
@@ -39,7 +39,7 @@
             <div class="col-md-2 mb-1">
                 <label for="r_type">Reference Type<span class="text-danger">*</span></label>
                 <select id="r_type" name="r_type" class="select-search cursor-pointer">
-                    <option value="">Pick a state...</option>
+                    <option value="">Pick options...</option>
                     @if(count($ref_types))
                         @foreach($ref_types as $rt)
                             <option @if(Request::get('rt') !== null && Request::get('rt') == $rt->id)selected @endif value="{!! $rt->id !!}">{!! $rt->name !!}</option>
