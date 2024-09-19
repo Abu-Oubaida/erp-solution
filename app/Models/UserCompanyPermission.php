@@ -14,6 +14,10 @@ class UserCompanyPermission extends Model
     {
         return $this->hasMany(User::class,'id','user_id');
     }
+    public function userRole()
+    {
+        return $this->belongsTo(Role::class,'role_id','id');
+    }
     public function companies()
     {
         return $this->belongsTo(company_info::class,'company_id','id');

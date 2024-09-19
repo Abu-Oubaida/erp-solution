@@ -35,7 +35,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             // return false
             if (per.length > 0 && dir.length > 0)
             {
-                let url = window.location.origin + sourceDir + "/system-super-admin/user-per-add";
+                let url = window.location.origin + sourceDir + "/system-operation/user-per-add";
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,
@@ -299,7 +299,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 {
                     return false
                 }
-                let url = window.location.origin + sourceDir + "/system-super-admin/permission-store";
+                let url = window.location.origin + sourceDir + "/system-operation/permission-store";
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,

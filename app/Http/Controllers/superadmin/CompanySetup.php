@@ -385,8 +385,9 @@ class CompanySetup extends Controller
                 return $this->userCompanyPermissionStore($request, $cID);
             }
             $company = $this->getCompany()->where('id',$cID)->first();
-            $users = $this->getUser()->where('status',1)->get();
-            return view('back-end.control-panel.company.user-permission.add-permission',compact('users','company'))->render();
+            $users = $this->getUser()->where('status',1)->whereNot('id',$this->user->id)->get();
+            $roles = $this->getRole()->get();
+            return view('back-end.control-panel.company.user-permission.add-permission',compact('users','company','roles'))->render();
         } catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -396,6 +397,7 @@ class CompanySetup extends Controller
     {
         try {
             $request->validate([
+                'role' => ['required','numeric','exists:roles,id'],
                 'users' => ['required','array'],
                 'users.*' => ['nullable','string','exists:users,id'],
             ]);
@@ -405,6 +407,7 @@ class CompanySetup extends Controller
                 if (!(UserCompanyPermission::where('user_id',$user)->where('company_id',$companyID)->exists()))
                 {
                     UserCompanyPermission::create([
+                        'role_id'=>$role,
                         'user_id'=>$user,
                         'company_id'=>$companyID,
                         'created_at'=>now(),
@@ -414,6 +417,21 @@ class CompanySetup extends Controller
             }
             return back()->with('success','Data added successfully.');
         } catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+    public function userCompanyPermissionDelete(Request $request)
+    {
+        try {
+            if ($request->isMethod('delete'))
+            {
+                $id = Crypt::decryptString($request->post('id'));
+                UserCompanyPermission::where('id',$id)->delete();
+                return back()->with('success','Data deleted successfully.');
+            }
+            return back()->with('success','Requested method not allowed.');
+        }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }

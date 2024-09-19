@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\company_info;
+use App\Models\UserCompanyPermission;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -41,12 +43,39 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
-        if (! (Auth::attempt(['email'=>$this->email,'password'=>$this->password,'status'=>1,'company_id'=>$this->company_id], $this->boolean('remember')) || Auth::attempt(['phone'=>$this->email,'password'=>$this->password,'status'=>1,'company_id'=>$this->company_id], $this->boolean('remember'))))
+//        if (! (Auth::attempt(['email'=>$this->email,'password'=>$this->password,'status'=>1,'company_id'=>$this->company_id], $this->boolean('remember')) || Auth::attempt(['phone'=>$this->email,'password'=>$this->password,'status'=>1,'company_id'=>$this->company_id], $this->boolean('remember'))))
+        if (! (Auth::attempt(['email'=>$this->email,'password'=>$this->password,'status'=>1], $this->boolean('remember')) || Auth::attempt(['phone'=>$this->email,'password'=>$this->password,'status'=>1], $this->boolean('remember'))))
         {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
+            ]);
+        }
+        // Step 2: Check the company_id in user_company_permissions
+        $user = Auth::user(); // Get authenticated user
+        if ($user->isSystemSuperAdmin())
+        {
+            $companyPermission = company_info::where('id',$this->company_id)->first();
+        }
+        else {
+            $companyPermission = UserCompanyPermission::where('user_id', $user->id)
+                ->where('company_id', $this->company_id)
+                ->first();
+        }
+        // If company_id is valid, store it in the session
+        if ($companyPermission) {
+            // Step 3: Set the company_id in the session
+            session(['company_id' => $this->company_id]);
+
+            // Redirect the user to the intended page
+//            return redirect()->intended('dashboard');
+        } else {
+            // If company_id is not valid, log the user out and return an error
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'company_id' => 'Invalid company selection.',
             ]);
         }
 //        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {

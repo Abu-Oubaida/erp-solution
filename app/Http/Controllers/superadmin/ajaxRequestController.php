@@ -43,10 +43,19 @@ class ajaxRequestController extends Controller
                     'message' => 'Invalid credentials'
                 ], 401);
             }
+            if ($matchingUsers->first()->isSystemSuperAdmin())
+            {
+                $companies = company_info::all();
+            }
+            else {
+                $companies = company_info::whereHas('permissionUsers',function ($query) use ($matchingUsers) {
+                    $query->where('user_id',$matchingUsers->first()->id);
+                })->get();
+            }
             // Extract companies associated with the matching users
-            $companies = $matchingUsers->map(function ($user){
-                return company_info::where('id',$user->company_id)->first();// assuming a relation with Company
-            });
+//            $companies = $matchingUsers->map(function ($user){
+//                return company_info::where('id',$user->company_id)->first();// assuming a relation with Company
+//            });
             // Return the list of companies to the frontend
             return response()->json([
                 'status' => 'success',

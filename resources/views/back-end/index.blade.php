@@ -61,6 +61,10 @@
                                                 <th>Department:</th>
                                                 <td>{!! isset($user->department->dept_name)?$user->department->dept_name:'' !!}</td>
                                             </tr>
+{{--                                            <tr>--}}
+{{--                                                <th>Company Name:</th>--}}
+{{--                                                <td>{!! isset($user->company->company_name)?$user->company->company_name:'' !!}</td>--}}
+{{--                                            </tr>--}}
 
                                             </tbody>
                                         </table>

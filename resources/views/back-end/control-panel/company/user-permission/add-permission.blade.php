@@ -40,7 +40,18 @@
                     @csrf
                     @method('post')
                     <div class="row">
-                        <div class="col-sm-10 mb-1">
+                        <div class="col-sm-3 mb-1">
+                            <label for="user">Select Role<span class="text-danger">*</span></label>
+                            <select id="role" name="role" class="select-search cursor-pointer">
+                                <option value="">Pick options...</option>
+                                @if(count($roles))
+                                    @foreach($roles as $r)
+                                        <option value="{!! $r->id !!}">{!! $r->display_name !!}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-sm-7 mb-1">
                             <label for="user">Select Users Name<span class="text-danger">*</span></label>
                             <select id="user" name="users[]" class="select-search cursor-pointer" multiple>
                                 <option value="">Pick options...</option>
@@ -77,6 +88,7 @@
                                 <th>Name</th>
                                 <th>Employee ID</th>
                                 <th>User Status</th>
+                                <th>Role</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -90,12 +102,22 @@
                                         <td>{!! $u->name !!}</td>
                                         <td>{!! $u->employee_id !!}</td>
                                         <td>@if($u->status == 1) <span class="badge bg-success">Active</span> @else <span class="badge bg-danger">Inactive</span> @endif</td>
-                                        <td></td>
+                                        <td>{!! isset($u->userRole)?$u->userRole->display_name:'' !!}</td>
+                                        <td>
+                                        @if(auth()->user()->hasPermission('delete_user_company_permission'))
+                                            <form action="{{route('delete.user.company.permission')}}" class="display-inline" method="post">
+                                                @method('delete')
+                                                @csrf
+                                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($u->id) !!}">
+                                                <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="5">Not Found</td>
+                                    <td colspan="6">Not Found</td>
                                 </tr>
                             @endif
                             </tbody>
@@ -120,6 +142,7 @@
                                 <th>Name</th>
                                 <th>Employee ID</th>
                                 <th>User Status</th>
+                                <th>Role</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -133,6 +156,7 @@
                                         <td>{!! $u->name !!}</td>
                                         <td>{!! $u->employee_id !!}</td>
                                         <td>@if($u->status == 1) <span class="badge bg-success">Active</span> @else <span class="badge bg-danger">Inactive</span> @endif</td>
+                                        <td>{!! isset($u->roles()->first()->display_name)?$u->roles()->first()->display_name:'' !!}</td>
                                         <td></td>
                                     </tr>
                                 @endforeach

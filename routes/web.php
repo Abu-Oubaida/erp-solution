@@ -71,71 +71,73 @@ Route::group(['middleware' => ['auth']],function (){
     });//3.2 End
 
 # 3.2 System Admin Controller
-    Route::group(['middleware'=>['auth','role:systemsuperadmin'],'prefix'=>'system-super-admin'],function (){
-# 3.2.1 Only for programmer
-        Route::controller(prorammerController::class)->group(function (){
-            Route::get('permission-input','create')->name('permission.input');
-            Route::post('permission-store','store')->name('permission.input.store');
-            Route::delete('permission-input-delete','delete')->name('permission.input.delete');
+    Route::group(['prefix'=>'system-operation'],function (){
+        # 3.2.1 Only for system super admin
+        Route::group(['middleware'=>['auth','role:systemsuperadmin']],function () {
+            # 3.2.1.1 Only for programmer
+            Route::controller(prorammerController::class)->group(function (){
+                Route::get('permission-input','create')->name('permission.input');
+                Route::post('permission-store','store')->name('permission.input.store');
+                Route::delete('permission-input-delete','delete')->name('permission.input.delete');
+            });//3.2.1.1 End
+            # 3.2.1.2 Company Setup
+            Route::controller(CompanySetup::class)->group(function (){
+                Route::match(['get','post'],'company-setup','index')->name('company.setup');
+                Route::match(['get','post'],'company-add','companyAdd')->name('add.company');
+                Route::match(['get'],'company-list','companyList')->name('company.list');
+                Route::match(['put','get'],'company-edit/{companyID}','companyEdit')->name('edit.company');
+                Route::delete('company-delete','companyDelete')->name('delete.company');
+
+                Route::match(['get','post'],'company-type-add','companyTypeAdd')->name('add.company.type');
+                Route::match(['get'],'company-type-list','companyTypeList')->name('company.type.list');
+                Route::match(['put','get'],'company-type-edit/{companyTypeID}','companyTypeEdit')->name('edit.company.type');
+                Route::delete('company-type-delete','companyTypeDelete')->name('delete.company.type');
+
+                Route::match(['post','get'],'user-company-permission/{companyID}','userCompanyPermission')->name('user.company.permission');
+                Route::middleware(['permission:delete_user_company_permission'])->group(function (){
+                    Route::delete('user-company-permission-delete','userCompanyPermissionDelete')->name('delete.user.company.permission');
+                });
+            });
+            # 3.2.1.3 Operation Reference Type
+            Route::controller(OpReferenceTypeController::class)->group(function (){
+                Route::match(['get','post'],'op-reference-type','index')->name('op.reference.type');
+                Route::match(['get','put'],'op-reference-type-edit/{typeID}','edit')->name('op.reference.type.edit');
+                Route::match(['delete'],'op-reference-type-delete','destroy')->name('op.reference.type.delete');
+            });
+            # 3.2.1.4 User Blood group
+            Route::controller(BloodGroupController::class)->group(function (){
+                Route::middleware(['permission:list_blood_group'])->group(function (){
+                    Route::match(['get'],'blood-group-list','index')->name('blood.group.list');
+                });
+                Route::middleware(['permission:add_blood_group'])->group(function (){
+                    Route::match(['post','get'],'add-blood-group','create')->name('add.blood.group');
+                });
+                Route::middleware(['permission:delete_blood_group'])->group(function (){
+                    Route::match(['delete'],'delete-blood-group','destroy')->name('delete.blood.group');
+                });
+            });// 3.2.1.4 End
         });//3.2.1 End
-# 3.2.2 User Screen Permission Controller
+
+        # 3.2.2 User Screen Permission Controller
         Route::controller(UserPermissionController::class)->group(function (){
-            Route::post('add-user-permission','addPermission')->name('add.user.permission');
-            Route::delete('delete-user-permission','removePermission')->name('remove.user.permission');
+            Route::middleware(['permission:add_user_screen_permission'])->group(function (){
+                Route::post('add-user-permission','addPermission')->name('add.user.permission');
+            });
+             Route::middleware(['permission:delete_user_screen_permission'])->group(function (){
+                 Route::delete('delete-user-permission','removePermission')->name('remove.user.permission');
+            });
         });//3.2.2 End
-# 3.2.3 User File manager permission
+        # 3.2.3 User File manager permission
         Route::controller(UserController::class)->group(function (){
-            Route::post('user-per-add','UserPerSubmit');
-            Route::post('user-per-delete','UserPerDelete');
+            Route::middleware(['permission:add_user_file_manager_permission'])->group(function (){
+                Route::post('user-per-add','UserPerSubmit');
+            });
+            Route::middleware(['permission:delete_user_file_manager_permission'])->group(function (){
+                Route::post('user-per-delete','UserPerDelete');
+            });
         });//3.2.3 End
-# 3.2.4 Company Setup
-        Route::controller(CompanySetup::class)->group(function (){
-            Route::match(['get','post'],'company-setup','index')->name('company.setup');
-            Route::match(['get','post'],'company-add','companyAdd')->name('add.company');
-            Route::match(['get'],'company-list','companyList')->name('company.list');
-            Route::match(['put','get'],'company-edit/{companyID}','companyEdit')->name('edit.company');
-            Route::delete('company-delete','companyDelete')->name('delete.company');
 
-            Route::match(['get','post'],'company-type-add','companyTypeAdd')->name('add.company.type');
-            Route::match(['get'],'company-type-list','companyTypeList')->name('company.type.list');
-            Route::match(['put','get'],'company-type-edit/{companyTypeID}','companyTypeEdit')->name('edit.company.type');
-            Route::delete('company-type-delete','companyTypeDelete')->name('delete.company.type');
 
-            Route::match(['post','get'],'user-company-permission/{companyID}','userCompanyPermission')->name('user.company.permission');
-        });
-        # 3.2.5 Operation Reference Type
-        Route::controller(OpReferenceTypeController::class)->group(function (){
-            Route::match(['get','post'],'op-reference-type','index')->name('op.reference.type');
-            Route::match(['get','put'],'op-reference-type-edit/{typeID}','edit')->name('op.reference.type.edit');
-            Route::match(['delete'],'op-reference-type-delete','destroy')->name('op.reference.type.delete');
-        });
-        # 3.2.6 User Blood group
-        Route::controller(BloodGroupController::class)->group(function (){
-            Route::middleware(['permission:list_blood_group'])->group(function (){
-                Route::match(['get'],'blood-group-list','index')->name('blood.group.list');
-            });
-            Route::middleware(['permission:add_blood_group'])->group(function (){
-                Route::match(['post','get'],'add-blood-group','create')->name('add.blood.group');
-            });
-            Route::middleware(['permission:delete_blood_group'])->group(function (){
-                Route::match(['delete'],'delete-blood-group','destroy')->name('delete.blood.group');
-            });
-        });// 3.2.6 End
-        # 3.2.7 Role Management
-        Route::controller(RoleController::class)->group(function (){
-            Route::middleware(['permission:role_list'])->group(function (){
-                Route::match(['post','get'],'role-list','index')->name('role.list');
-            });
-            Route::middleware(['permission:add_role'])->group(function (){
-                Route::match(['post','get'],'role-add','create')->name('add.role');
-            });
-            Route::middleware(['permission:edit_role'])->group(function (){
-                Route::match(['put','get'],'role-edit/{roleID}','edit')->name('edit.role');
-            });
-            Route::middleware(['permission:delete_role'])->group(function (){
-                Route::match(['delete'],'delete-role','destroy')->name('delete.role');
-            });
-        });
     });//3.2 End
 
 # 3.3 User Management Controller
@@ -439,6 +441,22 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::middleware(['permission:fixed_asset_damage'])->group(function (){});
                 Route::middleware(['permission:fixed_asset_issue_return'])->group(function (){});
             });
+        });
+    });
+
+    # 3.15 Role Management
+    Route::controller(RoleController::class)->group(function (){
+        Route::middleware(['permission:role_list'])->group(function (){
+            Route::match(['post','get'],'role-list','index')->name('role.list');
+        });
+        Route::middleware(['permission:add_role'])->group(function (){
+            Route::match(['post','get'],'role-add','create')->name('add.role');
+        });
+        Route::middleware(['permission:edit_role'])->group(function (){
+            Route::match(['put','get'],'role-edit/{roleID}','edit')->name('edit.role');
+        });
+        Route::middleware(['permission:delete_role'])->group(function (){
+            Route::match(['delete'],'delete-role','destroy')->name('delete.role');
         });
     });
 });//3.0 End

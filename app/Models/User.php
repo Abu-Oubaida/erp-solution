@@ -41,6 +41,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function getCompanyIdAttribute()
+    {
+        return session('company_id');
+    }
 
     public function permissions()
     {
@@ -64,14 +68,35 @@ class User extends Authenticatable
     }
     public function getUserType()
     {
-        $roles = $this->roles;
+        if (Auth::user() !== null) {
+            $company_permission = UserCompanyPermission::with(['userRole','companies'])->where('user_id',Auth::user()->id)->first();
+            if (isset($company_permission->userRole))
+            {
+                return $company_permission->userRole->name;
+            }
+            else
+            {
+                $roles = $this->roles;
 
-        // Assuming a user has only one role, you can return its name
-        if ($roles->count() > 0) {
-            return $roles->first()->name;
+                // Assuming a user has only one role, you can return its name
+                if ($roles->count() > 0) {
+                    return $roles->first()->name;
+                }
+
+                return 'User'; // Default user type if no role is associated
+            }
+        }else
+        {
+            $roles = $this->roles;
+
+            // Assuming a user has only one role, you can return its name
+            if ($roles->count() > 0) {
+                return $roles->first()->name;
+            }
+
+            return 'User'; // Default user type if no role is associated
         }
 
-        return 'User'; // Default user type if no role is associated
     }
 //    public function roles()
 //    {

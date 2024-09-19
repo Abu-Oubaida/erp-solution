@@ -78,7 +78,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->where('company_id',$this->user->company_id);
+        return $object->where('company_id',$this->user->company_id)->where('id','>=',$this->user->roles()->first()->id);
     }
 
     protected function getCompany()
