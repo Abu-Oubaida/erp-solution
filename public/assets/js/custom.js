@@ -365,6 +365,15 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            makeEmployeeID:function (e,companyID,joining_date){
+                let company_id = $("#"+companyID).val()
+                let department_id = $(e).val()
+                let joining = $("#"+joining_date).val()
+                if (company_id.length === 0)
+                {
+                    return alert("Empty Company ID")
+                }
+            },
             fiendPermissionChild : function (e,actionID) {
                 let id = $(e).val()
                 if (id)

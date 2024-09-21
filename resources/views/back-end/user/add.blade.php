@@ -34,20 +34,10 @@
                         <h3 class="text-capitalize"><i class="fas fa-user-plus"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
                     </div>
                     <div class="col-md-6">
-                        <div class="row mt-1">
-                            <div class="col">
-                                <a class="btn btn-success btn-sm float-end mb-1" href="{{route('add.department')}}"><i class="fa-solid fa-building-user"></i> Add Department</a>
-                            </div>
-                            <div class="col">
-                                <a class="btn btn-success btn-sm float-end mb-1" href="{{route('add.designation')}}"><i class="fa-solid fa-user-tag"></i> Add Designation</a>
-                            </div>
-                            <div class="col">
-                                <a class="btn btn-success btn-sm float-end mb-1" href="{{route('add.branch')}}"><i class="fa-solid fa-code-branch"></i> Add Branch</a>
-                            </div>
-                            <div class="col">
-                                <a class="btn btn-info btn-sm float-end mb-1" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  User List</a>
-                            </div>
-                        </div>
+                        <a class="btn btn-info btn-sm float-end m-1 me-0" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  User List</a>
+                        <a class="btn btn-success btn-sm float-end m-1 me-0" href="{{route('add.department')}}"><i class="fa-solid fa-building-user"></i> Add Department</a>
+                        <a class="btn btn-success btn-sm float-end m-1 me-0" href="{{route('add.designation')}}"><i class="fa-solid fa-user-tag"></i> Add Designation</a>
+                        <a class="btn btn-success btn-sm float-end m-1 me-0" href="{{route('add.branch')}}"><i class="fa-solid fa-code-branch"></i> Add Branch</a>
                     </div>
                 </div>
             </div>
@@ -80,7 +70,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-control mb-3">
+                            <div class="mb-3">
                                 <label for="company">Company Name <span class="text-danger">*</span></label>
                                 <select class="text-capitalize select-search" id="company" name="company">
                                     @if(isset($companies) || (count($companies) > 0))
@@ -92,7 +82,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-control mb-3">
+                            <div class="mb-3">
                                 <label for="branch">Branch Name <span class="text-danger">*</span></label>
                                 <select class="text-capitalize select-search" id="branch" name="branch">
                                     @if(isset($branches) || (count($branches) > 0))
@@ -104,10 +94,10 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-control mb-3">
+                        <div class="col-md-3">
+                            <div class="mb-3">
                                 <label for="priority">To Department <span class="text-danger">*</span></label>
-                                <select class="select-search" id="to" name="dept">
+                                <select class="select-search" id="to" name="dept" onchange="return Obj.makeEmployeeID(this,'company','joining_date')">
                                     <option value=""></option>
                                     @if(isset($depts) || (count($depts) > 0))
                                         @foreach($depts as $d)
@@ -117,8 +107,14 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <div class=" mb-3">
+                                <label for="employee_id">Employee ID <span class="text-danger">*</span></label>
+                                <input class="form-control" id="employee_id" name="employee_id" type="text" placeholder="Employee ID" value="{{old('employee_id')}}" readonly/>
+                            </div>
+                        </div>
                         <div class="col-md-2">
-                            <div class="form-control mb-3">
+                            <div class="mb-3">
                                 <label for="designation">Designation <span class="text-danger">*</span></label>
                                 <select class="select-search" id="designation" name="designation">
                                     <option value=""></option>
@@ -131,7 +127,7 @@
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <div class="form-control mb-3">
+                            <div class="mb-3">
                                 <label for="roll">User Role <span class="text-danger">*</span></label>
                                 <select class="select-search" id="roll" name="roll">
                                     <option value=""></option>

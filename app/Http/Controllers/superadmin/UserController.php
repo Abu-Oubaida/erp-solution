@@ -74,8 +74,8 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name'  => ['required', 'string', 'max:255'],
-                'phone' => ['required', 'numeric', 'unique:'.User::class],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+                'phone' => ['required', 'numeric', 'unique:'.$this->getUser()->class],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:'.$this->getUser()->class],
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
                 'dept'  => ['required', 'integer', new DepartmentStatusRule],
                 'designation'  => ['required', 'integer', new DesignationStatusRule],
@@ -265,7 +265,7 @@ class UserController extends Controller
             $roles = Role::get();
             $designations = Designation::where('status',1)->get();
             $branches = branch::where('status',1)->get();
-            $user = User::with(['getDepartment','getBranch','getDesignation','roles'])->where('users.id',$userID)->first();
+            $user = $this->getUser()->with(['getDepartment','getBranch','getDesignation','roles'])->where('users.id',$userID)->first();
             return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','permissionParents','userPermissions','designations','branches'))->render();
         }catch (\Throwable $exception)
         {
@@ -349,9 +349,9 @@ class UserController extends Controller
                 }else {
                     $status = 0;
                 }
-                if (User::where('id',$userId)->first())
+                if ($this->getUser()->where('id',$userId)->first())
                 {
-                    User::where('id',$userId)->update([
+                    $this->getUser()->where('id',$userId)->update([
                         'status'=>$status,
                     ]);
                     return back()->with('success','Update successfully!');
@@ -370,9 +370,9 @@ class UserController extends Controller
             try {
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                if (User::where('id',$userId)->first())
+                if ($this->getUser()->where('id',$userId)->first())
                 {
-                    User::where('id',$userId)->update([
+                    $this->getUser()->where('id',$userId)->update([
                         'status'=>5,//delete
                     ]);
                     return back()->with('warning','User Deleted!');
@@ -417,9 +417,9 @@ class UserController extends Controller
             try {
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                if(User::where('id',$userId)->first())
+                if($this->getUser()->where('id',$userId)->first())
                 {
-                    User::where('id',$userId)->update([
+                    $this->getUser()->where('id',$userId)->update([
                         "password" => Hash::make($password)
                     ]);
                 }
@@ -439,7 +439,7 @@ class UserController extends Controller
             try {
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                $oldData = User::where('id',$userId)->first();
+                $oldData = $this->getUser()->where('id',$userId)->first();
                 if (!($oldData->joining_date))
                 {
                     return back()->with('error','Empty employee joining date');
@@ -451,7 +451,7 @@ class UserController extends Controller
                 if($dept = department::where('id',$dept_id)->first())
                 {
                     $eid = $this->getEid($dept,$oldData->joining_date);
-                    User::where('id',$userId)->update([
+                    $this->getUser()->where('id',$userId)->update([
                         "dept_id" => $dept_id,
                         'employee_id' => $eid[1],
                         'employee_id_hidden'    => $eid[0],
@@ -489,8 +489,8 @@ class UserController extends Controller
                 ]);
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                $oldData = User::find($userId);
-                User::where('id',$userId)->update([
+                $oldData = $this->getUser()->find($userId);
+                $this->getUser()->where('id',$userId)->update([
                     'designation_id'   =>  $designation_id,
                 ]);
                 DesignationChangeHistory::create([
@@ -517,8 +517,8 @@ class UserController extends Controller
                 ]);
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                $oldData = User::find($userId);
-                User::where('id',$userId)->update([
+                $oldData = $this->getUser()->find($userId);
+                $this->getUser()->where('id',$userId)->update([
                     'branch_id'   =>  $branch_id,
                 ]);
                 UserBranchChangeHistory::create([
@@ -543,7 +543,7 @@ class UserController extends Controller
                 $this->UserUpdate($request);
             }
             $userID = Crypt::decryptString($id);
-            $user = User::where('users.id',$userID)->first();
+            $user = $this->getUser()->where('users.id',$userID)->first();
             return view('back-end.user.edit',compact('user'))->render();
         }catch (\Throwable $exception)
         {
@@ -561,8 +561,8 @@ class UserController extends Controller
             ]);
             extract($request->post());
             $UserID = Crypt::decryptString($id);
-            $user = User::where('id',$UserID)->first();
-            User::where('id',$UserID)->update([
+            $user = $this->getUser()->where('id',$UserID)->first();
+            $this->getUser()->where('id',$UserID)->update([
                 'name' => $name,
                 'phone' => $phone,
                 'email' => $email,
@@ -591,11 +591,11 @@ class UserController extends Controller
     {
         $joining_year = date('y',strtotime($joining_date));
         $joining_month = date('m',strtotime($joining_date));
-        $countOfEmployee = User::where('dept_id', $dept->id)->count();
+        $countOfEmployee = $this->getUser()->where('dept_id', $dept->id)->count();
         $nextEmployee = $countOfEmployee + 1;
         $fourDigit = str_pad($nextEmployee, 3, "0", STR_PAD_LEFT);
         $eid =  $dept->dept_code . $fourDigit;
-        while (User::where('employee_id_hidden', $eid)->count()) {
+        while ($this->getUser()->where('employee_id_hidden', $eid)->count()) {
             $nextEmployee++;
             $fourDigit = str_pad($nextEmployee, 3, "0", STR_PAD_LEFT);
             $eid =  $dept->dept_code . $fourDigit;
