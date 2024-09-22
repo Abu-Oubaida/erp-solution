@@ -28,7 +28,6 @@ class BranchController extends Controller
     public function index()
     {
         try {
-
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
             $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
             return view('back-end.branch.list',compact('branches','branchTypeAll'))->render();
@@ -50,10 +49,11 @@ class BranchController extends Controller
             {
                 return $this->store($request);
             }
+            $companies = $this->getCompany()->get();
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
             $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
             $branchTypeActive = $this->getBranchType()->where('status',1)->orderBY('code','asc')->get();
-            return view('back-end.branch.add',compact('branchTypeActive','branchTypeAll','branches'))->render();
+            return view('back-end.branch.add',compact('branchTypeActive','branchTypeAll','branches','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -69,6 +69,7 @@ class BranchController extends Controller
     {
         try {
             $request->validate([
+                'company'=> ['required', 'integer', 'exists:company_infos,id'],
                 'branch_name'   => ['required','string','unique:branches,branch_name'],
                 'branch_type'   => ['required','string','exists:branch_types,id'],
                 'branch_status'   => ['required','string'],
@@ -81,7 +82,7 @@ class BranchController extends Controller
             else
                 $status = 0;
             $this->getBranch()->create([
-                'company_id' => $this->user->company_id,
+                'company_id' => $company,
                 'branch_name'   =>  $branch_name,
                 'branch_type'   =>  $branch_type,
                 'status'   =>  $status,
@@ -119,10 +120,11 @@ class BranchController extends Controller
                 return $this->update($request,$id);
             }
             $id = Crypt::decryptString($id);
+            $companies = $this->getCompany()->get();
             $branch = $this->getBranch()->where('id',$id)->first();
             $branchTypeActive = $this->getBranchType()->where('status',1)->orderBY('code','asc')->get();
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
-            return view('back-end/branch/edit',compact('branch','branchTypeActive','branches'))->render();
+            return view('back-end/branch/edit',compact('branch','branchTypeActive','branches','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -138,6 +140,7 @@ class BranchController extends Controller
         //
         try {
             $request->validate([
+                'company'=> ['required', 'integer', 'exists:company_infos,id'],
                 'branch_name'   => ['required','string', Rule::unique('branches', 'branch_name')->ignore(Crypt::decryptString($id))],
                 'branch_type'   => ['required','string','exists:branch_types,id'],
                 'branch_status'   => ['required','string'],
@@ -151,6 +154,7 @@ class BranchController extends Controller
             else
                 $status = 0;
             $this->getBranch()->where('id',$branchID)->update([
+                'company_id' => $company,
                 'branch_name'   =>  $branch_name,
                 'branch_type'   =>  $branch_type,
                 'status'   =>  $status,

@@ -11,6 +11,7 @@
     <x-back-end._header-link/>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 </head>
+{{--<body class="sb-nav-fixed sb-sidenav-toggled">--}}
 <body class="sb-nav-fixed">
 @include("layouts.back-end._header")
 {{--<div id="layoutSidenav" class="bg-image-dashboard" style="background-image: linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(117, 19, 93, 0.73)), url({{url("image/bg/chl-2.jpg")}});">--}}

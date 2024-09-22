@@ -129,4 +129,14 @@ class DashboardController extends Controller
             return back()->with('error',$exception->getMessage());
         }
     }
+
+    public function appSetting(Request $request)
+    {
+        try {
+            return view('back-end.app-setting')->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
 }

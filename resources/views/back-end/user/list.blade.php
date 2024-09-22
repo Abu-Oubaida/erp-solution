@@ -38,6 +38,8 @@
                         <th>No</th>
                         <th>Employee ID</th>
                         <th>Name</th>
+                        <th>Company</th>
+                        <th>Branch</th>
                         <th>Joining Date</th>
                         <th>Phone</th>
                         <th>Email</th>
@@ -53,6 +55,8 @@
                         <th>No</th>
                         <th>Employee ID</th>
                         <th>Name</th>
+                        <th>Company</th>
+                        <th>Branch</th>
                         <th>Joining Date</th>
                         <th>Phone</th>
                         <th>Email</th>
@@ -73,11 +77,13 @@
                                 <td>{!! $i++ !!}</td>
                                 <td>{!! $u->employee_id !!}</td>
                                 <td>{!! $u->name !!}</td>
+                                <td>{!! isset($u->company->company_name)?$u->company->company_name:'N/A' !!}</td>
+                                <td>{!! isset($u->branch->branch_name)?$u->branch->branch_name:'N/A' !!}</td>
                                 <td>{!! date('d-M-y',strtotime($u->joining_date)) !!}</td>
                                 <td>{!! $u->phone !!}</td>
                                 <td>{!! $u->email !!}</td>
-                                <td>{!! isset($u->getDepartment->dept_name)?$u->getDepartment->dept_name:'N/A' !!}</td>
-                                <td>{!! isset($u->getDesignation)?$u->getDesignation->title:"N/A" !!}</td>
+                                <td>{!! isset($u->department->dept_name)?$u->department->dept_name:'N/A' !!}</td>
+                                <td>{!! isset($u->designation)?$u->designation->title:"N/A" !!}</td>
                                 <td>@foreach ($u->roles as $role)
                                         {{ $role->display_name }}
                                     @endforeach</td>
@@ -98,7 +104,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="6" class="text-center text-danger">Not found!</td>
+                            <td colspan="13" class="text-center text-danger">Not found!</td>
                         </tr>
                     @endif
                     </tbody>

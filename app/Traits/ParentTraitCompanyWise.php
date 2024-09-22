@@ -10,6 +10,7 @@ use App\Models\department;
 use App\Models\Designation;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserCompanyPermission;
 use Illuminate\Database\Eloquent\Builder;
 
 trait ParentTraitCompanyWise
@@ -88,7 +89,15 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->where('id',$this->user->company_id);
+        $userCompanyPermissions = UserCompanyPermission::where('user_id',$this->user->id)->get();
+        if (count($userCompanyPermissions) > 0) {
+            $userComPerIDs = $userCompanyPermissions->pluck('company_id')->unique()->toArray();
+            return $object->whereIn('id',$userComPerIDs);
+        }
+        else{
+            return $object->where('id',$this->user->company_id);
+        }
+
     }
 
     protected function getBloodGroup()

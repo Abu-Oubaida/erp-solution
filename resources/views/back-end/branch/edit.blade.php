@@ -29,6 +29,18 @@
                             @csrf
                             @method('put')
                             <div class="row">
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label for="company">Company Name <span class="text-danger">*</span></label>
+                                        <select class="text-capitalize select-search" id="company" name="company">
+                                            @if(isset($companies) || (count($companies) > 0))
+                                                @foreach($companies as $c)
+                                                    <option value="{{$c->id}}" @if($branch->company_id == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-4">
                                         <input class="form-control" id="branch_name" name="branch_name" type="text" placeholder="Enter Branch Name" value="{{$branch->branch_name}}" required/>

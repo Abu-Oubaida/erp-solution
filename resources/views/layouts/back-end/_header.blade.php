@@ -16,11 +16,13 @@
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="{!! route("dashboard") !!}"><i class="fas fa-user"></i> Profile</a></li>
-{{--                <li><a class="dropdown-item" href="#!">Activity Log</a></li>--}}
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="{{route('logout')}}"><i class="fas fa-sign-out"></i> Logout</a></li>
-            </ul>
-        </li>
-    </ul>
+                <li><a class="dropdown-item @if(Route::currentRouteName() == 'dashboard') active @endif" href="{!! route("dashboard") !!}"><i class="fas fa-user"></i> Profile</a></li>
+            @if(auth()->user()->hasPermission('app_setting'))
+                <li><a class="dropdown-item @if(Route::currentRouteName() == 'app.setting') active @endif" href="{!! route('app.setting') !!}"><i class="fas fa-cog"></i> App Setting</a></li>
+            @endif
+    <li><hr class="dropdown-divider" /></li>
+    <li><a class="dropdown-item" href="{{route('logout')}}"><i class="fas fa-sign-out"></i> Logout</a></li>
+</ul>
+</li>
+</ul>
 </nav>

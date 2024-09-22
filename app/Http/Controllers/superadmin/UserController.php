@@ -56,10 +56,10 @@ class UserController extends Controller
                 return $this->store($request);
             }else{
                 $companies = $this->getCompany()->get();
-                $depts = $this->getDepartment()->where('status',1)->get();
-                $branches = $this->getBranch()->where('status',1)->get();
+                $depts = $this->getDepartment()->where('company_id',$this->user->company_id)->where('status',1)->get();
+                $branches = $this->getBranch()->where('company_id',$this->user->company_id)->where('status',1)->get();
                 $roles = $this->getRole()->get();
-                $designations = $this->getDesignation()->where('status',1)->get();
+                $designations = $this->getDesignation()->where('company_id',$this->user->company_id)->where('status',1)->get();
                 return view('back-end.user.add',compact('depts','branches','roles','designations','companies'))->render();
             }
 
@@ -74,13 +74,23 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name'  => ['required', 'string', 'max:255'],
-                'phone' => ['required', 'numeric', 'unique:'.$this->getUser()->class],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:'.$this->getUser()->class],
+                'phone' => ['required', 'numeric','regex:/^(01[3-9]\d{8})$/', Rule::unique('users','phone')->where(function ($query) use ($request) {
+                    return $query->where('company_id',$request->post('company'));
+                })],
+                'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users','email')->where(function ($query) use ($request) {
+                    return $query->where('company_id',$request->post('company'));
+                })],
+                'employee_id' => ['required', 'string', 'max:255','min:6',Rule::unique('users','employee_id')->where(function ($query) use ($request) {
+                    return $query->where('company_id',$request->post('company'));
+                })],
+                'employee_id_hidden' => ['required', 'string', 'max:255','min:6',Rule::unique('users','employee_id_hidden')->where(function ($query) use ($request) {
+                    return $query->where('company_id',$request->post('company'));
+                })],
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
                 'dept'  => ['required', 'integer', new DepartmentStatusRule],
                 'designation'  => ['required', 'integer', new DesignationStatusRule],
                 'branch'  => ['required', 'integer', new BranchStatusRule],
-                'roll'  => ['required','integer', new RoleStatusRule],
+                'role'  => ['required','integer', new RoleStatusRule],
                 'joining_date'  => ['required','date'],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
             ]);
@@ -93,12 +103,17 @@ class UserController extends Controller
                     return redirect(route('dashboard'))->with('error','Company not allowed');
                 }
                 $dept = $this->getDepartment()->where('id',$dept)->first();
-                $eid = $this->getEid($dept, $joining_date);
-                $roles = $this->getRole()->where('id',$roll)->first();
+                if (!isset($employee_id) || !isset($employee_id_hidden))
+                {
+                    $eid = $this->getEid($dept, $joining_date,$company);
+                    $employee_id_hidden = $eid[0];
+                    $employee_id = $eid[1];
+                }
+                $roles = $this->getRole()->where('id',$role)->first();
                 $user = $this->getUser()->create([
                     'company_id' => $company,
-                    'employee_id' => $eid[1],
-                    'employee_id_hidden'    => $eid[0],
+                    'employee_id' => $employee_id,
+                    'employee_id_hidden'    => $employee_id_hidden,
                     'name' => $name,
                     'phone' => $phone,
                     'email' => $email,
@@ -171,8 +186,8 @@ class UserController extends Controller
                     $blood = $this->getBloodGroup()->where('blood_type',$data[9])->first();
                     ($blood)? $b_id = $blood->id:$b_id = null;
                     ($data[8])?$status = $data[8]:$status = 0;
-                    $eid = $this->getEid($dept, $data[5]);
-                    $alreadyInDB = $this->getUser()->where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
+                    $eid = $this->getEid($dept, $data[5],$this->user->company_id);
+                    $alreadyInDB = $this->getUser()->where('company_id',$this->user->company_id)->where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
                     if (!$alreadyInDB)
                     {
                         $user = $this->getUser()->create([
@@ -243,7 +258,7 @@ class UserController extends Controller
             else {
                 $users = $this->getUser()->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
             }
-            return view('back-end/user/list',compact('users'))->render();
+            return view('back-end.user.list',compact('users'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -587,20 +602,91 @@ class UserController extends Controller
      * @param string $joining_month
      * @return string[]
      */
-    public function getEid($dept, string $joining_date): array
+    public function getEid($dept, string $joining_date, $company_id): array
     {
         $joining_year = date('y',strtotime($joining_date));
         $joining_month = date('m',strtotime($joining_date));
-        $countOfEmployee = $this->getUser()->where('dept_id', $dept->id)->count();
+        $countOfEmployee = User::where('company_id',$company_id)->where('dept_id', $dept->id)->count();
         $nextEmployee = $countOfEmployee + 1;
         $fourDigit = str_pad($nextEmployee, 3, "0", STR_PAD_LEFT);
         $eid =  $dept->dept_code . $fourDigit;
-        while ($this->getUser()->where('employee_id_hidden', $eid)->count()) {
+        while (User::where('company_id',$company_id)->where('employee_id_hidden', $eid)->count()) {
             $nextEmployee++;
             $fourDigit = str_pad($nextEmployee, 3, "0", STR_PAD_LEFT);
             $eid =  $dept->dept_code . $fourDigit;
         }
         $fullEID = $joining_year . $joining_month . $eid;
         return [$eid, $fullEID];
+    }
+
+    public function getEmployeeId(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'department_id' => ['required','integer', new DepartmentStatusRule],
+                    'company_id' => ['required', 'integer', 'exists:company_infos,id'],
+                    'joining_date' => ['required', 'date_format:Y-m-d','date', 'before_or_equal:today'],
+                ]);
+                extract($request->post());
+                $dept = department::where('company_id',$company_id)->where('id',$department_id)->first();
+                if ($dept)
+                {
+                    $employee_id = $this->getEid($dept->first(), $joining_date, $company_id);
+                    return response()->json([
+                        'status' => 'success',
+                        'data' => $employee_id,
+                        'message' => 'Request processed successfully!'
+                    ]);
+                }
+                return response()->json([
+                    'status'    =>  'error',
+                    'message'   =>  'Department not found for selected company!'
+                ],401);
+            }
+            return response()->json([
+                'status'    =>  'error',
+                'message'   =>  'Request method not allowed!'
+            ],401);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ],401);
+        }
+    }
+
+    public function changeUserCompany(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'company_id' => ['required','integer', 'exists:company_infos,id'],
+                ]);
+                extract($request->post());
+                $branches = branch::where('company_id',$company_id)->where('status',1)->get();
+                $departments = department::where('company_id',$company_id)->where('status',1)->get();
+                $designations = Designation::where('company_id',$company_id)->where('status',1)->get();
+                $roles = Role::where('company_id',$company_id)->get();
+                return response()->json([
+                    'status'    =>  'success',
+                    'data'      => ['branches'=>$branches,'departments'=>$departments,'designations'=>$designations,'roles'=>$roles],
+                    'message'   =>  'Request processed successfully!'
+                ]);
+            }
+            return response()->json([
+                'status'    =>  'error',
+                'message'   =>  'Request method not allowed!'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
     }
 }

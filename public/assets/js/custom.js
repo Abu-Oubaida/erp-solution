@@ -20,7 +20,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
         const employeeDatas = [];
         const materialsTempList = [];
         $('.select-search').selectize({
-            // create: true,
+            create: false,
             sortField: 'text'
         });
         $('.select-search-with-create').selectize({
@@ -365,14 +365,82 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
-            makeEmployeeID:function (e,companyID,joining_date){
+            changeUserCompany:function (e){
+                let company = $(e).val()
+                if (company.length === 0)
+                {
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/change-user-company";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'company_id':company},
+                    success: function (response) {
+                        if (response.status === 'error')
+                        {
+                            return alert(response.message)
+                        }
+                        if (response.status === 'success')
+                        {
+                            updateSelectBox(response.data.departments,'dept_menu','dept_name')
+                            updateSelectBox(response.data.branches,'branch_menu','branch_name')
+                            updateSelectBox(response.data.designations,'designation_menu','title')
+                            updateSelectBox(response.data.roles,'role_menu','display_name')
+                            $("#employee_id").val('')
+                            $("#employee_id_hide").val('')
+                        }
+                    },
+                    error: function (error)
+                    {
+                        return alert(error.responseJSON.message)
+                    }
+                })
+            },
+            makeEmployeeID:function (dept_menu,companyID,joining_date){
                 let company_id = $("#"+companyID).val()
-                let department_id = $(e).val()
+                let department_id = $("#"+dept_menu).val()
                 let joining = $("#"+joining_date).val()
                 if (company_id.length === 0)
                 {
-                    return alert("Empty Company ID")
+                    alert("Empty Company ID")
+                    return false
                 }
+                if (department_id.length === 0)
+                {
+                    alert("Empty Department ID")
+                    return false
+                }
+                if (joining.length === 0)
+                {
+                    alert("Empty Joining Date")
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/get-employee-id";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'department_id':department_id,'company_id':company_id,'joining_date':joining},
+                    success: function (response) {
+                        if (response.status === 'error')
+                        {
+                            return alert(response.message)
+                        }
+                        if (response.status === 'success')
+                        {
+                            console.log(response)
+                            $("#employee_id").val(response.data[1])
+                            $("#employee_id_hide").val(response.data[0])
+                        }
+                    },
+                    error: function (error)
+                    {
+                        return alert(error.responseJSON.message)
+                    }
+
+                })
             },
             fiendPermissionChild : function (e,actionID) {
                 let id = $(e).val()
@@ -806,7 +874,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         if (response.status === 'success')
                         {
                             const fixedAsset = response.data[0].fixed_asset
-                            updateSelectBox(response.data,'specification')
+                            updateSelectBox(response.data,'specification','specification')
                             $("#rate").val(fixedAsset.rate)
                             $("#unite").val(fixedAsset.unit)
                             $("#qty").val(1)
@@ -1303,14 +1371,22 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
         }
 
     })
-    function updateSelectBox(data,id) {
-        var selectize = $('#'+id)[0].selectize;
-        selectize.clearOptions(); // Clear existing options
+    function updateSelectBox(data,id,value_name) {
+        const $select = $('#' + id);
+        // Ensure Selectize is initialized
+        if ($select[0] && $select[0].selectize) {
+            const selectize = $select[0].selectize;
 
-        data.forEach(function(item) {
-            selectize.addOption({value: item.id, text: item.specification});
-        });
+            selectize.clear();
+            selectize.clearOptions(); // Clear existing options
 
-        selectize.refreshOptions(); // Refresh the options in the select box
+            data.forEach(function(item) {
+                selectize.addOption({ value: item.id, text: item[value_name] });
+            });
+
+            selectize.refreshOptions(true); // Refresh the options in the select box
+        } else {
+            console.error("Selectize is not initialized for #" + id);
+        }
     }
 }(jQuery))
