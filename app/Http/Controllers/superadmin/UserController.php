@@ -75,16 +75,16 @@ class UserController extends Controller
             $request->validate([
                 'name'  => ['required', 'string', 'max:255'],
                 'phone' => ['required', 'numeric','regex:/^(01[3-9]\d{8})$/', Rule::unique('users','phone')->where(function ($query) use ($request) {
-                    return $query->where('company_id',$request->post('company'));
+                    return $query->where('company',$request->post('company'));
                 })],
                 'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users','email')->where(function ($query) use ($request) {
-                    return $query->where('company_id',$request->post('company'));
+                    return $query->where('company',$request->post('company'));
                 })],
                 'employee_id' => ['required', 'string', 'max:255','min:6',Rule::unique('users','employee_id')->where(function ($query) use ($request) {
-                    return $query->where('company_id',$request->post('company'));
+                    return $query->where('company',$request->post('company'));
                 })],
                 'employee_id_hidden' => ['required', 'string', 'max:255','min:6',Rule::unique('users','employee_id_hidden')->where(function ($query) use ($request) {
-                    return $query->where('company_id',$request->post('company'));
+                    return $query->where('company',$request->post('company'));
                 })],
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
                 'dept'  => ['required', 'integer', new DepartmentStatusRule],
@@ -96,12 +96,11 @@ class UserController extends Controller
             ]);
             if ($request->isMethod('post'))
             {
-//                dd($request->post());
                 extract($request->post());
-                if ($company != $this->user->company_id || !$this->user->isSystemSuperAdmin())
-                {
-                    return redirect(route('dashboard'))->with('error','Company not allowed');
-                }
+//                if ($company != $this->user->company_id || !$this->user->isSystemSuperAdmin())
+//                {
+//                    return redirect(route('dashboard'))->with('error','Company not allowed');
+//                }
                 $dept = $this->getDepartment()->where('id',$dept)->first();
                 if (!isset($employee_id) || !isset($employee_id_hidden))
                 {
@@ -111,7 +110,7 @@ class UserController extends Controller
                 }
                 $roles = $this->getRole()->where('id',$role)->first();
                 $user = $this->getUser()->create([
-                    'company_id' => $company,
+                    'company' => $company,
                     'employee_id' => $employee_id,
                     'employee_id_hidden'    => $employee_id_hidden,
                     'name' => $name,
@@ -137,7 +136,7 @@ class UserController extends Controller
 
     public function excelStore(Request $request)
     {
-        try {
+//        try {
             $input = $request->post()['input'];
             unset($input[0]);
             $rules = [
@@ -187,11 +186,11 @@ class UserController extends Controller
                     ($blood)? $b_id = $blood->id:$b_id = null;
                     ($data[8])?$status = $data[8]:$status = 0;
                     $eid = $this->getEid($dept, $data[5],$this->user->company_id);
-                    $alreadyInDB = $this->getUser()->where('company_id',$this->user->company_id)->where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
+                    $alreadyInDB = $this->getUser()->where('company',$this->user->company_id)->where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
                     if (!$alreadyInDB)
                     {
                         $user = $this->getUser()->create([
-                            'company_id' => $this->user->company_id,
+                            'company' => $this->user->company_id,
                             'employee_id' => $eid[1],
                             'employee_id_hidden'    => $eid[0],
                             'name' => $data[0],
@@ -237,15 +236,15 @@ class UserController extends Controller
                 ];
             }
             return response()->json($response, 200);
-        }catch (\Throwable $exception)
-        {
-            $response = [
-                'error' => true,
-                'code' => $exception->getCode(), // You can use any appropriate error code
-                'message' => $exception->getMessage(),
-            ];
-            return response()->json($response, 200);
-        }
+//        }catch (\Throwable $exception)
+//        {
+//            $response = [
+//                'error' => true,
+//                'code' => $exception->getCode(), // You can use any appropriate error code
+//                'message' => $exception->getMessage(),
+//            ];
+//            return response()->json($response, 200);
+//        }
     }
 
     public function show()
@@ -258,6 +257,7 @@ class UserController extends Controller
             else {
                 $users = $this->getUser()->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
             }
+            dd($users->first()->company);
             return view('back-end.user.list',compact('users'))->render();
         }catch (\Throwable $exception)
         {
@@ -390,6 +390,10 @@ class UserController extends Controller
                     $this->getUser()->where('id',$userId)->update([
                         'status'=>5,//delete
                     ]);
+//                    if (Auth::user()->roles->first()->name == 'systemsuperadmin')
+//                    {
+//
+//                    }
                     return back()->with('warning','User Deleted!');
                 }
             }catch (\Throwable $exception)
@@ -606,11 +610,11 @@ class UserController extends Controller
     {
         $joining_year = date('y',strtotime($joining_date));
         $joining_month = date('m',strtotime($joining_date));
-        $countOfEmployee = User::where('company_id',$company_id)->where('dept_id', $dept->id)->count();
+        $countOfEmployee = User::where('company',$company_id)->where('dept_id', $dept->id)->count();
         $nextEmployee = $countOfEmployee + 1;
         $fourDigit = str_pad($nextEmployee, 3, "0", STR_PAD_LEFT);
         $eid =  $dept->dept_code . $fourDigit;
-        while (User::where('company_id',$company_id)->where('employee_id_hidden', $eid)->count()) {
+        while (User::where('company',$company_id)->where('employee_id_hidden', $eid)->count()) {
             $nextEmployee++;
             $fourDigit = str_pad($nextEmployee, 3, "0", STR_PAD_LEFT);
             $eid =  $dept->dept_code . $fourDigit;

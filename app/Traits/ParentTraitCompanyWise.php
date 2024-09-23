@@ -23,7 +23,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
+        return $object->whereIn('company',$this->getUserCompanyPermissionsArray());
     }
     protected function getBranch()
     {
@@ -103,6 +103,6 @@ trait ParentTraitCompanyWise
     }
     protected function getBloodGroup()
     {
-        return BloodGroup::class;
+        return BloodGroup::all();
     }
 }

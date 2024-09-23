@@ -29,8 +29,8 @@ class BranchController extends Controller
     {
         try {
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
-//            $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
-            return view('back-end.branch.list',compact('branches'))->render();
+            $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
+            return view('back-end.branch.list',compact('branches','branchTypeAll'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

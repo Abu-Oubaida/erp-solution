@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\company_info;
+use App\Models\User;
 use App\Models\UserCompanyPermission;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
@@ -59,9 +60,18 @@ class LoginRequest extends FormRequest
             $companyPermission = company_info::where('id',$this->company_id)->first();
         }
         else {
-            $companyPermission = UserCompanyPermission::where('user_id', $user->id)
-                ->where('company_id', $this->company_id)
-                ->first();
+            $userComPerIDs = [];
+            $userCompanyPermissions = UserCompanyPermission::where('user_id',$user->id)->get();
+            if (count($userCompanyPermissions) > 0) {
+                $userComPerIDs = $userCompanyPermissions->pluck('company_id')->unique()->toArray();
+            }
+            $userComPerIDs[] = (integer)$user->company;
+            $companyPermission = company_info::whereIn('id',$userComPerIDs)->where('id',$this->company_id)->first();
+
+
+//            $companyPermission = UserCompanyPermission::where('user_id', $user->id)
+//                ->where('company_id', $this->company_id)
+//                ->first();
         }
         // If company_id is valid, store it in the session
         if ($companyPermission) {

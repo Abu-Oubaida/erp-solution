@@ -49,6 +49,7 @@
                             <div class="mb-3">
                                 <label for="company">Company Name <span class="text-danger">*</span></label>
                                 <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.changeUserCompany(this)">
+                                    <option value="">Pick options...</option>
                                     @if(isset($companies) || (count($companies) > 0))
                                         @foreach($companies as $c)
                                             <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
@@ -85,24 +86,24 @@
                             <div class="mb-3">
                                 <label for="branch">Branch Name <span class="text-danger">*</span></label>
                                 <select class="text-capitalize select-search" id="branch_menu" name="branch">
-                                    <option value=""></option>
-                                    @if(isset($branches) || (count($branches) > 0))
-                                        @foreach($branches as $branch)
-                                            <option value="{{$branch->id}}" @if(old('branch') == $branch->id) selected @endif>{{$branch->branch_name}} ({!! $branch->company->company_name !!})</option>
-                                        @endforeach
-                                    @endif
+                                    <option value="">Pick options...</option>
+{{--                                    @if(isset($branches) || (count($branches) > 0))--}}
+{{--                                        @foreach($branches as $branch)--}}
+{{--                                            <option value="{{$branch->id}}" @if(old('branch') == $branch->id) selected @endif>{{$branch->branch_name}} ({!! $branch->company->company_name !!})</option>--}}
+{{--                                        @endforeach--}}
+{{--                                    @endif--}}
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label for="department">Department <span class="text-danger">*</span></label>
                             <select class="select-search" id="dept_menu" name="dept" onchange="return Obj.makeEmployeeID('dept_menu','company','joining_date')">
-                                <option value=""></option>
-                                @if(isset($depts) || (count($depts) > 0))
-                                    @foreach($depts as $d)
-                                        <option value="{{$d->id}}" @if(old('dept') == $d->id) selected @endif>{{$d->dept_name}} ({!! $d->company->company_name !!})</option>
-                                    @endforeach
-                                @endif
+                                <option value="">Pick options...</option>
+{{--                                @if(isset($depts) || (count($depts) > 0))--}}
+{{--                                    @foreach($depts as $d)--}}
+{{--                                        <option value="{{$d->id}}" @if(old('dept') == $d->id) selected @endif>{{$d->dept_name}} ({!! $d->company->company_name !!})</option>--}}
+{{--                                    @endforeach--}}
+{{--                                @endif--}}
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -113,24 +114,23 @@
                         <div class="col-md-3">
                             <label for="designation">Designation <span class="text-danger">*</span></label>
                             <select class="select-search" id="designation_menu" name="designation">
-                                <option value=""></option>
-                                @if(isset($designations) || (count($designations) > 0))
-                                    @foreach($designations as $d)
-                                        <option value="{{$d->id}}" @if(old('designation') == $d->id) selected @endif>{{$d->title}} ({!! $d->company->company_name !!})</option>
-                                    @endforeach
-                                @endif
+                                <option value="">Pick options...</option>
+{{--                                @if(isset($designations) || (count($designations) > 0))--}}
+{{--                                    @foreach($designations as $d)--}}
+{{--                                        <option value="{{$d->id}}" @if(old('designation') == $d->id) selected @endif>{{$d->title}} ({!! $d->company->company_name !!})</option>--}}
+{{--                                    @endforeach--}}
+{{--                                @endif--}}
                             </select>
                         </div>
                         <div class="col-md-3">
                             <label for="roll">User Role <span class="text-danger">*</span></label>
                             <select class="select-search" id="role_menu" name="role">
-                                <option value=""></option>
-                                @if(isset($roles) || (count($roles) > 0))
-                                    <option value="0">--Select please--</option>
-                                    @foreach($roles as $r)
-                                        <option value="{{$r->id}}" @if(old('role') == $r->id) selected @endif>{{$r->display_name}} ({!! $d->company->company_name !!})</option>
-                                    @endforeach
-                                @endif
+                                <option value="">Pick options...</option>
+{{--                                @if(isset($roles) || (count($roles) > 0))--}}
+{{--                                    @foreach($roles as $r)--}}
+{{--                                        <option value="{{$r->id}}" @if(old('role') == $r->id) selected @endif>{{$r->display_name}} ({!! $d->company->company_name !!})</option>--}}
+{{--                                    @endforeach--}}
+{{--                                @endif--}}
                             </select>
                         </div>
 
