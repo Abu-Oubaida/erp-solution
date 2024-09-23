@@ -332,7 +332,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get'],'branch-type-list','index')->name('branch.type.list');
         });
         Route::middleware(['permission:add_branch_type'])->group(function (){
-            Route::match(['post'],'add-branch-type','store')->name('add.branch.type');
+            Route::match(['post','get'],'add-branch-type','create')->name('add.branch.type');
         });
         Route::middleware(['permission:edit_branch_type'])->group(function (){
             Route::match(['put','get'],'edit-branch-type/{branchTypeID}','edit')->name('edit.branch.type');
@@ -347,6 +347,7 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::middleware(['permission:add_branch'])->group(function (){
             Route::match(['post','get'],'add-branch','create')->name('add.branch');
+            Route::post('change-branch-company','changeCompany');
         });
         Route::middleware(['permission:edit_branch'])->group(function (){
             Route::match(['put','get'],'edit-branch/{branchID}','edit')->name('edit.branch');

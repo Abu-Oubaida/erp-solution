@@ -398,6 +398,35 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            changeBranchCompany:function (e){
+                let company = $(e).val()
+                if (company.length === 0)
+                {
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/change-branch-company";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'company_id':company},
+                    success: function (response) {
+                        if (response.status === 'error')
+                        {
+                            return alert(response.message)
+                        }
+                        if (response.status === 'success')
+                        {
+                            // console.log(response.data.branchTypes)
+                            updateSelectBox(response.data.branchTypes,'branch_type','title')
+                        }
+                    },
+                    error: function (error)
+                    {
+                        return alert(error.responseJSON.message)
+                    }
+                })
+            },
             makeEmployeeID:function (dept_menu,companyID,joining_date){
                 let company_id = $("#"+companyID).val()
                 let department_id = $("#"+dept_menu).val()

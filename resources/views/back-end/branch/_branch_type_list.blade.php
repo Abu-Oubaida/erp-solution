@@ -1,6 +1,5 @@
 <div class="row">
-    <h3 class="text-capitalize">List of Branch Type</h3>
-    <table class="table table-sm" id="datatablesSimple2">
+    <table class="table table-sm" id="datatablesSimple">
         <thead>
         <tr>
             <th>No</th>

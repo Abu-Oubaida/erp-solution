@@ -43,7 +43,7 @@ class RoleController extends Controller
 
         }catch (\Throwable $exception)
         {
-            return back()->with('error',$exception->getMessage());
+            return back()->with('error',$exception->getMessage())->withInput();
         }
     }
     public function edit(Request $request, $id)
@@ -67,8 +67,8 @@ class RoleController extends Controller
     {
         try {
             $request->validate([
-                'name' => ['required', 'string', 'max:255','regex:/^[a-z0-9_]+$/',Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})],
-                'display_name' => ['required', 'string', 'max:255',Rule::unique('roles','display_name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})],
+                'name' => ['required', 'string', 'max:255','regex:/^[a-z0-9_]+$/',Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->post('company'));})],
+                'display_name' => ['required', 'string', 'max:255',Rule::unique('roles','display_name')->where(function ($query) use ($request){$query->where('company_id',$request->post('company'));})],
                 'company' => ['required', 'string', 'max:255','exists:company_infos,id'],
                 'description' => ['nullable','sometimes','string','max:255'],
             ]);
@@ -79,20 +79,21 @@ class RoleController extends Controller
                 'display_name'=>$display_name,
                 'description'=>$description,
                 'created_by'=>$this->user->id,
-                'created_at'=>date(now())
+                'created_at'=>date(now()),
+                'updated_at'=>null,
             ]);
             return back()->with('success','Role added successfully');
         }catch (\Throwable $exception)
         {
-            return back()->with('error',$exception->getMessage());
+            return back()->with('error',$exception->getMessage())->withInput();
         }
     }
     private function update(Request $request,$id)
     {
         try {
             $request->validate([
-                'name' => ['required', 'string', 'max:255','regex:/^[a-z0-9_]+$/', Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})->ignore($id,'id')],
-                'display_name' => ['required', 'string', 'max:255',Rule::unique('roles','display_name')->where(function ($query) use ($request){$query->where('company_id',$request->company);})->ignore($id,'id')],
+                'name' => ['required', 'string', 'max:255','regex:/^[a-z0-9_]+$/', Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->post('company'));})->ignore($id,'id')],
+                'display_name' => ['required', 'string', 'max:255',Rule::unique('roles','display_name')->where(function ($query) use ($request){$query->where('company_id',$request->post('company'));})->ignore($id,'id')],
                 'company' => ['required', 'string', 'max:255','exists:company_infos,id'],
                 'description' => ['nullable','sometimes','string','max:255'],
             ]);

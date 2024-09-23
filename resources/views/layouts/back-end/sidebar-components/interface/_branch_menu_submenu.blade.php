@@ -15,11 +15,18 @@
     <div class="collapse" id="branch" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
     @endif
             <nav class="sb-sidenav-menu-nested nav">
+                @if(auth()->user()->hasPermission('add_branch_type'))
+                    @if(Route::currentRouteName() == 'add.branch.type')
+                        <a class="nav-link" href="{{route("add.branch.type")}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-plus"></i></div> Add Type</a>
+                    @else
+                        <a class="nav-link text-chl" href="{{route("add.branch.type")}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-plus"></i></div> Add Type</a>
+                    @endif
+                @endif
                 @if(auth()->user()->hasPermission('add_branch'))
                     @if(Route::currentRouteName() == 'add.branch')
-                        <a class="nav-link" href="{{route("add.branch")}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add New</a>
+                        <a class="nav-link" href="{{route("add.branch")}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-plus"></i></div> Add Branch</a>
                     @else
-                        <a class="nav-link text-chl" href="{{route("add.branch")}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add New</a>
+                        <a class="nav-link text-chl" href="{{route("add.branch")}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-plus"></i></div> Add Branch</a>
                     @endif
                 @endif
                 @if(auth()->user()->hasPermission('list_branch'))

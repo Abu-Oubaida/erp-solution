@@ -40,8 +40,20 @@ class BranchTypeController extends Controller
      * Show the form for creating a new resource.
      *
      */
-    public function create()
+    public function create(Request $request)
     {
+        try {
+            if ($request->isMethod('post'))
+            {
+                return $this->store($request);
+            }
+            $companies = $this->getCompany()->get();
+            $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
+            return view('back-end.branch.add-type',compact('branchTypeAll','companies'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
     }
 
     /**
@@ -53,8 +65,9 @@ class BranchTypeController extends Controller
         //
         try {
             $request->validate([
-                'branch_type_title' =>  ['required','string','unique:branch_types,title'],
-                'branch_type_code' =>  ['required','string','unique:branch_types,code'],
+                'company' => ['required','string','exists:company_infos,id'],
+                'branch_type_title' =>  ['required','string',Rule::unique('branch_types','title')->where(function ($query) use($request){return $query->where('company_id',$request->post('company'));})],
+                'branch_type_code' =>  ['required','string', Rule::unique('branch_types','code')->where(function ($query) use($request) {return $query->where('company_id',$request->post('company'));})],
                 'branch_type_status' =>  ['required','string'],
                 'remarks' =>  ['sometimes','nullable','string'],
             ]);
@@ -64,7 +77,7 @@ class BranchTypeController extends Controller
             else
                 $status = 0;
             $this->getBranchType()->create([
-                'company_id'=>$this->user->company_id,'status'=>$status,'title'=>$branch_type_title,'code'=>$branch_type_code,'remarks'=>$remarks,'created_by'=> $this->user->id
+                'company_id'=>$company,'status'=>$status,'title'=>$branch_type_title,'code'=>$branch_type_code,'remarks'=>$remarks,'created_by'=> $this->user->id
             ]);
             return back()->with('success','Data added successfully');
         }catch (\Throwable $exception)
@@ -112,8 +125,10 @@ class BranchTypeController extends Controller
     {
         try {
             $request->validate([
-                'branch_type_title' =>  ['required','string',Rule::unique('branch_types','title')->ignore(Crypt::decryptString($id))],
-                'branch_type_code' =>  ['required','string',Rule::unique('branch_types','code')->ignore(Crypt::decryptString($id))],
+
+                'company' => ['required','string','exists:company_infos,id'],
+                'branch_type_title' =>  ['required','string',Rule::unique('branch_types','title')->where(function ($query) use($request){return $query->where('company_id',$request->post('company'));})->ignore(Crypt::decryptString($id))],
+                'branch_type_code' =>  ['required','string', Rule::unique('branch_types','code')->where(function ($query) use($request) {return $query->where('company_id',$request->post('company'));})->ignore(Crypt::decryptString($id))],
                 'branch_type_status' =>  ['required','string'],
                 'remarks' =>  ['sometimes','nullable','string'],
             ]);
@@ -124,7 +139,12 @@ class BranchTypeController extends Controller
             else
                 $status = 0;
             $this->getBranchType()->where('id',$typeID)->update([
-                'status'=>$status,'title'=>$branch_type_title,'code'=>$branch_type_code,'remarks'=>$remarks,'updated_by'=> Auth::user()->id
+//                'company' => $company,
+                'status'=>$status,
+                'title'=>$branch_type_title,
+                'code'=>$branch_type_code,
+                'remarks'=>$remarks,
+                'updated_by'=> Auth::user()->id
             ]);
             return back()->with('success','Data update successfully');
         }catch (\Throwable $exception)
@@ -142,7 +162,7 @@ class BranchTypeController extends Controller
         try {
             extract($request->post());
             $branchTypeChild = $this->getBranchType()->where('id',Crypt::decryptString($id))->first();
-            if(count($branchTypeChild->getBranch))
+            if(count($branchTypeChild->getBranches))
             {
                 return back()->with('warning','Deletion not possible! A relationship exists.');
             }

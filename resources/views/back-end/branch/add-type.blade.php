@@ -15,85 +15,84 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12" id="branch-type-add">
                 <div class="card mb-4">
                     <div class="card-header">
                         <div class="row">
                             <div class="col-sm-10">
-                                <h3 class="text-capitalize"> <i class="fas fa-edit"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                                <h3 class="text-capitalize"> <i class="fa-solid fa-plus"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
                             </div>
                             <div class="col-sm-2">
-                                <a class="btn btn-outline-primary btn-sm float-end" href="{{route('branch.type.list')}}"><i class="fas fa-list-check"></i>  Branch Type List</a>
+                                <a class="btn btn-outline-primary btn-sm float-end mt-1" href="#branch-type-list"><i class="fas fa-list-check"></i>  Branch List</a>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <form action="" method="POST">
+                        <form action="{{ route('add.branch.type') }}" method="POST">
                             @csrf
-                            @method('put')
                             <div class="row">
-                                <div class="col-md-3">
+                                <div class="col-md-6 mb-2">
                                     <label for="company">Company Name <span class="text-danger">*</span></label>
                                     <select class="text-capitalize select-search" id="company" name="company">
-                                        <option value="{{$branchType->company->id}}">{{$branchType->company->company_name}} ({!! $branchType->company->company_code !!})</option>
+                                        @if(isset($companies) || (count($companies) > 0))
+                                            @foreach($companies as $c)
+                                                <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="form-floating mb-4">
-                                        <input class="form-control" id="branch_type_title" name="branch_type_title" type="text" placeholder="Enter Branch Type Title" value="{{$branchType->title}}" required/>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-2">
+                                        <input class="form-control" id="branch_type_title" name="branch_type_title" type="text" placeholder="Enter Branch Type Title" value="{{old('branch_type_title')}}" required/>
                                         <label for="branch_type_title">Branch Type Title<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="form-floating mb-4">
-                                        <input class="form-control" id="branch_type_code" name="branch_type_code" type="text" placeholder="Enter Branch Type Code" value="{{$branchType->code}}"/>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-2">
+                                        <input class="form-control" id="branch_type_code" name="branch_type_code" type="text" placeholder="Enter Branch Type Code" value="{{old('branch_type_code')}}"/>
                                         <label for="branch_type_code">Branch Type Code</label>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="form-floating mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-2">
                                         <select class="form-control" id="branch_type_status" name="branch_type_status" required>
-                                            <option value="1" @if($branchType->status == 1) selected @endif>Active</option>
-                                            <option value="0" @if($branchType->status == 0) selected @endif>Inactive</option>
+                                            <option value="1">Active</option>
+                                            <option value="0">Inactive</option>
                                         </select>
                                         <label for="branch_type_status">Branch Status<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-8">
-                                    <div class="form-floating mb-4">
-                                        <textarea class="form-control" id="remarks" name="remarks">{!! $branchType->remarks !!}</textarea>
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-2">
+                                        <textarea class="form-control" id="remarks" name="remarks">{!! old('remarks') !!}</textarea>
                                         <label for="remarks">Remarks<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-floating mt-4 float-end">
-                                        <button type="submit" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Update</button>
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-2 float-end">
+                                        <input type="submit" value="Add" class="btn btn-chl-outline" name="submit" >
                                     </div>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
-            </div>
-
-            <div class="col-md-12">
                 <div class="card mb-4">
                     <div class="card-header">
                         <div class="row">
                             <div class="col-sm-10">
-                                <h3> <i class="fas fa-list"></i> Branch Type List</h3>
+                                <h3 class="text-capitalize"><i class="fas fa-list"></i> List of Branch Type</h3>
                             </div>
                             <div class="col-sm-2">
-                                <a class="btn btn-outline-info btn-sm float-end" href="{{route('add.branch.type')}}"><i class="fas fa-plus"></i>  Add Branch Type</a>
+                                <a class="btn btn-outline-info btn-sm float-end mt-1" href="#branch-type-add"><i class="fas fa-plus"></i>  Branch Add</a>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" id="branch-type-list">
                         @include('back-end.branch._branch_type_list')
                     </div>
                 </div>
             </div>
-
         </div>
 
     </div>

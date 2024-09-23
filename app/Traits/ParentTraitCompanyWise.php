@@ -23,7 +23,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->where('company_id',$this->user->company_id);
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
     protected function getBranch()
     {
@@ -32,7 +32,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->where('company_id',$this->user->company_id);
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
     protected function getProject()
     {
@@ -41,7 +41,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->where('company_id',$this->user->company_id);
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
     protected function getBranchType()
     {
@@ -50,7 +50,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->where('company_id',$this->user->company_id);
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
     protected function getDepartment()
     {
@@ -59,7 +59,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->where('company_id',$this->user->company_id);
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
 
     protected function getDesignation()
@@ -69,7 +69,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->where('company_id',$this->user->company_id);
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
 
     protected function getRole()
@@ -79,7 +79,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->where('company_id',$this->user->company_id)->where('id','>=',$this->user->roles()->first()->id);
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray())->where('id','>=',$this->user->roles()->first()->id);
     }
 
     protected function getCompany()
@@ -89,17 +89,18 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
+        return $object->whereIn('id',$this->getUserCompanyPermissionsArray());
+    }
+    private function getUserCompanyPermissionsArray()
+    {
+        $userComPerIDs = [];
         $userCompanyPermissions = UserCompanyPermission::where('user_id',$this->user->id)->get();
         if (count($userCompanyPermissions) > 0) {
             $userComPerIDs = $userCompanyPermissions->pluck('company_id')->unique()->toArray();
-            return $object->whereIn('id',$userComPerIDs);
         }
-        else{
-            return $object->where('id',$this->user->company_id);
-        }
-
+        $userComPerIDs[] = (integer)$this->user->company_id;
+        return $userComPerIDs;
     }
-
     protected function getBloodGroup()
     {
         return BloodGroup::class;

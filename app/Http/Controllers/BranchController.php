@@ -29,14 +29,39 @@ class BranchController extends Controller
     {
         try {
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
-            $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
-            return view('back-end.branch.list',compact('branches','branchTypeAll'))->render();
+//            $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
+            return view('back-end.branch.list',compact('branches'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
     }
 
+    public function changeCompany(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                extract($request->post());
+                $branchTypes = $this->getBranchType()->where('company_id',$company_id)->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data'=>['branchTypes'=>$branchTypes],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            return response()->json([
+                'status'=>'error',
+                'message'=>'Request not allowed'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=>$exception->getMessage()
+            ]);
+        }
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -120,11 +145,10 @@ class BranchController extends Controller
                 return $this->update($request,$id);
             }
             $id = Crypt::decryptString($id);
-            $companies = $this->getCompany()->get();
             $branch = $this->getBranch()->where('id',$id)->first();
-            $branchTypeActive = $this->getBranchType()->where('status',1)->orderBY('code','asc')->get();
+            $branchTypeActive = $this->getBranchType()->where('company_id',$branch->company_id)->orderBY('code','asc')->get();
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
-            return view('back-end/branch/edit',compact('branch','branchTypeActive','branches','companies'))->render();
+            return view('back-end/branch/edit',compact('branch','branchTypeActive','branches'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -141,7 +165,7 @@ class BranchController extends Controller
         try {
             $request->validate([
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
-                'branch_name'   => ['required','string', Rule::unique('branches', 'branch_name')->ignore(Crypt::decryptString($id))],
+                'branch_name'   => ['required','string', Rule::unique('branches', 'branch_name')->where(function ($query) use ($request) {return $query->where('company_id',$request->post('company'));})->ignore(Crypt::decryptString($id))],
                 'branch_type'   => ['required','string','exists:branch_types,id'],
                 'branch_status'   => ['required','string'],
                 'address'   => ['sometimes','nullable','string'],
