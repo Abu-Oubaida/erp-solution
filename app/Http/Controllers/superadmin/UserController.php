@@ -147,8 +147,12 @@ class UserController extends Controller
                 '*.3'   =>  ['required','exists:designations,title'],
                 '*.4'   =>  ['required','exists:branches,branch_name'],
                 '*.5'   =>  ['required','date'],
-                '*.6'   =>  ['required','numeric','unique:users,phone',],
-                '*.7'   =>  ['sometimes','nullable','email','unique:users,email'],
+                '*.6'   =>  ['required','numeric','regex:/^(01[3-9]\d{8})$/', Rule::unique('users','phone')->where(function ($query) {
+                    return $query->where('company',$this->user->company);
+                }),],
+                '*.7'   =>  ['sometimes','nullable', 'email', 'max:255', Rule::unique('users','email')->where(function ($query) {
+                    return $query->where('company',$this->user->company);
+                })],
                 '*.8'   =>  ['sometimes','nullable','numeric'],
                 '*.9'   =>  ['sometimes','nullable','exists:blood_groups,blood_type'],
             ];
@@ -190,7 +194,7 @@ class UserController extends Controller
                     if (!$alreadyInDB)
                     {
                         $user = $this->getUser()->create([
-                            'company' => $this->user->company_id,
+                            'company' => $this->user->company,
                             'employee_id' => $eid[1],
                             'employee_id_hidden'    => $eid[0],
                             'name' => $data[0],
@@ -257,7 +261,7 @@ class UserController extends Controller
             else {
                 $users = $this->getUser()->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
             }
-            dd($users->first()->company);
+//            dd($users->first()->getCompany);
             return view('back-end.user.list',compact('users'))->render();
         }catch (\Throwable $exception)
         {
@@ -269,18 +273,18 @@ class UserController extends Controller
     {
         try {
             $userID = Crypt::decryptString($id);
+            $user = $this->getUser()->where('id',$userID)->first();
             $dir = config('app.file_manager_url');
             ($dir)?$fileManagers = scandir($dir):$fileManagers = ['Not Found'];
             unset($fileManagers[0]);
             unset($fileManagers[1]);
             $permissionParents = Permission::where('parent_id',null)->orWhere('is_parent',1)->get();
             $userPermissions = PermissionUser::with('permissionParent')->where('user_id',$userID)->orderBy('permission_name','asc')->get();
-            $deptLists = department::where('status',1)->get();
+            $deptLists = department::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
             $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
-            $roles = Role::get();
-            $designations = Designation::where('status',1)->get();
-            $branches = branch::where('status',1)->get();
-            $user = $this->getUser()->with(['getDepartment','getBranch','getDesignation','roles'])->where('users.id',$userID)->first();
+            $roles = Role::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->get();
+            $designations = Designation::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
+            $branches = branch::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
             return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','permissionParents','userPermissions','designations','branches'))->render();
         }catch (\Throwable $exception)
         {

@@ -18,7 +18,7 @@ trait ParentTraitCompanyWise
     use AuthTrait;
     protected function getUser()
     {
-        $object = User::with(['permissions','department','designation','branch','company']);
+        $object = User::with(['permissions','department','designation','branch','getCompany']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
@@ -99,6 +99,17 @@ trait ParentTraitCompanyWise
             $userComPerIDs = $userCompanyPermissions->pluck('company_id')->unique()->toArray();
         }
         $userComPerIDs[] = (integer)$this->user->company_id;
+        return $userComPerIDs;
+    }
+    public function getUserCompanyPermissionArray($user_id)
+    {
+        $userComPerIDs = [];
+        $userCompanyPermissions = UserCompanyPermission::where('user_id',$user_id)->get();
+        if (count($userCompanyPermissions) > 0) {
+            $userComPerIDs = $userCompanyPermissions->pluck('company_id')->unique()->toArray();
+        }
+        $userDefaultCompanyID = $this->getUser()->where('id',$user_id)->first('company');
+        $userComPerIDs[] = (integer)$userDefaultCompanyID->company;
         return $userComPerIDs;
     }
     protected function getBloodGroup()

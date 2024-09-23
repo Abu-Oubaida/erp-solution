@@ -24,32 +24,6 @@ class UserPermissionController extends Controller
                 ]);
                 extract($request->post());
                 $user = User::findOrFail($user_id);
-//                dd()
-//                //parent permission
-//                if (Permission::where('id',$parentPermission)->where('name','none')->first())
-//                {
-//                    return back()->with('warning','No need to add None Permission')->withInput();
-//                }
-//                $permissionParent = Permission::where('parent_id',null)->where('id',$parentPermission)->first();
-//                if (!$permissionParent)
-//                {
-//                    return back()->with('error','Parent Permission Not Found!')->withInput();
-//                }
-//                // Check if the permission already exists for the user
-//                $existingPermissionParent = $user->permissions()->where('permission_name', $permissionParent->name)->first();
-//                if (!$existingPermissionParent)
-//                {
-//                    $id1 = $user->permissions()->create([
-//                        'permission_name' => $permissionParent->name,
-//                        'is_parent' => 1,
-//                    ])->id;
-//                    PermissionUserHistory::create([
-//                        'admin_id'=>Auth::user()->id,
-//                        'user_id'=>$user->id,
-//                        'permission_parent_id'=>$id1,
-//                        'operation_name'=> 'added',
-//                    ]);
-//                }
                 //child permission
                 if (count($childPermission) != 0)
                 {

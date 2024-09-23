@@ -33,6 +33,7 @@ class DashboardController extends Controller
         try {
             $auth = $this->user;
             $user = $this->getUser()->where('id', $auth->id)->first();
+//            dd($auth->companyInfo);
 //            dd($user->roles->first()->name);
 //            $user = User::leftJoin('departments as dept','dept.id','users.dept_id')->leftJoin('role_user as ur','ur.user_id','users.id')->leftJoin('roles as r','r.id','ur.role_id')->where('users.id',$auth->id)->select('dept.dept_name','r.display_name','r.id as role_id','users.*')->first();
             return view('back-end.index',compact('user'))->render();

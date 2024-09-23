@@ -384,10 +384,10 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         }
                         if (response.status === 'success')
                         {
-                            updateSelectBox(response.data.departments,'dept_menu','dept_name')
-                            updateSelectBox(response.data.branches,'branch_menu','branch_name')
-                            updateSelectBox(response.data.designations,'designation_menu','title')
-                            updateSelectBox(response.data.roles,'role_menu','display_name')
+                            updateSelectBox(response.data.departments,'dept_menu','id','dept_name')
+                            updateSelectBox(response.data.branches,'branch_menu','id','branch_name')
+                            updateSelectBox(response.data.designations,'designation_menu','id','title')
+                            updateSelectBox(response.data.roles,'role_menu','id','display_name')
                             $("#employee_id").val('')
                             $("#employee_id_hide").val('')
                         }
@@ -418,7 +418,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         if (response.status === 'success')
                         {
                             // console.log(response.data.branchTypes)
-                            updateSelectBox(response.data.branchTypes,'branch_type','title')
+                            updateSelectBox(response.data.branchTypes,'branch_type','id','title')
                         }
                     },
                     error: function (error)
@@ -488,19 +488,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                                 alert(data.error.msg);
                             } else {
                                 let permissions = data.results;
-
-                                if (!permissions || permissions.length === 0) {
-                                    alert("No data found!");
-                                    let response = "<option value=\"none\">1. None</option>";
-                                    $("#" + actionID).html(response);
-                                } else {
-                                    let counter = 2;
-                                    let response = "<option value=\"none\">1. None</option>";
-                                    permissions.forEach(function (permission) {
-                                        response += "<option value=\"" + permission.name + "\">" + counter++ + ". " + permission.display_name + "</option>";
-                                    });
-                                    $("#" + actionID).html(response);
-                                }
+                                updateSelectBox(permissions,actionID,'name','display_name')
                             }
                         }
                     })
@@ -903,7 +891,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         if (response.status === 'success')
                         {
                             const fixedAsset = response.data[0].fixed_asset
-                            updateSelectBox(response.data,'specification','specification')
+                            updateSelectBox(response.data,'specification','id','specification')
                             $("#rate").val(fixedAsset.rate)
                             $("#unite").val(fixedAsset.unit)
                             $("#qty").val(1)
@@ -1400,7 +1388,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
         }
 
     })
-    function updateSelectBox(data,id,value_name) {
+    function updateSelectBox(data,id,value,value_name) {
         const $select = $('#' + id);
         // Ensure Selectize is initialized
         if ($select[0] && $select[0].selectize) {
@@ -1410,7 +1398,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             selectize.clearOptions(); // Clear existing options
 
             data.forEach(function(item) {
-                selectize.addOption({ value: item.id, text: item[value_name] });
+                selectize.addOption({ value: item[value], text: item[value_name] });
             });
 
             selectize.refreshOptions(true); // Refresh the options in the select box

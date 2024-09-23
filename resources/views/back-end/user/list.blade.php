@@ -77,7 +77,7 @@
                                 <td>{!! $i++ !!}</td>
                                 <td>{!! $u->employee_id !!}</td>
                                 <td>{!! $u->name !!}</td>
-                                <td>{!! isset($u->company->company_name)?$u->company->company_name:'N/A' !!}</td>
+                                <td>{!! isset($u->getCompany->company_name)?$u->getCompany->company_name:'N/A' !!}</td>
                                 <td>{!! isset($u->branch->branch_name)?$u->branch->branch_name:'N/A' !!}</td>
                                 <td>{!! date('d-M-y',strtotime($u->joining_date)) !!}</td>
                                 <td>{!! $u->phone !!}</td>

@@ -127,13 +127,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserSalaryCertificateData::class,'updated_by');
     }
-    public function company()
+    public function getCompany()
     {
         return $this->belongsTo(company_info::class,'company','id');
     }
+//    public function company()
+//    {
+//        return $this->belongsTo(company_info::class,'company','id');
+//    }
     public function companyInfo()
     {
-        return $this->belongsTo(company_info::class,'company_id','id');
+        return $this->belongsTo(company_info::class,'company','id');
     }
 //    public function voucherTypeCreate()
 //    {
