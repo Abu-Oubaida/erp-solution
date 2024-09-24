@@ -226,11 +226,21 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <label for="user">For User</label>
-                                                <select class="form-control" id="user" name="user_id">
+                                                <select class="form-control select-search" id="user" name="user_id">
                                                     <option value="{!! $user->id !!}" selected>{!! $user->name !!}</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-8">
+                                            <div class="col-md-4">
+                                                <label for="user">For Company</label>
+                                                <select class="form-control select-search" id="user" name="user_id">
+                                        @if(count($userCompanies))
+                                            @foreach($userCompanies as $uc)
+                                                    <option value="{!! $uc->id !!}" selected>{!! $uc->company_name !!}</option>
+                                            @endforeach
+                                        @endif
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
                                                 <label for="parentPermission">Parent Permission</label>
                                                 <select class="form-control select-search cursor-pointer" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
                                                     <option value="">--Select Option--</option>

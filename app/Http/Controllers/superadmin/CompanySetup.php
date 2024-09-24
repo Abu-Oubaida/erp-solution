@@ -385,6 +385,7 @@ class CompanySetup extends Controller
                 return $this->userCompanyPermissionStore($request, $cID);
             }
             $company = $this->getCompany()->where('id',$cID)->first();
+            $selfUsersID = $company->users->pluck('id')->unique()->toArray();
             $users = $this->getUser()->where('status',1)->whereNot('id',$this->user->id)->get();
             $roles = $this->getRole()->get();
             return view('back-end.control-panel.company.user-permission.add-permission',compact('users','company','roles'))->render();

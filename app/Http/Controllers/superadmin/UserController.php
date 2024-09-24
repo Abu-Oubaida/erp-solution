@@ -8,6 +8,7 @@ use App\Exports\UsersSalaryDataExport1;
 use App\Http\Controllers\Controller;
 use App\Models\BloodGroup;
 use App\Models\branch;
+use App\Models\company_info;
 use App\Models\department;
 use App\Models\Designation;
 use App\Models\DesignationChangeHistory;
@@ -284,8 +285,9 @@ class UserController extends Controller
             $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
             $roles = Role::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->get();
             $designations = Designation::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
+            $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
             $branches = branch::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
-            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','permissionParents','userPermissions','designations','branches'))->render();
+            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','permissionParents','userPermissions','designations','branches','userCompanies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
