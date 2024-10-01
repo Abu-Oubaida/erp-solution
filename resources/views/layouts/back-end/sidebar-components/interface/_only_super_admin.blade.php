@@ -14,7 +14,7 @@
     <div class="collapse" id="programmerLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
 @endif
         <nav class="sb-sidenav-menu-nested nav ">
-            @if(Route::currentRouteName() == 'add.company' || Route::currentRouteName() == 'company.setup' || Route::currentRouteName() == 'edit.company' || Route::currentRouteName() == 'company.list' || Route::currentRouteName() == 'add.company.type'  || Route::currentRouteName() == 'company.type.list' || Route::currentRouteName() == 'edit.company.type' || Route::currentRouteName() == 'user.company.permission')
+            @if(Route::currentRouteName() == 'add.company' || Route::currentRouteName() == 'company.setup' || Route::currentRouteName() == 'edit.company' || Route::currentRouteName() == 'company.list' || Route::currentRouteName() == 'add.company.type'  || Route::currentRouteName() == 'company.type.list' || Route::currentRouteName() == 'edit.company.type' || Route::currentRouteName() == 'user.company.permission' || Route::currentRouteName() == 'company.module.permission')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#companies" aria-expanded="true" aria-controls="companies">
                     <div class="sb-nav-link-icon"><i class="fa-solid fa-city"></i></div>
                     Company Setup
@@ -58,6 +58,9 @@
                         @endif
                         @if(Route::currentRouteName() == 'user.company.permission')
                             <a class="nav-link" href="{!! route('user.company.permission',['companyID'=>\Illuminate\Support\Facades\Request::route('companyID')]) !!}"><div class="sb-nav-link-icon"><i class="fa-solid fa-user-shield"></i></div> User Permission</a>
+                        @endif
+                        @if(Route::currentRouteName() == 'company.module.permission')
+                            <a class="nav-link" href="{!! route('company.module.permission',['companyID'=>\Illuminate\Support\Facades\Request::route('companyID')]) !!}"><div class="sb-nav-link-icon"><i class="fa-solid fa-shield-halved"></i></div> Module Permission</a>
                         @endif
                     </nav>
                 </div>

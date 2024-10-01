@@ -1373,6 +1373,49 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 
                 }
                 return false
+            },
+            companyModulePermission:function (e)
+            {
+                let id = $(e).val()
+                if (id.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/system-operation/parent-wise-module-permission"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'id':id},
+                    success:function (response)
+                    {
+                        if (response.status === 'error')
+                        {
+                            alert('Error: ' + response.message)
+                        }
+                        else if (response.status === 'success') {
+                            updateSelectBox(response.data,'permissions','id','name')
+                        }
+                    }
+                })
+            },
+            selectAllOption:function (e){
+                const $select = $(e);
+
+                if ($select[0] && $select[0].selectize) {
+                    const selectize = $select[0].selectize; // Get the selectize instance
+                    const selectedValues = selectize.getValue(); // Get the current selected values as array
+                    if (selectedValues.includes('0')) {  // Check if "All" (value '0') is selected
+                        // Get all option values except the "All" option
+                        const allValues = selectize.options;
+                        const allKeys = Object.keys(allValues).filter(key => key !== '0');  // Exclude "All"
+
+                        // Set all other options as selected
+                        selectize.setValue(allKeys);
+                    }
+                } else {
+                    console.error("Selectize is not initialized for the provided element.");
+                }
             }
 
         }
@@ -1396,14 +1439,26 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 
             selectize.clear();
             selectize.clearOptions(); // Clear existing options
-
+            selectize.addOption({value:0, text: '01. All'})
             data.forEach(function(item) {
                 selectize.addOption({ value: item[value], text: item[value_name] });
             });
 
             selectize.refreshOptions(true); // Refresh the options in the select box
+
+            // Handle 'change' event for the selectize input
+            selectize.on('change', function(selectedValue) {
+                if (selectedValue === '0') {
+                    // If "All" is selected, select all other options
+                    const allValues = selectize.options;
+                    const allKeys = Object.keys(allValues).filter(key => key !== '0');
+                    selectize.setValue(allKeys);
+                }
+            });
         } else {
             console.error("Selectize is not initialized for #" + id);
         }
     }
+
+
 }(jQuery))

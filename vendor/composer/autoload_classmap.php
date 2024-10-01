@@ -102,6 +102,7 @@ return array(
     'App\\Models\\Account_voucher' => $baseDir . '/app/Models/Account_voucher.php',
     'App\\Models\\BloodGroup' => $baseDir . '/app/Models/BloodGroup.php',
     'App\\Models\\BranchType' => $baseDir . '/app/Models/BranchType.php',
+    'App\\Models\\CompanyModulePermission' => $baseDir . '/app/Models/CompanyModulePermission.php',
     'App\\Models\\Create_file_history' => $baseDir . '/app/Models/Create_file_history.php',
     'App\\Models\\Deleted_history' => $baseDir . '/app/Models/Deleted_history.php',
     'App\\Models\\Designation' => $baseDir . '/app/Models/Designation.php',

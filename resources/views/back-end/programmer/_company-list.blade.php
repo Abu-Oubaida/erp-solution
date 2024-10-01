@@ -53,7 +53,7 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li><a href="{!! route('user.company.permission',['companyID'=> \Illuminate\Support\Facades\Crypt::encryptString($company->id)]) !!}" class="dropdown-item" type="button"><i class="fa-solid fa-user-shield"></i> Users</a></li>
-                            <li><a href="" class="dropdown-item" type="button"><i class="fa-solid fa-key"></i> Set Super-Admin</a></li>
+                            <li><a href="{!! route('company.module.permission',['companyID'=>\Illuminate\Support\Facades\Crypt::encryptString($company->id)]) !!}" class="dropdown-item" type="button"><i class="fa-solid fa-shield-halved"></i> Module Permission</a></li>
                         </ul>
                     </div>
                 </td>

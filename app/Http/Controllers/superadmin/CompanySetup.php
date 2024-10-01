@@ -5,6 +5,7 @@ namespace App\Http\Controllers\superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\company_info;
 use App\Models\company_type;
+use App\Models\Permission;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
 use App\Traits\DeleteFileTrait;
@@ -435,6 +436,74 @@ class CompanySetup extends Controller
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function companyModulePermission(Request $request,$companyID)
+    {
+        try {
+            $cID = Crypt::decryptString($companyID);
+            if ($request->isMethod('post'))
+            {
+                return $this->companyModulePermissionStore($request, $cID);
+            }
+            $company = $this->getCompany()->where('id',$cID)->first();
+            $parent_permissions = Permission::where('parent_id',NULL)->get();
+            return view('back-end.programmer.company-module-permission',compact('company','parent_permissions'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    private function companyModulePermissionStore(Request $request,$companyID)
+    {
+        try {
+            $request->validate([
+                'permission_parent' => ['required','numeric','exists:permissions,id'],
+                'permissions' => ['required','array'],
+                'permissions.*' => ['required','string','exists:permissions,id'],
+            ]);
+            extract($request->post());
+            dd($permissions);
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function parentModulePermission(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                   'id' => ['required','numeric'],
+                ]);
+                extract($request->post());
+                if ($id == 0)
+                {
+                    $child_permissions = Permission::get();
+                }
+                else{
+                    $child_permissions = Permission::where('parent_id',$id)->get();
+                }
+                return response()->json([
+                    'status'=>'success',
+                    'data'=>$child_permissions,
+                    'message'=>'Request processed successfully.'
+                ]);
+            }
+            return response()->json([
+                'status'=>'error',
+                'message'=>'Requested method not allowed.',
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=>$exception->getMessage()
+            ]);
         }
     }
 }
