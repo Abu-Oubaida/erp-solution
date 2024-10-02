@@ -105,6 +105,10 @@ Route::group(['middleware' => ['auth']],function (){
                     Route::match(['get','post'],'company-module-permission/{companyID}','companyModulePermission')->name('company.module.permission');
                     Route::post('parent-wise-module-permission','parentModulePermission')->name('parent.module.permission');
                 });
+                Route::middleware(['permission:company_module_permission_delete'])->group(function (){
+                    Route::delete('company-module-permission-delete-all','companyModulePermissionDeleteAll')->name('company.module.permission.delete.all');
+                    Route::delete('company-module-permission-delete','companyModulePermissionDelete')->name('company.module.permission.delete');
+                });
             });
             # 3.2.1.3 Operation Reference Type
             Route::controller(OpReferenceTypeController::class)->group(function (){

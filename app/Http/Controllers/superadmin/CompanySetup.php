@@ -5,6 +5,8 @@ namespace App\Http\Controllers\superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\company_info;
 use App\Models\company_type;
+use App\Models\CompanyModulePermission;
+use App\Models\CompanyModulePermissionDeleteHistory;
 use App\Models\Permission;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
@@ -387,7 +389,7 @@ class CompanySetup extends Controller
             }
             $company = $this->getCompany()->where('id',$cID)->first();
             $selfUsersID = $company->users->pluck('id')->unique()->toArray();
-            $users = $this->getUser()->where('status',1)->whereNot('id',$this->user->id)->get();
+            $users = $this->getUser()->where('status',1)->whereNot('company',$cID)->get();
             $roles = $this->getRole()->get();
             return view('back-end.control-panel.company.user-permission.add-permission',compact('users','company','roles'))->render();
         } catch (\Throwable $exception)
@@ -449,7 +451,9 @@ class CompanySetup extends Controller
             }
             $company = $this->getCompany()->where('id',$cID)->first();
             $parent_permissions = Permission::where('parent_id',NULL)->get();
-            return view('back-end.programmer.company-module-permission',compact('company','parent_permissions'))->render();
+            $company_permission = CompanyModulePermission::where('company_id',$company->id)->get()->pluck('module_id')->toArray();
+            $permissions = Permission::with(['parentName'])->whereIn('id',$company_permission)->get();
+            return view('back-end.programmer.company-module-permission',compact('company','parent_permissions','permissions'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -460,15 +464,123 @@ class CompanySetup extends Controller
     {
         try {
             $request->validate([
-                'permission_parent' => ['required','numeric','exists:permissions,id'],
+                'permission_parent' => ['required','numeric',],
                 'permissions' => ['required','array'],
-                'permissions.*' => ['required','string','exists:permissions,id'],
+                'permissions.*' => ['required','string','exists:permissions,id',],
             ]);
             extract($request->post());
-            dd($permissions);
+            $get_permissions = Permission::whereIn('id',$permissions)->get();
+            foreach ($get_permissions as $permission)
+            {
+                if (!CompanyModulePermission::where('module_id',$permission->id)->where('company_id',$companyID)->exists())
+                {
+                    CompanyModulePermission::create([
+                        'company_id' => $companyID,
+                        'module_parent_id' => $permission->parent_id,
+                        'module_id' => $permission->id,
+                        'created_at' => now(),
+                        'created_by' => $this->user->id,
+                    ]);
+                }
+            }
+            return back()->with('success','Data added successfully.');
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    private function companyModulePermissionDeleteHistory($data)
+    {
+        try {
+            return CompanyModulePermissionDeleteHistory::create([
+                'old_id' => $data->id,
+                'company_id' => $data->company_id,
+                'module_parent_id' => $data->module_parent_id,
+                'module_id' => $data->module_id,
+                'old_created_by' => $data->created_by,
+                'old_updated_by' => $data->updated_by,
+                'old_created_at' => $data->created_at,
+                'old_updated_at' => $data->updated_at,
+                'created_by' => $this->user->id,
+            ]);
+        }
+        catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+    public function companyModulePermissionDelete(Request $request)
+    {
+        try {
+            if ($request->isMethod('delete'))
+            {
+                $request->validate([
+                    'id' => ['required','numeric','exists:company_module_permissions,module_id'],
+                ]);
+                extract($request->post());
+                $data = CompanyModulePermission::where('module_id',$id)->first();
+                $company_id = $data->company_id;
+                $this->companyModulePermissionDeleteHistory($data);
+                $data->delete();
+                $company_permission = CompanyModulePermission::where('company_id',$company_id)->get()->pluck('module_id')->toArray();
+                $permissions = Permission::with(['parentName'])->whereIn('id',$company_permission)->get();
+                $view = view('back-end.programmer.__company-module-permission-list',compact('permissions'))->render();
+                return response()->json([
+                    'status'=>'success',
+                    'message'=>'Data deleted successfully.',
+                    'data'=>$view,
+                ]);
+            }
+            return response()->json([
+                'status'=>'error',
+                'message'=>'Requested method not allowed.'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=>$exception->getMessage()
+            ]);
+        }
+    }
+    public function companyModulePermissionDeleteAll(Request $request)
+    {
+        try {
+            if ($request->isMethod('delete'))
+            {
+                $request->validate([
+                   'company_id' => ['required','numeric','exists:company_infos,id'],
+                ]);
+                extract($request->post());
+                $datas = CompanyModulePermission::where('company_id',$company_id)->get();
+                foreach ($datas as $data)
+                {
+                    $this->companyModulePermissionDeleteHistory($data);
+                }
+                CompanyModulePermission::where('company_id',$company_id)->delete();
+                $company_permission = CompanyModulePermission::where('company_id',$company_id)->get()->pluck('module_id')->toArray();
+                $permissions = Permission::with(['parentName'])->whereIn('id',$company_permission)->get();
+                $view = view('back-end.programmer.__company-module-permission-list',compact('permissions'))->render();
+                return response()->json([
+                    'status'=>'success',
+                    'message'=>'Data deleted successfully.',
+                    'data'=>$view,
+                ]);
+            }
+            return response()->json([
+                'status'=>'error',
+                'message'=>'Requested method not allowed.'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=>$exception->getMessage()
+            ]);
         }
     }
 
@@ -483,7 +595,7 @@ class CompanySetup extends Controller
                 extract($request->post());
                 if ($id == 0)
                 {
-                    $child_permissions = Permission::get();
+                    $child_permissions = Permission::whereNot('parent_id',NULL)->get();
                 }
                 else{
                     $child_permissions = Permission::where('parent_id',$id)->get();

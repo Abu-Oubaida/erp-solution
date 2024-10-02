@@ -4,7 +4,7 @@
     <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item">
-            <a href="{{route('control.panel')}}" class="text-capitalize text-chl">Control Panel</a>
+            <a href="{{route('company.list')}}" class="text-capitalize text-chl">Company List</a>
         </li>
         <li class="breadcrumb-item"><a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a></li>
     </ol>
@@ -53,7 +53,7 @@
                                 <label for="permission_parent">Permission Parent</label>
                                 <select class="form-control cursor-pointer select-search text-capitalize" name="permission_parent" id="permission_parent" onchange="Obj.companyModulePermission(this)">
                                     <option value="">--Select Option--</option>
-                                    <option value="0">All</option>
+                                    <option value="0">@ All</option>
                                     @if(isset($parent_permissions) && count($parent_permissions))
                                         @foreach($parent_permissions as $pp)
                                             <option value="{{$pp->id}}">{!! $pp->name !!}</option>
@@ -62,7 +62,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-5">
+                            <div class="col-md-7">
                                 <label for="permission_parent">Permissions</label>
                                 <select class="form-control cursor-pointer select-search" name="permissions[]" id="permissions" multiple onchange="Obj.selectAllOption(this)">
                                     <option value="">--Select Options--</option>
@@ -83,9 +83,13 @@
                 <div class="col-sm-6">
                     <h3 class="text-capitalize"><i class="fa-solid fa-shield-halved"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
                 </div>
+                <div class="col-sm-6">
+                    <a href="" class="btn btn-outline-danger btn-sm float-end mt-1" ref="{!! $company->id !!}" onclick="return Obj.deleteCompanyModulePermissionAll(this)"><i class="fas fa-trash"></i> Delete All</a>
+                </div>
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body" id="company-permission-list">
+            @include('back-end.programmer.__company-module-permission-list')
         </div>
     </div>
 

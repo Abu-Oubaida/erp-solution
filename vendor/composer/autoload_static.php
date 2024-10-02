@@ -775,6 +775,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\BloodGroup' => __DIR__ . '/../..' . '/app/Models/BloodGroup.php',
         'App\\Models\\BranchType' => __DIR__ . '/../..' . '/app/Models/BranchType.php',
         'App\\Models\\CompanyModulePermission' => __DIR__ . '/../..' . '/app/Models/CompanyModulePermission.php',
+        'App\\Models\\CompanyModulePermissionDeleteHistory' => __DIR__ . '/../..' . '/app/Models/CompanyModulePermissionDeleteHistory.php',
         'App\\Models\\Create_file_history' => __DIR__ . '/../..' . '/app/Models/Create_file_history.php',
         'App\\Models\\Deleted_history' => __DIR__ . '/../..' . '/app/Models/Deleted_history.php',
         'App\\Models\\Designation' => __DIR__ . '/../..' . '/app/Models/Designation.php',

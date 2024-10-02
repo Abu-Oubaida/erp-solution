@@ -1416,7 +1416,67 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 } else {
                     console.error("Selectize is not initialized for the provided element.");
                 }
-            }
+            },
+            deleteCompanyModulePermissionAll:function (e)
+            {
+                if (confirm("Are you sure delete all permission?"))
+                {
+                    let cid = $(e).attr('ref')
+                    if (cid.length === 0)
+                    {
+                        return false
+                    }
+                    const url = window.location.origin + sourceDir + "/system-operation/company-module-permission-delete-all"
+                    $.ajax({
+                        url: url,
+                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        method: "DELETE",
+                        data:{'company_id':cid},
+                        success:function (response)
+                        {
+                            if (response.status === 'error')
+                            {
+                                alert('Error: ' + response.message)
+                            }
+                            else if (response.status === 'success') {
+                                $("#company-permission-list").html(response.data)
+                                alert("Success:" + response.message)
+                            }
+                        }
+                    })
+                }
+                return false
+            },
+            deleteCompanyModulePermissionSingle:function (e)
+            {
+                if (confirm("Are you sure delete this permission?"))
+                {
+                    let id = $(e).attr('ref')
+                    if (id.length === 0)
+                    {
+                        return false
+                    }
+                    const url = window.location.origin + sourceDir + "/system-operation/company-module-permission-delete"
+                    $.ajax({
+                        url: url,
+                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        method: "DELETE",
+                        data:{'id':id},
+                        success:function (response)
+                        {
+                            if (response.status === 'error')
+                            {
+                                alert('Error: ' + response.message)
+                            }
+                            else if (response.status === 'success') {
+                                $("#company-permission-list").html(response.data)
+                                alert("Success:" + response.message)
+                            }
+                        }
+                    })
+                }
+                return false
+            },
 
         }
         function checkFileExists(url, callback) {
@@ -1439,7 +1499,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 
             selectize.clear();
             selectize.clearOptions(); // Clear existing options
-            selectize.addOption({value:0, text: '01. All'})
+            selectize.addOption({value:0, text: '@ All'})
             data.forEach(function(item) {
                 selectize.addOption({ value: item[value], text: item[value_name] });
             });
