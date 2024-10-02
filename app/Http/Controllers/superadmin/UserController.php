@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BloodGroup;
 use App\Models\branch;
 use App\Models\company_info;
+use App\Models\CompanyModulePermission;
 use App\Models\department;
 use App\Models\Designation;
 use App\Models\DesignationChangeHistory;
@@ -279,7 +280,8 @@ class UserController extends Controller
             ($dir)?$fileManagers = scandir($dir):$fileManagers = ['Not Found'];
             unset($fileManagers[0]);
             unset($fileManagers[1]);
-            $permissionParents = Permission::where('parent_id',null)->orWhere('is_parent',1)->get();
+//            $companyWiseParentPermission = CompanyModulePermission::select('module_parent_id')->where('company_id',$user->company)->distinct()->get();
+//            $permissionParents = Permission::whereIn('id',$companyWiseParentPermission)->where('parent_id',null)->get();
             $userPermissions = PermissionUser::with('permissionParent')->where('user_id',$userID)->orderBy('permission_name','asc')->get();
             $deptLists = department::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
             $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
@@ -287,7 +289,7 @@ class UserController extends Controller
             $designations = Designation::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
             $branches = branch::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
-            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','permissionParents','userPermissions','designations','branches','userCompanies'))->render();
+            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','userPermissions','designations','branches','userCompanies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\superadmin;
 use App\Http\Controllers\Controller;
 use App\Mail\ShareVoucherDocument;
 use App\Models\company_info;
+use App\Models\CompanyModulePermission;
 use App\Models\DocumentShareLinkEmail;
 use App\Models\Permission;
 use App\Models\User;
@@ -75,7 +76,8 @@ class ajaxRequestController extends Controller
     {
         try {
             extract($request->post());
-            $results = Permission::where('parent_id',$pid)->orWhere('id',$pid)->get();
+            $companyModulePermissionChild = CompanyModulePermission::select('module_id')->where('module_parent_id',$pid)->get();
+            $results = Permission::whereIn('id',$companyModulePermissionChild)->get();
             return array(
                 'results' => $results
             );
@@ -87,6 +89,35 @@ class ajaxRequestController extends Controller
                     'code' => $exception->getCode(),
                 )
             ));
+        }
+    }
+
+    public function companyChangeModulePermission(Request $request)
+    {
+        try {
+            if ($request->isMethod('post')) {
+                $request->validate([
+                    'cid'=> ['required','string','exists:company_infos,id'],
+                ]);
+                extract($request->post());
+                $companyWiseParentPermission = CompanyModulePermission::select('module_parent_id')->where('company_id',$cid)->distinct()->get();
+                $permissionParents = Permission::whereIn('id',$companyWiseParentPermission)->where('parent_id',null)->get();
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Permission successfully changed',
+                    'data' => $permissionParents
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid request'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
         }
     }
 

@@ -471,6 +471,28 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 
                 })
             },
+            companyChangeModulePermission: function (e){
+                let id = $(e).val()
+                if (id.length === 0)
+                {
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/company-change-module-permission";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'cid':id},
+                    success: function (responses) {
+                        if (responses.status === 'error') {
+                            alert("Error: " +responses.message)
+                        } else {
+                            let parents = responses.data;
+                            updateSelectBox(parents,'parentPermission','id','display_name')
+                        }
+                    }
+                })
+            },
             fiendPermissionChild : function (e,actionID) {
                 let id = $(e).val()
                 if (id)
@@ -1499,7 +1521,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 
             selectize.clear();
             selectize.clearOptions(); // Clear existing options
-            selectize.addOption({value:0, text: '@ All'})
+            selectize.addOption({value:0, text: '# All'})
             data.forEach(function(item) {
                 selectize.addOption({ value: item[value], text: item[value_name] });
             });

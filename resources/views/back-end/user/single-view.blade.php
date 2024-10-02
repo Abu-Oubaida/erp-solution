@@ -60,7 +60,7 @@
                                         </tr>
                                         <tr>
                                             <th>Department:</th>
-                                            <td>{!! $user->department->dept_name !!}</td>
+                                            <td>{!! isset($user->department->dept_name)?$user->department->dept_name:'' !!}</td>
                                         </tr>
                                         <tr>
                                             <th>Access Role:</th>
@@ -149,7 +149,7 @@
                                                         <option value="">--Select Option--</option>
                                                         @if(isset($deptLists) && count($deptLists))
                                                             @foreach($deptLists as $d)
-                                                                <option value="{{$d->id}}" @if($d->id == $user->department->id) selected @endif>{!! $d->dept_name !!}</option>
+                                                                <option value="{{$d->id}}" @if(isset($user->department->id) && $d->id == $user->department->id) selected @endif>{!! $d->dept_name !!}</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -170,7 +170,7 @@
                                                         <option value="">--Select Option--</option>
                                                         @if(isset($branches) && count($branches))
                                                             @foreach($branches as $branch)
-                                                                <option value="{{$branch->id}}" @if($branch->id == $user->branch->id) selected @endif>{!! $branch->branch_name !!}</option>
+                                                                <option value="{{$branch->id}}" @if( isset($user->branch->id) && $branch->id == $user->branch->id) selected @endif>{!! $branch->branch_name !!}</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -232,10 +232,11 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <label for="user">For Company</label>
-                                                <select class="form-control select-search" id="user" name="user_id">
+                                                <select class="form-control select-search" id="user" name="user_id" onchange="Obj.companyChangeModulePermission(this)">
+                                                    <option value="">--Select Option--</option>
                                         @if(count($userCompanies))
                                             @foreach($userCompanies as $uc)
-                                                    <option value="{!! $uc->id !!}" selected>{!! $uc->company_name !!}</option>
+                                                    <option value="{!! $uc->id !!}">{!! $uc->company_name !!}</option>
                                             @endforeach
                                         @endif
                                                 </select>
@@ -244,11 +245,11 @@
                                                 <label for="parentPermission">Parent Permission</label>
                                                 <select class="form-control select-search cursor-pointer" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
                                                     <option value="">--Select Option--</option>
-                                                    @if($permissionParents)
-                                                        @foreach($permissionParents as $data)
-                                                            <option value="{!! $data->id !!}">{!! $data->display_name !!}</option>
-                                                        @endforeach
-                                                    @endif
+{{--                                                    @if($permissionParents)--}}
+{{--                                                        @foreach($permissionParents as $data)--}}
+{{--                                                            <option value="{!! $data->id !!}">{!! $data->display_name !!}</option>--}}
+{{--                                                        @endforeach--}}
+{{--                                                    @endif--}}
                                                 </select>
                                             </div>
                                             <div class="col-md-12">
