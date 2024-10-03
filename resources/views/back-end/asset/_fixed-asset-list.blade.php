@@ -5,6 +5,7 @@
     <thead>
         <tr>
             <th>No</th>
+            <th>Company</th>
             <th>Recourse Code</th>
             <th>Materials</th>
             <th>Status</th>
@@ -24,6 +25,7 @@
         @foreach($fixed_assets as $fa)
             <tr class="{!! (isset($fixed_asset) && $fa->id == $fixed_asset->id)?'text-primary':'' !!}">
                 <td>{!! $no++ !!}</td>
+                <td>{!! $fa->company->company_name !!}</td>
                 <td>{!! $fa->recourse_code !!}</td>
                 <td>{!! $fa->materials_name !!}</td>
                 <td>@if($fa->status==1) <span class='badge bg-success'> Active</span> @else <span class='badge bg-danger'>Inactive </span>@endif</td>

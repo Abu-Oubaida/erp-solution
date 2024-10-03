@@ -26,7 +26,20 @@
                         <form action="{{ route('fixed.asset.add') }}" method="POST">
                             @csrf
                             <div class="row">
-                                <div class="col-md-2">
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label for="company">Company Name <span class="text-danger">*</span></label>
+                                        <select class="text-capitalize select-search" id="company" name="company">
+                                            <option value="">Pick options...</option>
+                                            @if(isset($companies) || (count($companies) > 0))
+                                                @foreach($companies as $c)
+                                                    <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-floating mb-">
                                         <input class="form-control" id="recourse_code" name="recourse_code" type="text" placeholder="Enter Recourse Code" value="{{old('recourse_code')}}" required/>
                                         <label for="recourse_code">Recourse Code<span class="text-danger">*</span></label>
@@ -38,7 +51,7 @@
                                         <label for="materials">Materials Name<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="form-floating mb-3">
                                         <input class="form-control" id="rate" name="rate" type="text" placeholder="Materials Rate" value="{{old('rate')}}" required/>
                                         <label for="rate">Materials Rate<span class="text-danger">*</span></label>
@@ -66,7 +79,7 @@
                                         <label for="depreciation">Depreciation Rate (%)</label>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-7">
                                     <div class="form-floating mb-3">
                                         <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10">{{old('remarks')}}</textarea>
                                         <label for="remarks">Remarks</label>

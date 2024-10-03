@@ -6,6 +6,7 @@ use App\Models\Fixed_asset;
 use App\Models\Fixed_asset_delete_history;
 use App\Models\fixed_asset_specifications;
 use App\Models\User;
+use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -20,6 +21,14 @@ use Throwable;
 
 class FixedAssetController extends Controller
 {
+    use ParentTraitCompanyWise;
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->setUser();
+            return $next($request);
+        });
+    }
     /**
      * Display a listing of the resource.
      *
@@ -43,8 +52,10 @@ class FixedAssetController extends Controller
             }
             else{
                 $user = Auth::user();
-                $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('created_by',$user->id)->where('status','<=',2)->get();
-                return view('back-end.asset.fixed-asset-add',compact('fixed_assets'));
+                $fixed_assets = $this->getFixedAsset()->where('created_by',$user->id)->where('status','<=',2)->get();
+                $companies = $this->getCompany()->get();
+//                dd($companies);
+                return view('back-end.asset.fixed-asset-add',compact('fixed_assets','companies'));
             }
         }catch (\Throwable $exception){
             return back()->with('error',$exception->getMessage())->withInput();
@@ -97,8 +108,13 @@ class FixedAssetController extends Controller
     private function store(Request $request)
     {
         $request->validate([
-            'recourse_code' => ['string','required',Rule::unique('fixed_assets','recourse_code')->ignore(3,'status')],
-            'materials' => ['string','required',Rule::unique('fixed_assets','materials_name')->ignore(3,'status')],
+            'company'=> ['required', 'integer', 'exists:company_infos,id'],
+            'recourse_code' => ['string','required',Rule::unique('fixed_assets','recourse_code')->where(function ($query) use ($request){
+                return $query->where('company_id',$request->post('company'));
+            })->ignore(3,'status')],
+            'materials' => ['string','required',Rule::unique('fixed_assets','materials_name')->where(function ($query) use ($request){
+                return $query->where('company_id',$request->post('company'));
+            })->ignore(3,'status')],
             'rate'  =>  ['numeric','required'],
             'unit'  =>  ['string','required'],
             'status'  =>  ['numeric','required','between:0,1'],
@@ -116,7 +132,7 @@ class FixedAssetController extends Controller
                 'depreciation'  => $depreciation,
                 'status'    =>  $status,
                 'remarks'   =>  $remarks,
-                'company_id'=> $user->company_id,
+                'company_id'=> $company,
                 'created_by'=>  $user->id,
             ]);
             return back()->with('success','Fixed Asset Added Successfully');
@@ -163,7 +179,7 @@ class FixedAssetController extends Controller
     {
         try {
             $user = Auth::user();
-            $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status','<=',2)->get();
+            $fixed_assets = $this->getFixedAsset()->where('status','<=',2)->get();
             return view('back-end.asset.fixed-asset-list',compact('fixed_assets'));
         }catch (\Throwable $exception){
             return back()->with('error',$exception->getMessage());

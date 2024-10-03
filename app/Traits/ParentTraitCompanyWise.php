@@ -8,6 +8,7 @@ use App\Models\BranchType;
 use App\Models\company_info;
 use App\Models\department;
 use App\Models\Designation;
+use App\Models\Fixed_asset;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
@@ -100,6 +101,15 @@ trait ParentTraitCompanyWise
         }
         $userComPerIDs[] = (integer)$this->user->company_id;
         return $userComPerIDs;
+    }
+    private function getFixedAsset()
+    {
+        $object = Fixed_asset::with(['company']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
     public function getUserCompanyPermissionArray($user_id)
     {
