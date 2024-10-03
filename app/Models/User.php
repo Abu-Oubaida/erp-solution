@@ -55,7 +55,7 @@ class User extends Authenticatable
     public function hasPermission($permission)
     {
         // Implement your permission check logic here
-        return $this->isSystemSuperAdmin()|| $this->defaultPermissions()->where('role_name',$this->getUserType())->where('permission_name',$permission)->exists() || $this->permissions()->where('permission_name', $permission)->exists();
+        return $this->isSystemSuperAdmin()|| $this->defaultPermissions()->where('role_name',$this->getUserType())->where('permission_name',$permission)->exists() || $this->permissions()->where('permission_name', $permission)->where('company_id',Auth::user()->company)->exists();
     }
     public function isSuperAdmin()
     {

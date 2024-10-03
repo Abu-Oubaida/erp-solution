@@ -18,4 +18,8 @@ class PermissionUser extends Model
     {
         return $this->hasMany(User::class,'id','user_id');
     }
+    public function company()
+    {
+        return $this->belongsTo(company_info::class,'company_id','id');
+    }
 }

@@ -4,95 +4,88 @@ namespace App\Http\Controllers\superadmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
+use App\Models\PermissionUser;
 use App\Models\PermissionUserHistory;
 use App\Models\User;
+use App\Traits\DeleteFileTrait;
+use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 class UserPermissionController extends Controller
 {
+    use DeleteFileTrait, ParentTraitCompanyWise;
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->setUser();
+            return $next($request);
+        });
+    }
     public function addPermission(Request $request)
     {
         try {
             if ($request->isMethod('post'))
             {
                 $request->validate([
-                    'user_id' => ['required','exists:users,id'],
-                    'parentPermission' => ['required','string','exists:permissions,id'],
-                    'childPermission.*' => ['required','string','exists:permissions,name'],
+                    'user_id' => ['required','string','exists:users,id'],
+                    'company_id' => ['required','string',function ($attribute, $value, $fail) {
+                        $existsInPermissions = DB::table('user_company_permissions')
+                            ->where('company_id', $value)
+                            ->exists();
+
+                        $existsInUsers = DB::table('users')
+                            ->where('company', $value)
+                            ->exists();
+
+                        if (!$existsInPermissions && !$existsInUsers) {
+                            $fail('The selected company_id is invalid.');
+                        }
+                    }],
+                    'parentPermission' => ['required','string',function ($attribute, $value, $fail) {
+                        if ($value != 0) {
+                            // Apply the exists rule only when pid is not 0
+                            $exists = DB::table('company_module_permissions')
+                                ->where('module_parent_id', $value)
+                                ->exists();
+                            if (!$exists) {
+                                $fail('The selected pid is invalid.');
+                            }
+                        }
+                    }],
+                    'childPermission.*' => ['required','string','exists:company_module_permissions,module_id'],
                 ]);
                 extract($request->post());
                 $user = User::findOrFail($user_id);
                 //child permission
-                if (count($childPermission) != 0)
+                if (count($childPermission))
                 {
-                    $error = 0;
-                    $historyError = 0;
-                    $success = 0;
-                    foreach ($childPermission as $data)
+                    $permissions = Permission::whereIn('id', $childPermission)->get();
+                    foreach ($permissions as $permission)
                     {
-                        if (!($data == 'none'))
+                        if (!PermissionUser::where('user_id', $user->id)->where('company_id',$company_id)->where('permission_name', $permission->name)->where('parent_id',$permission->parent_id)->exists())
                         {
-                            $permissionChild = Permission::where('parent_id',$parentPermission)->orWhere('id',$parentPermission)->where('name',$data)->first();
-                            if (!$permissionChild)
+                            $create = PermissionUser::create([
+                                'company_id' => $company_id,
+                                'user_id' => $user->id,
+                                'permission_name' => $permission->name,
+                                'parent_id' => $permission->parent_id,
+                            ]);
+                            if ($create->id)
                             {
-                                return back()->with('error','Invalid child permission ('.$data.')');
-                            }
-                            // Check if the permission already exists for the user
-                            $existingPermissionChild = $user->permissions()->where('permission_name', $permissionChild->name)->first();
-                            if (!$existingPermissionChild)
-                            {
-                                $create = $user->permissions()->create([
-                                    'permission_name' => $permissionChild->name,
-                                    'parent_id' => $parentPermission,
+                                PermissionUserHistory::create([
+                                    'company_id' => $company_id,
+                                    'admin_id'=>$this->user->id,
+                                    'user_id'=>$user->id,
+                                    'permission_id'=>$create->id,
+                                    'operation_name'=> 'added',
                                 ]);
-                                if ($create->id)
-                                {
-                                    $h = PermissionUserHistory::create([
-                                        'admin_id'=>Auth::user()->id,
-                                        'user_id'=>$user->id,
-                                        'permission_id'=>$create->id,
-                                        'operation_name'=> 'added',
-                                    ]);
-                                   ($h)? $success++ : $historyError++;
-                                }else{
-                                    $error++;
-                                }
-                            }
-                        }
-                        else{
-                            $permission = Permission::find($parentPermission);
-                            if (!$permission)
-                            {
-                                return back()->with('error','Invalid parent permission ('.$data.')');
-                            }
-                            $existingPermissionParent = $user->permissions()->where('permission_name', $permission->name)->first();
-                            if (!$existingPermissionParent)
-                            {
-                                $create = $user->permissions()->create([
-                                    'permission_name' => $permission->name,
-                                    'parent_id' => $parentPermission,
-                                ]);
-                                if ($create->id)
-                                {
-                                    $h = PermissionUserHistory::create([
-                                        'admin_id'=>Auth::user()->id,
-                                        'user_id'=>$user->id,
-                                        'permission_id'=>$create->id,
-                                        'operation_name'=> 'added',
-                                    ]);
-                                    ($h)? $success++ : $historyError++;
-                                }else{
-                                    $error++;
-                                }
                             }
                         }
                     }
-                    if ($success > $error+$historyError)
-                        return back()->with('success','Maximum number of permission added successfully! Please verify on list');
-                    elseif ($success < $error+$historyError)
-                        return back()->with('error','Maximum number of permission added not possible! Please verify on list');
+                    return back()->with('success','Permission added successfully.');
                 }
                 return back()->with('error','No options are selected');
             }
@@ -116,13 +109,15 @@ class UserPermissionController extends Controller
             $uid = Crypt::decryptString($user_id);
             $user = User::findOrFail($uid);
             // Remove the permission from the user
-            $user->permissions()->where('id', $pid)->delete();
+            $userPermissionThis = $user->permissions()->where('id', $pid)->first();
             PermissionUserHistory::create([
+                'company_id' => $userPermissionThis->company_id,
                 'admin_id'=>Auth::user()->id,
                 'user_id'=>$user->id,
                 'permission_id'=>$pid,
                 'operation_name'=> 'deleted',
             ]);
+            $userPermissionThis->delete();
             return back()->with('success','Permission removed successfully.');
         }catch (\Throwable $exception)
         {

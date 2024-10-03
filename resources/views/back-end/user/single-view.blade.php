@@ -109,7 +109,7 @@
                                                         <option value="">--Select Option--</option>
                                                         @if(isset($roles) && count($roles))
                                                             @foreach($roles as $r)
-                                                                <option value="{{$r->id}}" @if($r->display_name == $roleNew) selected @endif>{!! $r->display_name !!}</option>
+                                                                <option value="{{$r->id}}" @if($r->display_name == $roleNew) selected @endif>{!! $r->display_name !!} ({!! $r->company->company_name !!})</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -130,7 +130,7 @@
                                                         <option value="">--Select Option--</option>
                                                         @if(isset($designations) && count($designations))
                                                             @foreach($designations as $dig)
-                                                                <option value="{{$dig->id}}" @if($dig->id == $user->designation_id) selected @endif>{!! $dig->title !!}</option>
+                                                                <option value="{{$dig->id}}" @if($dig->id == $user->designation_id) selected @endif>{!! $dig->title !!} ({!! $dig->company->company_name !!})</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -149,7 +149,7 @@
                                                         <option value="">--Select Option--</option>
                                                         @if(isset($deptLists) && count($deptLists))
                                                             @foreach($deptLists as $d)
-                                                                <option value="{{$d->id}}" @if(isset($user->department->id) && $d->id == $user->department->id) selected @endif>{!! $d->dept_name !!}</option>
+                                                                <option value="{{$d->id}}" @if(isset($user->department->id) && $d->id == $user->department->id) selected @endif>{!! $d->dept_name !!} ({!! $d->company->company_name !!})</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -170,7 +170,7 @@
                                                         <option value="">--Select Option--</option>
                                                         @if(isset($branches) && count($branches))
                                                             @foreach($branches as $branch)
-                                                                <option value="{{$branch->id}}" @if( isset($user->branch->id) && $branch->id == $user->branch->id) selected @endif>{!! $branch->branch_name !!}</option>
+                                                                <option value="{{$branch->id}}" @if( isset($user->branch->id) && $branch->id == $user->branch->id) selected @endif>{!! $branch->branch_name !!} ({!! $branch->company->company_name !!})</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -231,8 +231,8 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="user">For Company</label>
-                                                <select class="form-control select-search" id="user" name="user_id" onchange="Obj.companyChangeModulePermission(this)">
+                                                <label for="company">For Company</label>
+                                                <select class="form-control select-search" id="company" name="company_id" onchange="Obj.companyChangeModulePermission(this)">
                                                     <option value="">--Select Option--</option>
                                         @if(count($userCompanies))
                                             @foreach($userCompanies as $uc)
@@ -243,18 +243,13 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <label for="parentPermission">Parent Permission</label>
-                                                <select class="form-control select-search cursor-pointer" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission">
+                                                <select class="form-control select-search cursor-pointer" id="parentPermission" onchange="Obj.fiendPermissionChild(this,'childPermission')" name="parentPermission" multiple>
                                                     <option value="">--Select Option--</option>
-{{--                                                    @if($permissionParents)--}}
-{{--                                                        @foreach($permissionParents as $data)--}}
-{{--                                                            <option value="{!! $data->id !!}">{!! $data->display_name !!}</option>--}}
-{{--                                                        @endforeach--}}
-{{--                                                    @endif--}}
                                                 </select>
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="childPermission">Child Permissions</label>
-                                                <select class="form-control select-search" id="childPermission" multiple="multiple" name="childPermission[]">
+                                                <select class="form-control select-search" id="childPermission" multiple="multiple" name="childPermission[]" onchange="return Obj.selectAllOption(this)">
                                                     <option value="none">1. None</option>
                                                 </select>
                                                 <sub>Multiple Option choice-able  <span class="badge bg-secondary">Ctrl + </span> OR <span class="badge bg-primary">Shift + </span></sub>
@@ -272,19 +267,12 @@
                                             <thead>
                                             <tr>
                                                 <th>No</th>
+                                                <th>Company</th>
                                                 <th>Parent Permission Name</th>
                                                 <th>Child Permission Name</th>
                                                 <th>Action</th>
                                             </tr>
                                             </thead>
-                                            <tfoot>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Parent Permission Name</th>
-                                                <th>Child Permission Name</th>
-                                                <th>Action</th>
-                                            </tr>
-                                            </tfoot>
                                             <tbody>
                                             @if(count($userPermissions))
                                                 @php
@@ -293,15 +281,14 @@
                                                 @foreach($userPermissions as $p)
                                                     <tr>
                                                         <td>{!! $i++ !!}</td>
+                                                        <td>{!! $p->company->company_name !!}</td>
                                                         <td>
-                                                        <span class="text-capitalize">
-                                                            {!! $p->permissionParent->display_name !!}
-                                                        </span>
+                                                            <span class="text-capitalize"> {!! $p->permissionParent->display_name !!}</span>
                                                         </td>
                                                         <td>
-                                                        <span class="text-capitalize">
-                                                            @if($p->is_parent == null) {!! /*str_replace('_',' ',$p->permission_name)*/ $p->permission_name!!}@endif
-                                                        </span>
+                                                            <span class="text-capitalize">
+                                                                @if($p->is_parent == null) {!! /*str_replace('_',' ',$p->permission_name)*/ $p->permission_name!!}@endif
+                                                            </span>
                                                         </td>
 
                                                         <td class="">
@@ -318,10 +305,11 @@
                                                 @endforeach
                                             @else
                                                 <tr>
-                                                    <td colspan="4" class="text-center text-danger">Not found!</td>
+                                                    <td colspan="5" class="text-center text-danger">Not found!</td>
                                                 </tr>
                                             @endif
                                             </tbody>
+
                                         </table>
                                     </div>
                                 </div>

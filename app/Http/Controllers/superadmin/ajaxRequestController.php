@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use function Symfony\Component\String\s;
 
 class ajaxRequestController extends Controller
 {
@@ -75,20 +76,62 @@ class ajaxRequestController extends Controller
     public function findPermissionChild(Request $request)
     {
         try {
-            extract($request->post());
-            $companyModulePermissionChild = CompanyModulePermission::select('module_id')->where('module_parent_id',$pid)->get();
-            $results = Permission::whereIn('id',$companyModulePermissionChild)->get();
-            return array(
-                'results' => $results
-            );
+            if (request()->ajax()) {
+                $request->validate([
+                    'pids'=> ['required','array'],
+                    'pids.*'=> ['required','string',function ($attribute, $value, $fail) {
+                        if ($value != 0) {
+                            // Apply the exists rule only when pid is not 0
+                            $exists = DB::table('company_module_permissions')
+                                ->where('module_parent_id', $value)
+                                ->exists();
+
+                            if (!$exists) {
+                                $fail('The selected pid is invalid.');
+                            }
+                        }
+                    }],
+                    'company_id'=> ['required','string',function ($attribute, $value, $fail) {
+                        $existsInPermissions = DB::table('user_company_permissions')
+                            ->where('company_id', $value)
+                            ->exists();
+
+                        $existsInUsers = DB::table('users')
+                            ->where('company', $value)
+                            ->exists();
+
+                        if (!$existsInPermissions && !$existsInUsers) {
+                            $fail('The selected company_id is invalid.');
+                        }
+                    }],
+                ]);
+                extract($request->post());
+                $companyModulePermissionChild = CompanyModulePermission::select('module_id')->where('company_id',$company_id)->whereIn('module_parent_id',$pids)->get();
+//                dd($companyModulePermissionChild);
+//                if ($pid == 0)
+//                {
+//                    $companyModulePermissionChild = CompanyModulePermission::select('module_id')->where('company_id',$company_id)->get();
+//                }
+//                else {
+//                    $companyModulePermissionChild = CompanyModulePermission::select('module_id')->where('company_id',$company_id)->where('module_parent_id',$pid)->get();
+//                }
+                $results = Permission::whereIn('id',$companyModulePermissionChild)->get();
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Permissions found',
+                    'data' => $results
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Requested method not allowed'
+            ]);
         }catch (\Throwable $exception)
         {
-            echo json_encode(array(
-                'error' => array(
-                    'msg' => $exception->getMessage(),
-                    'code' => $exception->getCode(),
-                )
-            ));
+            return response()->json([
+                'status'=>'error',
+                'message'=>$exception->getMessage(),
+            ]);
         }
     }
 

@@ -489,29 +489,36 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         } else {
                             let parents = responses.data;
                             updateSelectBox(parents,'parentPermission','id','display_name')
+                            setSelectBoxBlank('childPermission')
                         }
                     }
                 })
             },
             fiendPermissionChild : function (e,actionID) {
-                let id = $(e).val()
-                if (id)
+                let ids = $(e).val()
+                let company = $("#company").val()
+                if (ids.length !== 0 && company.length !== 0)
                 {
                     let url = window.location.origin + sourceDir + "/fiend-permission-child";
                     $.ajax({
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         url: url,
                         type: "POST",
-                        data: {'pid':id},
-                        success: function (data) {
-                            if (data.error) {
-                                let division = "<option></option>";
-                                $("#" + actionID).append(division);
-                                alert(data.error.msg);
-                            } else {
-                                let permissions = data.results;
-                                updateSelectBox(permissions,actionID,'name','display_name')
+                        data: {'pids':ids,'company_id':company},
+                        success: function (response) {
+                            if (response.status === 'error')
+                            {
+                                alert("Error: "+ response.message)
+                                return false
                             }
+                            if (response.status === 'success')
+                            {
+                                let permissions = response.data;
+                                updateSelectBox(permissions,actionID,'id','display_name')
+                                Obj.selectAllOption(e)
+                                return true
+                            }
+
                         }
                     })
                 }
@@ -1513,6 +1520,19 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
         }
 
     })
+    function setSelectBoxBlank (targetID){
+        const $select = $('#' + targetID);
+        // Ensure Selectize is initialized
+        if ($select[0] && $select[0].selectize) {
+            const selectize = $select[0].selectize;
+            selectize.clear();
+            selectize.clearOptions(); // Clear existing options
+            selectize.refreshOptions(true); // Refresh the options in the select box
+
+        } else {
+            console.error("Selectize is not initialized for #" + id);
+        }
+    }
     function updateSelectBox(data,id,value,value_name) {
         const $select = $('#' + id);
         // Ensure Selectize is initialized
@@ -1521,22 +1541,12 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 
             selectize.clear();
             selectize.clearOptions(); // Clear existing options
-            selectize.addOption({value:0, text: '# All'})
+            selectize.addOption({value:0, text: '@ All'})
             data.forEach(function(item) {
                 selectize.addOption({ value: item[value], text: item[value_name] });
             });
 
             selectize.refreshOptions(true); // Refresh the options in the select box
-
-            // Handle 'change' event for the selectize input
-            selectize.on('change', function(selectedValue) {
-                if (selectedValue === '0') {
-                    // If "All" is selected, select all other options
-                    const allValues = selectize.options;
-                    const allKeys = Object.keys(allValues).filter(key => key !== '0');
-                    selectize.setValue(allKeys);
-                }
-            });
         } else {
             console.error("Selectize is not initialized for #" + id);
         }
