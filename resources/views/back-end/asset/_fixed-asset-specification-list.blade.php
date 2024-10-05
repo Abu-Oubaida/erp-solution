@@ -1,6 +1,3 @@
-<div class="row">
-    <h5 class="text-capitalize">Fixed Asset Specification List</h5>
-</div>
 <table class="table table-sm" id="permissionstable">
     <thead>
     <tr>

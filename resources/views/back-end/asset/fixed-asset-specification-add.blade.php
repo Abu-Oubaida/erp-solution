@@ -19,14 +19,30 @@
 
         </div>
         <div class="row">
-            <div class="col-md-5">
+            <div class="col-md-6">
                 <div class="card mb-2">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-toolbox"></i> Select Material Here</h3>
+                    </div>
                     <div class="card-body">
                         <form action="{!! route('fixed.asset.specification') !!}" method="post">
                             @csrf
                             @method('post')
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="company">Company Name <span class="text-danger">*</span></label>
+                                        <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.changeUserCompany(this)">
+                                            <option value="">Pick options...</option>
+                                            @if(isset($companies) || (count($companies) > 0))
+                                                @foreach($companies as $c)
+                                                    <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="recourse_code">Materials Name<span class="text-danger">*</span></label>
                                         <select class="select-search" name="recourse_code" id="recourse_code" required>
@@ -52,8 +68,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <div class="card mb-2">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-hammer"></i> Add Materials Specification</h3>
+                    </div>
                     <div class="card-body">
                         <form action="{!! route('fixed.asset.specification') !!}" method="post">
                             @csrf
@@ -89,6 +108,11 @@
             </div>
             <div class="col-md-12">
                 <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <h3 class="text-capitalize"><i class="fas fa-list"></i> Fixed Asset Specification List</h3>
+                        </div>
+                    </div>
                     <div class="card-body">
                         @include('back-end.asset._fixed-asset-specification-list')
                     </div>

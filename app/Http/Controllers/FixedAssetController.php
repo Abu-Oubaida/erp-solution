@@ -92,7 +92,8 @@ class FixedAssetController extends Controller
                 }
                 $fixed_asset_specifications = $fixed_asset_specifications->orderBy('created_at','DESC')->get();
                 $fixed_assets= Fixed_asset::where('company_id',$user->company_id)->where('status',1)->orderBy('materials_name','ASC')->get();
-                return view('back-end.asset.fixed-asset-specification-add',compact('fixed_assets','fixed_asset_specifications'));
+                $companies = $this->getCompany()->get();
+                return view('back-end.asset.fixed-asset-specification-add',compact('fixed_assets','fixed_asset_specifications','companies'));
             }
         }catch (\Throwable $exception){
             return back()->with('error',$exception->getMessage())->withInput();
