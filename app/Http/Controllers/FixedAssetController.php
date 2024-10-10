@@ -70,11 +70,12 @@ class FixedAssetController extends Controller
                 if ($request->input('search') == 'search')
                 {
                     $request->validate([
-                        'recourse_code' => ['string','required','exists:fixed_assets,recourse_code']
+                        'recourse_code' => ['string','required','exists:fixed_assets,recourse_code'],
+                        'company' => ['string','required','exists:company_infos,id'],
                     ]);
                     extract($request->post());
-                    $fa = Fixed_asset::where('company_id',$user->company_id)->where('recourse_code',$recourse_code)->first();
-                    return redirect(route('fixed.asset.specification',['fid'=>$fa->id,'code'=>$fa->recourse_code,'name'=>$fa->materials_name]))->withInput();
+                    $fa = Fixed_asset::where('company_id',$company)->where('recourse_code',$recourse_code)->first();
+                    return redirect(route('fixed.asset.specification',['c'=>$company,'fid'=>$fa->id,'code'=>$fa->recourse_code,'name'=>$fa->materials_name]))->withInput();
                 }
                 elseif ($request->input('addSpec') == 'addSpec')
                 {
@@ -83,15 +84,16 @@ class FixedAssetController extends Controller
                 return back()->with('error','Invalid Request of Post Methode!');
             }
             else{
-                $fixed_asset_specifications = fixed_asset_specifications::with(['fixed_asset','createdBy','createdBy'])->where('company_id',$user->company_id);
-                if ($request->get('fid'))
+                $fixed_asset_specifications = $this->getFixedAssetSpecification();
+                if ($request->get('fid') && $request->get('c'))
                 {
                     $fid = $request->get('fid');
-                    $fixed_asset = Fixed_asset::where('company_id',$user->company_id)->where('status',1)->where('id',$fid)->first();
+                    $company_id = $request->get('c');
+                    $fixed_asset = Fixed_asset::where('company_id',$company_id)->where('status',1)->where('id',$fid)->first();
                     $fixed_asset_specifications = $fixed_asset_specifications->where('fixed_asset_id',$fixed_asset->id);
                 }
                 $fixed_asset_specifications = $fixed_asset_specifications->orderBy('created_at','DESC')->get();
-                $fixed_assets= Fixed_asset::where('company_id',$user->company_id)->where('status',1)->orderBy('materials_name','ASC')->get();
+                $fixed_assets= $this->getFixedAsset()->where('status',1)->orderBy('materials_name','ASC')->get();
                 $companies = $this->getCompany()->get();
                 return view('back-end.asset.fixed-asset-specification-add',compact('fixed_assets','fixed_asset_specifications','companies'));
             }
@@ -323,6 +325,34 @@ class FixedAssetController extends Controller
         }catch (\Throwable $exception)
         {
             return back()->with('error', $exception->getMessage());
+        }
+    }
+
+    public function companyWiseFixedAsset(Request $request)
+    {
+        try {
+            if ($request->isMethod('POST')) {
+                $request->validate([
+                   'id' => ['required', 'string', 'exists:company_infos,id'],
+                ]);
+                extract($request->post());
+                $fx_assets = $this->getFixedAsset()->where('status',1)->where('company_id',$id)->get();
+                return response()->json([
+                    'status'    =>  'success',
+                    'data'      =>  $fx_assets,
+                    'message'   =>  'Request processed successfully.',
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message'=> "Request method not allowed!",
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
         }
     }
 }

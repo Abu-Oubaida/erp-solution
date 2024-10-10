@@ -403,6 +403,7 @@ Route::group(['middleware' => ['auth']],function (){
         Route::controller(FixedAssetController::class)->group(function (){
             Route::middleware(['permission:fixed_asset'])->prefix('fixed-asset')->group(function (){
                 Route::match(['get','post'],'index','index')->name('fixed.asset');
+                Route::post('company-wise-fixed-asset','companyWiseFixedAsset');
                 Route::middleware(['permission:add_fixed_asset'])->group(function (){
                     Route::match(['post','get'],'add-fixed-asset','create')->name('fixed.asset.add');
                 });

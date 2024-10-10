@@ -9,6 +9,7 @@ use App\Models\company_info;
 use App\Models\department;
 use App\Models\Designation;
 use App\Models\Fixed_asset;
+use App\Models\fixed_asset_specifications;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
@@ -105,6 +106,15 @@ trait ParentTraitCompanyWise
     private function getFixedAsset()
     {
         $object = Fixed_asset::with(['company']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
+    }
+    private function getFixedAssetSpecification()
+    {
+        $object = fixed_asset_specifications::with(['fixed_asset','createdBy','createdBy']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;

@@ -32,7 +32,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="company">Company Name <span class="text-danger">*</span></label>
-                                        <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.changeUserCompany(this)">
+                                        <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseFixedAssets(this,'recourse_code')">
                                             <option value="">Pick options...</option>
                                             @if(isset($companies) || (count($companies) > 0))
                                                 @foreach($companies as $c)

@@ -1428,6 +1428,30 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            companyWiseFixedAssets:function (e,action_id)
+            {
+                let id = $(e).val()
+                if (id.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset/company-wise-fixed-asset"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'id':id},
+                    success:function (response)
+                    {
+                        if (response.status === 'error') {
+                            alert('Error: ' + response.message);
+                            return false
+                        } else if (response.status === 'success') {
+                            updateSelectBoxSingleOption(response.data, action_id, 'recourse_code', 'materials_name');
+                        }
+                    }
+                })
+            },
             selectAllOption:function (e){
                 const $select = $(e);
 
@@ -1542,6 +1566,23 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             selectize.clear();
             selectize.clearOptions(); // Clear existing options
             selectize.addOption({value:0, text: '@ All'})
+            data.forEach(function(item) {
+                selectize.addOption({ value: item[value], text: item[value_name] });
+            });
+
+            selectize.refreshOptions(true); // Refresh the options in the select box
+        } else {
+            console.error("Selectize is not initialized for #" + id);
+        }
+    }
+    function updateSelectBoxSingleOption(data,id,value,value_name) {
+        const $select = $('#' + id);
+        // Ensure Selectize is initialized
+        if ($select[0] && $select[0].selectize) {
+            const selectize = $select[0].selectize;
+
+            selectize.clear();
+            selectize.clearOptions(); // Clear existing options
             data.forEach(function(item) {
                 selectize.addOption({ value: item[value], text: item[value_name] });
             });
