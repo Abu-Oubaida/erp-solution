@@ -36,7 +36,7 @@ class Deleting
         $a = $this->items;
         $p = $a[0]["path"];
         $r = strtok($p, "/");//root folder
-        if( !(Auth::user()->hasRole('superadmin')) ) {
+        if( !((Auth::user()->hasRole('superadmin')) || (Auth::user()->hasRole('systemsuperadmin'))) ) {
             if(!(filemanager_permission::where("user_id",Auth::user()->id)->where("dir_name",$r)->where("permission_type",'>',2)->first()))
             {
                 \Event::listen('Alexusmai\LaravelFileManager\Events\Deleting', function ($event) {

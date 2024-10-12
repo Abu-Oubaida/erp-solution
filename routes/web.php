@@ -106,6 +106,9 @@ Route::group(['middleware' => ['auth']],function (){
                     Route::match(['get','post'],'company-module-permission/{companyID}','companyModulePermission')->name('company.module.permission');
                     Route::post('parent-wise-module-permission','parentModulePermission')->name('parent.module.permission');
                 });
+                Route::middleware(['permission:company_directory_permission'])->group(function (){
+                    Route::post('company-wise-directory-permission','companyWiseDirectoryPermission')->name('company.directory.permission');
+                });
                 Route::middleware(['permission:company_module_permission_delete'])->group(function (){
                     Route::delete('company-module-permission-delete-all','companyModulePermissionDeleteAll')->name('company.module.permission.delete.all');
                     Route::delete('company-module-permission-delete','companyModulePermissionDelete')->name('company.module.permission.delete');
@@ -409,6 +412,7 @@ Route::group(['middleware' => ['auth']],function (){
                 });
                 Route::middleware(['permission:add_fixed_asset_specification'])->group(function (){
                     Route::match(['post','get'],'add-specification','createSpecification')->name('fixed.asset.specification');
+                    Route::post('store-specification','specificationStore');
                 });
                 Route::middleware(['permission:edit_fixed_asset_specification'])->group(function (){
                     Route::match(['put','get'],'edit-specification/{fasid}','editSpecification')->name('edit.fixed.asset.specification');

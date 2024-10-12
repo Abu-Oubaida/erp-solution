@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('pest_histories', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('company_id')->nullable();;
             $table->string('status')->nullable();
             $table->string('message')->nullable();
             $table->string('type')->nullable()->comment('copy/cut');

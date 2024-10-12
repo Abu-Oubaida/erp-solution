@@ -160,6 +160,8 @@ return [
      */
     'aclRules'          => [
         null => [
+            ['disks' => 'file-manager', 'path' => 'systemsuperadmin', 'access' => 0],// guest don't have access for this folder
+            ['disks' => 'file-manager', 'path' => 'systemsuperadmin/*', 'access' => 0],
             ['disks' => 'file-manager', 'path' => 'superadmin', 'access' => 0],// guest don't have access for this folder
             ['disks' => 'file-manager', 'path' => 'superadmin/*', 'access' => 0],
             ['disks' => 'file-manager', 'path' => 'admin', 'access' => 1],// only read - guest can't change folder - rename, delete

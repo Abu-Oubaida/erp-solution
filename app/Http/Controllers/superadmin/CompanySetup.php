@@ -238,6 +238,10 @@ class CompanySetup extends Controller
                 'created_by'=>$user->id,
                 'created_at'=>now(),
             ]);
+            $directory = config('app.file_manager_url')."/".$company_short_name;
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
             return back()->with('success','Data add successfully.');
         }catch (\Throwable $exception)
         {
@@ -603,6 +607,39 @@ class CompanySetup extends Controller
                 return response()->json([
                     'status'=>'success',
                     'data'=>$child_permissions,
+                    'message'=>'Request processed successfully.'
+                ]);
+            }
+            return response()->json([
+                'status'=>'error',
+                'message'=>'Requested method not allowed.',
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=>$exception->getMessage()
+            ]);
+        }
+    }
+
+    public function companyWiseDirectoryPermission(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'id' => ['required','numeric'],
+                ]);
+                extract($request->post());
+                $company = $this->getCompany()->where('id',$id)->first();
+                $dir = config('app.file_manager_url').'/'.$company->company_code;
+                ($dir)?$fileManagers = scandir($dir):$fileManagers = ['Not Found'];
+                unset($fileManagers[0]);
+                unset($fileManagers[1]);
+                return response()->json([
+                    'status'=>'success',
+                    'data'=>$fileManagers,
                     'message'=>'Request processed successfully.'
                 ]);
             }

@@ -28,19 +28,20 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             sortField: 'text'
         });
         $('#perAdd').click(function (){
+            let company = $("#company_id").val()
             let per = $("#per").val()
             let dir = $("#dir").val()
             let ref = $("#per").attr('ref')
             // alert(window.location.origin + sourceDir + "/user-per-add")
             // return false
-            if (per.length > 0 && dir.length > 0)
+            if (per.length > 0 && dir.length > 0 && company.length > 0 && ref.length > 0)
             {
                 let url = window.location.origin + sourceDir + "/system-operation/user-per-add";
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,
                     type: "POST",
-                    data: {'per': per, 'dir': dir,'ref':ref},
+                    data: {'per': per, 'dir': dir,'ref':ref, 'company':company},
                     success: function (data) {
                         try {
                             data = JSON.parse(data)
@@ -48,33 +49,6 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         } catch (e) {
                             $("#f-p-list").html(data)
                             alert('Data added successfully!')
-                            window.location.reload()
-                        }
-                    }
-                })
-            }
-        })
-        $('.per-delete').click(function (){
-            if(!(confirm('Are you sure to delete this data!')))
-            {
-                return false
-            }
-            let ref = $(this).attr('ref')
-            if (ref.length > 0)
-            {
-                let url = window.location.origin + sourceDir + "/user-per-delete";
-                $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    url: url,
-                    type: "POST",
-                    data: {'ref':ref},
-                    success: function (data) {
-                        try {
-                            data = JSON.parse(data)
-                            alert(data.error.msg)
-                        } catch (e) {
-                            alert('Data delete successfully!')
-                            window.location.reload()
                         }
                     }
                 })
@@ -1428,6 +1402,74 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            companyDirectoryPermission:function (e)
+            {
+                let id = $(e).val()
+                if (id.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/system-operation/company-wise-directory-permission"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'id':id},
+                    success:function (response)
+                    {
+                        if (response.status === 'error')
+                        {
+                            alert('Error: ' + response.message)
+                        }
+                        else if (response.status === 'success') {
+                            // console.log(response.data)
+                            const $select = $('#dir');
+                            // Ensure Selectize is initialized
+                            if ($select[0] && $select[0].selectize) {
+                                const selectize = $select[0].selectize;
+
+                                selectize.clear();
+                                selectize.clearOptions(); // Clear existing options
+                                // Loop through the JSON object to add each item as an option
+                                Object.entries(response.data).forEach(([key, value]) => {
+                                    selectize.addOption({ value: value, text: value });
+                                });
+
+                                selectize.refreshOptions(true); // Refresh the options in the select box
+                            } else {
+                                console.error("Selectize is not initialized for #" + id);
+                            }
+                        }
+                    }
+                })
+            },
+            companyDirectoryPermissionDelete:function (e)
+            {
+                if(!(confirm('Are you sure to delete this data!')))
+                {
+                    return false
+                }
+                let ref = $(e).attr('ref')
+                if (ref.length > 0)
+                {
+                    let url = window.location.origin + sourceDir + "/system-operation/user-per-delete";
+                    $.ajax({
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        url: url,
+                        type: "POST",
+                        data: {'ref':ref},
+                        success: function (response) {
+                            if (response.status === 'error')
+                            {
+                                alert('Error: ' + response.message)
+                            }else if (response.status === 'success') {
+                                $("#f-p-list").html(response.data)
+                                alert(response.message)
+                            }
+                        }
+                    })
+                }
+            },
             companyWiseFixedAssets:function (e,action_id)
             {
                 let id = $(e).val()
@@ -1448,6 +1490,33 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                             return false
                         } else if (response.status === 'success') {
                             updateSelectBoxSingleOption(response.data, action_id, 'recourse_code', 'materials_name');
+                        }
+                    }
+                })
+            },
+            fixedAssetSpecificationStore:function (e)
+            {
+                let cid = $("#company_id").val()
+                let fid = $("#fixed_asset_id").val()
+                let specification = $("#specification").val()
+                let status = $("#status").val()
+                if (cid.length === 0 || fid.length === 0 || specification.length === 0 || status.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset/store-specification"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'cid':cid,'fid':fid,'specification':specification,'status':status},
+                    success:function (response)
+                    {
+                        if (response.status === 'error') {
+                            alert('Error: ' + response.message);
+                            return false
+                        } else if (response.status === 'success') {
+                            $("#specification_data").html(response.data)
                         }
                     }
                 })

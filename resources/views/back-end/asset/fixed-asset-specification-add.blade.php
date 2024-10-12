@@ -36,7 +36,7 @@
                                             <option value="">Pick options...</option>
                                             @if(isset($companies) || (count($companies) > 0))
                                                 @foreach($companies as $c)
-                                                    <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                                    <option value="{{$c->id}}" @if( Request::get('c') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
                                                 @endforeach
                                             @endif
                                         </select>
@@ -46,9 +46,9 @@
                                     <div class="mb-3">
                                         <label for="recourse_code">Materials Name<span class="text-danger">*</span></label>
                                         <select class="select-search" name="recourse_code" id="recourse_code" required>
-                                            @if(count($fixed_assets))
+                                            @if(isset($fixed_assets) && count($fixed_assets))
                                                 @foreach($fixed_assets as $fx)
-                                                    <option value="{!! $fx->recourse_code !!}">{!! $fx->materials_name !!}</option>
+                                                    <option value="{!! $fx->recourse_code !!}" @if(Request::get('code')  == $fx->recourse_code) selected @endif>{!! $fx->materials_name !!}</option>
                                                 @endforeach
                                             @endif
                                         </select>
@@ -74,23 +74,22 @@
                         <h3><i class="fa-solid fa-hammer"></i> Add Materials Specification</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{!! route('fixed.asset.specification') !!}" method="post">
-                            @csrf
-                            @method('post')
+                        <form>
                             <div class="row">
-                                <input type="hidden" name="fixed_asset_id" value="{!! Request::get('fid') !!}">
+                                <input type="hidden" id="fixed_asset_id" value="{!! Request::get('fid') !!}">
+                                <input type="hidden" id="company_id" value="{!! Request::get('c') !!}">
                                 <div class="col-md-8">
                                     <div class="form-floating mb-2">
-                                        <input class="form-control form-control-sm" id="specification" name="specification" type="text" placeholder="Enter Specification" value="{{old('specification')}}" required/>
+                                        <input class="form-control form-control-sm" id="specification" type="text" placeholder="Enter Specification" value="{{old('specification')}}" required/>
                                         <label for="specification">Specification<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3">
-                                        <select class="form-control" name="status" id="status" required>
+                                        <select class="form-control" id="status" required>
                                             <option value=""></option>
-                                            <option value="0" @if(old('status') == 0) selected @endif>Inactive</option>
-                                            <option value="1" @if(old('status') == 1) selected @endif>Active</option>
+                                            <option value="0">Inactive</option>
+                                            <option value="1">Active</option>
                                         </select>
                                         <label for="status">Status<span class="text-danger">*</span></label>
                                     </div>
@@ -98,7 +97,7 @@
                                 <div class="col-md-12">
                                     <span><strong>Recourse Code:</strong> {!! Request::get('code') !!} ({!! Request::get('name') !!})</span>
                                     <div class="form-floating float-end">
-                                        <button type="submit"  class="btn btn-chl-outline" value="addSpec" name="addSpec" ><i class="fas fa-save"></i> Add New</button>
+                                        <button type="button"  class="btn btn-chl-outline" value="addSpec" name="addSpec" onclick="return Obj.fixedAssetSpecificationStore(this)"><i class="fas fa-save"></i> Add New</button>
                                     </div>
                                 </div>
                             </div>
@@ -113,7 +112,7 @@
                             <h3 class="text-capitalize"><i class="fas fa-list"></i> Fixed Asset Specification List</h3>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" id="specification_data">
                         @include('back-end.asset._fixed-asset-specification-list')
                     </div>
                 </div>

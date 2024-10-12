@@ -206,9 +206,9 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                    @if(strtolower($roleNew) == strtolower('superadmin'))
+                    @if(strtolower($roleNew) == strtolower('superadmin') || strtolower($roleNew) == strtolower('systemsuperadmin'))
                         <div class="col-md-12">
-                            <strong class="text-center text-info">Super Admin has all the permissions by default! </strong>
+                            <strong class="text-center text-info">System/Super Admin has all the permissions by default! </strong>
                         </div>
                     @else
                         <div class="col-md-12">
@@ -335,15 +335,27 @@
                                 </div>
                             </div>
                         @else
-                            @if(strtolower($roleNew) == strtolower('superadmin'))
+                            @if(strtolower($roleNew) == strtolower('superadmin') || strtolower($roleNew) == strtolower('systemsuperadmin'))
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <strong class="text-center text-info">Super Admin has all the permissions by default! </strong>
+                                        <strong class="text-center text-info">System/Super Admin has all the permissions by default! </strong>
                                     </div>
                                 </div>
                             @else
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <label for="company_id">For Company</label>
+                                        <select class="form-control select-search" id="company_id" name="company_id" onchange="return Obj.companyDirectoryPermission(this)">
+                                            <option value="">--Select Option--</option>
+                                            @if(count($userCompanies))
+                                                @foreach($userCompanies as $uc)
+                                                    <option value="{!! $uc->id !!}">{!! $uc->company_name !!}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="dir">Directory</label>
                                         <select class="form-control select-search cursor-pointer" id="dir">
                                             <option value="">--Select folder--</option>
                                             @if(@$fileManagers && count($fileManagers))
@@ -354,6 +366,7 @@
                                         </select>
                                     </div>
                                     <div class="col-md-9">
+                                        <label for="per">Permission Type</label>
                                         <select class="form-control select-search cursor-pointer" id="per" ref="{{\Illuminate\Support\Facades\Crypt::encryptString($user->id)}}">
                                             <option value="">--Permission--</option>
                                             <option value="1">View Only</option>
@@ -362,7 +375,7 @@
                                         </select>
                                     </div>
                                     <div class="col-md-3">
-                                        <button class="btn btn-sm btn-chl-outline float-end" id="perAdd" type="button" onclick="return confirm('Are you sure!')"><i class="fas fa-plus"></i> Add</button>
+                                        <button class="btn btn-sm btn-chl-outline float-end mt-4" id="perAdd" type="button" onclick="return confirm('Are you sure!')"><i class="fas fa-plus"></i> Add</button>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -371,6 +384,7 @@
                                             <thead>
                                             <tr>
                                                 <th>No</th>
+                                                <th>Company</th>
                                                 <th>Directory</th>
                                                 <th>Permission</th>
                                                 <th>Action</th>

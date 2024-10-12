@@ -5,10 +5,18 @@ namespace App\Http;
 use Alexusmai\LaravelFileManager\Services\ACLService\ACLRepository;
 use App\Models\filemanager_permission;
 use App\Models\User;
+use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Support\Facades\Auth;
 
 class UsersACLRepository implements ACLRepository
 {
+    use ParentTraitCompanyWise;
+
+    public function __construct()
+    {
+        $this->user = Auth::user(); // Get the authenticated user
+        $this->setUser();
+    }
 
     /**
      * @inheritDoc
@@ -26,27 +34,40 @@ class UsersACLRepository implements ACLRepository
     public function getRules(): array
     {
         // TODO: Implement getRules() method.
-        if (Auth::user()->hasRole('superadmin'))
+        if (Auth::user()->hasRole('superadmin') || Auth::user()->hasRole('systemsuperadmin'))
         {
             $dir = config('app.file_manager_url');
-
             $fileManagers = scandir($dir);
-            $array=[
+            if (Auth::user()->hasRole('systemsuperadmin'))
+            {
+                $array=[
                     ['disks' => 'file-manager', 'path' => '', 'access' => 2],
                     ['disks' => 'file-manager', 'path' => '*', 'access' => 2],
                     ['disks' => 'file-manager', 'path' => '/', 'access' => 2],
                     ['disks' => 'file-manager', 'path' => '/*', 'access' => 2],
                 ];
-            foreach ($fileManagers as $file)
-            {
-                array_push($array,['disks' => 'file-manager', 'path' => $file, 'access' => 2]);
-                array_push($array,['disks' => 'file-manager', 'path' => $file.'/*', 'access' => 2]);
+                foreach ($fileManagers as $file)
+                {
+                    array_push($array,['disks' => 'file-manager', 'path' => $file, 'access' => 2]);
+                    array_push($array,['disks' => 'file-manager', 'path' => $file.'/*', 'access' => 2]);
+                }
+                return $array;
             }
-            return $array;
-        }elseif (Auth::user()->hasRole('admin'))
+            $array=[
+                ['disks' => 'file-manager', 'path' => '/', 'access' => 2],
+                ['disks' => 'file-manager', 'path' => '/*', 'access' => 2],
+            ];
+            $companies = $this->getCompany()->get();
+            if (count($companies) > 0) {
+                foreach ($companies as $company) {
+                    array_push($array, ['disks' => 'file-manager', 'path' => $company->company_code, 'access' => 2]);
+                    array_push($array, ['disks' => 'file-manager', 'path' => $company->company_code."/*", 'access' => 2]);
+                }
+            }
+        }
+        elseif (Auth::user())
         {
             $dir = config('app.file_manager_url');
-            $fileManagers = scandir($dir);
             $array=[
                 ['disks' => 'file-manager', 'path' => '/', 'access' => 2],
                 ['disks' => 'file-manager', 'path' => '/*', 'access' => 2],
@@ -59,60 +80,64 @@ class UsersACLRepository implements ACLRepository
 //                ['disks' => 'file-manager', 'path' => 'guest', 'access' => 2],
 //                ['disks' => 'file-manager', 'path' => 'guest/*', 'access' => 2],
             ];
-            foreach ($fileManagers as $file)
-            {
-                if($permission = filemanager_permission::where("dir_name",$file)->where("status",1)->where("user_id",Auth::user()->id)->first())
-                {
-                    if ($permission->permission_type > 2)
+            $companies = $this->getCompany()->get();
+            if (count($companies) > 0) {
+                foreach ($companies as $company) {
+                    array_push($array, ['disks' => 'file-manager', 'path' => $company->company_code, 'access' => 2]);
+                    array_push($array, ['disks' => 'file-manager', 'path' => $company->company_code."/", 'access' => 2]);
+                    $fileManagers = scandir($dir."/".$company->company_code);
+                    foreach ($fileManagers as $file)
                     {
-                        $p = 2;
-                    }else {
-                        $p = $permission->permission_type;
+                        if($permission = filemanager_permission::where("dir_name",$file)->where('company_id', $company->id)->where("status",1)->where("user_id",Auth::user()->id)->first())
+                        {
+                            if ($permission->permission_type > 2)
+                            {
+                                $p = 2;
+                            }else {
+                                $p = $permission->permission_type;
+                            }
+                            array_push($array,['disks' => 'file-manager', 'path' => $company->company_code."/".$file, 'access' => $p]);
+                            array_push($array,['disks' => 'file-manager', 'path' => $company->company_code."/".$file.'/*', 'access' => $p]);
+                        }
                     }
-                    array_push($array,['disks' => 'file-manager', 'path' => $file, 'access' => $p]);
-                    array_push($array,['disks' => 'file-manager', 'path' => $file.'/*', 'access' => $p]);
                 }
             }
             return $array;
-        }elseif (Auth::user()->hasRole('user'))
-        {
-            $dir = config('app.file_manager_url');
-            $fileManagers = scandir($dir);
-            $array=[
-                ['disks' => 'file-manager', 'path' => '/', 'access' => 2],
-                ['disks' => 'file-manager', 'path' => '/*', 'access' => 2],
-//                ['disks' => 'file-manager', 'path' => 'user', 'access' => 2],
-//                ['disks' => 'file-manager', 'path' => 'user/*', 'access' => 2],
-//                ['disks' => 'file-manager', 'path' => 'common', 'access' => 2],
-//                ['disks' => 'file-manager', 'path' => 'common/*', 'access' => 2],
-//                ['disks' => 'file-manager', 'path' => 'guest', 'access' => 2],
-//                ['disks' => 'file-manager', 'path' => 'guest/*', 'access' => 2],
-            ];
-            foreach ($fileManagers as $file)
-            {
-                if($permission = filemanager_permission::where("dir_name",$file)->where("status",1)->where("user_id",Auth::user()->id)->first())
-                {
-                    if ($permission->permission_type > 2)
-                    {
-                        $p = 2;
-                    }else {
-                        $p = $permission->permission_type;
-                    }
-                    array_push($array,['disks' => 'file-manager', 'path' => $file, 'access' => $p]);
-                    array_push($array,['disks' => 'file-manager', 'path' => $file.'/*', 'access' => $p]);
-                }
-            }
-            return $array;
-        }else
-        {
-            return[
-                ['disks' => 'file-manager', 'path' => '/', 'access' => 1],
-                ['disks' => 'file-manager', 'path' => '/*', 'access' => 1],
-                ['disks' => 'file-manager', 'path' => 'guest', 'access' => 1],
-                ['disks' => 'file-manager', 'path' => 'guest/*', 'access' => 1],
-                ['disks' => 'file-manager', 'path' => 'common', 'access' => 1],
-                ['disks' => 'file-manager', 'path' => 'common/*', 'access' => 1],
-            ];
         }
+//        elseif (Auth::user()->hasRole('user'))
+//        {
+//            $dir = config('app.file_manager_url');
+//            $fileManagers = scandir($dir);
+//            $array=[
+//                ['disks' => 'file-manager', 'path' => '/', 'access' => 2],
+//                ['disks' => 'file-manager', 'path' => '/*', 'access' => 2],
+////                ['disks' => 'file-manager', 'path' => 'user', 'access' => 2],
+////                ['disks' => 'file-manager', 'path' => 'user/*', 'access' => 2],
+////                ['disks' => 'file-manager', 'path' => 'common', 'access' => 2],
+////                ['disks' => 'file-manager', 'path' => 'common/*', 'access' => 2],
+////                ['disks' => 'file-manager', 'path' => 'guest', 'access' => 2],
+////                ['disks' => 'file-manager', 'path' => 'guest/*', 'access' => 2],
+//            ];
+//            foreach ($fileManagers as $file)
+//            {
+//                if($permission = filemanager_permission::where("dir_name",$file)->where("status",1)->where("user_id",Auth::user()->id)->first())
+//                {
+//                    if ($permission->permission_type > 2)
+//                    {
+//                        $p = 2;
+//                    }else {
+//                        $p = $permission->permission_type;
+//                    }
+//                    array_push($array,['disks' => 'file-manager', 'path' => $file, 'access' => $p]);
+//                    array_push($array,['disks' => 'file-manager', 'path' => $file.'/*', 'access' => $p]);
+//                }
+//            }
+//            return $array;
+//        }
+
+        return[
+            ['disks' => 'file-manager', 'path' => '', 'access' => 1],
+            ['disks' => 'file-manager', 'path' => '/', 'access' => 1],
+        ];
     }
 }

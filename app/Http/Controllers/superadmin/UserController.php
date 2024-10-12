@@ -276,21 +276,17 @@ class UserController extends Controller
         try {
             $userID = Crypt::decryptString($id);
             $user = $this->getUser()->where('id',$userID)->first();
-            $dir = config('app.file_manager_url');
-            ($dir)?$fileManagers = scandir($dir):$fileManagers = ['Not Found'];
-            unset($fileManagers[0]);
-            unset($fileManagers[1]);
 //            $companyWiseParentPermission = CompanyModulePermission::select('module_parent_id')->where('company_id',$user->company)->distinct()->get();
 //            $permissionParents = Permission::whereIn('id',$companyWiseParentPermission)->where('parent_id',null)->get();
             $userPermissions = PermissionUser::with(['permissionParent','company'])->where('user_id',$userID)->orderBy('permission_name','asc')->get();
 //            $deptLists = department::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
             $deptLists = $this->getDepartment()->where('company_id',$user->company)->where('status',1)->get();
-            $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID)->get();
+            $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID)->get();
             $roles = Role::where('company_id',$user->company)->get();
             $designations = $this->getDesignation()->where('company_id',$user->company)->where('status',1)->get();
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
             $branches = $this->getBranch()->where('company_id',$user->company)->where('status',1)->get();
-            return view('back-end.user.single-view',compact('user','fileManagers','filPermission','roles','deptLists','userPermissions','designations','branches','userCompanies'))->render();
+            return view('back-end.user.single-view',compact('user','filPermission','roles','deptLists','userPermissions','designations','branches','userCompanies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -301,12 +297,19 @@ class UserController extends Controller
     public function UserPerSubmit(Request $request)
     {
         try {
+            $request->validate([
+                'company' => ['required','numeric','exists:company_infos,id'],
+                'per' => ['required','string',],
+                'dir' => ['required','string',],
+                'ref' => ['required','string',],
+            ]);
             extract($request->post());
             $id = Crypt::decryptString($ref);
             $user = User::where('id',$id)->first();
             if ($data = filemanager_permission::where("user_id",$id)->where('dir_name',$dir)->first())
             {
                 filemanager_permission::where("user_id",$id)->where('dir_name',$dir)->update([
+                    'company_id' => $company,
                     'status'=>1,
                     'permission_type'=>$per,
                 ]);
@@ -319,14 +322,14 @@ class UserController extends Controller
             }
             else{
                 filemanager_permission::create([
-                    'company_id' => $user->company,
+                    'company_id' => $company,
                     'status'=>1,
-                    'user_id'=>$id,
+                    'user_id'=>$user->id,
                     'dir_name'=>$dir,
                     'permission_type'=>$per,
                 ]);
             }
-            $filPermission = filemanager_permission::where('status',1)->where('user_id',$id)->orderBy('id', 'DESC')->get();
+            $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$id)->orderBy('id', 'DESC')->get();
             return view("back-end.user._file-permission-list",compact('filPermission'))->render();
         }catch (\Throwable $exception)
         {
@@ -348,17 +351,22 @@ class UserController extends Controller
             {
                 $userID = filemanager_permission::where('id',$id)->select('user_id')->first();
                 filemanager_permission::where('id',$id)->update(['status'=>0]);
-                $filPermission = filemanager_permission::where('status',1)->where('user_id',$userID->user_id)->orderBy('id', 'DESC')->get();
-                return view("back-end.user._file-permission-list",compact('filPermission'))->render();
+                $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID->user_id)->orderBy('id', 'DESC')->get();
+                $view = view("back-end.user._file-permission-list",compact('filPermission'))->render();
+                return response()->json([
+                   'status' => 'success',
+                   'data' => $view,
+                   'message' => 'Record deleted successfully.',
+                ]);
+
             }
         }catch (\Throwable $exception)
         {
-            echo json_encode(array(
-                'error' => array(
-                    'msg' => $exception->getMessage(),
-                    'code' => $exception->getCode(),
-                )
-            ));
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+
         }
     }
 
