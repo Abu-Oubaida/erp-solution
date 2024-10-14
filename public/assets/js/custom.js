@@ -1634,7 +1634,10 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 
             selectize.clear();
             selectize.clearOptions(); // Clear existing options
-            selectize.addOption({value:0, text: '@ All'})
+            if (data.length > 0)
+            {
+                selectize.addOption({value:0, text: '@ All'})
+            }
             data.forEach(function(item) {
                 selectize.addOption({ value: item[value], text: item[value_name] });
             });

@@ -263,7 +263,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <br>
-                                        <table id="datatablesSimple">
+                                        <table @if(count($userPermissions))id="datatablesSimple"@else class="table table-sm"@endif>
                                             <thead>
                                             <tr>
                                                 <th>No</th>
@@ -380,7 +380,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-sm">
+                                        <table class="table table-sm" id="data-table">
                                             <thead>
                                             <tr>
                                                 <th>No</th>

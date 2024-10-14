@@ -13,7 +13,7 @@
     @endforeach
 @else
     <tr>
-        <td colspan="4" class="text-center text-danger">Not Found!</td>
+        <td colspan="5" class="text-center text-danger">Not Found!</td>
     </tr>
 @endif
 
