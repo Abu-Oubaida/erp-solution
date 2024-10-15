@@ -19,10 +19,18 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card mb-4">
-                    <div class="card-body">
+                    <div class="card-header">
                         <div class="row">
-                            <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                            <div class="col-sm-8">
+                                <h3 class="text-capitalize"><i class="fas fa-plus"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                            </div>
+                            <div class="col-sm-4">
+                                <a href="{!! route('fixed.asset.specification') !!}" class="btn btn-outline-primary btn-sm mt-2 float-end"><i class="fas fa-plus"></i> Add Specification</a>
+                            </div>
+
                         </div>
+                    </div>
+                    <div class="card-body">
                         <form action="{{ route('fixed.asset.add') }}" method="POST">
                             @csrf
                             <div class="row">
@@ -99,6 +107,11 @@
             </div>
             <div class="col-md-12">
                 <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <h3 class="text-capitalize"><i class="fas fa-list"></i> Fixed Asset Materials List</h3>
+                        </div>
+                    </div>
                     <div class="card-body">
                         @include('back-end.asset._fixed-asset-list')
                     </div>

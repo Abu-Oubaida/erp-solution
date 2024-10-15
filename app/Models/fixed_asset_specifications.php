@@ -14,7 +14,7 @@ class fixed_asset_specifications extends Model
 
     public function company()
     {
-        $this->belongsTo(Company::class, 'company_id');
+        return $this->belongsTo(company_info::class, 'company_id');
     }
     public function createdBy()
     {

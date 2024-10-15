@@ -397,6 +397,7 @@ Route::group(['middleware' => ['auth']],function (){
                     Route::match(['delete','post'],'user-project-permission-delete-all','userProjectPermissionDeleteAll');
                 });
             });
+            Route::post('company-wise-user','companyWiseUser');
         });
 
     });//3.13 End

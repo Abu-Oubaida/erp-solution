@@ -11,25 +11,32 @@
     <div class="card mb-4">
         <div class="card-body">
             <div class="row">
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-9 mb-1">
-                            <label for="user">User Name<span class="text-danger">*</span></label>
-                            <select id="user" name="user" class="select-search cursor-pointer">
-                                <option value="">Pick options...</option>
-                                @if(count($employees))
-                                    @foreach($employees as $e)
-                                        <option @if(Request::get('e') !== null && Request::get('e') == $e->id)selected @endif value="{!! $e->id !!}">{!! $e->name !!} (ID: {!! $e->employee_id !!}, {!! $e->getDesignation->title !!}, {!! $e->getDepartment->dept_name !!})</option>
-                                    @endforeach
-                                @endif
-                            </select>
-                        </div>
-                        <div class="col-md-3 mt-4">
-                            <button class="btn btn-chl-outline" type="button" id="ref-src-btn" onclick="return Obj.userProjectPermissionSearch(this)">
-                                <i class="fa fa-search"></i> search
-                            </button>
-                        </div>
-                    </div>
+                <div class="col-md-4 mb-1">
+                    <label for="company">Company<span class="text-danger">*</span></label>
+                    <select id="company" name="company" class="select-search cursor-pointer" onchange="return Obj.companyWiseUsers(this,'user')">
+                        <option value="">Pick options...</option>
+                        @if(count($companies))
+                            @foreach($companies as $c)
+                                <option @if(Request::get('e') !== null && Request::get('c') == $c->id)selected @endif value="{!! $c->id !!}">{!! $c->company_name !!} </option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+                <div class="col-md-4 mb-1">
+                    <label for="user">User Name<span class="text-danger">*</span></label>
+                    <select id="user" name="user" class="select-search cursor-pointer" onchange="return Obj.userProjectPermissionSearch(this)">
+                        <option value="">Pick options...</option>
+{{--                                @if(count($employees))--}}
+{{--                                    @foreach($employees as $e)--}}
+{{--                                        <option @if(Request::get('e') !== null && Request::get('e') == $e->id)selected @endif value="{!! $e->id !!}">{!! $e->name !!} (ID: {!! $e->employee_id !!}, {!! $e->getDesignation->title !!}, {!! $e->getDepartment->dept_name !!})</option>--}}
+{{--                                    @endforeach--}}
+{{--                                @endif--}}
+                    </select>
+                </div>
+                <div class="col-md-3 mt-4">
+                    <button class="btn btn-chl-outline" type="button" id="ref-src-btn" onclick="return Obj.userProjectPermissionSearch(this)">
+                        <i class="fa fa-search"></i> search
+                    </button>
                 </div>
             </div>
             <div class="row">

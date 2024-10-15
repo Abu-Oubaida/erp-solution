@@ -36,7 +36,7 @@ class FixedAssetController extends Controller
      */
     public function index()
     {
-        //
+        return redirect(route('fixed.asset.add'));
     }
 
     /**

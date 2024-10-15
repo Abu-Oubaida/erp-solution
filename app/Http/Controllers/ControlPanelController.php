@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\branch;
 use App\Models\User;
 use App\Models\userProjectPermission;
+use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,11 +14,11 @@ use Throwable;
 
 class ControlPanelController extends Controller
 {
-    private $user;
-    public function __construct(Request $request)
+    use ParentTraitCompanyWise;
+    public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->user= Auth::user();
+            $this->setUser();
             return $next($request);
         });
     }
@@ -29,10 +30,39 @@ class ControlPanelController extends Controller
     public function userProjectPermission()
     {
         try {
-            $employees = User::with(['getDepartment', 'getDesignation','roles'])->where('status', 1)->where('company_id', $this->user->company_id)->get();
-            return view('back-end.control-panel.user-project-permission', compact('employees'));
+            $companies = $this->getCompany()->get();
+//            $employees = User::with(['getDepartment', 'getDesignation','roles'])->where('status', 1)->where('company_id', $this->user->company_id)->get();
+            return view('back-end.control-panel.user-project-permission', compact('companies'));
         }catch (\Throwable $exception){
             return back()->with('error',$exception->getMessage());
+        }
+    }
+    public function companyWiseUser(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'company_id' => ['required','string','exists:company_infos,id'],
+                ]);
+                extract($request->post());
+                $users = $this->getUser()->where('company',$company_id)->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $users,
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message'=> 'Request method not allowed!',
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
         }
     }
     public function userProjectPermissionSearch(Request $request)
@@ -40,10 +70,12 @@ class ControlPanelController extends Controller
         try {
             $request->validate([
                 'user'  => [ 'required', 'string', 'exists:users,id' ],
+                'company_id' => ['required','string','exists:company_infos,id'],
             ]);
             if ($request->isMethod('post')) {
+                extract($request->post());
                 $user = $request->post('user');
-                $projects = branch::where('status', 1)->where('company_id', $this->user->company_id)->get();
+                $projects = branch::where('status', 1)->where('company_id', $company_id)->get();
                 $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $this->user->company_id)->where('user_id', $user)->get();
                 $permission_users = userProjectPermission::select(['user_id', DB::raw('MAX(id) as id')])
                     ->with(['user'])

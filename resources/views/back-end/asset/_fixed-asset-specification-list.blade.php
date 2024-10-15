@@ -1,13 +1,16 @@
-<table class="table table-sm" id="permissionstable">
+<table class="table table-sm" @if(count($fixed_asset_specifications))id="DataTableSearchAll"@endif>
     <thead>
     <tr>
         <th>No</th>
+        <th>Company</th>
         <th>Recourse Code</th>
         <th>Materials</th>
         <th>Specification</th>
         <th>Status</th>
         <th>Created By</th>
+        <th>Created At</th>
         <th>Updated By</th>
+        <th>Updated At</th>
         <th>Action</th>
     </tr>
     </thead>
@@ -20,12 +23,15 @@
         @foreach($fixed_asset_specifications as $fs)
             <tr class="{!! (isset($fas) && $fs->id == $fas->id)?'text-primary':'' !!}">
                 <td>{!! $no++ !!}</td>
+                <td>{!! @$fs->company->company_name !!}</td>
                 <td>{!! $fs->fixed_asset->recourse_code !!}</td>
                 <td>{!! $fs->fixed_asset->materials_name !!}</td>
                 <td>{!! $fs->specification !!}</td>
-                <td>{!! (isset($fs->createdBy->name))?$fs->createdBy->name:'-' !!}</td>
-                <td>{!! (isset($fs->updatdBy->name))?$fs->updatdBy->name:'-' !!}</td>
                 <td>@if($fs->status==1) <span class='badge bg-success'> Active</span> @else <span class='badge bg-danger'>Inactive </span>@endif</td>
+                <td>{!! (isset($fs->createdBy->name))?$fs->createdBy->name:'-' !!}</td>
+                <td>{!! date('d-M-y',strtotime(@$fs->created_at)) !!}</td>
+                <td>{!! (isset($fs->updatdBy->name))?$fs->updatdBy->name:'-' !!}</td>
+                <td>{!! (isset($fs->updatdBy->name))?date('d-M-y',strtotime(@$fs->updated_at)):'-' !!}</td>
 
                 <td>
                     <div class="text-center">
@@ -46,8 +52,30 @@
         @endforeach
     @else
         <tr>
-            <td colspan="9" class="text-center text-danger">Not found!</td>
+            <td colspan="11" class="text-center text-danger">Not found!</td>
         </tr>
     @endif
     </tbody>
 </table>
+<script>
+    $('#DataTableSearchAll').DataTable({
+        dom: 'lfrtip', // 'l' includes the "length changing" input
+        lengthMenu: [[5, 10, 15, 25, 50, 100, -1],[5, 10, 15, 25, 50, 100, "ALL"]],
+        pageLength: 15,
+        initComplete: function () {
+            // Add search inputs to header
+            $('#DataTableSearchAll thead th').each(function() {
+                var title = $(this).text(); // Use the text content of the header cells
+                $(this).html('<input type="text" class="form-control" placeholder="' + title + '..." />');
+            });
+
+            // Apply the search
+            var table = this.api(); // Use the DataTables API instance
+            table.columns().eq(0).each(function(colIdx) {
+                $('input', table.column(colIdx).header()).on('keyup change', function() {
+                    table.column(colIdx).search(this.value).draw();
+                });
+            });
+        }
+    });
+</script>

@@ -71,7 +71,14 @@
             <div class="col-md-6">
                 <div class="card mb-2">
                     <div class="card-header">
-                        <h3><i class="fa-solid fa-hammer"></i> Add Materials Specification</h3>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <h3><i class="fa-solid fa-hammer"></i> Add Materials Specification</h3>
+                            </div>
+                            <div class="col-sm-4">
+                                <a href="{!! route('fixed.asset.add') !!}" class="btn btn-outline-primary btn-sm mt-2 float-end"><i class="fas fa-plus"></i> Add Materials</a>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <form>
@@ -87,9 +94,8 @@
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3">
                                         <select class="form-control" id="status" required>
-                                            <option value=""></option>
-                                            <option value="0">Inactive</option>
                                             <option value="1">Active</option>
+                                            <option value="0">Inactive</option>
                                         </select>
                                         <label for="status">Status<span class="text-danger">*</span></label>
                                     </div>

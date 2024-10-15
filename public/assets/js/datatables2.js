@@ -90,6 +90,26 @@
                 });
             }
         });
+        $('#DataTableSearchAll').DataTable({
+            dom: 'lfrtip', // 'l' includes the "length changing" input
+            lengthMenu: [[5, 10, 15, 25, 50, 100, -1],[5, 10, 15, 25, 50, 100, "ALL"]],
+            pageLength: 15,
+            initComplete: function () {
+                // Add search inputs to header
+                $('#DataTableSearchAll thead th').each(function() {
+                    var title = $(this).text(); // Use the text content of the header cells
+                    $(this).html('<input type="text" class="form-control" placeholder="' + title + '..." />');
+                });
+
+                // Apply the search
+                var table = this.api(); // Use the DataTables API instance
+                table.columns().eq(0).each(function(colIdx) {
+                    $('input', table.column(colIdx).header()).on('keyup change', function() {
+                        table.column(colIdx).search(this.value).draw();
+                    });
+                });
+            }
+        });
         // Initialize DataTable
         $('#userTable').DataTable({
             dom: 'lBfrtip', // 'l' includes the "length changing" input

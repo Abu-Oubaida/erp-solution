@@ -105,7 +105,7 @@ trait ParentTraitCompanyWise
     }
     private function getFixedAsset()
     {
-        $object = Fixed_asset::with(['company']);
+        $object = Fixed_asset::with(['company','specifications','createdBy','updatedBy']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
@@ -114,7 +114,7 @@ trait ParentTraitCompanyWise
     }
     private function getFixedAssetSpecification()
     {
-        $object = fixed_asset_specifications::with(['fixed_asset','createdBy','createdBy']);
+        $object = fixed_asset_specifications::with(['company','fixed_asset','createdBy','createdBy']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
