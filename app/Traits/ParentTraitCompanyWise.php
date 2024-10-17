@@ -10,9 +10,11 @@ use App\Models\department;
 use App\Models\Designation;
 use App\Models\Fixed_asset;
 use App\Models\fixed_asset_specifications;
+use App\Models\Op_reference_type;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
+use App\Models\userProjectPermission;
 use Illuminate\Database\Eloquent\Builder;
 
 trait ParentTraitCompanyWise
@@ -103,6 +105,19 @@ trait ParentTraitCompanyWise
         $userComPerIDs[] = (integer)$this->user->company_id;
         return $userComPerIDs;
     }
+    protected function getUserProjectPermissions($user_id)
+    {
+        $object = branch::with(['getUsers','company']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray())->whereIn('id',$this->userProjectPermissionArray($user_id));
+    }
+    private function userProjectPermissionArray($user_id)
+    {
+        return userProjectPermission::where('user_id',$user_id)->get()->pluck('project_id')->unique()->toArray();
+    }
     private function getFixedAsset()
     {
         $object = Fixed_asset::with(['company','specifications','createdBy','updatedBy']);
@@ -135,5 +150,24 @@ trait ParentTraitCompanyWise
     protected function getBloodGroup()
     {
         return BloodGroup::all();
+    }
+
+    protected function getOperationReferenceType()
+    {
+        $object = Op_reference_type::with(['createdBy','updatedBy','company','fixedAssetOpening']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
+    }
+    protected function getFixedAssets()
+    {
+        $object = Fixed_asset::with(['company','specifications','createdBy','updatedBy']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
 }

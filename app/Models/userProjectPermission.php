@@ -18,4 +18,8 @@ class userProjectPermission extends Model
     {
         return $this->belongsTo(branch::class,'project_id','id');
     }
+    public function company()
+    {
+        return $this->belongsTo(company_info::class,'company_id','id');
+    }
 }

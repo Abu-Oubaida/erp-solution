@@ -893,8 +893,10 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     success: function (response){
                         if (response.status === 'success')
                         {
-                            const fixedAsset = response.data[0].fixed_asset
-                            updateSelectBox(response.data,'specification','id','specification')
+                            let fixedAsset = []
+                            if (response.data && response.data[0] && response.data[0].fixed_asset)
+                                fixedAsset = response.data[0].fixed_asset
+                            updateSelectBoxWithNone(response.data,'specification','id','specification')
                             $("#rate").val(fixedAsset.rate)
                             $("#unite").val(fixedAsset.unit)
                             $("#qty").val(1)
@@ -913,6 +915,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             },
             fixedAssetOpeningAddList:function (e){
                 const opdate = $('#date').val()
+                const company_id = $('#company_id_hide').val()
                 const reference = $('#ref_hide').val()
                 const r_type = $('#r_type_id_hide').val()
                 const project_id = $('#project_id_hide').val()
@@ -922,7 +925,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 const qty = $('#qty').val()
                 const purpose = $('#purpose').val()
                 const remarks = $('#remarks').val()
-                if (opdate.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || r_type.length === 0)
+                if (opdate.length === 0 || company_id.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || r_type.length === 0)
                 {
                     alert('All field are required')
                     return false
@@ -932,7 +935,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     url:url,
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     method: "POST",
-                    data: {'opening_date':opdate,'reference':reference,'r_type':r_type,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
+                    data: {'opening_date':opdate,'company_id':company_id,'reference':reference,'r_type':r_type,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
                     success(response)
                     {
                         if (response.status === 'success')
@@ -971,10 +974,11 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             },
             fixedAssetOpeningSearch:function (e, outputID)
             {
+                const company_id = $("#company").val()
                 const reference = $("#ref-src").val()
                 const project = $("#project").val()
                 const rt = $("#r_type").val()
-                if (reference.length === 0 && project.length === 0 && rt === 0)
+                if (company_id.length === 0 && reference.length === 0 && project.length === 0 && rt.length === 0)
                 {
                     alert('All Input are Required!')
                     return false
@@ -984,7 +988,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     url:url,
                     method:'POST',
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'reference':reference,'branch_id':project,'r_type_id':rt},
+                    data:{'company_id':company_id,'reference':reference,'branch_id':project,'r_type_id':rt},
                     success:function(response)
                     {
                         if (response.status === 'success')
@@ -993,7 +997,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                             // Get the current URL
                             var currentUrl = window.location.href
                             // Construct the new URL by appending the ref value
-                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference + '&project=' + project + '&rt=' + rt
+                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference + '&project=' + project + '&rt=' + rt + '&c=' + company_id
                             // Change the URL without reloading the page
                             history.pushState({ref: reference}, '', newUrl)
                         }
@@ -1534,6 +1538,54 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            companyWiseProjects:function (e,action_id)
+            {
+                let id = $(e).val()
+                if (id.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/company-wise-projects"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'company_id':id},
+                    success:function (response)
+                    {
+                        if (response.status === 'error') {
+                            alert('Error: ' + response.message);
+                            return false
+                        } else if (response.status === 'success') {
+
+                        }
+                    }
+                })
+            },
+            userWiseCompanyProjectPermissions:function (e,user_id,action_id)
+            {
+                let company_id = $(e).val()
+                if (company_id.length === 0 || user_id.length === 0 || action_id.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/user-wise-company-project-permissions"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'company_id':company_id,'user_id':user_id},
+                    success:function (response)
+                    {
+                        if (response.status === 'error') {
+                            alert('Error: ' + response.message);
+                            return false
+                        } else if (response.status === 'success') {
+                            updateSelectBoxSingleOption(response.data,action_id,'id','branch_name')
+                        }
+                    }
+                })
+            },
             fixedAssetSpecificationStore:function (e)
             {
                 let cid = $("#company_id").val()
@@ -1678,6 +1730,24 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             {
                 selectize.addOption({value:0, text: '@ All'})
             }
+            data.forEach(function(item) {
+                selectize.addOption({ value: item[value], text: item[value_name] });
+            });
+
+            selectize.refreshOptions(true); // Refresh the options in the select box
+        } else {
+            console.error("Selectize is not initialized for #" + id);
+        }
+    }
+    function updateSelectBoxWithNone(data,id,value,value_name) {
+        const $select = $('#' + id);
+        // Ensure Selectize is initialized
+        if ($select[0] && $select[0].selectize) {
+            const selectize = $select[0].selectize;
+
+            selectize.clear();
+            selectize.clearOptions(); // Clear existing options
+            selectize.addOption({value:0, text: '0 - None'})
             data.forEach(function(item) {
                 selectize.addOption({ value: item[value], text: item[value_name] });
             });

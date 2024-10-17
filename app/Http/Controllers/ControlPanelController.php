@@ -76,10 +76,10 @@ class ControlPanelController extends Controller
                 extract($request->post());
                 $user = $request->post('user');
                 $projects = branch::where('status', 1)->where('company_id', $company_id)->get();
-                $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $this->user->company_id)->where('user_id', $user)->get();
+                $userProjectPermissions = userProjectPermission::with(['user','projects','company'])->where('company_id', $company_id)->where('user_id', $user)->get();
                 $permission_users = userProjectPermission::select(['user_id', DB::raw('MAX(id) as id')])
                     ->with(['user'])
-                    ->where('company_id', $this->user->company_id)
+                    ->where('company_id', $company_id)
                     ->where('user_id','!=',$user)
                     ->groupBy('user_id')
                     ->get();

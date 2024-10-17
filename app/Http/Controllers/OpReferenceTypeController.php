@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Op_reference_type;
+use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -12,13 +13,11 @@ use Throwable;
 
 class OpReferenceTypeController extends Controller
 {
-    private $user;
-    private $company_id;
-    public function __construct(Request $request)
+    use ParentTraitCompanyWise;
+    public function __construct()
     {
-//        dd($this->setAuthUser());
         $this->middleware(function ($request, $next) {
-            $this->user= Auth::user();
+            $this->setUser();
             return $next($request);
         });
     }
@@ -29,8 +28,9 @@ class OpReferenceTypeController extends Controller
             {
                 $this->store($request);
             }
-            $op_ref_types = Op_reference_type::with(['createdBy','updatedBy'])->get();
-            return view('back-end.programmer.operation_ref_type',compact('op_ref_types'));
+            $op_ref_types = $this->getOperationReferenceType()->get();
+            $companies = $this->getCompany()->get();
+            return view('back-end.programmer.operation_ref_type',compact('op_ref_types','companies'));
         }catch (\Throwable $exception){
             return back()->with('error', $exception->getMessage());
         }
@@ -41,14 +41,19 @@ class OpReferenceTypeController extends Controller
             if ($request->isMethod('post'))
             {
                 $request->validate([
-                    'name' => ['required','string','max:255','unique:op_reference_types,name'],
-                    'code' => ['required','string','max:255','unique:op_reference_types,code'],
+                    'company' => ['required','string','max:255','exists:company_infos,id'],
+                    'name' => ['required','string','max:255',Rule::unique('op_reference_types','name')->where(function ($query) use($request){
+                        $query->where('company_id',$request->get('company'));
+                    })],
+                    'code' => ['required','string','max:255',Rule::unique('op_reference_types','code')->where(function ($query) use($request){
+                        $query->where('company_id',$request->get('company'));
+                    })],
                     'description' => ['sometimes','nullable','string'],
                     'status' => ['numeric','required','between:0,1'],
                 ]);
                 extract($request->post());
                 Op_reference_type::create([
-                    'company_id' => $this->user->company_id,
+                    'company_id' => $company,
                     'name' => $name,
                     'code' => $code,
                     'description' => $description,
@@ -72,8 +77,8 @@ class OpReferenceTypeController extends Controller
             {
                 $this->update($request,$id);
             }
-            $op_ref_types = Op_reference_type::with(['createdBy','updatedBy'])->get();
-            $type = Op_reference_type::where('id',$id)->first();
+            $op_ref_types = $this->getOperationReferenceType()->get();
+            $type = $this->getOperationReferenceType()->where('id',$id)->first();
             return view('back-end.programmer.operation_ref_type_edit',compact('op_ref_types','type'));
         }catch (\Throwable $exception){
             return back()->with('error', $exception->getMessage())->withInput();
@@ -84,8 +89,13 @@ class OpReferenceTypeController extends Controller
     {
         try {
             $request->validate([
-                'name' => ['required','string','max:255',Rule::unique('op_reference_types','name')->ignore($id)],
-                'code' => ['required','string','max:255',Rule::unique('op_reference_types','code')->ignore($id)],
+                'company' => ['required','string','max:255','exists:company_infos,id'],
+                'name' => ['required','string','max:255',Rule::unique('op_reference_types','name')->where(function ($query) use ($request) {
+                    $query->where('company_id',$request->get('company'));
+                })->ignore($id)],
+                'code' => ['required','string','max:255',Rule::unique('op_reference_types','code')->where(function ($query) use ($request) {
+                    $query->where('company_id',$request->get('company'));
+                })->ignore($id)],
                 'description' => ['sometimes','nullable','string'],
                 'status' => ['numeric','required','between:0,1'],
             ]);

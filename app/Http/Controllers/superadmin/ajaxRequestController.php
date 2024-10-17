@@ -4,11 +4,13 @@ namespace App\Http\Controllers\superadmin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ShareVoucherDocument;
+use App\Models\branch;
 use App\Models\company_info;
 use App\Models\CompanyModulePermission;
 use App\Models\DocumentShareLinkEmail;
 use App\Models\Permission;
 use App\Models\User;
+use App\Models\userProjectPermission;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentShareEmailLink;
 use App\Models\VoucherDocumentShareEmailList;
@@ -402,6 +404,63 @@ class ajaxRequestController extends Controller
                     'code' => $exception->getCode(),
                 )
             ));
+        }
+    }
+    public function companyWiseProjects(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'company_id' => ['required','string','exists:company_infos,id'],
+                ]);
+                extract($request->post());
+                $projects = branch::where('company_id',$company_id)->where('status',1)->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $projects,
+                    'message' => 'Request processed successfully!'
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message'=> 'Request method not allowed!'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+    public function userWiseCompanyProjectPermissions(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'company_id' => ['required','string','exists:company_infos,id'],
+                    'user_id' => ['required','string','exists:users,id'],
+                ]);
+                extract($request->post());
+                $projects = branch::with(['getUsers','company'])->whereIn('id',userProjectPermission::where('user_id',$user_id)->get()->pluck('project_id')->unique()->toArray())->where('company_id',$company_id)->where('status',1)->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $projects,
+                    'message' => 'Request processed successfully!'
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message'=> 'Request method not allowed!'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
         }
     }
 }

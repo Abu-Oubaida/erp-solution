@@ -72,6 +72,8 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('share-voucher-document-email','shareVoucherDocumentEmail')->name('share.voucher.document');
             Route::post('email-link-status-change','emailLinkStatusChange')->name('email.link.status.change');
         });
+        Route::post('company-wise-projects','companyWiseProjects');
+        Route::post('user-wise-company-project-permissions','userWiseCompanyProjectPermissions');
     });//3.2 End
 
 # 3.2 System Admin Controller
@@ -435,7 +437,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::middleware(['permission:fixed_asset_distribution'])->prefix('fixed-asset-distribution')->group(function (){
                 Route::match(['get','post'],'index','index')->name('fixed.asset.distribution');
                 Route::middleware(['permission:fixed_asset_with_reference_input'])->group(function (){
-                    Route::match(['get','post'],'opening-input','openingInput')->name('fixed.asset.distribution.opening.input');
+                    Route::match(['get','post'],'with-reference-input','openingInput')->name('fixed.asset.distribution.opening.input');
                     Route::post('get-fixed-asset-spec','getFixedAssetSpecification');
                     Route::post('add-fixed-asset-opening','addFixedAssetOpening');
                     Route::post('get-fixed-asset-opening','getFixedAssetOpening');

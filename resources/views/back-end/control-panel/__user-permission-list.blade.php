@@ -3,11 +3,11 @@
     user project permission list
 </div>
 <div class="card-body">
-    <table id="datatablesSimple" class="table">
+    <table id="simpleDataTable2" class="table">
         <thead>
         <tr>
             <th>SL.</th>
-{{--            <th>User Name</th>--}}
+            <th>Company</th>
             <th>Project Name</th>
             <th>Action</th>
         </tr>
@@ -18,6 +18,7 @@
             @foreach($userProjectPermissions as $upp)
                 <tr>
                     <td>{!! $n++ !!}</td>
+                    <td>{!! @$upp->company->company_name !!}</td>
 {{--                    <td>{!! $upp->user->name !!}</td>--}}
                     <td>{!! $upp->projects->branch_name !!}</td>
                     <td>
@@ -30,9 +31,20 @@
             @endforeach
         @else
             <tr>
-                <td colspan="6">Not Found!</td>
+                <td colspan="4" class="text-center text-danger">Not Found!</td>
             </tr>
         @endif
         </tbody>
     </table>
 </div>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            $('#simpleDataTable2').DataTable({
+                dom: 'lfrtip',
+                lengthMenu: [[5, 10, 15, 25, 50, 100, -1], [5, 10, 15, 25, 50, 100, "ALL"]],
+                pageLength: 15,
+            })
+        })
+    }(jQuery))
+</script>

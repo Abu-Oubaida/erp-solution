@@ -11,8 +11,9 @@
         <div class="row card-body">
             <div class="col-md-7">
                 <label for="project">Project Name<span class="text-danger">*</span></label>
-                <select id="project" name="project" class="select-search cursor-pointer" multiple="multiple">
+                <select id="project" name="project" class="select-search cursor-pointer" multiple="multiple" onchange="Obj.selectAllOption(this)">
                     <option value="">Pick options...</option>
+                    <option value="0">@ All</option>
                     @if(count($projects))
                         @foreach($projects as $p)
                             <option value="{!! $p->id !!}">{!! $p->branch_name !!}</option>

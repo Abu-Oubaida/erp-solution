@@ -34,6 +34,7 @@
                     </div>
                 </div>
                 <input type="hidden" id="ref_hide" value="{!! isset($reference)?$reference:'' !!}">
+                <input type="hidden" id="company_id_hide" value="{!! isset($company_id)?$company_id:'' !!}">
                 <input type="hidden" id="project_id_hide" value="{!! isset($for_project_id)?$for_project_id:'' !!}">
                 <input type="hidden" id="r_type_id_hide" value="{!! isset($ref_type_id)?$ref_type_id:'' !!}">
                 <div class="col-md-3">

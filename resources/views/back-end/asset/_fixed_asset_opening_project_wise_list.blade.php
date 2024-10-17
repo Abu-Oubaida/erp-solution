@@ -4,7 +4,7 @@
             @if(isset($fixed_asset_with_ref_report_list))
             <div class="row">
                 <div class="col-md-12">
-                    <table @if(count($fixed_asset_with_ref_report_list))id="simpleDataTable2" class="display" @else class="table" @endif style="width: 100%">
+                    <table @if(count($fixed_asset_with_ref_report_list))id="userTable" class="display" @else class="table" @endif style="width: 100%">
                         <thead>
                         <tr>
                             <th>SL.</th>
@@ -23,6 +23,7 @@
                             <th>Action</th>
                         </tr>
                         </thead>
+                        @if(count($fixed_asset_with_ref_report_list))
                         <tfoot>
                         <tr>
                             <th>SL.</th>
@@ -41,6 +42,7 @@
                             <th>Action</th>
                         </tr>
                         </tfoot>
+                        @endif
                         <tbody>
                         @if(count($fixed_asset_with_ref_report_list))
                             @php($n=1)
@@ -106,43 +108,95 @@
     </div>
 </div>
 @if(count($fixed_asset_with_ref_report_list))
-{{--<script>--}}
-{{--(function ($){--}}
-{{--    $(document).ready(function(){--}}
-{{--        $('#simpleDataTable2').DataTable({--}}
-{{--            dom: 'lfrtip', // 'l' includes the "length changing" input--}}
-{{--            lengthMenu: [[5, 10, 15, 25, 50, 100, -1],[5, 10, 15, 25, 50, 100, "ALL"]],--}}
-{{--            pageLength: 10,--}}
-{{--            buttons: [--}}
-{{--                {--}}
-{{--                    extend: 'pdfHtml5',--}}
-{{--                    text: '<i class="fas fa-file-pdf"></i> PDF',--}}
-{{--                    orientation: 'landscape', // Landscape orientation--}}
-{{--                    pageSize: 'A4', // A4 page size--}}
-{{--                    title: 'My Table Export', // Optional: Custom title--}}
-{{--                    exportOptions: {--}}
-{{--                        columns: ':visible' // Export only visible columns--}}
-{{--                    }--}}
-{{--                },--}}
-{{--                {--}}
-{{--                    extend: 'copy',--}}
-{{--                    text: '<i class="fas fa-copy"></i> Copy',--}}
-{{--                },--}}
-{{--                {--}}
-{{--                    extend:'csv',--}}
-{{--                    text: '<i class="fas fa-file-csv"></i> CSV',--}}
-{{--                },--}}
-{{--                {--}}
-{{--                    extend: 'excel',--}}
-{{--                    text: '<i class="fas fa-file-excel"></i> Excel',--}}
-{{--                },--}}
-{{--                {--}}
-{{--                    extend: 'print',--}}
-{{--                    text: '<i class="fas fa-print"></i> Print',--}}
-{{--                },--}}
-{{--            ],--}}
-{{--        })--}}
-{{--    })--}}
-{{--}(jQuery))--}}
-{{--</script>--}}
+<script>
+(function ($){
+    $(document).ready(function(){
+        $('#userTable').DataTable({
+            dom: 'lBfrtip', // 'l' includes the "length changing" input
+            lengthMenu: [[5, 10, 15, 25, 50, 100, -1],[5, 10, 15, 25, 50, 100, "ALL"]],
+            pageLength: 15,
+            buttons: [
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fas fa-file-pdf"></i> PDF',
+                    orientation: 'landscape', // Landscape orientation
+                    pageSize: 'A4', // A4 page size
+                    title: 'My Table Export', // Optional: Custom title
+                    exportOptions: {
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    }
+                },
+                {
+                    extend: 'copy',
+                    text: '<i class="fas fa-copy"></i> Copy',
+                    exportOptions: {
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    },
+                },
+                {
+                    extend:'csv',
+                    text: '<i class="fas fa-file-csv"></i> CSV',
+                    exportOptions: {
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    },
+                },
+                {
+                    extend: 'excel',
+                    text: '<i class="fas fa-file-excel"></i> Excel',
+                    exportOptions: {
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    },
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print"></i> Print',
+                    exportOptions: {
+                        columns: ':visible' ,// Export only visible columns
+                        format: {
+                            header: function (data, columnIdx) {
+                                return $('#userTable tfoot th').eq(columnIdx).text();
+                            }
+                        }
+                    },
+                },
+            ],
+            initComplete: function () {
+                // Add search inputs
+                $('#userTable thead th').each(function() {
+                    var title = $('#userTable tfoot th').eq($(this).index()).text();
+                    $(this).html('<input type="text" class="form-control" placeholder="' + title + '..." />');
+                });
+
+                // Apply the search
+                var table = $('#userTable').DataTable();
+                table.columns().eq(0).each(function(colIdx) {
+                    $('input', table.column(colIdx).header()).on('keyup change', function() {
+                        table.column(colIdx).search(this.value).draw();
+                    });
+                });
+            }
+        });
+    })
+}(jQuery))
+</script>
 @endif
