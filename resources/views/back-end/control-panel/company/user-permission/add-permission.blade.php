@@ -85,6 +85,7 @@
                             <tr>
                                 <th>SL</th>
                                 <th>System ID</th>
+                                <th>Company</th>
                                 <th>Name</th>
                                 <th>Employee ID</th>
                                 <th>User Status</th>
@@ -99,6 +100,7 @@
                                     <tr>
                                         <td>{!! $n++ !!}</td>
                                         <td>{!! $u->id !!}</td>
+                                        <td>{!! $u->getCompany->company_name !!}</td>
                                         <td>{!! $u->name !!}</td>
                                         <td>{!! $u->employee_id !!}</td>
                                         <td>@if($u->status == 1) <span class="badge bg-success">Active</span> @else <span class="badge bg-danger">Inactive</span> @endif</td>
@@ -117,7 +119,7 @@
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="6">Not Found</td>
+                                    <td colspan="7">Not Found</td>
                                 </tr>
                             @endif
                             </tbody>
