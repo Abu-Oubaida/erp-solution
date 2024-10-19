@@ -37,20 +37,20 @@ class FixedAssetDistribution extends Controller
     private $document_path = "documents/fixed-asset/";
     //
 
-    private function getUserWiseProjects($user_id)
+//    private function getUserWiseProjects($user_id)
+//    {
+//        try {
+//            return userProjectPermission::with(['projects'])->where('company_id',$this->user->company_id)->where('user_id',$user_id)->get();
+//        }catch (\Throwable $exception) {
+//            return [];
+//        }
+//
+//    }
+    protected function fixedAssetOpeningBalances()
     {
         try {
-            return userProjectPermission::with(['projects'])->where('company_id',$this->user->company_id)->where('user_id',$user_id)->get();
-        }catch (\Throwable $exception) {
-            return [];
-        }
-
-    }
-    protected function fixedAssetOpeningBalances($company_id)
-    {
-        try {
-            $projectIds = $this->getUserWiseProjects($this->user->id)->pluck('projects.id')->flatten()->unique()->toArray();
-            return Fixed_asset_opening_balance::with(['withSpecifications','attestedDocuments','branch','createdBy','updatedBy','refType'])->where('company_id',$company_id)->whereIn('branch_id',$projectIds);
+            $projectIds = $this->getUserProjectPermissions($this->user->id)->pluck('id')->unique()->toArray();
+            return Fixed_asset_opening_balance::with(['withSpecifications','attestedDocuments','branch','createdBy','updatedBy','refType','company'])->whereIn('branch_id',$projectIds);
         }catch (\Throwable $exception)
         {
             return $exception;
@@ -94,9 +94,9 @@ class FixedAssetDistribution extends Controller
             $projects = $this->getUserProjectPermissions($this->user->id)->get();
         }
         $companies = $this->getCompany()->get();
-//        dd($companies);
+        $company = $this->getCompany()->where('id',$company_id)->first();
         $ref_types = $this->refTypes()->get();
-        if (empty($reference) && empty($branch_id) && empty($r_type_id))
+        if (empty($company_id) && empty($reference) && empty($branch_id) && empty($r_type_id))
         {
             if ($isApiRequest)
             {
@@ -108,7 +108,7 @@ class FixedAssetDistribution extends Controller
             return view('back-end.asset.fixed-asset-opening',compact('projects','companies','ref_types'));
         }
         else{
-            $fixed_asset_with_ref = $this->fixedAssetOpeningBalances($company_id);
+            $fixed_asset_with_ref = $this->fixedAssetOpeningBalances()->where('company_id',$company_id);
             if (!empty($reference))
             {
                 $withRefData = $fixed_asset_with_ref->where('references',$reference)->first();
@@ -146,10 +146,10 @@ class FixedAssetDistribution extends Controller
                     //Input Field
                     if ($isApiRequest)
                     {
-                        $view =  view('back-end.asset._fixed_asset_opening_body',compact('fixed_assets','withRefData','reference','for_project_id','ref_type_id','ref_type_name','for_project_name','companies','company_id'))->render();
+                        $view =  view('back-end.asset._fixed_asset_opening_body',compact('fixed_assets','withRefData','reference','for_project_id','ref_type_id','ref_type_name','for_project_name','companies','company'))->render();
                     }
                     else{
-                        $view =  view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','ref_types','withRefData','reference','for_project_id','ref_type_id','ref_type_name','for_project_name','companies','company_id'))->render();
+                        $view =  view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','ref_types','withRefData','reference','for_project_id','ref_type_id','ref_type_name','for_project_name','companies','company'))->render();
                     }
                 }
                 else if (empty($withRefData))
@@ -160,10 +160,10 @@ class FixedAssetDistribution extends Controller
                     $ref_type_id = $r_type_id;
                     if ($isApiRequest)
                     {
-                        $view = view('back-end.asset._fixed_asset_opening_body',compact('fixed_assets','withRefData','reference','for_project_id','ref_type_id','ref_type_name','for_project_name','companies','company_id'))->render();
+                        $view = view('back-end.asset._fixed_asset_opening_body',compact('fixed_assets','withRefData','reference','for_project_id','ref_type_id','ref_type_name','for_project_name','companies','company'))->render();
                     }
                     else{
-                        $view = view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','ref_types','withRefData','reference','for_project_id','ref_type_id','ref_type_name','for_project_name','companies','company_id'))->render();
+                        $view = view('back-end.asset.fixed-asset-opening',compact('projects','fixed_assets','ref_types','withRefData','reference','for_project_id','ref_type_id','ref_type_name','for_project_name','companies','company'))->render();
                     }
                 }
                 else{
@@ -180,7 +180,11 @@ class FixedAssetDistribution extends Controller
             }
             else{
                 // Reporting--------------
-                if (empty($branch_id) && !empty($r_type_id))
+                if (!empty($company_id) && empty($branch_id) && empty($r_type_id))
+                {
+                    $fixed_asset_with_ref_report_list = $fixed_asset_with_ref->where('company_id',$company_id)->get();
+                }
+                else if (empty($branch_id) && !empty($r_type_id))
                 {
                     $fixed_asset_with_ref_report_list = $fixed_asset_with_ref->where('ref_type_id',$r_type_id)->get();
                 }
@@ -282,7 +286,7 @@ class FixedAssetDistribution extends Controller
                 'r_type' => ['required','string',Rule::exists('op_reference_types','id')->where(function ($query) use ($request) {$query->where('status',1);})],
                 'project_id'=>  ['required','string','exists:branches,id'],
                 'materials_id'=>    ['required','string','exists:fixed_assets,id',],
-                'specification'=>   ['required','string',],
+                'specification'=>   ['required','string','exists:fixed_asset_specifications,id'],
                 'rate'  =>  ['required','numeric'],
                 'qty'   =>  ['required','numeric'],
                 'purpose'=> ['sometimes','nullable','string'],
@@ -346,7 +350,7 @@ class FixedAssetDistribution extends Controller
                         ]);
                     }
 //                }
-                $withRefData = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('branch_id',$project_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
+                $withRefData = $this->fixedAssetOpeningBalances()->where('company_id',$company_id)->where('branch_id',$project_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
                 $view = view('back-end.asset.__edit_fixed_asset_opening_body_list',compact('withRefData'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -370,18 +374,19 @@ class FixedAssetDistribution extends Controller
     public function editFixedAssetOpening(Request $request,$faobid)
     {
         try {
-
             $id = Crypt::decryptString($faobid);
             $item = $this->fixedAssetOpeningBalances()->where('id',$id)->first();
-            $projects = $this->getUserWiseProjects($this->user->id);
+            $projects = $this->getUserProjectPermissions($this->user->id)->get();
+//            $projects = $this->getUserWiseProjects($this->user->id);
             $ref_types = $this->refTypes()->get();
             $fixed_assets = $this->FixedAssets()->get();
             $spec = $this->fixedAssetSpecifications($id)->get();
+            $companies = $this->getCompany()->get();
             if ($request->isMethod('PUT'))
             {
                 return $this->updateFixedAssetOpening($request, $id);
             }
-            $view = view('back-end.asset.edit-fixed-asset-opening',compact('id','projects','ref_types','fixed_assets','spec','item'))->render();
+            $view = view('back-end.asset.edit-fixed-asset-opening',compact('id','projects','ref_types','fixed_assets','spec','item','companies'))->render();
             return $view;
 
         }catch (\Throwable $exception)
@@ -392,8 +397,9 @@ class FixedAssetDistribution extends Controller
     protected function updateFixedAssetOpening(Request $request,$id)
     {
         try {
-            $projectIds = $this->getUserWiseProjects($this->user->id)->pluck('projects.id')->flatten()->unique()->toArray();
+//            $projectIds = $this->getUserProjectPermissions($this->user->id)->pluck('id')->unique()->toArray();
             $request->validate([
+                'company_id' => ['required','string','exists:company_infos,id'],
                 'reference' => ['required','string',Rule::unique('fixed_asset_opening_balances','references')->ignore($id, 'id')],
                 'r_type' => ['required','string',Rule::exists('op_reference_types','id')->where(function ($query) use ($request) {$query->where('status',1);})],
                 'project_id'=>  ['required','string','exists:branches,id'],
@@ -403,6 +409,7 @@ class FixedAssetDistribution extends Controller
             extract($request->post());
             $data = $this->fixedAssetOpeningBalances()->where('id',$id)->first();
             $update = $this->fixedAssetOpeningBalances()->where('id',$id)->update([
+                'company_id'=>$company_id,
                 'references'=>$reference,
                 'ref_type_id'=>$r_type,
                 'branch_id'=>$project_id,
@@ -414,6 +421,14 @@ class FixedAssetDistribution extends Controller
             {
                 Fixed_asset_opening_with_spec::where('opening_asset_id',$id)->update([
                     'references'=>$reference,
+                    'updated_by'=>$this->user->id,
+                    'updated_at'=>date('Y-m-d H:i:s')
+                ]);
+            }
+            if ($data->company_id != $company_id)
+            {
+                Fixed_asset_opening_with_spec::where('opening_asset_id',$id)->update([
+                    'company_id'=>$company_id,
                     'updated_by'=>$this->user->id,
                     'updated_at'=>date('Y-m-d H:i:s')
                 ]);

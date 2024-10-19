@@ -46,7 +46,7 @@
                     <option value="">Pick options...</option>
                     @if(count($permission_users))
                         @foreach($permission_users as $p_user)
-                            <option value="{!! $p_user->user_id !!}">{!! $p_user->user->name !!} (ID: {!! $p_user->user->employee_id !!})</option>
+                            <option value="{!! $p_user->id !!}">{!! $p_user->name !!} (ID: {!! $p_user->employee_id !!})</option>
                         @endforeach
                     @endif
                 </select>

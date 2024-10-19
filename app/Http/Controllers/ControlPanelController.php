@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\branch;
 use App\Models\User;
+use App\Models\UserCompanyPermission;
 use App\Models\userProjectPermission;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
@@ -46,7 +47,7 @@ class ControlPanelController extends Controller
                     'company_id' => ['required','string','exists:company_infos,id'],
                 ]);
                 extract($request->post());
-                $users = $this->getUser()->where('company',$company_id)->get();
+                $users = $this->companyWisePermissionUsers($company_id)->get();
                 return response()->json([
                     'status' => 'success',
                     'data' => $users,
@@ -77,12 +78,12 @@ class ControlPanelController extends Controller
                 $user = $request->post('user');
                 $projects = branch::where('status', 1)->where('company_id', $company_id)->get();
                 $userProjectPermissions = userProjectPermission::with(['user','projects','company'])->where('company_id', $company_id)->where('user_id', $user)->get();
-                $permission_users = userProjectPermission::select(['user_id', DB::raw('MAX(id) as id')])
-                    ->with(['user'])
-                    ->where('company_id', $company_id)
+                $userIDs = userProjectPermission::where('company_id', $company_id)
                     ->where('user_id','!=',$user)
-                    ->groupBy('user_id')
-                    ->get();
+                    ->pluck('user_id')->unique()->toArray();
+                $permission_users = $this->getUser()->whereIn('id',$userIDs)->whereDoesntHave('roles', function ($query) {
+                    $query->where('name', 'systemsuperadmin');
+                })->get();
                 $view = view('back-end.control-panel._user-project-permission-add',compact('projects','userProjectPermissions','user','permission_users'))->render();
                 return \response()->json([
                     'status'=>'success',

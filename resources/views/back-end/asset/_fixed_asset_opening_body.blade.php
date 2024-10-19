@@ -20,10 +20,16 @@
                 <div class="col-md-12">
                     <div class="row mt-0">
                         <div class="col">
-                            <span class=""><strong>Reference: </strong>{!! isset($ref_type_name)?$ref_type_name:'' !!}-{!! isset($reference)?$reference: '' !!}</span>
+                            <span class="float-start"><strong>Company: </strong>{!! isset($company)?$company->company_name: '' !!}</span>
+                        </div>
+                        <div class="col text-center">
+                            <span class=""><strong>Project: </strong>{!! isset($for_project_name)?$for_project_name: '' !!}</span>
                         </div>
                         <div class="col">
-                            <span class="float-end"><strong>Project: </strong>{!! isset($for_project_name)?$for_project_name: '' !!}</span>
+                            <span class="float-end"><strong>Reference: </strong>{!! isset($ref_type_name)?$ref_type_name:'' !!}-{!! isset($reference)?$reference: '' !!}</span>
+                        </div>
+                        <div class="col-md-12">
+                            <hr class="text-secondary">
                         </div>
                     </div>
                 </div>
@@ -34,7 +40,7 @@
                     </div>
                 </div>
                 <input type="hidden" id="ref_hide" value="{!! isset($reference)?$reference:'' !!}">
-                <input type="hidden" id="company_id_hide" value="{!! isset($company_id)?$company_id:'' !!}">
+                <input type="hidden" id="company_id_hide" value="{!! isset($company)?$company->id:'' !!}">
                 <input type="hidden" id="project_id_hide" value="{!! isset($for_project_id)?$for_project_id:'' !!}">
                 <input type="hidden" id="r_type_id_hide" value="{!! isset($ref_type_id)?$ref_type_id:'' !!}">
                 <div class="col-md-3">

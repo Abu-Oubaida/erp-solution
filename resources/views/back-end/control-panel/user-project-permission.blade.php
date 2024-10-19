@@ -11,7 +11,7 @@
     <div class="card mb-4">
         <div class="card-body">
             <div class="row">
-                <div class="col-md-4 mb-1">
+                <div class="col-md-2 mb-1">
                     <label for="company">Company<span class="text-danger">*</span></label>
                     <select id="company" name="company" class="select-search cursor-pointer" onchange="return Obj.companyWiseUsers(this,'user')">
                         <option value="">Pick options...</option>
@@ -22,7 +22,7 @@
                         @endif
                     </select>
                 </div>
-                <div class="col-md-4 mb-1">
+                <div class="col-md-6 mb-1">
                     <label for="user">User Name<span class="text-danger">*</span></label>
                     <select id="user" name="user" class="select-search cursor-pointer" onchange="return Obj.userProjectPermissionSearch(this)">
                         <option value="">Pick options...</option>

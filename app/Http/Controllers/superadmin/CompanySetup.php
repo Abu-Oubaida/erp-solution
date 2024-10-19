@@ -393,7 +393,10 @@ class CompanySetup extends Controller
             }
             $company = $this->getCompany()->where('id',$cID)->first();
             $selfUsersID = $company->users->pluck('id')->unique()->toArray();
-            $users = $this->getUser()->where('status',1)->whereNot('company',$cID)->get();
+            $users = $this->getUser()->where('status',1)->whereNot('company',$cID)->whereDoesntHave('roles', function ($query) {
+                $query->where('name', 'systemsuperadmin');
+//                ->orWhere('name', 'systemadmin'); // Add other roles if needed
+            })->get();
             $roles = $this->getRole()->get();
             return view('back-end.control-panel.company.user-permission.add-permission',compact('users','company','roles'))->render();
         } catch (\Throwable $exception)

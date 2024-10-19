@@ -31,7 +31,7 @@
 
             body {
                 margin: 0;
-                padding: 0.5cm;
+                padding: 0;
             }
 
             .print-header, .print-footer {
@@ -91,12 +91,12 @@
             </div>
             <div class="col-md-6 text-center" style="width: 35%;">
                 <!-- Logo or Company Name -->
-                @if(isset($withRefData->company->logo))
+                @if(!empty(@$withRefData->company->logo))
                     <img src="{{url($withRefData->company->logo)}}" alt="Company Logo" style="max-height: 80px;">
                 @else
-                    <h3 class="text-center text-chl">{!! $withRefData->company->company_name !!}</h3>
+                    <h3 class="text-center text-chl text-uppercase">{!! $withRefData->company->company_name !!}</h3>
                 @endif
-                <p>{!! $withRefData->company->location !!}</p>
+                <p>{!! @$withRefData->company->location !!}</p>
                 <h5>Fixed Asset Distribution With Reference</h5>
             </div>
             <div class="col-md-3" style="width: 30%;">
@@ -132,7 +132,7 @@
                         <th>Unit</th>
                         <th>Rate</th>
                         <th>Qty.</th>
-                        <th>Total</th>
+                        <th>Price</th>
                         <th>Purpose</th>
                         <th>Remarks</th>
                     </tr>
@@ -162,27 +162,9 @@
                                 $total += (float)($opm->qty * $opm->rate);
                             @endphp
                         @endforeach
-                        @foreach($withRefData->withSpecifications as $opm)
-                            <tr style="page-break-inside: avoid;">
-                                <td>{!! $n++ !!}</td>
-                                <td>{!! date('d-M-Y', strtotime($opm->date)) !!}</td>
-                                <td>{!! $opm->asset->materials_name !!} ({!! $opm->asset->recourse_code !!})</td>
-                                <td>{!! $opm->specification->specification !!}</td>
-                                <td>{!! $opm->asset->unit !!}</td>
-                                <td>{!! $opm->rate !!}</td>
-                                <td>{!! $opm->qty !!}</td>
-                                <td>{!! (float)($opm->qty * $opm->rate) !!}</td>
-                                <td>{!! (isset($opm->purpose))?$opm->purpose:'' !!}</td>
-                                <td>{!! (isset($opm->remarks))?$opm->remarks:'' !!}</td>
-                            </tr>
-                            @php
-                                $total_qnt += $opm->qty;
-                                $total += (float)($opm->qty * $opm->rate);
-                            @endphp
-                        @endforeach
 
                         <tr>
-                            <th colspan="6">Total:</th>
+                            <th colspan="6">Total Price:</th>
                             <th>{!! $total_qnt !!}</th>
                             <th>{!! $total !!}</th>
                             <th colspan="2"></th>

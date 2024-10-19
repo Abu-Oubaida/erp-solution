@@ -3,14 +3,19 @@
         <div class="card-body">
             @if(isset($withRefData))
             <div class="row">
-                <div class="col"><strong>Date:</strong> {!! date('d-F-Y',strtotime($withRefData->date)) !!}</div>
-                <div class="col"><strong>Project:</strong> {!! $withRefData->branch->branch_name !!}</div>
-                <div class="col"><strong>References:</strong> {!! $withRefData->references !!}</div>
+                <div class="col text-start"><strong>Company:</strong> {!! $withRefData->company->company_name !!}</div>
+                <div class="col text-center"><strong>Project:</strong> {!! $withRefData->branch->branch_name !!}</div>
+                <div class="col text-center"><strong>References:</strong> {!! $withRefData->references !!}</div>
+                <div class="col text-end"><strong>Date:</strong> {!! date('d-F-Y',strtotime($withRefData->date)) !!}</div>
+                <div class="col-md-12">
+                    <hr class="text-secondary">
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-12" id="opening-materials-list">
                     @include('back-end.asset.__edit_fixed_asset_opening_body_list')
                 </div>
+                @if(isset($withRefData->withSpecifications) && count($withRefData->withSpecifications))
                 <form action="{!! route('fixed.asset.distribution.update') !!}" method="post" enctype="multipart/form-data">
                     @csrf
                     @method('put')
@@ -31,6 +36,7 @@
                         </div>
                     </div>
                 </form>
+                @endif
             </div>
             @endif
         </div>

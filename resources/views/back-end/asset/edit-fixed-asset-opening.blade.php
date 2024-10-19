@@ -30,12 +30,23 @@
                             @method('put')
                             <div class="row">
                                 <div class="col-md-3 mb-1">
+                                    <label for="company">Company<span class="text-danger">*</span></label>
+                                    <select id="company" name="company_id" class="select-search cursor-pointer" onchange="return Obj.userWiseCompanyProjectPermissions(this,{!! Auth::user()->id !!},'project')">
+                                        <option value="">Pick options...</option>
+                                        @if(count($companies))
+                                            @foreach($companies as $c)
+                                                <option @if( @$item->company->id == $c->id)selected @endif value="{!! $c->id !!}">{!! $c->company_name !!} </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-1">
                                     <label for="project">Enter Project Name<span class="text-danger">*</span></label>
                                     <select id="project" name="project_id" class="select-search cursor-pointer">
                                         <option value="">Pick options...</option>
                                         @if(count($projects))
                                             @foreach($projects as $p)
-                                                <option @if($item && $item->branch_id == $p->projects->id)selected @endif value="{!! $p->projects->id !!}">{!! $p->projects->branch_name !!}</option>
+                                                <option @if($item && $item->branch_id == $p->id)selected @endif value="{!! $p->id !!}">{!! $p->branch_name !!}</option>
                                             @endforeach
                                         @endif
                                     </select>
@@ -57,15 +68,16 @@
                                         @endif
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <label for="remarks">Attachments: ({!! count($item->attestedDocuments) !!})</label>
-                                    <input class="form-control" type="file" name="attachment[]" id="attachment" multiple>
-                                </div>
-                                <div class="col-md-10">
+
+                                <div class="col-md-7">
                                     <div>
                                         <label for="remarks">Narration:</label>
                                         <textarea class="form-control form-control-sm"  id="narration" name="narration">{!! ($item->narration)?$item->narration:'' !!}</textarea>
                                     </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="remarks">Attachments: ({!! count($item->attestedDocuments) !!})</label>
+                                    <input class="form-control" type="file" name="attachment[]" id="attachment" multiple>
                                 </div>
                                 <div class="col-md-2">
                                     <button type="submit" class="btn btn-chl-outline float-end mt-4"><i class="fas fa-save"></i> Update</button>

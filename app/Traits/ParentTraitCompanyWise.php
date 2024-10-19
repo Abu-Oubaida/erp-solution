@@ -105,6 +105,20 @@ trait ParentTraitCompanyWise
         $userComPerIDs[] = (integer)$this->user->company_id;
         return $userComPerIDs;
     }
+    protected function companyWisePermissionUsers($company_id)
+    {
+        $userIDs = $this->companyWisePermissionUserArray($company_id);
+        return $this->getUser()->whereIn('id',$userIDs)->whereDoesntHave('roles', function ($query) {
+            $query->where('name', 'systemsuperadmin');
+//                ->orWhere('name', 'systemadmin'); // Add other roles if needed
+        });
+    }
+    protected function companyWisePermissionUserArray($company_id): array
+    {
+        $userCompanyPermissions = userCompanyPermission::where('company_id', $company_id)->pluck('user_id')->unique()->toArray();
+        $users = $this->getUser()->where('company',$company_id)->pluck('id')->unique()->toArray();
+        return array_merge($userCompanyPermissions,$users);
+    }
     protected function getUserProjectPermissions($user_id)
     {
         $object = branch::with(['getUsers','company']);

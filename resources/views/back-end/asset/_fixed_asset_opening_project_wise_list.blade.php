@@ -8,10 +8,11 @@
                         <thead>
                         <tr>
                             <th>SL.</th>
+                            <th>Company</th>
+                            <th>Project</th>
                             <th>Date</th>
                             <th>Reference Type</th>
                             <th>Reference</th>
-                            <th>Project</th>
                             <th>Status</th>
                             <th>Resource Count</th>
                             <th>Documents</th>
@@ -27,10 +28,11 @@
                         <tfoot>
                         <tr>
                             <th>SL.</th>
+                            <th>Company</th>
+                            <th>Project</th>
                             <th>Date</th>
                             <th>Reference Type</th>
                             <th>Reference</th>
-                            <th>Project</th>
                             <th>Status</th>
                             <th>Resource Count</th>
                             <th>Documents</th>
@@ -49,10 +51,11 @@
                             @foreach($fixed_asset_with_ref_report_list as $pwr)
                                 <tr class="text-center text-capitalize">
                                     <td>{!! $n++ !!}</td>
+                                    <td>{!! $pwr->company->company_name !!}</td>
+                                    <td>{!! $pwr->branch->branch_name !!}</td>
                                     <td>{!! date('d-M-Y', strtotime($pwr->date)) !!}</td>
                                     <td>{!! $pwr->refType->name !!}</td>
                                     <td>{!! $pwr->references !!}</td>
-                                    <td>{!! $pwr->branch->branch_name !!}</td>
                                     <td>
                                         @if($pwr->status == 1) <span class="badge bg-success">Active</span>
                                         @elseif($pwr->status == 2) <span class="badge bg-info">Approved</span>
@@ -77,10 +80,10 @@
                                     <td>{!! (isset($pwr->createdBy->name))?$pwr->createdBy->name:'-' !!}</td>
                                     <td>{!! date('d-M-Y', strtotime($pwr->created_at)) !!}</td>
                                     <td>{!! (isset($pwr->updatedBy->name))?$pwr->updatedBy->name:'-' !!}</td>
-                                    <td>{!! date('d-M-Y', strtotime($pwr->updated_at)) !!}</td>
+                                    <td>{!! (isset($pwr->updatedBy->name))?date('d-M-Y', strtotime($pwr->updated_at)):'-' !!}</td>
                                     <td class="text-center">
                                         @if($pwr->status == 5)
-                                            <a href="{!! url(route('fixed.asset.distribution.opening.input',['ref'=>$pwr->references,'project'=>$pwr->branch->id,'rt'=>$pwr->refType->id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>
+                                            <a href="{!! url(route('fixed.asset.distribution.opening.input',['ref'=>$pwr->references,'project'=>$pwr->branch->id,'rt'=>$pwr->refType->id,'c'=>$pwr->company_id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>
                                             <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $pwr->id !!}" ><i class="fas fa-trash"></i></button>
                                         @else
                                             <a href="{!! route('fixed.asset.with.reference.print',['assetID'=>\Illuminate\Support\Facades\Crypt::encryptString($pwr->id)]) !!}" class="text-success border-0 inline-block bg-none" target="_blank"><i class="fas fa-print"></i></a>

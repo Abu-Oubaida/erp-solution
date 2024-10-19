@@ -64,6 +64,9 @@
                 </button>
             </div>
             <div class="col-md-2 mt-4">
+                <a href="{!! route('fixed.asset.distribution.opening.input') !!}" class="btn btn-outline-info float-start" type="button" id="ref-src-btn">
+                    <i class="fa-solid fa-file-circle-plus"></i> New Input
+                </a>
                 <button class="btn btn-outline-primary float-end" type="button" id="ref-src-btn" onclick="return window.location.reload()">
                     <i class="fa fa-refresh"></i> Refresh
                 </button>

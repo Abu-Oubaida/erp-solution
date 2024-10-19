@@ -893,10 +893,8 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     success: function (response){
                         if (response.status === 'success')
                         {
-                            let fixedAsset = []
-                            if (response.data && response.data[0] && response.data[0].fixed_asset)
-                                fixedAsset = response.data[0].fixed_asset
-                            updateSelectBoxWithNone(response.data,'specification','id','specification')
+                            fixedAsset = response.data[0].fixed_asset
+                            updateSelectBoxSingleOption(response.data,'specification','id','specification')
                             $("#rate").val(fixedAsset.rate)
                             $("#unite").val(fixedAsset.unit)
                             $("#qty").val(1)
@@ -1527,7 +1525,11 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                                 selectize.clear();
                                 selectize.clearOptions(); // Clear existing options
                                 response.data.forEach(function(item) {
-                                    selectize.addOption({ value: item['id'], text: item['name']+" ("+item['employee_id']+")" });
+                                    const companyName = item.get_company ? item.get_company.company_name : 'N/A'; // Fallback if get_company is null
+                                    const designationTitle = item.designation ? item.designation.title : 'N/A'; // Fallback if get_company is null
+                                    const optionText = `${item.name} (ID: ${item.employee_id}) - (Designation: ${designationTitle}) - (Company: ${companyName})`;
+
+                                    selectize.addOption({ value: item.id, text: optionText });
                                 });
                                 selectize.refreshOptions(true); // Refresh the options in the select box
                                 $('#user-project-permission-add-list').html('')

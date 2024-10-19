@@ -3,7 +3,7 @@
     user project permission list
 </div>
 <div class="card-body">
-    <table id="simpleDataTable2" class="table">
+    <table @if(count($userProjectPermissions))id="simpleDataTable2" @endif class="table">
         <thead>
         <tr>
             <th>SL.</th>

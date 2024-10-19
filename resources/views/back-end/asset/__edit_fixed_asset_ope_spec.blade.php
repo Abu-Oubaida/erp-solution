@@ -11,7 +11,7 @@
         </div>
         <div class="col-md-2">
             <label for="edit-specification">Specification<span class="text-danger">*</span></label>
-            <input type="text" value="{!! $data->specification->specification !!}" id="edit-specification" class="form-control" disabled readonly>
+            <input type="text" value="{!! isset($data->specification->specification)?$data->specification->specification:'None' !!}" id="edit-specification" class="form-control" disabled readonly>
         </div>
         <div class="col-md-1">
                 <label for="edit-unit">Unite<span class="text-danger">*</span></label>
