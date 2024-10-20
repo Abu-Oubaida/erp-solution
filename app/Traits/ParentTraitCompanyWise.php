@@ -6,11 +6,13 @@ use App\Models\BloodGroup;
 use App\Models\branch;
 use App\Models\BranchType;
 use App\Models\company_info;
+use App\Models\CompanyModulePermission;
 use App\Models\department;
 use App\Models\Designation;
 use App\Models\Fixed_asset;
 use App\Models\fixed_asset_specifications;
 use App\Models\Op_reference_type;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
@@ -86,6 +88,17 @@ trait ParentTraitCompanyWise
         return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray())->where('id','>=',$this->user->roles()->first()->id);
     }
 
+    protected function getCompanyModulePermissionWise($operation_permission_name)
+    {
+        $permission = permission::where('name',$operation_permission_name)->first();
+        $companyModulePermission = CompanyModulePermission::whereIn('company_id',$this->getUserCompanyPermissionsArray())->where('module_id',$permission->id)->pluck('company_id')->unique()->toArray();
+        $object = company_info::with(['createdBy','updatedBy','users','companyType','fixedAssets','permissionUsers']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('id',$this->getUserCompanyPermissionsArray())->whereIn('id',$companyModulePermission);
+    }
     protected function getCompany()
     {
         $object = company_info::with(['createdBy','updatedBy','users','companyType','fixedAssets','permissionUsers']);

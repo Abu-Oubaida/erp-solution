@@ -57,7 +57,7 @@ class UserController extends Controller
             {
                 return $this->store($request);
             }else{
-                $companies = $this->getCompany()->get();
+                $companies = $this->getCompanyModulePermissionWise('add_user')->get();
                 $depts = $this->getDepartment()->where('company_id',$this->user->company_id)->where('status',1)->get();
                 $branches = $this->getBranch()->where('company_id',$this->user->company_id)->where('status',1)->get();
                 $roles = $this->getRole()->get();

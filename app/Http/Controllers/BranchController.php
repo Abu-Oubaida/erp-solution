@@ -74,7 +74,7 @@ class BranchController extends Controller
             {
                 return $this->store($request);
             }
-            $companies = $this->getCompany()->get();
+            $companies = $this->getCompanyModulePermissionWise('add_branch')->get();
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
             $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
             $branchTypeActive = $this->getBranchType()->where('status',1)->orderBY('code','asc')->get();
@@ -145,7 +145,8 @@ class BranchController extends Controller
                 return $this->update($request,$id);
             }
             $id = Crypt::decryptString($id);
-            $companies = $this->getCompany()->get();
+            $companies = $this->getCompanyModulePermissionWise('edit_branch')->get();
+            //need to work if permission dose not exit edit not possible.
             $branch = $this->getBranch()->where('id',$id)->first();
             $branchTypeActive = $this->getBranchType()->where('company_id',$branch->company_id)->orderBY('code','asc')->get();
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
