@@ -206,7 +206,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                    @if(strtolower($roleNew) == strtolower('superadmin') || strtolower($roleNew) == strtolower('systemsuperadmin'))
+                    @if(strtolower($roleNew) == strtolower('systemsuperadmin'))
                         <div class="col-md-12">
                             <strong class="text-center text-info">System/Super Admin has all the permissions by default! </strong>
                         </div>
@@ -335,7 +335,7 @@
                                 </div>
                             </div>
                         @else
-                            @if(strtolower($roleNew) == strtolower('superadmin') || strtolower($roleNew) == strtolower('systemsuperadmin'))
+                            @if(strtolower($roleNew) == strtolower('systemsuperadmin'))
                                 <div class="row">
                                     <div class="col-md-12">
                                         <strong class="text-center text-info">System/Super Admin has all the permissions by default! </strong>

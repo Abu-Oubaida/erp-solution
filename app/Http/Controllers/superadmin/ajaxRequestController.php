@@ -10,6 +10,7 @@ use App\Models\CompanyModulePermission;
 use App\Models\DocumentShareLinkEmail;
 use App\Models\Permission;
 use App\Models\User;
+use App\Models\UserCompanyPermission;
 use App\Models\userProjectPermission;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentShareEmailLink;
@@ -52,9 +53,17 @@ class ajaxRequestController extends Controller
                 $companies = company_info::all();
             }
             else {
-                $companies = company_info::whereHas('permissionUsers',function ($query) use ($matchingUsers) {
-                    $query->where('user_id',$matchingUsers->first()->id);
-                })->get();
+                $userComPerIDs = [];
+                $userCompanyPermissions = UserCompanyPermission::where('user_id',$matchingUsers->first()->id)->get();
+                if (count($userCompanyPermissions) > 0) {
+                    $userComPerIDs = $userCompanyPermissions->pluck('company_id')->unique()->toArray();
+                }
+                $userComPerIDs[] = (integer)$matchingUsers->first()->company;
+                $companies = company_info::whereIn('id',$userComPerIDs)->get();
+
+//                $companies = company_info::whereHas('permissionUsers',function ($query) use ($matchingUsers) {
+//                    $query->where('user_id',$matchingUsers->first()->id);
+//                })->get();
             }
             // Extract companies associated with the matching users
 //            $companies = $matchingUsers->map(function ($user){

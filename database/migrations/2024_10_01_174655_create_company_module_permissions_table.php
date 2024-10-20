@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('company_module_permissions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('module_parent_id');
+            $table->unsignedBigInteger('module_parent_id')->nullable();
             $table->unsignedBigInteger('module_id');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

@@ -40,8 +40,24 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <label for="company">Company Name <span class="text-danger">*</span></label>
-                                    <select class="text-capitalize select-search" id="company" name="company">
-                                        <option value="{{$branch->company->id}}">{{$branch->company->company_name}} ({!! $branch->company->company_code !!})</option>
+                                    <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.changeBranchCompany(this)">
+                                        <option value="">Pick options...</option>
+                                        @if(isset($companies) || (count($companies) > 0))
+                                            @foreach($companies as $c)
+                                                <option value="{{$c->id}}" @if($branch->company->id == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="branch_type">Branch Type<span class="text-danger">*</span></label>
+                                    <select class="text-capitalize select-search" id="branch_type" name="branch_type" required>
+                                        <option value="">Pick options...</option>
+                                        @if(count($branchTypeActive))
+                                            @foreach($branchTypeActive as $type)
+                                                <option value="{!! $type->id !!}" @if($branch->branch_type == $type->id) selected @endif>{!! $type->title !!}</option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -50,18 +66,7 @@
                                         <label for="branch_name">Branch Name<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="form-floating mb-4">
-                                        <select class="form-control" id="branch_type" name="branch_type" required>
-                                    @if(count($branchTypeActive))
-                                        @foreach($branchTypeActive as $type)
-                                            <option value="{!! $type->id !!}" @if($branch->branch_type == $type->id) selected @endif>{!! $type->title !!}</option>
-                                        @endforeach
-                                    @endif
-                                        </select>
-                                        <label for="branch_type">Branch Type<span class="text-danger">*</span></label>
-                                    </div>
-                                </div>
+
                                 <div class="col-md-3">
                                     <div class="form-floating mb-4">
                                         <select class="form-control" id="branch_status" name="branch_status" required>

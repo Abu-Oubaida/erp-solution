@@ -46,11 +46,6 @@
                                     <label for="branch_type">Branch Type<span class="text-danger">*</span></label>
                                     <select class="text-capitalize select-search" id="branch_type" name="branch_type" required>
                                         <option value="">Pick options...</option>
-{{--                                @if(count($branchTypeActive))--}}
-{{--                                    @foreach($branchTypeActive as $type)--}}
-{{--                                        <option value="{!! $type->id !!}">{!! $type->title !!}</option>--}}
-{{--                                    @endforeach--}}
-{{--                                @endif--}}
                                     </select>
                                 </div>
                                 <div class="col-md-3">

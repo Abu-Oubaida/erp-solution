@@ -457,7 +457,7 @@ class CompanySetup extends Controller
                 return $this->companyModulePermissionStore($request, $cID);
             }
             $company = $this->getCompany()->where('id',$cID)->first();
-            $parent_permissions = Permission::where('parent_id',NULL)->get();
+            $parent_permissions = Permission::where('is_parent',1)->get();
             $company_permission = CompanyModulePermission::where('company_id',$company->id)->get()->pluck('module_id')->toArray();
             $permissions = Permission::with(['parentName'])->whereIn('id',$company_permission)->get();
             return view('back-end.programmer.company-module-permission',compact('company','parent_permissions','permissions'))->render();
@@ -471,11 +471,13 @@ class CompanySetup extends Controller
     {
         try {
             $request->validate([
-                'permission_parent' => ['required','numeric',],
+                'permission_parent' => ['required','numeric','exists:permissions,id',],
                 'permissions' => ['required','array'],
                 'permissions.*' => ['required','string','exists:permissions,id',],
             ]);
             extract($request->post());
+            $permissions[] = $permission_parent;
+
             $get_permissions = Permission::whereIn('id',$permissions)->get();
             foreach ($get_permissions as $permission)
             {

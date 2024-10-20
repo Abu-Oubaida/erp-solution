@@ -358,10 +358,10 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         }
                         if (response.status === 'success')
                         {
-                            updateSelectBox(response.data.departments,'dept_menu','id','dept_name')
-                            updateSelectBox(response.data.branches,'branch_menu','id','branch_name')
-                            updateSelectBox(response.data.designations,'designation_menu','id','title')
-                            updateSelectBox(response.data.roles,'role_menu','id','display_name')
+                            updateSelectBoxSingleOption(response.data.departments,'dept_menu','id','dept_name')
+                            updateSelectBoxSingleOption(response.data.branches,'branch_menu','id','branch_name')
+                            updateSelectBoxSingleOption(response.data.designations,'designation_menu','id','title')
+                            updateSelectBoxSingleOption(response.data.roles,'role_menu','id','display_name')
                             $("#employee_id").val('')
                             $("#employee_id_hide").val('')
                         }
@@ -392,7 +392,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         if (response.status === 'success')
                         {
                             // console.log(response.data.branchTypes)
-                            updateSelectBox(response.data.branchTypes,'branch_type','id','title')
+                            updateSelectBoxSingleOption(response.data.branchTypes,'branch_type','id','title')
                         }
                     },
                     error: function (error)

@@ -95,7 +95,7 @@ class BranchController extends Controller
         try {
             $request->validate([
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
-                'branch_name'   => ['required','string','unique:branches,branch_name'],
+                'branch_name'   => ['required','string',Rule::unique('branches','branch_name')->where(function ($query) use($request){return $query->where('company_id',$request->post('company'));})],
                 'branch_type'   => ['required','string','exists:branch_types,id'],
                 'branch_status'   => ['required','string'],
                 'address'   => ['sometimes','nullable','string'],
@@ -145,10 +145,11 @@ class BranchController extends Controller
                 return $this->update($request,$id);
             }
             $id = Crypt::decryptString($id);
+            $companies = $this->getCompany()->get();
             $branch = $this->getBranch()->where('id',$id)->first();
             $branchTypeActive = $this->getBranchType()->where('company_id',$branch->company_id)->orderBY('code','asc')->get();
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
-            return view('back-end/branch/edit',compact('branch','branchTypeActive','branches'))->render();
+            return view('back-end/branch/edit',compact('branch','branchTypeActive','branches','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
