@@ -52,7 +52,7 @@
                             </select>
                         </div>
                         <div class="col-md-2 mb-1">
-                            <label for="company">Company<span class="text-danger">*</span></label>
+                            <label for="company">From Company<span class="text-danger">*</span></label>
                             <select id="company" name="company" class="select-search cursor-pointer" onchange="return Obj.companyWiseUsersCompanyPermission(this,'user')">
                                 <option value="">Pick options...</option>
                                 @if(count($companies))
