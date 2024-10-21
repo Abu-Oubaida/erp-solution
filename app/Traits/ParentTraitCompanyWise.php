@@ -13,6 +13,7 @@ use App\Models\Fixed_asset;
 use App\Models\fixed_asset_specifications;
 use App\Models\Op_reference_type;
 use App\Models\Permission;
+use App\Models\PermissionUser;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
@@ -22,7 +23,16 @@ use Illuminate\Database\Eloquent\Builder;
 trait ParentTraitCompanyWise
 {
     use AuthTrait;
-    protected function getUser()
+    protected function getUser($operation_permission_name)
+    {
+        $object = User::with(['permissions','department','designation','branch','getCompany']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('company',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
+    }
+    protected function getUserAll()
     {
         $object = User::with(['permissions','department','designation','branch','getCompany']);
         if ($this->user->isSystemSuperAdmin())
@@ -92,12 +102,33 @@ trait ParentTraitCompanyWise
     {
         $permission = permission::where('name',$operation_permission_name)->first();
         $companyModulePermission = CompanyModulePermission::whereIn('company_id',$this->getUserCompanyPermissionsArray())->where('module_id',$permission->id)->pluck('company_id')->unique()->toArray();
+
+        $userCompanyPermission = UserCompanyPermission::where('user_id',$this->user->id)->get();
+        $companyPermissionIDs = [];
+        foreach ($userCompanyPermission as $value)
+        {
+            if ($value->users->where('id',$this->user->id)->first()->companyWiseRoles()->first()->name == 'superadmin')
+            {
+                $companyPermissionIDs[] = $value->company_id;
+            }
+        }
+        if ($this->user->isSuperAdmin())
+        {
+            $companyPermissionIDs[] = $this->user->company;
+        }
+        $otherCompanyPermissionIDs = PermissionUser::whereIn('company_id',$companyModulePermission)->where('user_id',$this->user->id)->where('permission_name',$operation_permission_name)->pluck('company_id')->unique()->toArray();
+        $companyPermissionIDs = array_merge($companyPermissionIDs,$otherCompanyPermissionIDs);
         $object = company_info::with(['createdBy','updatedBy','users','companyType','fixedAssets','permissionUsers']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
         }
-        return $object->whereIn('id',$this->getUserCompanyPermissionsArray())->whereIn('id',$companyModulePermission);
+        return $object->whereIn('id',$this->getUserCompanyPermissionsArray())->whereIn('id',$companyPermissionIDs);
+    }
+
+    protected function getCompanyModulePermissionWiseArray($operation_permission_name)
+    {
+        return $this->getCompanyModulePermissionWise($operation_permission_name)->pluck('id')->unique()->toArray();
     }
     protected function getCompany()
     {
@@ -170,7 +201,7 @@ trait ParentTraitCompanyWise
         if (count($userCompanyPermissions) > 0) {
             $userComPerIDs = $userCompanyPermissions->pluck('company_id')->unique()->toArray();
         }
-        $userDefaultCompanyID = $this->getUser()->where('id',$user_id)->first('company');
+        $userDefaultCompanyID = $this->getUserAll()->where('id',$user_id)->first('company');
         $userComPerIDs[] = (integer)$userDefaultCompanyID->company;
         return $userComPerIDs;
     }

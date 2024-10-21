@@ -51,15 +51,26 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-sm-7 mb-1">
-                            <label for="user">Select Users Name<span class="text-danger">*</span></label>
-                            <select id="user" name="users[]" class="select-search cursor-pointer" multiple>
+                        <div class="col-md-2 mb-1">
+                            <label for="company">Company<span class="text-danger">*</span></label>
+                            <select id="company" name="company" class="select-search cursor-pointer" onchange="return Obj.companyWiseUsersCompanyPermission(this,'user')">
                                 <option value="">Pick options...</option>
-                                @if(count($users))
-                                    @foreach($users as $user)
-                                        <option value="{!! $user->id !!}">{!! $user->name !!} (ID: {!! $user->employee_id !!})</option>
+                                @if(count($companies))
+                                    @foreach($companies as $c)
+                                        <option value="{!! $c->id !!}">{!! $c->company_name !!} </option>
                                     @endforeach
                                 @endif
+                            </select>
+                        </div>
+                        <div class="col-sm-5 mb-1">
+                            <label for="user">Select Users Name<span class="text-danger">*</span></label>
+                            <select id="user" name="users[]" class="select-search cursor-pointer" multiple onchange="Obj.selectAllOption(this)">
+                                <option value="">Pick options...</option>
+{{--                                @if(count($users))--}}
+{{--                                    @foreach($users as $user)--}}
+{{--                                        <option value="{!! $user->id !!}">{!! $user->name !!} (ID: {!! $user->employee_id !!})</option>--}}
+{{--                                    @endforeach--}}
+{{--                                @endif--}}
                             </select>
                         </div>
                         <div class="col-sm-2 mt-4">
@@ -104,13 +115,14 @@
                                         <td>{!! $u->name !!}</td>
                                         <td>{!! $u->employee_id !!}</td>
                                         <td>@if($u->status == 1) <span class="badge bg-success">Active</span> @else <span class="badge bg-danger">Inactive</span> @endif</td>
-                                        <td>{!! isset($u->userRole)?$u->userRole->display_name:'' !!}</td>
+                                        <td>{!! isset($u->companyWiseRoles()->first()->display_name)?$u->companyWiseRoles()->first()->display_name:'' !!}</td>
                                         <td>
                                         @if(auth()->user()->hasPermission('delete_user_company_permission'))
                                             <form action="{{route('delete.user.company.permission')}}" class="display-inline" method="post">
                                                 @method('delete')
                                                 @csrf
-                                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($u->id) !!}">
+                                                <input type="hidden" name="user_id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($u->id) !!}">
+                                                <input type="hidden" name="company_id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($company->id) !!}">
                                                 <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this data?')"><i class="fas fa-trash"></i></button>
                                             </form>
                                         @endif
@@ -174,7 +186,6 @@
             </div>
         </div>
     </div>
-
 </div>
 @stop
 

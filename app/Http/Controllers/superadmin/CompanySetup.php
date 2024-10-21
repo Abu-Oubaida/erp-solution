@@ -383,6 +383,37 @@ class CompanySetup extends Controller
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
+    public function companyWiseUsersCompanyPermission(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'company_id' => ['required','string','exists:company_infos,id'],
+                ]);
+                extract($request->post());
+                $users = $this->getUserAll()->where('status',1)->where('company',$company_id)->whereDoesntHave('roles', function ($query) {
+                    $query->where('name', 'systemsuperadmin');
+//                ->orWhere('name', 'systemadmin'); // Add other roles if needed
+                })->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data'  => $users,
+                    'message' => 'Request process successfully.'
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Requested method not allowed.'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
     public function userCompanyPermission(Request $request,$companyID)
     {
         try {
@@ -393,17 +424,15 @@ class CompanySetup extends Controller
             }
             $company = $this->getCompany()->where('id',$cID)->first();
             $selfUsersID = $company->users->pluck('id')->unique()->toArray();
-            $users = $this->getUser()->where('status',1)->whereNot('company',$cID)->whereDoesntHave('roles', function ($query) {
-                $query->where('name', 'systemsuperadmin');
-//                ->orWhere('name', 'systemadmin'); // Add other roles if needed
-            })->get();
-            $roles = $this->getRole()->get();
-            return view('back-end.control-panel.company.user-permission.add-permission',compact('users','company','roles'))->render();
+            $companies = $this->getCompany()->whereNot('id',$company->id)->get();
+            $roles = $this->getRole()->where('company_id',$company->id)->get();
+            return view('back-end.programmer.add-company-user-permission',compact('company','roles','companies'))->render();
         } catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
     }
+
     public function userCompanyPermissionStore(Request $request,$companyID)
     {
         try {
@@ -437,8 +466,13 @@ class CompanySetup extends Controller
         try {
             if ($request->isMethod('delete'))
             {
-                $id = Crypt::decryptString($request->post('id'));
-                UserCompanyPermission::where('id',$id)->delete();
+                $request->validate([
+                    'company_id' => ['required','string',],
+                    'user_id' => ['required','string',],
+                ]);
+                $user_id = Crypt::decryptString($request->post('user_id'));
+                $company_id = Crypt::decryptString($request->post('company_id'));
+                UserCompanyPermission::where('user_id',$user_id)->where('company_id',$company_id)->delete();
                 return back()->with('success','Data deleted successfully.');
             }
             return back()->with('success','Requested method not allowed.');

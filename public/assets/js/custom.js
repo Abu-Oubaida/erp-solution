@@ -1540,6 +1540,53 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            companyWiseUsersCompanyPermission:function (e,action_id)
+            {
+                let id = $(e).val()
+                if (id.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/system-operation/company-wise-users-company-permission"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'company_id':id},
+                    success:function (response)
+                    {
+                        if (response.status === 'error') {
+                            alert('Error: ' + response.message);
+                            return false
+                        } else if (response.status === 'success') {
+                            // updateSelectBoxSingleOption(response.data, action_id, 'id', 'name');
+                            const $select = $("#"+action_id);
+                            // Ensure Selectize is initialized
+                            if ($select[0] && $select[0].selectize) {
+                                const selectize = $select[0].selectize;
+
+                                selectize.clear();
+                                selectize.clearOptions(); // Clear existing options
+                                if (response.data.length > 0)
+                                {
+                                    selectize.addOption({value:0, text: '@ All'})
+                                }
+                                response.data.forEach(function(item) {
+                                    const companyName = item.get_company ? item.get_company.company_name : 'N/A'; // Fallback if get_company is null
+                                    const designationTitle = item.designation ? item.designation.title : 'N/A'; // Fallback if get_company is null
+                                    const optionText = `${item.name} (ID: ${item.employee_id}) - (Designation: ${designationTitle}) - (Company: ${companyName})`;
+
+                                    selectize.addOption({ value: item.id, text: optionText });
+                                });
+                                selectize.refreshOptions(true); // Refresh the options in the select box
+                                $('#user-project-permission-add-list').html('')
+                            } else {
+                                console.error("Selectize is not initialized for #" + action_id);
+                            }
+                        }
+                    }
+                })
+            },
             companyWiseProjects:function (e,action_id)
             {
                 let id = $(e).val()

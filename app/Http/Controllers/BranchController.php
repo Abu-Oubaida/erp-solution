@@ -147,6 +147,8 @@ class BranchController extends Controller
             $id = Crypt::decryptString($id);
             $companies = $this->getCompanyModulePermissionWise('edit_branch')->get();
             //need to work if permission dose not exit edit not possible.
+
+
             $branch = $this->getBranch()->where('id',$id)->first();
             $branchTypeActive = $this->getBranchType()->where('company_id',$branch->company_id)->orderBY('code','asc')->get();
             $branches = $this->getBranch()->orderBY('branch_name','asc')->get();

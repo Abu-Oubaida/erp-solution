@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserCompanyPermission extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id','company_id','created_by','updated_by'];
+    protected $fillable = ['role_id','user_id','company_id','created_by','updated_by'];
 
     public function users()
     {
