@@ -57,13 +57,14 @@ class UsersACLRepository implements ACLRepository
                 ['disks' => 'file-manager', 'path' => '/', 'access' => 2],
                 ['disks' => 'file-manager', 'path' => '/*', 'access' => 2],
             ];
-            $companies = $this->getCompany()->get();
+            $companies = $this->getCompany()->where('id',Auth::user()->company)->get();
             if (count($companies) > 0) {
                 foreach ($companies as $company) {
                     array_push($array, ['disks' => 'file-manager', 'path' => $company->company_code, 'access' => 2]);
                     array_push($array, ['disks' => 'file-manager', 'path' => $company->company_code."/*", 'access' => 2]);
                 }
             }
+            return $array;
         }
         elseif (Auth::user())
         {

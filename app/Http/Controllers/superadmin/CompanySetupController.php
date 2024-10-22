@@ -19,7 +19,7 @@ use Illuminate\Validation\Rule;
 use function PHPUnit\Framework\isEmpty;
 use Illuminate\Support\Facades\File;
 
-class CompanySetup extends Controller
+class CompanySetupController extends Controller
 {
     use DeleteFileTrait, ParentTraitCompanyWise;
     public function __construct()

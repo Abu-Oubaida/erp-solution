@@ -25,7 +25,7 @@ trait ParentTraitCompanyWise
     use AuthTrait;
     protected function getUser($operation_permission_name)
     {
-        $object = User::with(['permissions','department','designation','branch','getCompany']);
+        $object = User::with(['permissions','department','designation','branch','getCompany','companyPermissions']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
@@ -129,6 +129,7 @@ trait ParentTraitCompanyWise
     protected function getCompanyModulePermissionWiseArray($operation_permission_name)
     {
         return $this->getCompanyModulePermissionWise($operation_permission_name)->pluck('id')->unique()->toArray();
+//        return $this->getCompanyModulePermissionWise($operation_permission_name)->pluck('id')->unique()->toArray();
     }
     protected function getCompany()
     {

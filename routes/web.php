@@ -16,7 +16,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesInterfaceController;
 use App\Http\Controllers\ShareDocumentViewController;
 use App\Http\Controllers\superadmin\ajaxRequestController;
-use App\Http\Controllers\superadmin\CompanySetup;
+use App\Http\Controllers\superadmin\CompanySetupController;
 use App\Http\Controllers\superadmin\DepartmentController;
 use App\Http\Controllers\superadmin\MobileSIMController;
 use App\Http\Controllers\superadmin\prorammerController;
@@ -87,7 +87,7 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::delete('permission-input-delete','delete')->name('permission.input.delete');
             });//3.2.1.1 End
             # 3.2.1.2 Company Setup
-            Route::controller(CompanySetup::class)->group(function (){
+            Route::controller(CompanySetupController::class)->group(function (){
                 Route::match(['get','post'],'company-setup','index')->name('company.setup');
                 Route::match(['get','post'],'company-add','companyAdd')->name('add.company');
                 Route::match(['get'],'company-list','companyList')->name('company.list');
@@ -99,17 +99,9 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::match(['put','get'],'company-type-edit/{companyTypeID}','companyTypeEdit')->name('edit.company.type');
                 Route::delete('company-type-delete','companyTypeDelete')->name('delete.company.type');
 
-                Route::match(['post','get'],'user-company-permission/{companyID}','userCompanyPermission')->name('user.company.permission');
-                Route::middleware(['permission:delete_user_company_permission'])->group(function (){
-                    Route::delete('user-company-permission-delete','userCompanyPermissionDelete')->name('delete.user.company.permission');
-                });
-
                 Route::middleware(['permission:company_module_permission'])->group(function (){
                     Route::match(['get','post'],'company-module-permission/{companyID}','companyModulePermission')->name('company.module.permission');
                     Route::post('parent-wise-module-permission','parentModulePermission')->name('parent.module.permission');
-                });
-                Route::middleware(['permission:company_directory_permission'])->group(function (){
-                    Route::post('company-wise-directory-permission','companyWiseDirectoryPermission')->name('company.directory.permission');
                 });
                 Route::middleware(['permission:company_module_permission_delete'])->group(function (){
                     Route::delete('company-module-permission-delete-all','companyModulePermissionDeleteAll')->name('company.module.permission.delete.all');
@@ -137,7 +129,16 @@ Route::group(['middleware' => ['auth']],function (){
                 });
             });// 3.2.1.4 End
         });//3.2.1 End
+        Route::controller(CompanySetupController::class)->group(function (){
+            Route::match(['post','get'],'user-company-permission/{companyID}','userCompanyPermission')->name('user.company.permission');
+            Route::middleware(['permission:delete_user_company_permission'])->group(function (){
+                Route::delete('user-company-permission-delete','userCompanyPermissionDelete')->name('delete.user.company.permission');
+            });
 
+            Route::middleware(['permission:company_directory_permission'])->group(function (){
+                Route::post('company-wise-directory-permission','companyWiseDirectoryPermission')->name('company.directory.permission');
+            });
+        });
         # 3.2.2 User Screen Permission Controller
         Route::controller(UserPermissionController::class)->group(function (){
             Route::middleware(['permission:add_user_screen_permission'])->group(function (){

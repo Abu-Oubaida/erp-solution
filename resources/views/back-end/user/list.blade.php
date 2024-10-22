@@ -38,7 +38,7 @@
                         <th>No</th>
                         <th>Employee ID</th>
                         <th>Name</th>
-                        <th>Company</th>
+                        <th>Companies</th>
                         <th>Branch</th>
                         <th>Joining Date</th>
                         <th>Phone</th>
@@ -55,7 +55,7 @@
                         <th>No</th>
                         <th>Employee ID</th>
                         <th>Name</th>
-                        <th>Company</th>
+                        <th>Companies</th>
                         <th>Branch</th>
                         <th>Joining Date</th>
                         <th>Phone</th>
@@ -77,7 +77,12 @@
                                 <td>{!! $i++ !!}</td>
                                 <td>{!! $u->employee_id !!}</td>
                                 <td>{!! $u->name !!}</td>
-                                <td>{!! isset($u->getCompany->company_name)?$u->getCompany->company_name:'N/A' !!}</td>
+                                <td class="text-center text-capitalize">
+                                    <span class="badge bg-success" title="Mother Company">{!! isset($u->getCompany->company_name)?$u->getCompany->company_name:'N/A' !!}</span>
+                                    @foreach(@$u->companyPermissions as $cp)
+                                        <span class="badge bg-info" title="Permission Company">{!! $cp->company->company_name !!}</span>
+                                    @endforeach
+                                </td>
                                 <td>{!! isset($u->branch->branch_name)?$u->branch->branch_name:'N/A' !!}</td>
                                 <td>{!! date('d-M-y',strtotime($u->joining_date)) !!}</td>
                                 <td>{!! $u->phone !!}</td>
@@ -87,17 +92,24 @@
                                 <td>@foreach ($u->roles as $role)
                                         {{ $role->display_name }}
                                     @endforeach</td>
-                                <td>@if($u->status == 1) {!! '<span class="text-primary">Active</span>' !!}  @else {!! '<span class="text-danger">Inactive</span>' !!} @endif</td>
+                                <td>@if($u->status == 1) {!! '<span class="badge bg-primary">Active</span>' !!}  @else {!! '<span class="badge bg-danger">Inactive</span>' !!} @endif</td>
                                 <td class="">
                                     <a href="{{route('user.single.view',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-primary" title="View"><i class='fas fa-eye'></i></a>
-                                    <a href="{{route('user.edit',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
                                     <form action="{{route('user.delete')}}" class="display-inline" method="post">
                                         @method('delete')
                                         @csrf
                                         <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($u->id) !!}">
                                         <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the user?')"><i class="fas fa-trash"></i></button>
                                     </form>
-
+                                    <div class="dropdown">
+                                        <button class="border-0 inline-block bg-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            More
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" type="button" href="{{route('user.edit',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" title="Edit"><i class='fas fa-edit'></i> Edit User</a></li>
+                                            <li><a href="" class="dropdown-item" type="button"><i class="fa-solid fa-shield-halved"></i> Company Permission</a></li>
+                                        </ul>
+                                    </div>
 {{--                                    <button type="button" class="btn btn-sm btn-primary" value="{!! $u->id !!}" onclick="return Obj.receivedComplainAction(this,'complain-action')" data-bs-toggle="modal" data-bs-target="#complain-action"> View </button>--}}
                                 </td>
                             </tr>

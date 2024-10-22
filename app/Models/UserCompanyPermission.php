@@ -18,7 +18,7 @@ class UserCompanyPermission extends Model
     {
         return $this->belongsTo(Role::class,'role_id','id');
     }
-    public function companies()
+    public function company()
     {
         return $this->belongsTo(company_info::class,'company_id','id');
     }

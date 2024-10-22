@@ -94,7 +94,7 @@ class UserController extends Controller
                 'employee_id' => ['required', 'string', 'max:255','min:6',Rule::unique('users','employee_id')->where(function ($query) use ($request) {
                     return $query->where('company',$request->post('company'));
                 })],
-                'employee_id_hidden' => ['required', 'string', 'max:255','min:6',Rule::unique('users','employee_id_hidden')->where(function ($query) use ($request) {
+                'employee_id_hidden' => ['required', 'string', 'max:255',Rule::unique('users','employee_id_hidden')->where(function ($query) use ($request) {
                     return $query->where('company',$request->post('company'));
                 })],
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
@@ -666,7 +666,7 @@ class UserController extends Controller
                 $dept = department::where('company_id',$company_id)->where('id',$department_id)->first();
                 if ($dept)
                 {
-                    $employee_id = $this->getEid($dept->first(), $joining_date, $company_id);
+                    $employee_id = $this->getEid($dept, $joining_date, $company_id);
                     return response()->json([
                         'status' => 'success',
                         'data' => $employee_id,

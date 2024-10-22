@@ -174,6 +174,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(company_info::class,'company','id');
     }
+    public function companyPermissions()
+    {
+        return $this->hasMany(UserCompanyPermission::class,'user_id','id');
+    }
 //    public function voucherTypeCreate()
 //    {
 //        return $this->hasMany(VoucherType::class,'created_by');

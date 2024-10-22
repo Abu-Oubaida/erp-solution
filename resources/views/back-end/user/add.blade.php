@@ -52,7 +52,7 @@
                                     <option value="">Pick options...</option>
                                     @if(isset($companies) || (count($companies) > 0))
                                         @foreach($companies as $c)
-                                            <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                            <option value="{{$c->id}}">{{$c->company_name}} ({!! $c->company_code !!})</option>
                                         @endforeach
                                     @endif
                                 </select>
