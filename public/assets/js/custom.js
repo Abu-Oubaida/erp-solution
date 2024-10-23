@@ -446,8 +446,9 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 })
             },
             companyChangeModulePermission: function (e){
-                let id = $(e).val()
-                if (id.length === 0)
+                let cid = $(e).val()
+                let uid = $('#user_id').val()
+                if (cid.length === 0 || uid.length === 0)
                 {
                     return false
                 }
@@ -456,10 +457,12 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,
                     type: "POST",
-                    data: {'cid':id},
+                    data: {'cid':cid,'uid':uid},
                     success: function (responses) {
                         if (responses.status === 'error') {
                             alert("Error: " +responses.message)
+                            setSelectBoxBlank('parentPermission')
+                            setSelectBoxBlank('childPermission')
                         } else {
                             let parents = responses.data;
                             updateSelectBox(parents,'parentPermission','id','display_name')
@@ -1407,8 +1410,9 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             },
             companyDirectoryPermission:function (e)
             {
-                let id = $(e).val()
-                if (id.length === 0)
+                let cid = $(e).val()
+                let uid = $(e).attr('ref')
+                if (cid.length === 0 || uid.length === 0)
                 {
                     return false
                 }
@@ -1417,7 +1421,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     url: url,
                     headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
                     method: "POST",
-                    data:{'id':id},
+                    data:{'cid':cid,'uid':uid},
                     success:function (response)
                     {
                         if (response.status === 'error')

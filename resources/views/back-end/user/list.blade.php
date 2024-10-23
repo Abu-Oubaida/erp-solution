@@ -94,19 +94,25 @@
                                     @endforeach</td>
                                 <td>@if($u->status == 1) {!! '<span class="badge bg-primary">Active</span>' !!}  @else {!! '<span class="badge bg-danger">Inactive</span>' !!} @endif</td>
                                 <td class="">
+                                    @if(auth()->user()->hasPermission('view_user'))
                                     <a href="{{route('user.single.view',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" class="text-primary" title="View"><i class='fas fa-eye'></i></a>
+                                    @endif
+                                    @if(auth()->user()->hasPermission('delete_user'))
                                     <form action="{{route('user.delete')}}" class="display-inline" method="post">
                                         @method('delete')
                                         @csrf
                                         <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($u->id) !!}">
                                         <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the user?')"><i class="fas fa-trash"></i></button>
                                     </form>
+                                    @endif
                                     <div class="dropdown">
                                         <button class="border-0 inline-block bg-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             More
                                         </button>
                                         <ul class="dropdown-menu">
+                                            @if(auth()->user()->hasPermission('edit_user'))
                                             <li><a class="dropdown-item" type="button" href="{{route('user.edit',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" title="Edit"><i class='fas fa-edit'></i> Edit User</a></li>
+                                            @endif
                                             <li><a href="" class="dropdown-item" type="button"><i class="fa-solid fa-shield-halved"></i> Company Permission</a></li>
                                         </ul>
                                     </div>

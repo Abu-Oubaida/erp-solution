@@ -23,6 +23,10 @@ use Illuminate\Database\Eloquent\Builder;
 trait ParentTraitCompanyWise
 {
     use AuthTrait;
+    protected function getSelfInfo()
+    {
+        return User::with(['permissions','department','designation','branch','getCompany','companyPermissions'])->where('id',$this->user->id)->first();
+    }
     protected function getUser($operation_permission_name)
     {
         $object = User::with(['permissions','department','designation','branch','getCompany','companyPermissions']);

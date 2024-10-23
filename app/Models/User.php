@@ -43,7 +43,7 @@ class User extends Authenticatable
     ];
     public function getCompanyIdAttribute()
     {
-        return session('company_id');
+        return (int) session('company_id');
     }
 
     public function permissions()
@@ -54,10 +54,7 @@ class User extends Authenticatable
 
     public function hasPermission($permission)
     {
-        // Implement your permission check logic here
-//        dd($this->defaultPermissions()->get());
-        return $this->isSystemSuperAdmin()|| $this->defaultPermissions($permission)->exists() || $this->permissions()->where('permission_name', $permission)->where('company_id',Auth::user()->company)->exists();
-//        return $this->isSystemSuperAdmin()|| $this->permissions()->where('permission_name', $permission)->where('company_id',Auth::user()->company)->exists();
+        return $this->isSystemSuperAdmin()|| $this->defaultPermissions($permission)->exists() || $this->permissions()->where('permission_name', $permission)->where('company_id',Auth::user()->getCompanyIdAttribute())->exists();
     }
     public function defaultPermissions($permission)
     {
@@ -67,15 +64,13 @@ class User extends Authenticatable
             return Permission::whereIn('id',$companyModulePermissionArray)->where('name',$permission);
         }
         else{
-            return RoleWiseDefaultPermission::where('company_id',Auth::user()->company)->where('permission_name',$permission);
+            return RoleWiseDefaultPermission::where('company_id',Auth::user()->getCompanyIdAttribute())->where('permission_name',$permission);
         }
-
-
     }
 
     public function companyModulePermissions()
     {
-        return CompanyModulePermission::where('company_id',Auth::user()->company);
+        return CompanyModulePermission::where('company_id',Auth::user()->getCompanyIdAttribute());
     }
     public function isSuperAdmin()
     {
@@ -88,33 +83,22 @@ class User extends Authenticatable
     }
     public function getUserType()
     {
-        if (Auth::user() !== null) {
-//            $company_permission = UserCompanyPermission::with(['userRole','companies'])->where('user_id',Auth::user()->id)->first();
-//            if (isset($company_permission->userRole))
-//            {
-//                return $company_permission->userRole->name;
-//            }
-//            else
-//            {
-                $roles = $this->roles;
-                // Assuming a user has only one role, you can return its name
-                if ($roles->count() > 0) {
-                    return $roles->first()->name;
-                }
+        if ($this->company == $this->getCompanyIdAttribute()) {
 
-                return 'User'; // Default user type if no role is associated
-//            }
-        }else
-        {
-            $roles = $this->roles;
-
+            return (($roles = $this->belongsToMany(Role::class,'role_user','user_id','role_id'))->count() > 0)? $roles->first()->name : null;
+        }
+        else{
+            $roles = $this->companyWiseRoles;
             // Assuming a user has only one role, you can return its name
             if ($roles->count() > 0) {
                 return $roles->first()->name;
             }
-
-            return 'User'; // Default user type if no role is associated
         }
+//        $roles = $this->roles;
+//        // Assuming a user has only one role, you can return its name
+//        if ($roles->count() > 0) {
+//            return $roles->first()->name;
+//        }
 
     }
 //    public function roles()
@@ -128,14 +112,23 @@ class User extends Authenticatable
     }
     public function companyWiseRoleName()
     {
-        $roles = $this->companyWiseRoles;
-
-        // Assuming a user has only one role, you can return its name
-        if ($roles->count() > 0) {
-            return $roles->first()->name;
+        if ($this->isSystemSuperAdmin())
+        {
+            return $this->roles->first()->name;
         }
+        else{
+            if ($this->company == $this->getCompanyIdAttribute()) {
 
-        return 'User'; // Default user type if no role is associated
+                return (($roles = $this->belongsToMany(Role::class,'role_user','user_id','role_id'))->count() > 0)? $roles->first()->name : null;
+            }
+            else{
+                $roles = $this->companyWiseRoles;
+                // Assuming a user has only one role, you can return its name
+                if ($roles->count() > 0) {
+                    return $roles->first()->name;
+                }
+            }
+        }
     }
     public function department()
     {
@@ -170,10 +163,34 @@ class User extends Authenticatable
 //    {
 //        return $this->belongsTo(company_info::class,'company','id');
 //    }
+    public function primaryCompany()
+    {
+        return $this->belongsTo(company_info::class, 'company', 'id');
+    }
+
+    public function permittedCompanies()
+    {
+        return $this->belongsToMany(
+            company_info::class,
+            'user_company_permissions',
+            'user_id',
+            'company_id'
+        );
+    }
     public function companyInfo()
     {
-        return $this->belongsTo(company_info::class,'company','id');
+        if ($this->getCompanyIdAttribute() == $this->company || $this->isSystemSuperAdmin()) {
+            return $this->primaryCompany()->first();  // For belongsTo
+        } else {
+            return $this->permittedCompanies()
+                ->where('company_infos.id', $this->getCompanyIdAttribute())
+                ->first();  // For belongsToMany
+        }
     }
+//    public function company()
+//    {
+//        return $this->belongsTo(company_info::class,'company','id');
+//    }
     public function companyPermissions()
     {
         return $this->hasMany(UserCompanyPermission::class,'user_id','id');

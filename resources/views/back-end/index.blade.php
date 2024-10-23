@@ -35,7 +35,7 @@
                                             </tr>
                                             <tr>
                                                 <th>Access Role:</th>
-                                                <td>{!! $user->roles->first()->display_name !!}</td>
+                                                <td>{!! $user->roles->first()->display_name !!} <b>({!! $user->getCompany->company_name !!})</b></td>
                                             </tr>
                                             <tr>
                                                 <th>Account Status:</th>

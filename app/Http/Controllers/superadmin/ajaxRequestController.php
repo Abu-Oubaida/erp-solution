@@ -9,6 +9,7 @@ use App\Models\company_info;
 use App\Models\CompanyModulePermission;
 use App\Models\DocumentShareLinkEmail;
 use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
 use App\Models\userProjectPermission;
@@ -117,7 +118,7 @@ class ajaxRequestController extends Controller
                     }],
                 ]);
                 extract($request->post());
-                $companyModulePermissionChild = CompanyModulePermission::select('module_id')->where('company_id',$company_id)->whereIn('module_parent_id',$pids)->get();
+                $companyModulePermissionChild = CompanyModulePermission::select('module_id')->where('company_id',$company_id)->whereIn('module_parent_id',$pids)->orWhereIn('module_id',$pids)->get();
 //                dd($companyModulePermissionChild);
 //                if ($pid == 0)
 //                {
@@ -151,9 +152,25 @@ class ajaxRequestController extends Controller
         try {
             if ($request->isMethod('post')) {
                 $request->validate([
+                    'uid'=> ['required','string','exists:users,id'],
                     'cid'=> ['required','string','exists:company_infos,id'],
                 ]);
                 extract($request->post());
+                $user = User::where('id',$uid)->first();
+                if ($user->company == $cid)
+                {
+                    $userRole = $user->roles->first();
+                }
+                else {
+                    $userRole = UserCompanyPermission::with(['userRole'])->where('user_id',$uid)->where('company_id',$cid)->first()->userRole;
+                }
+                if ($userRole->name == 'superadmin')
+                {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => "Selected user ($user->name) is a Super Admin for selected company, No need to add any permission."
+                    ]);
+                }
                 $companyWiseParentPermission = CompanyModulePermission::select('module_parent_id')->where('company_id',$cid)->distinct()->get();
                 $permissionParents = Permission::whereIn('id',$companyWiseParentPermission)->where('parent_id',null)->get();
                 return response()->json([

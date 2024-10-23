@@ -51,7 +51,9 @@
                                             {{--                    Only Designaton Related Menu and Submenu is here--}}
                                             @include('layouts.back-end.sidebar-components.interface._designation_menu_submenu')
                                             @include('layouts.back-end.sidebar-components.interface._branch_menu_submenu')
+                                        @if(auth()->user()->hasPermission('role_management'))
                                             @include('layouts.back-end.sidebar-components.interface._role_management')
+                                        @endif
                                         </nav>
                                     </div>
                     </subgroup1>{{--#2.2.1.1   Route/URL Chck and set navigation header User Management End--}}
@@ -254,8 +256,8 @@
         <div class="small">
             Welcome Mr./Ms. {{\Illuminate\Support\Facades\Auth::user()->name}}
         </div>
-        <div class="small">Logged in
-            as: {!! \Illuminate\Support\Facades\Auth::user()->roles->first()->display_name !!}</div>
+{{--        <div class="small">Logged in as: {!! \Illuminate\Support\Facades\Auth::user()->roles->first()->display_name !!}</div>--}}
+        <div class="small">Logged in as: <span class="text-capitalize">{!! \Illuminate\Support\Facades\Auth::user()->companyWiseRoleName() !!}</span></div>
         <a href="https://github.com/abuoubaida" class="text-decoration-none text-chl" title="Abu Oubaida, MIS Dept.">Oubaida
             ❤️
         </a>{{config('app.name')}} {{date('Y')}}

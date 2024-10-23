@@ -14,18 +14,24 @@
             <div class="collapse" id="roles" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
                 @endif
                 <nav class="sb-sidenav-menu-nested nav">
+                @if(auth()->user()->hasPermission('add_role'))
                     @if(Route::currentRouteName() == 'add.role')
                         <a class="nav-link" href="{{route('add.role')}}"><div class="sb-nav-link-icon"><i class="fas fa-plus"></i></div> Add Role</a>
                     @else
                         <a class="nav-link text-chl" href="{!! route('add.role') !!}"><div class="sb-nav-link-icon"><i class="fas fa-plus"></i></div> Add Role</a>
                     @endif
+                @endif
+                @if(auth()->user()->hasPermission('role_list'))
                     @if(Route::currentRouteName() == 'role.list')
                         <a class="nav-link" href="{{route('role.list')}}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> Role List</a>
                     @else
                         <a class="nav-link text-chl" href="{!! route('role.list') !!}"><div class="sb-nav-link-icon"><i class="fas fa-list"></i></div> Role List</a>
                     @endif
+                @endif
+                @if(auth()->user()->hasPermission('edit_role'))
                     @if(Route::currentRouteName() == 'edit.role')
                         <a class="nav-link" href="{{route('edit.role',['roleID'=>\Illuminate\Support\Facades\Request::route('roleID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Edit Role</a>
                     @endif
+                @endif
                 </nav>
             </div>

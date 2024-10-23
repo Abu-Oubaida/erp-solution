@@ -85,12 +85,11 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name'  => ['required', 'string', 'max:255'],
-                'phone' => ['required', 'numeric','regex:/^(01[3-9]\d{8})$/', Rule::unique('users','phone')->where(function ($query) use ($request) {
-                    return $query->where('company',$request->post('company'));
-                })],
-                'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users','email')->where(function ($query) use ($request) {
-                    return $query->where('company',$request->post('company'));
-                })],
+                'phone' => ['required', 'numeric','regex:/^(01[3-9]\d{8})$/', Rule::unique('users','phone')],
+                'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users','email')],
+//                'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users','email')->where(function ($query) use ($request) {
+//                    return $query->where('company',$request->post('company'));
+//                })],
                 'employee_id' => ['required', 'string', 'max:255','min:6',Rule::unique('users','employee_id')->where(function ($query) use ($request) {
                     return $query->where('company',$request->post('company'));
                 })],
@@ -161,9 +160,7 @@ class UserController extends Controller
                 '*.6'   =>  ['required','numeric','regex:/^(01[3-9]\d{8})$/', Rule::unique('users','phone')->where(function ($query) {
                     return $query->where('company',$this->user->company);
                 }),],
-                '*.7'   =>  ['sometimes','nullable', 'email', 'max:255', Rule::unique('users','email')->where(function ($query) {
-                    return $query->where('company',$this->user->company);
-                })],
+                '*.7'   =>  ['sometimes','nullable', 'email', 'max:255', Rule::unique('users','email')],
                 '*.8'   =>  ['sometimes','nullable','numeric'],
                 '*.9'   =>  ['sometimes','nullable','exists:blood_groups,blood_type'],
             ];
@@ -282,7 +279,7 @@ class UserController extends Controller
 
     public function SingleView($id)
     {
-//        try {
+        try {
             $userID = Crypt::decryptString($id);
 //            dd($this->list_user);
             $user = $this->getUser($this->view_user)->where('id',$userID)->first();
@@ -296,11 +293,11 @@ class UserController extends Controller
             $designations = $this->getDesignation()->where('company_id',$user->company)->where('status',1)->get();
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
             $branches = $this->getBranch()->where('company_id',$user->company)->where('status',1)->get();
-            return view('back-end.user.single-view',compact('user','filPermission','roles','deptLists','userPermissions','designations','branches','userCompanies'));
-//        }catch (\Throwable $exception)
-//        {
-//            return back()->with('error',$exception->getMessage());
-//        }
+            return view('back-end.user.single-view',compact('user','filPermission','roles','deptLists','userPermissions','designations','branches','userCompanies'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
 
     }
 

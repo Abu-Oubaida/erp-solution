@@ -64,9 +64,12 @@
                                         </tr>
                                         <tr>
                                             <th>Access Role:</th>
-                                            <td>@foreach ($user->roles as $role)
+                                            <td>
+                                                @foreach ($user->roles as $role)
                                                     {{ $roleNew = $role->display_name }}
-                                                @endforeach</td>
+                                                @endforeach
+                                                <b>({!! $user->getCompany->company_name !!})</b>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th>Email:</th>
@@ -209,7 +212,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        @if(strtolower($roleNew) == strtolower('systemsuperadmin') || strtolower($roleNew) == strtolower('superadmin'))
+                        @if(strtolower($roleNew) == strtolower('systemsuperadmin'))
                             <div class="col-md-12">
                                 <strong class="text-center text-info">System/Super Admin has all the permissions by default! </strong>
                             </div>
@@ -229,7 +232,7 @@
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <label for="user">For User</label>
-                                                    <select class="form-control select-search" id="user" name="user_id">
+                                                    <select class="form-control select-search" id="user_id" name="user_id">
                                                         <option value="{!! $user->id !!}" selected>{!! $user->name !!}</option>
                                                     </select>
                                                 </div>
@@ -286,7 +289,7 @@
                                                             <td>{!! $i++ !!}</td>
                                                             <td>{!! $p->company->company_name !!}</td>
                                                             <td>
-                                                                <span class="text-capitalize"> {!! $p->permissionParent->display_name !!}</span>
+                                                                <span class="text-capitalize"> {!! @$p->permissionParent->display_name !!}</span>
                                                             </td>
                                                             <td>
                                                         <span class="text-capitalize">
@@ -341,7 +344,7 @@
                                 </div>
                             </div>
                         @else
-                            @if(strtolower($roleNew) == strtolower('systemsuperadmin') || strtolower($roleNew) == strtolower('superadmin'))
+                            @if(strtolower($roleNew) == strtolower('systemsuperadmin'))
                                 <div class="row">
                                     <div class="col-md-12">
                                         <strong class="text-center text-info">System/Super Admin has all the permissions by default! </strong>
@@ -351,7 +354,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="company_id">For Company</label>
-                                        <select class="form-control select-search" id="company_id" name="company_id" onchange="return Obj.companyDirectoryPermission(this)">
+                                        <select class="form-control select-search" id="company_id" name="company_id" ref="{!! $user->id !!}" onchange="return Obj.companyDirectoryPermission(this)">
                                             <option value="">--Select Option--</option>
                                             @if(count($userCompanies))
                                                 @foreach($userCompanies as $uc)

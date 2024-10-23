@@ -668,10 +668,26 @@ class CompanySetupController extends Controller
             if ($request->isMethod('post'))
             {
                 $request->validate([
-                    'id' => ['required','numeric'],
+                    'uid' => ['required','numeric'],
+                    'cid' => ['required','numeric'],
                 ]);
                 extract($request->post());
-                $company = $this->getCompany()->where('id',$id)->first();
+                $user = User::where('id',$uid)->first();
+                if ($user->company == $cid)
+                {
+                    $userRole = $user->roles->first();
+                }
+                else {
+                    $userRole = UserCompanyPermission::with(['userRole'])->where('user_id',$uid)->where('company_id',$cid)->first()->userRole;
+                }
+                if ($userRole->name == 'superadmin')
+                {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => "Selected user ($user->name) is a Super Admin for selected company, No need to add any permission."
+                    ]);
+                }
+                $company = $this->getCompany()->where('id',$cid)->first();
                 $dir = config('app.file_manager_url').'/'.$company->company_code;
                 ($dir)?$fileManagers = scandir($dir):$fileManagers = ['Not Found'];
                 unset($fileManagers[0]);
