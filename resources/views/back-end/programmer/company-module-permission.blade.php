@@ -11,8 +11,11 @@
     <div class="card mb-4">
         <div class="card-header">
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col">
                     <h3 class="text-capitalize"><i class="fa-solid fa-city"></i> Company Info</h3>
+                </div>
+                <div class="col">
+                    <a href="{!! route('user.company.permission',['companyID'=> \Illuminate\Support\Facades\Crypt::encryptString($company->id)]) !!}" class="btn btn-sm btn-outline-success float-end mt-2"> <i class="fas fa-shield"></i> User Permission</a>
                 </div>
             </div>
         </div>

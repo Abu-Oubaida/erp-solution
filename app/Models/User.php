@@ -79,7 +79,7 @@ class User extends Authenticatable
     }
     public function isSystemSuperAdmin()
     {
-        return $this->getUserType() === 'systemsuperadmin';
+        return $this->roles()->first()->name === 'systemsuperadmin';
     }
     public function getUserType()
     {
@@ -101,10 +101,10 @@ class User extends Authenticatable
 //        }
 
     }
-//    public function roles()
-//    {
-//        return $this->belongsToMany(Role::class,'role_user','user_id','role_id');
-//    }
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class,'role_user','user_id','role_id');
+    }
 
     public function companyWiseRoles()
     {
@@ -170,11 +170,7 @@ class User extends Authenticatable
 
     public function permittedCompanies()
     {
-        return $this->belongsToMany(
-            company_info::class,
-            'user_company_permissions',
-            'user_id',
-            'company_id'
+        return $this->belongsToMany(company_info::class, 'user_company_permissions', 'user_id', 'company_id'
         );
     }
     public function companyInfo()
@@ -182,9 +178,7 @@ class User extends Authenticatable
         if ($this->getCompanyIdAttribute() == $this->company || $this->isSystemSuperAdmin()) {
             return $this->primaryCompany()->first();  // For belongsTo
         } else {
-            return $this->permittedCompanies()
-                ->where('company_infos.id', $this->getCompanyIdAttribute())
-                ->first();  // For belongsToMany
+            return $this->permittedCompanies()->where('company_infos.id', $this->getCompanyIdAttribute())->first();  // For belongsToMany
         }
     }
 //    public function company()

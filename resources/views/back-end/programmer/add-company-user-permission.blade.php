@@ -10,7 +10,14 @@
     </ol>
     <div class="card mb-3">
         <div class="card-header">
-            <h3><i class="fa-solid fa-city"></i> Selected Company Information</h3>
+            <div class="row">
+                <div class="col">
+                    <h3><i class="fa-solid fa-city"></i> Selected Company Information</h3>
+                </div>
+                <div class="col">
+                    <a href="{!! route('company.module.permission',['companyID'=> \Illuminate\Support\Facades\Crypt::encryptString($company->id)]) !!}" class="btn btn-sm btn-outline-success float-end mt-2"> <i class="fas fa-shield"></i> Company Module Permission</a>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <table class="table">
