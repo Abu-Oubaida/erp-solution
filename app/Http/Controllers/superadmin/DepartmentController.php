@@ -43,12 +43,13 @@ class DepartmentController extends Controller
     public function create(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_department;
             if ($request->post())
             {
                 $this->store($request);
             }
-            $companies = $this->getCompanyModulePermissionWise($this->permissions()->add_department)->get();
-            $deplist = $this->getDepartment($this->permissions()->add_department)->get();
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            $deplist = $this->getDepartment($permission)->get();
             return view("back-end/department/add",compact('deplist','companies'))->render();
         }catch (\Throwable $exception) {
             return back()->with('error', $exception->getMessage());
@@ -65,6 +66,7 @@ class DepartmentController extends Controller
     {
         //
         try {
+            $permission = $this->permissions()->add_department;
             $request->validate([
                 'dept_name'  => ['required', 'string', 'max:255',Rule::unique('departments')->where(function ($query) use ($request) {
                     return $query->where('company_id', $request->post('company'));
@@ -79,7 +81,7 @@ class DepartmentController extends Controller
             extract($request->post());
             if ($company == $this->user->company_id || ($this->user->isSystemSuperAdmin()))
             {
-                $this->getDepartment($this->permissions()->add_department)->create([
+                $this->getDepartment($permission)->create([
                     'company_id'=> $company,
                     'dept_name' => $dept_name,
                     'dept_code' => $dept_code,
@@ -116,14 +118,15 @@ class DepartmentController extends Controller
     public function edit(Request $request,$id)
     {
         try {
+            $permission = $this->permissions()->edit_department;
             $id = Crypt::decryptString($id);
             if ($request->isMethod('put'))
             {
                 return $this->update($request,$id);
             }
-            $companies = $this->getCompanyModulePermissionWise($this->permissions()->edit_department)->get();
-            $deplist= $this->getDepartment($this->permissions()->edit_department)->get();
-            $department = $this->getDepartment($this->permissions()->edit_department)->find($id);
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            $deplist= $this->getDepartment($permission)->get();
+            $department = $this->getDepartment($permission)->find($id);
             return view("back-end/department/edit",compact('department','companies','deplist'))->render();
         }catch (\Throwable $exception) {
             return back()->with('error', $exception->getMessage());
@@ -140,6 +143,7 @@ class DepartmentController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $permission = $this->permissions()->edit_department;
             $request->validate([
                 'dept_name'  => ['required', 'string', 'max:255',Rule::unique('departments')->where(function ($query) use ($request) {
                     return $query->where('company_id', $request->post('company'));
@@ -154,7 +158,7 @@ class DepartmentController extends Controller
             extract($request->post());
             if ($company == $this->user->company_id || ($this->user->isSystemSuperAdmin()))
             {
-                $this->getDepartment($this->permissions()->edit_department)->where("id",$id)->update([
+                $this->getDepartment($permission)->where("id",$id)->update([
                     'dept_name' => $dept_name,
                     'dept_code' => $dept_code,
                     'status' => $status,
@@ -182,15 +186,16 @@ class DepartmentController extends Controller
     public function destroy(Request $request)
     {
         try {
+            $permission = $this->permissions()->delete_department;
             if ($request->isMethod('delete'))
             {
                 $request->validate(['id'=>['required','string',Rule::exists('departments','id')]]);
                 extract($request->post());
-                if (count($this->getDepartment($this->permissions()->delete_department)->where("id",$id)->first()->getUsers))
+                if (count($this->getDepartment($permission)->where("id",$id)->first()->getUsers))
                 {
                     return back()->with('warning','Deletion not possible! A relationship exists.');
                 }
-                $this->getDepartment($this->permissions()->delete_department)->where("id",$id)->delete();
+                $this->getDepartment($permission)->where("id",$id)->delete();
                 return redirect(route('add.department'))->with('success','Data deleted successfully');
             }
             return back()->with('error','Requested Method Not Allowed');

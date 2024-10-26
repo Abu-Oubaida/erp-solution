@@ -43,12 +43,13 @@ class BranchTypeController extends Controller
     public function create(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_branch_type;
             if ($request->isMethod('post'))
             {
                 return $this->store($request);
             }
-            $companies = $this->getCompanyModulePermissionWise($this->permissions()->add_branch_type)->get();
-            $branchTypeAll = $this->getBranchType($this->permissions()->add_branch_type)->orderBY('code','asc')->get();
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            $branchTypeAll = $this->getBranchType($permission)->orderBY('code','asc')->get();
             return view('back-end.branch.add-type',compact('branchTypeAll','companies'))->render();
         }catch (\Throwable $exception)
         {
@@ -64,6 +65,7 @@ class BranchTypeController extends Controller
     {
         //
         try {
+            $permission = $this->permissions()->add_branch_type;
             $request->validate([
                 'company' => ['required','string','exists:company_infos,id'],
                 'branch_type_title' =>  ['required','string',Rule::unique('branch_types','title')->where(function ($query) use($request){return $query->where('company_id',$request->post('company'));})],
@@ -76,7 +78,7 @@ class BranchTypeController extends Controller
                 $status = 1;
             else
                 $status = 0;
-            $this->getBranchType($this->permissions()->add_branch_type)->create([
+            $this->getBranchType($permission)->create([
                 'company_id'=>$company,'status'=>$status,'title'=>$branch_type_title,'code'=>$branch_type_code,'remarks'=>$remarks,'created_by'=> $this->user->id
             ]);
             return back()->with('success','Data added successfully');
@@ -101,12 +103,13 @@ class BranchTypeController extends Controller
     public function edit(Request $request, $id)
     {
         try {
+            $permission = $this->permissions()->edit_branch_type;
             if ($request->isMethod('put'))
             {
                 return $this->update($request,$id);
             }
-            $branchType = $this->getBranchType($this->permissions()->edit_branch_type)->where('id',Crypt::decryptString($id))->first();
-            $branchTypeAll = $this->getBranchType($this->permissions()->edit_branch_type)->orderBY('code','asc')->get();
+            $branchType = $this->getBranchType($permission)->where('id',Crypt::decryptString($id))->first();
+            $branchTypeAll = $this->getBranchType($permission)->orderBY('code','asc')->get();
             return view('back-end.branch.branch_type_edit',compact('branchTypeAll','branchType'))->render();
         }catch (\Throwable $exception)
         {
@@ -124,8 +127,8 @@ class BranchTypeController extends Controller
     public function update(Request $request,$id)
     {
         try {
+            $permission = $this->permissions()->edit_branch_type;
             $request->validate([
-
                 'company' => ['required','string','exists:company_infos,id'],
                 'branch_type_title' =>  ['required','string',Rule::unique('branch_types','title')->where(function ($query) use($request){return $query->where('company_id',$request->post('company'));})->ignore(Crypt::decryptString($id))],
                 'branch_type_code' =>  ['required','string', Rule::unique('branch_types','code')->where(function ($query) use($request) {return $query->where('company_id',$request->post('company'));})->ignore(Crypt::decryptString($id))],
@@ -138,7 +141,7 @@ class BranchTypeController extends Controller
                 $status = 1;
             else
                 $status = 0;
-            $this->getBranchType($this->permissions()->edit_branch_type)->where('id',$typeID)->update([
+            $this->getBranchType($permission)->where('id',$typeID)->update([
 //                'company' => $company,
                 'status'=>$status,
                 'title'=>$branch_type_title,
@@ -160,13 +163,14 @@ class BranchTypeController extends Controller
     public function destroy(Request $request)
     {
         try {
+            $permission = $this->permissions()->delete_branch_type;
             extract($request->post());
-            $branchTypeChild = $this->getBranchType($this->permissions()->delete_branch_type)->where('id',Crypt::decryptString($id))->first();
+            $branchTypeChild = $this->getBranchType($permission)->where('id',Crypt::decryptString($id))->first();
             if(count($branchTypeChild->getBranches))
             {
                 return back()->with('warning','Deletion not possible! A relationship exists.');
             }
-            $this->getBranchType($this->permissions()->delete_branch_type)->where('id',Crypt::decryptString($id))->delete();
+            $this->getBranchType($permission)->where('id',Crypt::decryptString($id))->delete();
             return redirect()->route('branch.list')->with('success','Data delete successfully');
         }catch (\Throwable $exception)
         {

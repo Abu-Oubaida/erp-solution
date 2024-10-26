@@ -70,14 +70,15 @@ class BranchController extends Controller
     public function create(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_branch;
             if ($request->isMethod('post'))
             {
                 return $this->store($request);
             }
-            $companies = $this->getCompanyModulePermissionWise($this->permissions()->add_branch)->get();
-            $branches = $this->getBranch($this->permissions()->add_branch)->orderBY('branch_name','asc')->get();
-            $branchTypeAll = $this->getBranchType($this->permissions()->add_branch)->orderBY('code','asc')->get();
-            $branchTypeActive = $this->getBranchType($this->permissions()->add_branch)->where('status',1)->orderBY('code','asc')->get();
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            $branches = $this->getBranch($permission)->orderBY('branch_name','asc')->get();
+            $branchTypeAll = $this->getBranchType($permission)->orderBY('code','asc')->get();
+            $branchTypeActive = $this->getBranchType($permission)->where('status',1)->orderBY('code','asc')->get();
             return view('back-end.branch.add',compact('branchTypeActive','branchTypeAll','branches','companies'))->render();
         }catch (\Throwable $exception)
         {
@@ -93,6 +94,7 @@ class BranchController extends Controller
     public function store(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_branch;
             $request->validate([
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
                 'branch_name'   => ['required','string',Rule::unique('branches','branch_name')->where(function ($query) use($request){return $query->where('company_id',$request->post('company'));})],
@@ -106,7 +108,7 @@ class BranchController extends Controller
                 $status = 1;
             else
                 $status = 0;
-            $this->getBranch($this->permissions()->add_branch)->create([
+            $this->getBranch($permission)->create([
                 'company_id' => $company,
                 'branch_name'   =>  $branch_name,
                 'branch_type'   =>  $branch_type,
@@ -140,18 +142,19 @@ class BranchController extends Controller
     public function edit(Request $request,$id)
     {
         try {
+            $permission = $this->permissions()->edit_branch;
             if ($request->isMethod('put'))
             {
                 return $this->update($request,$id);
             }
             $id = Crypt::decryptString($id);
-            $companies = $this->getCompanyModulePermissionWise($this->permissions()->edit_branch)->get();
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
             //need to work if permission dose not exit edit not possible.
 
 
-            $branch = $this->getBranch($this->permissions()->edit_branch)->where('id',$id)->first();
-            $branchTypeActive = $this->getBranchType($this->permissions()->edit_branch)->where('company_id',$branch->company_id)->orderBY('code','asc')->get();
-            $branches = $this->getBranch($this->permissions()->edit_branch)->orderBY('branch_name','asc')->get();
+            $branch = $this->getBranch($permission)->where('id',$id)->first();
+            $branchTypeActive = $this->getBranchType($permission)->where('company_id',$branch->company_id)->orderBY('code','asc')->get();
+            $branches = $this->getBranch($permission)->orderBY('branch_name','asc')->get();
             return view('back-end/branch/edit',compact('branch','branchTypeActive','branches','companies'))->render();
         }catch (\Throwable $exception)
         {
@@ -167,6 +170,7 @@ class BranchController extends Controller
     {
         //
         try {
+            $permission = $this->permissions()->edit_branch;
             $request->validate([
                 'company'=> ['required', 'integer', 'exists:company_infos,id'],
                 'branch_name'   => ['required','string', Rule::unique('branches', 'branch_name')->where(function ($query) use ($request) {return $query->where('company_id',$request->post('company'));})->ignore(Crypt::decryptString($id))],
@@ -181,7 +185,7 @@ class BranchController extends Controller
                 $status = 1;
             else
                 $status = 0;
-            $this->getBranch($this->permissions()->edit_branch)->where('id',$branchID)->update([
+            $this->getBranch($permission)->where('id',$branchID)->update([
                 'company_id' => $company,
                 'branch_name'   =>  $branch_name,
                 'branch_type'   =>  $branch_type,
@@ -205,15 +209,16 @@ class BranchController extends Controller
     public function destroy(Request $request)
     {
         try {
+            $permission = $this->permissions()->delete_branch;
             if (request()->isMethod('delete'))
             {
                 extract($request->post());
                 $id = Crypt::decryptString($id);
-                if (count($this->getBranch($this->permissions()->delete_branch)->where('id',$id)->first()->getUsers())>0)
+                if (count($this->getBranch($permission)->where('id',$id)->first()->getUsers())>0)
                 {
                     return back()->with('warning','Deletion not possible! A relationship exists.');
                 }
-                $this->getBranch($this->permissions()->delete_branch)->where('id',$id)->delete();
+                $this->getBranch($permission)->where('id',$id)->delete();
                 return back()->with('success','Data deleted successfully!');
             }
             return back()->with('error','Requested method not allowed!');
