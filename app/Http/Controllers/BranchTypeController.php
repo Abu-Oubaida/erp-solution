@@ -28,8 +28,8 @@ class BranchTypeController extends Controller
     public function index()
     {
         try {
-            $branches = $this->getBranch()->orderBY('branch_name','asc')->get();
-            $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
+            $branches = $this->getBranch($this->permissions()->list_branch)->orderBY('branch_name','asc')->get();
+            $branchTypeAll = $this->getBranchType($this->permissions()->list_branch_type)->orderBY('code','asc')->get();
             return view('back-end.branch.list',compact('branches','branchTypeAll'))->render();
         }catch (\Throwable $exception){
             return back()->with('error', $exception->getMessage());
@@ -47,8 +47,8 @@ class BranchTypeController extends Controller
             {
                 return $this->store($request);
             }
-            $companies = $this->getCompany()->get();
-            $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
+            $companies = $this->getCompanyModulePermissionWise($this->permissions()->add_branch_type)->get();
+            $branchTypeAll = $this->getBranchType($this->permissions()->add_branch_type)->orderBY('code','asc')->get();
             return view('back-end.branch.add-type',compact('branchTypeAll','companies'))->render();
         }catch (\Throwable $exception)
         {
@@ -76,7 +76,7 @@ class BranchTypeController extends Controller
                 $status = 1;
             else
                 $status = 0;
-            $this->getBranchType()->create([
+            $this->getBranchType($this->permissions()->add_branch_type)->create([
                 'company_id'=>$company,'status'=>$status,'title'=>$branch_type_title,'code'=>$branch_type_code,'remarks'=>$remarks,'created_by'=> $this->user->id
             ]);
             return back()->with('success','Data added successfully');
@@ -105,8 +105,8 @@ class BranchTypeController extends Controller
             {
                 return $this->update($request,$id);
             }
-            $branchType = $this->getBranchType()->where('id',Crypt::decryptString($id))->first();
-            $branchTypeAll = $this->getBranchType()->orderBY('code','asc')->get();
+            $branchType = $this->getBranchType($this->permissions()->edit_branch_type)->where('id',Crypt::decryptString($id))->first();
+            $branchTypeAll = $this->getBranchType($this->permissions()->edit_branch_type)->orderBY('code','asc')->get();
             return view('back-end.branch.branch_type_edit',compact('branchTypeAll','branchType'))->render();
         }catch (\Throwable $exception)
         {
@@ -138,7 +138,7 @@ class BranchTypeController extends Controller
                 $status = 1;
             else
                 $status = 0;
-            $this->getBranchType()->where('id',$typeID)->update([
+            $this->getBranchType($this->permissions()->edit_branch_type)->where('id',$typeID)->update([
 //                'company' => $company,
                 'status'=>$status,
                 'title'=>$branch_type_title,
@@ -161,12 +161,12 @@ class BranchTypeController extends Controller
     {
         try {
             extract($request->post());
-            $branchTypeChild = $this->getBranchType()->where('id',Crypt::decryptString($id))->first();
+            $branchTypeChild = $this->getBranchType($this->permissions()->delete_branch_type)->where('id',Crypt::decryptString($id))->first();
             if(count($branchTypeChild->getBranches))
             {
                 return back()->with('warning','Deletion not possible! A relationship exists.');
             }
-            $this->getBranchType()->where('id',Crypt::decryptString($id))->delete();
+            $this->getBranchType($this->permissions()->delete_branch_type)->where('id',Crypt::decryptString($id))->delete();
             return redirect()->route('branch.list')->with('success','Data delete successfully');
         }catch (\Throwable $exception)
         {

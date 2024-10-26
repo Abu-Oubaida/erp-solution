@@ -20,7 +20,7 @@
                 <td>{!! $d->dept_name !!}</td>
                 <td>{!! $d->dept_code !!}</td>
                 <td>@if($d->status==1) <span class="badge bg-success">Active</span> @else <span class="badge bg-danger">Inactive</span> @endif</td>
-                <td>{!! isset($d->company->company_code)?$d->company->company_code:'-' !!}</td>
+                <td>{!! isset($d->company->company_name)?$d->company->company_name:'-' !!}</td>
                 <td>
                     @if(auth()->user()->hasPermission('edit_department'))
                         <a href="{!! route('edit.department',['departmentID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" class="text-success"><i class="fas fa-edit"></i></a>

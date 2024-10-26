@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait ParentTraitCompanyWise
 {
-    use AuthTrait;
+    use AuthTrait, PermissionTrait;
     protected function getSelfInfo()
     {
         return User::with(['permissions','department','designation','branch','getCompany','companyPermissions'])->where('id',$this->user->id)->first();
@@ -45,14 +45,14 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company',$this->getUserCompanyPermissionsArray());
     }
-    protected function getBranch()
+    protected function getBranch($operation_permission_name)
     {
         $object = branch::with(['branchType','createdBy','updatedBy','company']);
         if($this->user->isSystemSuperAdmin())
         {
             return $object;
         }
-        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
+        return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
     protected function getProject()
     {
@@ -63,23 +63,23 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
-    protected function getBranchType()
+    protected function getBranchType($operation_permission_name)
     {
         $object = BranchType::with(['getBranches','createdBy','updatedBy','company']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
         }
-        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
+        return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
-    protected function getDepartment()
+    protected function getDepartment($operation_permission_name)
     {
         $object = department::with(['createdBy','updatedBy','getUsers','company']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
         }
-        return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
+        return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
 
     protected function getDesignation()

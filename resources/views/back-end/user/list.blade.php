@@ -38,14 +38,14 @@
                         <th>No</th>
                         <th>Employee ID</th>
                         <th>Name</th>
-                        <th>Companies</th>
+                        <th>Companies (Role)</th>
                         <th>Branch</th>
                         <th>Joining Date</th>
                         <th>Phone</th>
                         <th>Email</th>
                         <th>Dept.</th>
                         <th>Designation</th>
-                        <th>Role</th>
+{{--                        <th>Role</th>--}}
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -55,14 +55,14 @@
                         <th>No</th>
                         <th>Employee ID</th>
                         <th>Name</th>
-                        <th>Companies</th>
+                        <th>Companies (Role)</th>
                         <th>Branch</th>
                         <th>Joining Date</th>
                         <th>Phone</th>
                         <th>Email</th>
                         <th>Dept.</th>
                         <th>Designation</th>
-                        <th>Role</th>
+{{--                        <th>Role</th>--}}
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -78,9 +78,9 @@
                                 <td>{!! $u->employee_id !!}</td>
                                 <td>{!! $u->name !!}</td>
                                 <td class="text-center text-capitalize">
-                                    <span class="badge bg-success" title="Mother Company">{!! isset($u->getCompany->company_name)?$u->getCompany->company_name:'N/A' !!}</span>
+                                    <span class="badge bg-success" title="Mother Company">{!! isset($u->getCompany->company_name)?$u->getCompany->company_name:'N/A' !!} ({!! $u->roles->first()->display_name !!})</span>
                                     @foreach(@$u->companyPermissions as $cp)
-                                        <span class="badge bg-info" title="Permission Company">{!! $cp->company->company_name !!}</span>
+                                        <span class="badge bg-info" title="Permission Company">{!! $cp->company->company_name !!} ({!! $cp->userRole->display_name !!})</span>
                                     @endforeach
                                 </td>
                                 <td>{!! isset($u->branch->branch_name)?$u->branch->branch_name:'N/A' !!}</td>
@@ -89,9 +89,14 @@
                                 <td>{!! $u->email !!}</td>
                                 <td>{!! isset($u->department->dept_name)?$u->department->dept_name:'N/A' !!}</td>
                                 <td>{!! isset($u->designation)?$u->designation->title:"N/A" !!}</td>
-                                <td>@foreach ($u->roles as $role)
-                                        {{ $role->display_name }}
-                                    @endforeach</td>
+{{--                                <td>--}}
+{{--                                    @foreach ($u->roles as $role)--}}
+{{--                                        <span class="badge bg-success">{{ $role->display_name }}</span>--}}
+{{--                                    @endforeach--}}
+{{--                                    @foreach ($u->companyWiseRoles as $cwr)--}}
+{{--                                        <span class="badge bg-info">{{ $cwr->display_name }}</span>--}}
+{{--                                    @endforeach--}}
+{{--                                </td>--}}
                                 <td>@if($u->status == 1) {!! '<span class="badge bg-primary">Active</span>' !!}  @else {!! '<span class="badge bg-danger">Inactive</span>' !!} @endif</td>
                                 <td class="">
                                     @if(auth()->user()->hasPermission('view_user'))

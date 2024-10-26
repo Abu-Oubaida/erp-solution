@@ -42,15 +42,6 @@ use PhpParser\Node\Stmt\If_;
 class UserController extends Controller
 {
     use ParentTraitCompanyWise;
-    private $add_user = 'add_user';
-    private $edit_user = 'edit_user';
-    private $list_user = 'list_user';
-    private $view_user = 'view_user';
-    private $add_user_file_manager_permission = 'add_user_file_manager_permission';
-    private $add_user_screen_permission = "add_user_screen_permission";
-    private $delete_user = "delete_user";
-    private $delete_user_file_manager_permission = "delete_user_file_manager_permission";
-    private $delete_user_screen_permission = "delete_user_screen_permission";
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -66,7 +57,7 @@ class UserController extends Controller
             {
                 return $this->store($request);
             }else{
-                $companies = $this->getCompanyModulePermissionWise($this->add_user)->get();
+                $companies = $this->getCompanyModulePermissionWise($this->permissions()->add_user)->get();
                 $depts = $this->getDepartment()->where('company_id',$this->user->company_id)->where('status',1)->get();
                 $branches = $this->getBranch()->where('company_id',$this->user->company_id)->where('status',1)->get();
                 $roles = $this->getRole()->get();
@@ -119,7 +110,7 @@ class UserController extends Controller
                     $employee_id = $eid[1];
                 }
                 $roles = $this->getRole()->where('id',$role)->first();
-                $user = $this->getUser($this->add_user)->create([
+                $user = $this->getUser($this->permissions()->add_user)->create([
                     'company' => $company,
                     'employee_id' => $employee_id,
                     'employee_id_hidden'    => $employee_id_hidden,
@@ -198,10 +189,10 @@ class UserController extends Controller
                     ($blood)? $b_id = $blood->id:$b_id = null;
                     ($data[8])?$status = $data[8]:$status = 0;
                     $eid = $this->getEid($dept, $data[5],$this->user->company_id);
-                    $alreadyInDB = $this->getUser($this->add_user)->where('company',$this->user->company_id)->where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
+                    $alreadyInDB = $this->getUser($this->permissions()->add_user)->where('company',$this->user->company_id)->where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
                     if (!$alreadyInDB)
                     {
-                        $user = $this->getUser($this->add_user)->create([
+                        $user = $this->getUser($this->permissions()->add_user)->create([
                             'company' => $this->user->company,
                             'employee_id' => $eid[1],
                             'employee_id_hidden'    => $eid[0],
@@ -264,10 +255,10 @@ class UserController extends Controller
         try {
             if ($this->user->isSystemSuperAdmin())
             {
-                $users = $this->getUser($this->list_user)->orderBy('dept_id','asc')->get();
+                $users = $this->getUser($this->permissions()->list_user)->orderBy('dept_id','asc')->get();
             }
             else {
-                $users = $this->getUser($this->list_user)->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
+                $users = $this->getUser($this->permissions()->list_user)->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
             }
 //            dd($users->first()->getCompany);
             return view('back-end.user.list',compact('users'))->render();
@@ -282,7 +273,7 @@ class UserController extends Controller
         try {
             $userID = Crypt::decryptString($id);
 //            dd($this->list_user);
-            $user = $this->getUser($this->view_user)->where('id',$userID)->first();
+            $user = $this->getUser($this->permissions()->view_user)->where('id',$userID)->first();
 //            $companyWiseParentPermission = CompanyModulePermission::select('module_parent_id')->where('company_id',$user->company)->distinct()->get();
 //            $permissionParents = Permission::whereIn('id',$companyWiseParentPermission)->where('parent_id',null)->get();
             $userPermissions = PermissionUser::with(['permissionParent','company'])->where('user_id',$userID)->orderBy('permission_name','asc')->get();
@@ -390,9 +381,9 @@ class UserController extends Controller
                 }else {
                     $status = 0;
                 }
-                if ($this->getUser($this->edit_user)->where('id',$userId)->first())
+                if ($this->getUser($this->permissions()->edit_user)->where('id',$userId)->first())
                 {
-                    $this->getUser($this->edit_user)->where('id',$userId)->update([
+                    $this->getUser($this->permissions()->edit_user)->where('id',$userId)->update([
                         'status'=>$status,
                     ]);
                     return back()->with('success','Update successfully!');
@@ -411,9 +402,9 @@ class UserController extends Controller
             try {
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                if ($this->getUser($this->delete_user)->where('id',$userId)->first())
+                if ($this->getUser($this->permissions()->delete_user)->where('id',$userId)->first())
                 {
-                    $this->getUser($this->delete_user)->where('id',$userId)->update([
+                    $this->getUser($this->permissions()->delete_user)->where('id',$userId)->update([
                         'status'=>5,//delete
                     ]);
 //                    if (Auth::user()->roles->first()->name == 'systemsuperadmin')
@@ -462,9 +453,9 @@ class UserController extends Controller
             try {
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                if($this->getUser($this->edit_user)->where('id',$userId)->first())
+                if($this->getUser($this->permissions()->edit_user)->where('id',$userId)->first())
                 {
-                    $this->getUser($this->edit_user)->where('id',$userId)->update([
+                    $this->getUser($this->permissions()->edit_user)->where('id',$userId)->update([
                         "password" => Hash::make($password)
                     ]);
                 }
@@ -484,7 +475,7 @@ class UserController extends Controller
             try {
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                $oldData = $this->getUser($this->edit_user)->where('id',$userId)->first();
+                $oldData = $this->getUser($this->permissions()->edit_user)->where('id',$userId)->first();
                 if (!($oldData->joining_date))
                 {
                     return back()->with('error','Empty employee joining date');
@@ -496,7 +487,7 @@ class UserController extends Controller
                 if($dept = department::where('id',$dept_id)->first())
                 {
                     $eid = $this->getEid($dept,$oldData->joining_date);
-                    $this->getUser($this->edit_user)->where('id',$userId)->update([
+                    $this->getUser($this->permissions()->edit_user)->where('id',$userId)->update([
                         "dept_id" => $dept_id,
                         'employee_id' => $eid[1],
                         'employee_id_hidden'    => $eid[0],
@@ -534,8 +525,8 @@ class UserController extends Controller
                 ]);
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                $oldData = $this->getUser($this->edit_user)->find($userId);
-                $this->getUser($this->edit_user)->where('id',$userId)->update([
+                $oldData = $this->getUser($this->permissions()->edit_user)->find($userId);
+                $this->getUser($this->permissions()->edit_user)->where('id',$userId)->update([
                     'designation_id'   =>  $designation_id,
                 ]);
                 DesignationChangeHistory::create([
@@ -562,8 +553,8 @@ class UserController extends Controller
                 ]);
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                $oldData = $this->getUser($this->edit_user)->find($userId);
-                $this->getUser($this->edit_user)->where('id',$userId)->update([
+                $oldData = $this->getUser($this->permissions()->edit_user)->find($userId);
+                $this->getUser($this->permissions()->edit_user)->where('id',$userId)->update([
                     'branch_id'   =>  $branch_id,
                 ]);
                 UserBranchChangeHistory::create([
@@ -588,7 +579,7 @@ class UserController extends Controller
                 $this->UserUpdate($request);
             }
             $userID = Crypt::decryptString($id);
-            $user = $this->getUser($this->edit_user)->where('users.id',$userID)->first();
+            $user = $this->getUser($this->permissions()->edit_user)->where('users.id',$userID)->first();
             return view('back-end.user.edit',compact('user'))->render();
         }catch (\Throwable $exception)
         {
@@ -606,8 +597,8 @@ class UserController extends Controller
             ]);
             extract($request->post());
             $UserID = Crypt::decryptString($id);
-            $user = $this->getUser($this->edit_user)->where('id',$UserID)->first();
-            $this->getUser($this->delete_user)->where('id',$UserID)->update([
+            $user = $this->getUser($this->permissions()->edit_user)->where('id',$UserID)->first();
+            $this->getUser($this->permissions()->delete_user)->where('id',$UserID)->update([
                 'name' => $name,
                 'phone' => $phone,
                 'email' => $email,
