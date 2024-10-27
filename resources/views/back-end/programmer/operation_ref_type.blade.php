@@ -32,7 +32,7 @@
                                         <option value="">Pick options...</option>
                                         @if(count($companies))
                                             @foreach($companies as $c)
-                                                <option @if(Request::get('e') !== null && Request::get('c') == $c->id)selected @endif value="{!! $c->id !!}">{!! $c->company_name !!} </option>
+                                                <option @if(old('company') == $c->id)selected @endif value="{!! $c->id !!}">{!! $c->company_name !!} </option>
                                             @endforeach
                                         @endif
                                     </select>

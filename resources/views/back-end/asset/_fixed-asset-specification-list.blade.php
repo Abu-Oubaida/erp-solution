@@ -7,6 +7,7 @@
         <th>Materials</th>
         <th>Specification</th>
         <th>Status</th>
+        <th>Uses Count</th>
         <th>Created By</th>
         <th>Created At</th>
         <th>Updated By</th>
@@ -14,7 +15,22 @@
         <th>Action</th>
     </tr>
     </thead>
-    <tfoot></tfoot>
+    <tfoot>
+    <tr>
+        <th>No</th>
+        <th>Company</th>
+        <th>Recourse Code</th>
+        <th>Materials</th>
+        <th>Specification</th>
+        <th>Status</th>
+        <th>Uses Count</th>
+        <th>Created By</th>
+        <th>Created At</th>
+        <th>Updated By</th>
+        <th>Updated At</th>
+        <th>Action</th>
+    </tr>
+    </tfoot>
     <tbody>
     @if(count($fixed_asset_specifications))
         @php
@@ -28,6 +44,11 @@
                 <td>{!! $fs->fixed_asset->materials_name !!}</td>
                 <td>{!! $fs->specification !!}</td>
                 <td>@if($fs->status==1) <span class='badge bg-success'> Active</span> @else <span class='badge bg-danger'>Inactive </span>@endif</td>
+                <td>
+                    <span class="badge bg-secondary">
+                        With Ref. ({!! count($fs->fixedWithRefData) !!})
+                    </span>
+                </td>
                 <td>{!! (isset($fs->createdBy->name))?$fs->createdBy->name:'-' !!}</td>
                 <td>{!! date('d-M-y',strtotime(@$fs->created_at)) !!}</td>
                 <td>{!! (isset($fs->updatdBy->name))?$fs->updatdBy->name:'-' !!}</td>
@@ -38,8 +59,8 @@
                         @if(auth()->user()->hasPermission('edit_fixed_asset_specification'))
                             <a href="{!! route('edit.fixed.asset.specification',['fasid'=>\Illuminate\Support\Facades\Crypt::encryptString($fs->id)]) !!}" class="text-success"><i class="fas fa-edit"></i></a>
                         @endif
-                        @if(auth()->user()->hasPermission('fixed_asset_delete'))
-                            <form action="{{route('fixed.asset.delete')}}" class="display-inline" method="post">
+                        @if(auth()->user()->hasPermission('delete_fixed_asset_specification'))
+                            <form action="{{route('fixed.asset.specification.delete')}}" class="display-inline" method="post">
                                 @method('delete')
                                 @csrf
                                 <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($fs->id) !!}">

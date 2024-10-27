@@ -18,6 +18,10 @@ class Fixed_asset extends Model
     {
         return $this->hasMany(fixed_asset_specifications::class,'fixed_asset_id');
     }
+    public function withRefUses()
+    {
+        return $this->hasMany(Fixed_asset_opening_with_spec::class,'asset_id','id');
+    }
     public function createdBy()
     {
         return $this->belongsTo(User::class,'created_by');

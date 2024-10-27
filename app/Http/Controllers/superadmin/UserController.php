@@ -62,7 +62,7 @@ class UserController extends Controller
                 $depts = $this->getDepartment($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
                 $branches = $this->getBranch($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
                 $roles = $this->getRole()->get();
-                $designations = $this->getDesignation()->where('company_id',$this->user->company_id)->where('status',1)->get();
+                $designations = $this->getDesignation($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
                 return view('back-end.user.add',compact('depts','branches','roles','designations','companies'))->render();
             }
 
@@ -186,7 +186,7 @@ class UserController extends Controller
                 {
 //                    $dept = department::where('dept_name',$data[1])->where('dept_code',$data[2])->first();
                     $dept = $this->getDepartment($permission)->where('dept_code',$data[2])->first();
-                    $designation = $this->getDesignation()->where('title',$data[3])->first();
+                    $designation = $this->getDesignation($permission)->where('title',$data[3])->first();
                     $branch = $this->getBranch($permission)->where('branch_name',$data[4])->first();
                     $blood = $this->getBloodGroup()->where('blood_type',$data[9])->first();
                     ($blood)? $b_id = $blood->id:$b_id = null;
@@ -286,7 +286,7 @@ class UserController extends Controller
             $deptLists = $this->getDepartment($permission)->where('company_id',$user->company)->where('status',1)->get();
             $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID)->get();
             $roles = Role::where('company_id',$user->company)->get();
-            $designations = $this->getDesignation()->where('company_id',$user->company)->where('status',1)->get();
+            $designations = $this->getDesignation($permission)->where('company_id',$user->company)->where('status',1)->get();
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
             $branches = $this->getBranch($permission)->where('company_id',$user->company)->where('status',1)->get();
             return view('back-end.user.single-view',compact('user','filPermission','roles','deptLists','userPermissions','designations','branches','userCompanies'))->render();

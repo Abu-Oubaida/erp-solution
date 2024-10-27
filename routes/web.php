@@ -432,6 +432,9 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::middleware(['permission:fixed_asset_delete'])->group(function (){
                     Route::match(['delete'],'delete','destroy')->name('fixed.asset.delete');
                 });
+                Route::middleware(['permission:delete_fixed_asset_specification'])->group(function (){
+                    Route::match(['delete'],'delete-specification','destroySpecification')->name('fixed.asset.specification.delete');
+                });
 
             });
         });
@@ -441,7 +444,7 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::match(['get','post'],'index','index')->name('fixed.asset.distribution');
                 Route::middleware(['permission:fixed_asset_with_reference_input'])->group(function (){
                     Route::match(['get','post'],'with-reference-input','openingInput')->name('fixed.asset.distribution.opening.input');
-                    Route::post('get-fixed-asset-spec','getFixedAssetSpecification');
+                    Route::post('get-fixed-asset-spec','fixedAssetSpecification');
                     Route::post('add-fixed-asset-opening','addFixedAssetOpening');
                     Route::post('get-fixed-asset-opening','getFixedAssetOpening');
                     Route::post('edit-fixed-asset-opening-spec','editFixedAssetOpeningSpec');
@@ -467,6 +470,7 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::middleware(['permission:fixed_asset_issue'])->group(function (){});
                 Route::middleware(['permission:fixed_asset_damage'])->group(function (){});
                 Route::middleware(['permission:fixed_asset_issue_return'])->group(function (){});
+                Route::post('company-projects','companyProjects');
             });
         });
     });

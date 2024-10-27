@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('fixed_asset_specification_delete_histories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('old_id');
             $table->unsignedBigInteger('fixed_asset_id');
             $table->integer('status')->default(1)->comment('1=active,0=inactive');
             $table->text('specification')->comment('specification');

@@ -26,13 +26,13 @@
 {{--                            @csrf--}}
                             <div class="row">
                                 <div class="col-md-3">
-                                    <div class="form-floating mb-">
-                                        <select class="form-control" name="permission_parent" id="permission_parent" required>
+                                    <div class="mb-3">
+                                        <label for="permission_parent">Permission Parent<span class="text-danger">*</span></label>
+                                        <select class="select-search" name="permission_parent" id="permission_parent" required>
                                             @foreach($permissions as $p)
                                                 <option value="{!! $p->id !!}" @if(old('permission_parent') == $p->id) selected @endif>{!! $p->display_name !!}</option>
                                             @endforeach
                                         </select>
-                                        <label for="permission_parent">Permission Parent<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-3">

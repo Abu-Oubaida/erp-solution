@@ -1639,6 +1639,31 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            companyProjects:function (e,user_id,action_id,action_id2=null)
+            {
+                let company_id = $(e).val()
+                if (company_id.length === 0 || user_id.length === 0 || action_id.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/company-projects"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'company_id':company_id,'user_id':user_id},
+                    success:function (response)
+                    {
+                        if (response.status === 'error') {
+                            alert('Error: ' + response.message);
+                            return false
+                        } else if (response.status === 'success') {
+                            updateSelectBoxSingleOption(response.data['project'],action_id,'id','branch_name')
+                            updateSelectBoxSingleOption(response.data['op_ref_type'],action_id2,'id','name')
+                        }
+                    }
+                })
+            },
             fixedAssetSpecificationStore:function (e)
             {
                 let cid = $("#company_id").val()

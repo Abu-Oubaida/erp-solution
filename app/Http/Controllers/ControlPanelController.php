@@ -41,13 +41,14 @@ class ControlPanelController extends Controller
     public function companyWiseUser(Request $request)
     {
         try {
+            $permision = $this->permissions()->control_panel;
             if ($request->isMethod('post'))
             {
                 $request->validate([
                     'company_id' => ['required','string','exists:company_infos,id'],
                 ]);
                 extract($request->post());
-                $users = $this->companyWisePermissionUsers($company_id)->get();
+                $users = $this->companyWisePermissionUsers($company_id,$permision)->get();
                 return response()->json([
                     'status' => 'success',
                     'data' => $users,
@@ -69,6 +70,7 @@ class ControlPanelController extends Controller
     public function userProjectPermissionSearch(Request $request)
     {
         try {
+            $permision = $this->permissions()->add_user_project_permission;
             $request->validate([
                 'user'  => [ 'required', 'string', 'exists:users,id' ],
                 'company_id' => ['required','string','exists:company_infos,id'],
@@ -76,12 +78,21 @@ class ControlPanelController extends Controller
             if ($request->isMethod('post')) {
                 extract($request->post());
                 $user = $request->post('user');
+
+                $selectedUserPermissionCompany = UserCompanyPermission::where('user_id',$user)->where('company_id',$company_id)->first();
+                $selectedUserCompany = $this->getUserAll()->where('id',$user)->where('company',$company_id)->first();
+                if ((isset($selectedUserCompany) && (($selectedUserCompany->roles->first()->name == 'systemsuperadmin' || $selectedUserCompany->roles->first()->name == 'superadmin'))) || (isset($selectedUserPermissionCompany) && (($selectedUserPermissionCompany->userRole->name == 'systemsuperadmin' || $selectedUserPermissionCompany->userRole->name == 'superadmin')))) {
+                    return response()->json([
+                        'status'=>'error',
+                        'message'=>'Selected user is System Super Admin or Super Admin. No need to assigned any permission',
+                    ]);
+                }
                 $projects = branch::where('status', 1)->where('company_id', $company_id)->get();
                 $userProjectPermissions = userProjectPermission::with(['user','projects','company'])->where('company_id', $company_id)->where('user_id', $user)->get();
                 $userIDs = userProjectPermission::where('company_id', $company_id)
                     ->where('user_id','!=',$user)
                     ->pluck('user_id')->unique()->toArray();
-                $permission_users = $this->getUser()->whereIn('id',$userIDs)->whereDoesntHave('roles', function ($query) {
+                $permission_users = $this->getUser($permision)->whereIn('id',$userIDs)->whereDoesntHave('roles', function ($query) {
                     $query->where('name', 'systemsuperadmin');
                 })->get();
                 $view = view('back-end.control-panel._user-project-permission-add',compact('projects','userProjectPermissions','user','permission_users'))->render();

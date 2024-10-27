@@ -16,7 +16,11 @@ use App\Models\userProjectPermission;
 use App\Traits\ParentTraitCompanyWise;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Barryvdh\Snappy\Facades\SnappyPdf;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
@@ -35,21 +39,10 @@ class FixedAssetDistribution extends Controller
         });
     }
     private $document_path = "documents/fixed-asset/";
-    //
-
-//    private function getUserWiseProjects($user_id)
-//    {
-//        try {
-//            return userProjectPermission::with(['projects'])->where('company_id',$this->user->company_id)->where('user_id',$user_id)->get();
-//        }catch (\Throwable $exception) {
-//            return [];
-//        }
-//
-//    }
-    protected function fixedAssetOpeningBalances()
+    protected function fixedAssetOpeningBalances($permission)
     {
         try {
-            $projectIds = $this->getUserProjectPermissions($this->user->id)->pluck('id')->unique()->toArray();
+            $projectIds = $this->getUserProjectPermissions($this->user->id,$permission)->pluck('id')->unique()->toArray();
             return Fixed_asset_opening_balance::with(['withSpecifications','attestedDocuments','branch','createdBy','updatedBy','refType','company'])->whereIn('branch_id',$projectIds);
         }catch (\Throwable $exception)
         {
@@ -58,17 +51,17 @@ class FixedAssetDistribution extends Controller
     }
     protected function refTypes()
     {
-        return Op_reference_type::where('status',1)->where('company_id',$this->user->company_id);
+        return Op_reference_type::where('status',1);
     }
-    protected function fixedAssets()
+    protected function fixedAssets($permission)
     {
-        return $this->getFixedAssets()->where('status',1);
+        return $this->getFixedAssets($permission)->where('status',1);
     }
     protected function fixedAssetSpecifications($fixed_asset_id)
     {
         return fixed_asset_specifications::with(['fixed_asset'])->where('fixed_asset_id',$fixed_asset_id)->where('status',1)->where('company_id',$this->user->company_id);
     }
-    protected function processFixedAssetOpening(Request $request, $isApiRequest = false)
+    protected function processFixedAssetOpening(Request $request,$permission, $isApiRequest = false)
     {
         if ($request->isMethod('post'))
         {
@@ -86,16 +79,16 @@ class FixedAssetDistribution extends Controller
             $r_type_id = $request->get('rt');
             $company_id = $request->get('c');
         }
+        $projects = null;
+        $ref_types = null;
         if (!empty($company_id))
         {
-            $projects = $this->getUserProjectPermissions($this->user->id)->where('company_id',$company_id)->get();
+            $projects = $this->getUserProjectPermissions($this->user->id,$permission)->where('company_id',$company_id)->get();
+            $ref_types = $this->refTypes()->where('company_id',$company_id)->get();
         }
-        else {
-            $projects = $this->getUserProjectPermissions($this->user->id)->get();
-        }
-        $companies = $this->getCompany()->get();
+
+        $companies = $this->getCompanyModulePermissionWise($permission)->get();
         $company = $this->getCompany()->where('id',$company_id)->first();
-        $ref_types = $this->refTypes()->get();
         if (empty($company_id) && empty($reference) && empty($branch_id) && empty($r_type_id))
         {
             if ($isApiRequest)
@@ -108,11 +101,11 @@ class FixedAssetDistribution extends Controller
             return view('back-end.asset.fixed-asset-opening',compact('projects','companies','ref_types'));
         }
         else{
-            $fixed_asset_with_ref = $this->fixedAssetOpeningBalances()->where('company_id',$company_id);
+            $fixed_asset_with_ref = $this->fixedAssetOpeningBalances($permission)->where('company_id',$company_id);
             if (!empty($reference))
             {
                 $withRefData = $fixed_asset_with_ref->where('references',$reference)->first();
-                $fixed_assets = $this->fixedAssets()->where('company_id',$company_id)->get();
+                $fixed_assets = $this->fixedAssets($permission)->where('company_id',$company_id)->get();
                 if (empty($branch_id) || empty($r_type_id))
                 {
                     if ($isApiRequest)
@@ -222,7 +215,8 @@ class FixedAssetDistribution extends Controller
     public function openingInput(Request $request)
     {
         try {
-            return $this->processFixedAssetOpening($request, false);
+            $permission = $this->permissions()->fixed_asset_with_reference_input;
+            return $this->processFixedAssetOpening($request,$permission, false);
         } catch (Throwable $exception) {
             return back()->with('error', $exception->getMessage());
         }
@@ -230,8 +224,9 @@ class FixedAssetDistribution extends Controller
     public function getFixedAssetOpening(Request $request)
     {
         try {
+            $permission = $this->permissions()->fixed_asset_with_reference_input;
             if ($request->isMethod('post')) {
-                return $this->processFixedAssetOpening($request, true);
+                return $this->processFixedAssetOpening($request, $permission, true);
             }
             return response()->json([
                 'status' => 'error',
@@ -246,10 +241,9 @@ class FixedAssetDistribution extends Controller
     }
 
 
-    public function getFixedAssetSpecification(Request $request)
+    public function fixedAssetSpecification(Request $request): JsonResponse
     {
         try {
-            $user = Auth::user();
             $request->validate([
                 'id'=>['required','string','exists:fixed_assets,id'],
             ]);
@@ -278,7 +272,7 @@ class FixedAssetDistribution extends Controller
     public function addFixedAssetOpening(Request $request)
     {
         try {
-            $user = Auth::user();
+            $permission = $this->permissions()->fixed_asset_with_reference_input;
             $request->validate([
                 'opening_date'    => ['required','date'],
                 'company_id' => ['required','string','exists:company_infos,id',],
@@ -295,7 +289,7 @@ class FixedAssetDistribution extends Controller
             if ($request->isMethod('post'))
             {
                 extract($request->post());
-                $opening = Fixed_asset_opening_balance::with(['withSpecifications'])->where('company_id',$user->company_id)->where('branch_id',$project_id)->where('references',$reference)->first();
+                $opening = Fixed_asset_opening_balance::with(['withSpecifications'])->where('company_id',$this->user->company_id)->where('branch_id',$project_id)->where('references',$reference)->first();
                 if (is_null($opening) || empty($opening))
                 {
                     $opening = Fixed_asset_opening_balance::create([
@@ -305,7 +299,7 @@ class FixedAssetDistribution extends Controller
                         'branch_id'=>$project_id,
                         'company_id'=>$company_id,
                         'status'=>5,//status-5 = processing
-                        'created_by'=>$user->id,
+                        'created_by'=>$this->user->id,
                     ]);
                 }
 //                if ($opening && $opening->status !=5)
@@ -323,8 +317,8 @@ class FixedAssetDistribution extends Controller
 //                }
 //                else
 //                {
-                    $base_table_data = Fixed_asset_opening_balance::where('company_id',$user->company_id)->firstWhere('references',$reference);
-                    $opening_materials_obj = Fixed_asset_opening_with_spec::where('opening_asset_id',$base_table_data->id)->where('references',$base_table_data->references)->where('company_id',$user->company_id);
+                    $base_table_data = Fixed_asset_opening_balance::where('company_id',$this->user->company_id)->firstWhere('references',$reference);
+                    $opening_materials_obj = Fixed_asset_opening_with_spec::where('opening_asset_id',$base_table_data->id)->where('references',$base_table_data->references)->where('company_id',$this->user->company_id);
                     $omt1 = $opening_materials_obj;
                     if ($omt1->where('asset_id',$materials_id)->where('spec_id',$specification)->count() > 0)
                     {
@@ -346,11 +340,11 @@ class FixedAssetDistribution extends Controller
                             'qty'=>$qty,
                             'purpose'=>$purpose,
                             'remarks'=>$remarks,
-                            'created_by'=>$user->id,
+                            'created_by'=>$this->user->id,
                         ]);
                     }
 //                }
-                $withRefData = $this->fixedAssetOpeningBalances()->where('company_id',$company_id)->where('branch_id',$project_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
+                $withRefData = $this->fixedAssetOpeningBalances($permission)->where('company_id',$company_id)->where('branch_id',$project_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
                 $view = view('back-end.asset.__edit_fixed_asset_opening_body_list',compact('withRefData'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -374,12 +368,13 @@ class FixedAssetDistribution extends Controller
     public function editFixedAssetOpening(Request $request,$faobid)
     {
         try {
+            $permission = $this->permissions()->edit_fixed_asset_distribution_with_reference;
             $id = Crypt::decryptString($faobid);
-            $item = $this->fixedAssetOpeningBalances()->where('id',$id)->first();
-            $projects = $this->getUserProjectPermissions($this->user->id)->get();
+            $item = $this->fixedAssetOpeningBalances($permission)->where('id',$id)->first();
+            $projects = $this->getUserProjectPermissions($this->user->id,$permission)->get();
 //            $projects = $this->getUserWiseProjects($this->user->id);
             $ref_types = $this->refTypes()->get();
-            $fixed_assets = $this->FixedAssets()->get();
+            $fixed_assets = $this->FixedAssets($permission)->get();
             $spec = $this->fixedAssetSpecifications($id)->get();
             $companies = $this->getCompany()->get();
             if ($request->isMethod('PUT'))
@@ -397,7 +392,7 @@ class FixedAssetDistribution extends Controller
     protected function updateFixedAssetOpening(Request $request,$id)
     {
         try {
-//            $projectIds = $this->getUserProjectPermissions($this->user->id)->pluck('id')->unique()->toArray();
+            $permission = $this->permissions()->edit_fixed_asset_distribution_with_reference;
             $request->validate([
                 'company_id' => ['required','string','exists:company_infos,id'],
                 'reference' => ['required','string',Rule::unique('fixed_asset_opening_balances','references')->ignore($id, 'id')],
@@ -407,8 +402,8 @@ class FixedAssetDistribution extends Controller
                 'narration' => ['sometimes','nullable','string'],
             ]);
             extract($request->post());
-            $data = $this->fixedAssetOpeningBalances()->where('id',$id)->first();
-            $update = $this->fixedAssetOpeningBalances()->where('id',$id)->update([
+            $data = $this->fixedAssetOpeningBalances($permission)->where('id',$id)->first();
+            $update = $this->fixedAssetOpeningBalances($permission)->where('id',$id)->update([
                 'company_id'=>$company_id,
                 'references'=>$reference,
                 'ref_type_id'=>$r_type,
@@ -495,7 +490,6 @@ class FixedAssetDistribution extends Controller
             if ($request->isMethod('post'))
             {
                 extract($request->post());
-                $user = Auth::user();
                 $update_data = Fixed_asset_opening_with_spec::where('id', $id)->first();
 
                 if ($update_data) {
@@ -505,14 +499,14 @@ class FixedAssetDistribution extends Controller
                         'qty' => $qty,
                         'purpose' => $purpose,
                         'remarks' => $remarks,
-                        'updated_by' => $user->id,
+                        'updated_by' => $this->user->id,
                         'updated_at' => \Carbon\Carbon::now(),
                     ]);
 
                     // Refresh the model instance to get the updated data
                     $update_data = $update_data->fresh();
                 }
-                $withRefData = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('references',$update_data->references)->orderBy('created_at','DESC')->first();
+                $withRefData = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$this->user->company_id)->where('references',$update_data->references)->orderBy('created_at','DESC')->first();
                 $view = view('back-end.asset.__edit_fixed_asset_opening_body_list',compact('withRefData'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -542,7 +536,6 @@ class FixedAssetDistribution extends Controller
             if ($request->isMethod('delete'))
             {
                 extract($request->post());
-                $user = Auth::user();
                 $update_data = Fixed_asset_opening_with_spec::where('id', $id)->first();
                 $reference = $update_data->references;
                 if ($update_data) {
@@ -551,7 +544,7 @@ class FixedAssetDistribution extends Controller
                     // Refresh the model instance to get the updated data
                     $update_data = $update_data->fresh();
                 }
-                $withRefData = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$user->company_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
+                $withRefData = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$this->user->company_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
                 $view = view('back-end.asset.__edit_fixed_asset_opening_body_list',compact('withRefData'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -665,13 +658,13 @@ class FixedAssetDistribution extends Controller
             ],500);
         }
     }
-    public function finalUpdateFixedAssetOpeningSpec(Request $request)
+    public function finalUpdateFixedAssetOpeningSpec(Request $request): Redirector|RedirectResponse|Application
     {
-        $request->validate([
-            'id' => ['required','string',Rule::exists('fixed_asset_opening_balances','id')->where('status',5)],
-            'attachment.*' => ['sometimes','nullable','file','max:512000'],
-        ]);
         try {
+            $request->validate([
+                'id' => ['required','string',Rule::exists('fixed_asset_opening_balances','id')->where('status',5)],
+                'attachment.*' => ['sometimes','nullable','file','max:512000'],
+            ]);
             if ($request->isMethod('put'))
             {
                 extract($request->post());
@@ -702,8 +695,9 @@ class FixedAssetDistribution extends Controller
             }
         }catch (\Throwable $exception)
         {
-            return back()->withErrors([$exception->getMessage()]);
+            return back()->with('error',$exception->getMessage());
         }
+        return back()->with('error','Request not supported!');
     }
     protected function fixed_asset_opening_balance_documents($documents,$ref_id)
     {
@@ -780,4 +774,48 @@ class FixedAssetDistribution extends Controller
         }
     }
 
+    public function companyProjects(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'company_id' => ['required','string','exists:company_infos,id'],
+                    'user_id' => ['required','string','exists:users,id'],
+                ]);
+                extract($request->post());
+                $op_ref_type = Op_reference_type::where('company_id',$company_id)->where('status',1)->get();
+                if (Auth::user()->isSystemSuperAdmin())
+                {
+                    $projects = branch::with(['getUsers','company'])->where('company_id',$company_id)->where('status',1)->get();
+                }
+                else {
+                    $object = branch::with(['getUsers','company']);
+                    if (Auth::user()->companyWiseRoleName() == 'superadmin')
+                    {
+                        $projects = $object->where('company_id',$company_id)->where('status',1)->get();
+                    }
+                    else
+                    {
+                        $projects = $object->whereIn('id',userProjectPermission::where('user_id',$user_id)->get()->pluck('project_id')->unique()->toArray())->where('company_id',$company_id)->where('status',1)->get();
+                    }
+                }
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['project'=>$projects,'op_ref_type'=>$op_ref_type],
+                    'message' => 'Request processed successfully!'
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message'=> 'Request method not allowed!'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
 }

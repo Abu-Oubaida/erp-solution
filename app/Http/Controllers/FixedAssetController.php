@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
 use Throwable;
@@ -47,13 +48,14 @@ class FixedAssetController extends Controller
     public function create(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_fixed_asset;
             if ($request->isMethod('POST')) {
                 return $this->store($request);
             }
             else{
                 $user = Auth::user();
-                $fixed_assets = $this->getFixedAsset()->where('created_by',$user->id)->where('status','<=',2)->get();
-                $companies = $this->getCompany()->get();
+                $fixed_assets = $this->getFixedAssets($permission)->where('created_by',$user->id)->where('status','<=',2)->get();
+                $companies = $this->getCompanyModulePermissionWise($permission)->get();
 //                dd($companies);
                 return view('back-end.asset.fixed-asset-add',compact('fixed_assets','companies'));
             }
@@ -65,6 +67,7 @@ class FixedAssetController extends Controller
     public function createSpecification(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_fixed_asset_specification;
             if ($request->isMethod('POST')) {
                 if ($request->input('search') == 'search')
                 {
@@ -73,24 +76,24 @@ class FixedAssetController extends Controller
                         'company' => ['string','required','exists:company_infos,id'],
                     ]);
                     extract($request->post());
-                    $fa = Fixed_asset::where('company_id',$company)->where('recourse_code',$recourse_code)->first();
+                    $fa = $this->getFixedAssets($permission)->where('recourse_code',$recourse_code)->first();
                     return redirect(route('fixed.asset.specification',['c'=>$company,'fid'=>$fa->id,'code'=>$fa->recourse_code,'name'=>$fa->materials_name]))->withInput();
                 }
                 return back()->with('error','Invalid Request of Post Methode!');
             }
             else{
-                $fixed_asset_specifications = $this->getFixedAssetSpecification();
+                $fixed_asset_specifications = $this->getFixedAssetSpecification($permission);
                 $fixed_assets= null;
                 if ($request->get('fid') && $request->get('c'))
                 {
                     $fid = $request->get('fid');
                     $company_id = $request->get('c');
-                    $fixed_asset = $this->getFixedAsset()->where('company_id',$company_id)->where('status',1)->where('id',$fid)->first();
+                    $fixed_asset = $this->getFixedAssets($permission)->where('company_id',$company_id)->where('status',1)->where('id',$fid)->first();
                     $fixed_asset_specifications = $fixed_asset_specifications->where('fixed_asset_id',$fixed_asset->id);
-                    $fixed_assets= $this->getFixedAsset()->where('company_id',$company_id)->get();
+                    $fixed_assets= $this->getFixedAssets($permission)->where('company_id',$company_id)->get();
                 }
                 $fixed_asset_specifications = $fixed_asset_specifications->orderBy('created_at','DESC')->get();
-                $companies = $this->getCompany()->get();
+                $companies = $this->getCompanyModulePermissionWise($permission)->get();
                 return view('back-end.asset.fixed-asset-specification-add',compact('fixed_assets','fixed_asset_specifications','companies'));
             }
         }catch (\Throwable $exception){
@@ -143,6 +146,7 @@ class FixedAssetController extends Controller
     public function specificationStore(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_fixed_asset_specification;
             $request->validate([
                 'cid' =>  ['required','string','exists:company_infos,id'],
                 'fid' =>  ['required','string','exists:fixed_assets,id'],
@@ -151,7 +155,7 @@ class FixedAssetController extends Controller
             ]);
             if ($request->isMethod('POST')) {
                 extract($request->post());
-                $fixed_asset = $this->getFixedAsset()->where('status',1)->where('id',$fid)->first();
+                $fixed_asset = $this->getFixedAssets($permission)->where('status',1)->where('id',$fid)->first();
                 if ($fixed_asset)
                 {
                     fixed_asset_specifications::create([
@@ -162,7 +166,7 @@ class FixedAssetController extends Controller
                         'created_by'    =>  $this->user->id,
                         'created_at'    =>  now()
                     ]);
-                    $fixed_asset_specifications = $this->getFixedAssetSpecification()->where('company_id',$cid)->where('fixed_asset_id',$fixed_asset->id)->get();
+                    $fixed_asset_specifications = $this->getFixedAssetSpecification($permission)->where('company_id',$cid)->where('fixed_asset_id',$fixed_asset->id)->get();
                     $view = view('back-end.asset._fixed-asset-specification-list',compact('fixed_asset_specifications'))->render();
                     return response()->json([
                         'status' => 'success',
@@ -196,8 +200,8 @@ class FixedAssetController extends Controller
     public function show(Fixed_asset $fixed_asset)
     {
         try {
-            $user = Auth::user();
-            $fixed_assets = $this->getFixedAsset()->where('status','<=',2)->get();
+            $permission = $this->permissions()->add_fixed_asset;
+            $fixed_assets = $this->getFixedAssets($permission)->where('status','<=',2)->get();
             return view('back-end.asset.fixed-asset-list',compact('fixed_assets'));
         }catch (\Throwable $exception){
             return back()->with('error',$exception->getMessage());
@@ -212,14 +216,15 @@ class FixedAssetController extends Controller
     public function edit(Request $request, $fixedAssetID)
     {
         try {
-            $user = Auth::user();
+            $permission = $this->permissions()->fixed_asset_edit;
             $id = Crypt::decryptString($fixedAssetID);
             if ($request->isMethod('put')) {
                 return $this->update($request, $id);
             }
-            $fixed_assets = Fixed_asset::where('company_id',$user->company_id)->where('status','<=',2)->get();
-            $fixed_asset = Fixed_asset::where('company_id',$user->company_id)->where('status','<=',2)->where('id',$id)->first();
-            return view('back-end.asset.fixed-asset-edit',compact('fixed_assets','fixed_asset'));
+            $fixed_assets = $this->getFixedAssets($permission)->where('status','<=',2)->get();
+            $fixed_asset = $this->getFixedAssets($permission)->where('status','<=',2)->where('id',$id)->first();
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            return view('back-end.asset.fixed-asset-edit',compact('fixed_assets','fixed_asset','companies'));
         }catch (\Throwable $exception){
             return back()->with('error',$exception->getMessage());
         }
@@ -246,19 +251,21 @@ class FixedAssetController extends Controller
 
     private function update(Request $request,$fixedAssetID)
     {
-        $request->validate([
-            'recourse_code' => ['string','required', Rule::unique('fixed_assets','recourse_code')->ignore($fixedAssetID,'id')],
-            'materials' => ['string','required',Rule::unique('fixed_assets','materials_name')->ignore($fixedAssetID,'id')],
-            'rate'  =>  ['numeric','required'],
-            'unit'  =>  ['string','required'],
-            'status'  =>  ['numeric','required','between:0,1'],
-            'depreciation'  =>  ['string','sometimes','nullable'],
-            'remarks'   =>  ['string','nullable'],
-        ]);
         try {
-            $user = Auth::user();
+            $permission = $this->permissions()->fixed_asset_edit;
+            $request->validate([
+                'company' =>  ['required', 'integer','exists:company_infos,id'],
+                'recourse_code' => ['string','required', Rule::unique('fixed_assets','recourse_code')->ignore($fixedAssetID,'id')],
+                'materials' => ['string','required',Rule::unique('fixed_assets','materials_name')->ignore($fixedAssetID,'id')],
+                'rate'  =>  ['numeric','required'],
+                'unit'  =>  ['string','required'],
+                'status'  =>  ['numeric','required','between:0,1'],
+                'depreciation'  =>  ['string','sometimes','nullable'],
+                'remarks'   =>  ['string','nullable'],
+            ]);
             extract($request->post());
-            Fixed_asset::where('company_id',$user->company_id)->where('id',$fixedAssetID)->update([
+            $this->getFixedAssets($permission)->where('id',$fixedAssetID)->update([
+                'company_id' =>  $company,
                 'recourse_code' =>  $recourse_code,
                 'materials_name'    =>  $materials,
                 'rate'  =>  $rate,
@@ -266,7 +273,7 @@ class FixedAssetController extends Controller
                 'depreciation'  => $depreciation,
                 'status'    =>  $status,
                 'remarks'   =>  $remarks,
-                'updated_by'=>  $user->id,
+                'updated_by'=>  $this->user->id,
                 'updated_at'=>  now(),
             ]);
             return back()->with('success','Fixed Asset Updated Successfully');
@@ -303,19 +310,17 @@ class FixedAssetController extends Controller
     public function destroy(Request $request)
     {
         try {
-            $user = Auth::user();
+            $permission = $this->permissions()->fixed_asset_edit;
             $request->validate([
                 'id'    =>  ['string','required'],
             ]);
             extract($request->post());
             $deleteID = Crypt::decryptString($id);
-//            $company = Fixed_asset::with(['companies'])->find($deleteID);
-//            if(count($company->companies))
-//            {
-//                return back()->with('error','A relationship exists between other tables. Data delete not possible');
-//            }
-//            Fixed_asset::where('id',$deleteID)->where('company_id',$user->company_id)->update(['status'=>3]);
-            $fixed_asset_delete = Fixed_asset::where('id',$deleteID)->where('company_id',$user->company_id);
+            $fixed_asset_delete = $this->getFixedAssets($permission)->where('id',$deleteID);
+            if (count($fixed_asset_delete->first()->witRefUses) || count($fixed_asset_delete->first()->specifications))
+            {
+                return back()->with('warning','Data delete not possible, a relationship exists with another table.');
+            }
             if ($f = $fixed_asset_delete->first())
             {
                 Fixed_asset_delete_history::create([
@@ -332,7 +337,7 @@ class FixedAssetController extends Controller
                     'old_updated_time'  =>  $f->updated_at,
                     'old_created_by'    =>  $f->created_by,
                     'old_updated_by'    =>  $f->updated_by,
-                    'created_by'=>  $user->id,
+                    'created_by'=>  $this->user->id,
                 ]);
             }
             $fixed_asset_delete->delete();
@@ -343,15 +348,54 @@ class FixedAssetController extends Controller
         }
     }
 
+    public function destroySpecification(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->delete_fixed_asset_specification;
+            $request->validate([
+                'id'    =>  ['string','required'],
+            ]);
+            extract($request->post());
+            $deleteID = Crypt::decryptString($id);
+            $data = $this->getFixedAssetSpecification($permission)->where('id',$deleteID);
+            if (count($data->first()->fixedWithRefData))
+            {
+                return back()->with('warning','Data delete not possible, a relationship exists with another table.');
+            }
+            if ($f = $data->first())
+            {
+                DB::table('fixed_asset_specification_delete_histories')->insert([
+                    'old_id' => $f->id,
+                    'fixed_asset_id' => $f->fixed_asset_id,
+                    'status' =>  $f->status,
+                    'specification' =>  $f->specification,
+                    'company_id' =>  $f->company_id,
+                    'created_by' =>  $f->created_by,
+                    'updated_by' =>  $f->updated_by,
+                    'deleted_by' => $this->user->id,
+                    'old_created_at' => $f->created_at,
+                    'old_updated_at' => $f->updated_at,
+                    'created_at' => now(),
+                ]);
+            }
+            $data->delete();
+            return redirect(route('fixed.asset.specification'))->with('success','Data deleted successfully.');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error', $exception->getMessage());
+        }
+    }
+
     public function companyWiseFixedAsset(Request $request)
     {
         try {
+            $permission = $this->permissions()->fixed_asset_interface;
             if ($request->isMethod('POST')) {
                 $request->validate([
                    'id' => ['required', 'string', 'exists:company_infos,id'],
                 ]);
                 extract($request->post());
-                $fx_assets = $this->getFixedAsset()->where('status',1)->where('company_id',$id)->get();
+                $fx_assets = $this->getFixedAssets($permission)->where('status',1)->where('company_id',$id)->get();
                 return response()->json([
                     'status'    =>  'success',
                     'data'      =>  $fx_assets,

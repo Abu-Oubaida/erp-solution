@@ -27,12 +27,12 @@ class DesignationController extends Controller
     public function create(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_designation;
             if ($request->isMethod('post'))
             {
                 return $this->store($request);
             }
-//            $designations = $this->getDesignation()->orderBY('priority','asc')->get();
-            $companies = $this->getCompany()->get();
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end.designation.add',compact('companies'))->render();
         }catch (\Throwable $exception)
         {
@@ -42,14 +42,15 @@ class DesignationController extends Controller
     public function edit(Request $request,$designationID)
     {
         try {
+            $permission = $this->permissions()->edit_designation;
             $id = Crypt::decryptString($designationID);
             if ($request->isMethod('put'))
             {
                 return $this->update($request,$id);
             }
-            $designations = $this->getDesignation()->orderBY('priority','asc')->get();
+            $designations = $this->getDesignation($permission)->orderBY('priority','asc')->get();
             $companies = $this->getCompany()->get();
-            $designation = $this->getDesignation()->find($id);
+            $designation = $this->getDesignation($permission)->find($id);
             return view('back-end.designation.edit',compact('designations','companies','designation'));
         }catch (\Throwable $exception)
         {
@@ -59,7 +60,8 @@ class DesignationController extends Controller
     public function show()
     {
         try {
-            $designations = $this->getDesignation()->orderBY('priority','asc')->get();
+            $permission = $this->permissions()->list_designation;
+            $designations = $this->getDesignation($permission)->orderBY('priority','asc')->get();
             return view('back-end.designation.list',compact('designations'));
         }catch (\Throwable $exception)
         {
@@ -70,6 +72,7 @@ class DesignationController extends Controller
     private function store(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_designation;
             $request->validate([
                 'title' =>  ['required','string',Rule::unique('designations','title')->where(function ($query) use ($request){return $query->where('company_id',$request->post('company'));})],
                 'priority' =>  ['required','numeric',Rule::unique('designations','priority')->where(function ($query) use ($request){return $query->where('company_id',$request->post('company'));})],
@@ -80,7 +83,7 @@ class DesignationController extends Controller
             extract($request->post());
             if ($company == $this->user->company_id || ($this->user->isSystemSuperAdmin()))
             {
-                $this->getDesignation()->create([
+                $this->getDesignation($permission)->create([
                     'company_id' => $company,
                     'title'     =>  $title,
                     'priority'  =>  $priority,
@@ -99,6 +102,7 @@ class DesignationController extends Controller
     private function update(Request $request, $designationID)
     {
         try {
+            $permission = $this->permissions()->edit_designation;
             $request->validate([
                 'title' =>  ['required','string',Rule::unique('designations','title')->where(function ($query) use ($request){return $query->where('company_id',$request->post('company'));})->ignore($designationID,'id')],
                 'priority' =>  ['required','numeric',Rule::unique('designations','priority')->where(function ($query) use ($request){return $query->where('company_id',$request->post('company'));})->ignore($designationID,'id')],
@@ -111,13 +115,13 @@ class DesignationController extends Controller
             {
                 if ($company != $this->user->company_id)
                 {
-                    $designation = $this->getDesignation()->find($designationID);
+                    $designation = $this->getDesignation($permission)->find($designationID);
                     if(count($designation->getUsers))
                     {
                         return back()->with('warning','Company change not possible! There is exist relationship with users table');
                     }
                 }
-                $this->getDesignation()->where('id',$designationID)->update([
+                $this->getDesignation($permission)->where('id',$designationID)->update([
                     'company_id' => $company,
                     'title'     =>  $title,
                     'priority'  =>  $priority,
@@ -140,13 +144,14 @@ class DesignationController extends Controller
         try {
             if ($request->isMethod('delete'))
             {
+                $permission = $this->permissions()->delete_designation;
                 $request->validate(['id'=>['required','string',Rule::exists('designations','id')]]);
                 extract($request->post());
-                if (count($this->getDesignation()->where("id",$id)->first()->getUsers))
+                if (count($this->getDesignation($permission)->where("id",$id)->first()->getUsers))
                 {
                     return back()->with('warning','Deletion not possible! A relationship exists.');
                 }
-                $this->getDesignation()->where("id",$id)->delete();
+                $this->getDesignation($permission)->where("id",$id)->delete();
                 return redirect(route('designation.list'))->with('success','Data deleted successfully');
             }
             return back()->with('error','Requested Method Not Allowed');

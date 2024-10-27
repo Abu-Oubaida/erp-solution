@@ -71,7 +71,7 @@
                                         <label for="unit">Materials Unit<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
-                                <div class="col-md-1">
+                                <div class="col-md-2">
                                     <div class="form-floating mb-3">
                                         <select class="form-control" name="status" id="status" required>
                                             <option value=""></option>
@@ -87,7 +87,7 @@
                                         <label for="depreciation">Depreciation Rate (%)</label>
                                     </div>
                                 </div>
-                                <div class="col-md-7">
+                                <div class="col-md-6">
                                     <div class="form-floating mb-3">
                                         <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10">{{old('remarks')}}</textarea>
                                         <label for="remarks">Remarks</label>
@@ -97,7 +97,7 @@
 
                                 <div class="col-md-12">
                                     <div class="form-floating mb-3 float-end">
-                                        <input type="submit" value="Submit" class="btn btn-chl-outline" name="submit" >
+                                        <button type="submit" value="Submit" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Submit</button>
                                     </div>
                                 </div>
                             </div>
@@ -109,7 +109,12 @@
                 <div class="card mb-4">
                     <div class="card-header">
                         <div class="row">
-                            <h3 class="text-capitalize"><i class="fas fa-list"></i> Fixed Asset Materials List</h3>
+                            <div class="col">
+                                <h3 class="text-capitalize"><i class="fas fa-list"></i> Fixed Asset Materials List (Self Added)</h3>
+                            </div>
+                            <div class="col">
+                                <a href="{{route('fixed.asset.show')}}" class="btn btn-outline-primary btn-sm float-end mt-2"><i class="fa fa-list"></i> Show All List</a>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">

@@ -467,7 +467,15 @@ class ajaxRequestController extends Controller
                     $projects = branch::with(['getUsers','company'])->where('company_id',$company_id)->where('status',1)->get();
                 }
                 else {
-                    $projects = branch::with(['getUsers','company'])->whereIn('id',userProjectPermission::where('user_id',$user_id)->get()->pluck('project_id')->unique()->toArray())->where('company_id',$company_id)->where('status',1)->get();
+                    $object = branch::with(['getUsers','company']);
+                    if (Auth::user()->companyWiseRoleName() == 'superadmin')
+                    {
+                        $projects = $object->where('company_id',$company_id)->where('status',1)->get();
+                    }
+                    else
+                    {
+                        $projects = $object->whereIn('id',userProjectPermission::where('user_id',$user_id)->get()->pluck('project_id')->unique()->toArray())->where('company_id',$company_id)->where('status',1)->get();
+                    }
                 }
                 return response()->json([
                     'status' => 'success',

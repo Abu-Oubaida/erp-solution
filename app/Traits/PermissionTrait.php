@@ -8,7 +8,6 @@ trait PermissionTrait
 {
     private function permissions()
     {
-        $permissions = [];
         return (object) Permission::all()->pluck('name','name')->toArray();
     }
 }

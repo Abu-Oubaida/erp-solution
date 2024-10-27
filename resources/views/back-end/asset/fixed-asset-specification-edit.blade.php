@@ -21,6 +21,14 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card mb-2">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col"><h3><i class="fas fa-edit"></i> Fixed asset specification edit</h3></div>
+                            <div class="col">
+                                <a href="{{route('fixed.asset.specification')}}" class="btn btn-outline-primary btn-sm float-end mt-2"><i class="fa fa-plus"></i> Add Specification</a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <form action="{!! route('edit.fixed.asset.specification',['fasid'=>\Illuminate\Support\Facades\Crypt::encryptString($fas->id)]) !!}" method="post">
                             @csrf
@@ -64,6 +72,13 @@
             </div>
             <div class="col-md-12">
                 <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col">
+                                <h3><i class="fas fa-list"></i> Fixed asset specification list</h3>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
                         @include('back-end.asset._fixed-asset-specification-list')
                     </div>

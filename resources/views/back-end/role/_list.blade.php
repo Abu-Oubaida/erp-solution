@@ -27,7 +27,7 @@
                 <td>@isset($r->created_by){!! $r->createdBy->name !!}@endisset</td>
                 <td>@isset($r->created_at){!! date('d-M-Y',strtotime($r->created_at)) !!}@endisset</td>
                 <td>@isset($r->updated_by){!! $r->updatedBy->name !!}@endisset</td>
-                <td>@isset($r->updated_at){!! date('d-M-Y',strtotime($r->updated_at)) !!}@endisset</td>
+                <td>@isset($r->updated_by){!! date('d-M-Y',strtotime(@$r->updated_at)) !!}@endisset</td>
                 <td>{!! $r->description !!}</td>
                 <td>
                     @if(auth()->user()->hasPermission('edit_role'))

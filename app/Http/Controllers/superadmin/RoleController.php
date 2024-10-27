@@ -21,7 +21,8 @@ class RoleController extends Controller
     public function index()
     {
         try {
-            $roles = $this->getRole()->get();
+            $permission = $this->permissions()->role_management;
+            $roles = $this->getRole($permission)->get();
             return view('back-end.role.index', compact('roles'));
         }catch (\Throwable $exception)
         {
@@ -32,12 +33,13 @@ class RoleController extends Controller
     public function create(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_role;
             if ($request->isMethod('post'))
             {
                 return $this->store($request);
             }else{
-                $companies = $this->getCompany()->get();
-                $roles = $this->getRole()->get();
+                $companies = $this->getCompanyModulePermissionWise($permission)->get();
+                $roles = $this->getRole($permission)->get();
                 return view('back-end.role.add',compact('roles','companies'))->render();
             }
 
@@ -49,13 +51,14 @@ class RoleController extends Controller
     public function edit(Request $request, $id)
     {
         try {
+            $permission = $this->permissions()->edit_role;
             $id = Crypt::decryptString($id);
             if ($request->isMethod('put'))
             {
                 return $this->update($request,$id);
             }
-            $roles = $this->getRole()->get();
-            $role = $this->getRole()->where('id',$id)->first();
+            $roles = $this->getRole($permission)->get();
+            $role = $this->getRole($permission)->where('id',$id)->first();
             $companies = $this->getCompany()->get();
             return view('back-end.role.edit',compact('role','roles','companies',))->render();
         }catch (\Throwable $exception)
@@ -66,6 +69,7 @@ class RoleController extends Controller
     private function store(Request $request)
     {
         try {
+            $permission = $this->permissions()->add_role;
             $request->validate([
                 'name' => ['required', 'string', 'max:255','regex:/^[a-z0-9_]+$/',Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->post('company'));})],
                 'display_name' => ['required', 'string', 'max:255',Rule::unique('roles','display_name')->where(function ($query) use ($request){$query->where('company_id',$request->post('company'));})],
@@ -73,7 +77,15 @@ class RoleController extends Controller
                 'description' => ['nullable','sometimes','string','max:255'],
             ]);
             extract($request->post());
-            $this->getRole()->create([
+            if (@$name == 'systemsuperadmin' && $this->user->roles->first() !== 'systemsuperadmin')
+            {
+                return back()->with('error','Role name already exists');
+            }
+            if (@$name == 'superadmin' && ($this->user->roles->first() !== 'systemsuperadmin' || $this->user->roles->first() !== 'superadmin'))
+            {
+                return back()->with('error','Role name already exists');
+            }
+            $this->getRole($permission)->create([
                 'company_id'=>$company,
                 'name'=>$name,
                 'display_name'=>$display_name,
@@ -91,6 +103,7 @@ class RoleController extends Controller
     private function update(Request $request,$id)
     {
         try {
+            $permission = $this->permissions()->edit_role;
             $request->validate([
                 'name' => ['required', 'string', 'max:255','regex:/^[a-z0-9_]+$/', Rule::unique('roles','name')->where(function ($query) use ($request){$query->where('company_id',$request->post('company'));})->ignore($id,'id')],
                 'display_name' => ['required', 'string', 'max:255',Rule::unique('roles','display_name')->where(function ($query) use ($request){$query->where('company_id',$request->post('company'));})->ignore($id,'id')],
@@ -98,7 +111,7 @@ class RoleController extends Controller
                 'description' => ['nullable','sometimes','string','max:255'],
             ]);
             extract($request->post());
-            $this->getRole()->where('id',$id)->update([
+            $this->getRole($permission)->where('id',$id)->update([
                 'company_id'=>$company,
                 'name'=>$name,
                 'display_name'=>$display_name,
@@ -115,15 +128,16 @@ class RoleController extends Controller
     public function destroy(Request $request)
     {
         try {
+            $permission = $this->permissions()->delete_role;
             $request->validate([
                 'id'    =>  ['string','required',Rule::exists('roles','id')],
             ]);
             extract($request->post());
-            if (count($this->getRole()->where('id',$id)->first()->getUsers))
+            if (count($this->getRole($permission)->where('id',$id)->first()->getUsers))
             {
                 return back()->with('warning','This data has relation between another table. Data delete not possible!');
             }
-            $this->getRole()->where('id',$id)->delete();
+            $this->getRole($permission)->where('id',$id)->delete();
             return redirect(route('role.list'))->with('success','Role deleted successfully');
         }catch (\Throwable $exception)
         {

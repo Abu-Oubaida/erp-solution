@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('op_reference_types', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->unique()->nullable();
+            $table->string('code')->nullable();
             $table->string('description')->nullable();
             $table->integer('status')->default(0)->comment('0 - Inactive, 1 - Active');
             $table->unsignedBigInteger('created_by')->nullable();

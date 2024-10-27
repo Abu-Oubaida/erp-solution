@@ -21,7 +21,7 @@
         <div class="row">
             <div class="col-md-2 mb-1">
                 <label for="company">Company<span class="text-danger">*</span></label>
-                <select id="company" name="company" class="select-search cursor-pointer" onchange="return Obj.userWiseCompanyProjectPermissions(this,{!! Auth::user()->id !!},'project')">
+                <select id="company" name="company" class="select-search cursor-pointer" onchange="return Obj.companyProjects(this,{!! Auth::user()->id !!},'project','r_type')">
                     <option value="">Pick options...</option>
                     @if(count($companies))
                         @foreach($companies as $c)
@@ -34,7 +34,7 @@
                 <label for="project">Enter Project Name<span class="text-danger">*</span></label>
                 <select id="project" name="project" class="select-search cursor-pointer">
                     <option value="">Pick options...</option>
-                    @if(count($projects))
+                    @if(@$projects !== null)
                         @foreach($projects as $p)
                             <option @if(Request::get('project') !== null && Request::get('project') == $p->id)selected @endif value="{!! $p->id !!}">{!! $p->branch_name !!}</option>
                         @endforeach
@@ -51,7 +51,7 @@
                 <label for="r_type">Reference Type<span class="text-danger">*</span></label>
                 <select id="r_type" name="r_type" class="select-search cursor-pointer">
                     <option value="">Pick options...</option>
-                    @if(count($ref_types))
+                    @if(@$ref_types !== null)
                         @foreach($ref_types as $rt)
                             <option @if(Request::get('rt') !== null && Request::get('rt') == $rt->id)selected @endif value="{!! $rt->id !!}">{!! $rt->name !!}</option>
                         @endforeach

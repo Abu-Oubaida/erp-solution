@@ -28,4 +28,8 @@ class fixed_asset_specifications extends Model
     {
         return $this->belongsTo(Fixed_asset::class, 'fixed_asset_id');
     }
+    public function fixedWithRefData()
+    {
+        return $this->hasMany(Fixed_asset_opening_with_spec::class, 'spec_id','id');
+    }
 }
