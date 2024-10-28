@@ -40,4 +40,8 @@ class Fixed_asset_opening_balance extends Model
     {
         return $this->hasMany(Fixed_asset_opening_balance_document::class, 'opening_asset_id');
     }
+    public function detailsUsingReference()
+    {
+        return $this->hasMany(Fixed_asset_opening_with_spec::class,'references','references');
+    }
 }

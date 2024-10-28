@@ -10,6 +10,8 @@ use App\Models\CompanyModulePermission;
 use App\Models\department;
 use App\Models\Designation;
 use App\Models\Fixed_asset;
+use App\Models\Fixed_asset_opening_balance;
+use App\Models\Fixed_asset_opening_with_spec;
 use App\Models\fixed_asset_specifications;
 use App\Models\Op_reference_type;
 use App\Models\Permission;
@@ -228,5 +230,14 @@ trait ParentTraitCompanyWise
             return $object;
         }
         return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
+    }
+
+    protected function getFixedAssetStockMaterials($operation_permission_name,$project_id,$company_id)
+    {
+        $with_ref_stock = Fixed_asset_opening_balance::with(['withSpecifications','detailsUsingReference','branch','company']);
+        if (!$this->user->isSystemSuperAdmin())
+        {
+            $with_ref_stock = $with_ref_stock->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
+        }
     }
 }

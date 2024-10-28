@@ -1020,6 +1020,56 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            gpEntrySearch:function (e, outputID)
+            {
+                const from_company_id = $("#form_company").val()
+                const to_company_id = $("#to_company").val()
+                const reference = $("#gp_ref").val()
+                const from_project = $("#from_project").val()
+                const to_project = $("#to_project").val()
+                const gp_date = $("#gp_date").val()
+                alert(gp_date);
+                if (from_company_id.length === 0 && to_company_id.length === 0 && reference.length === 0 && from_project.length === 0 && to_project.length === 0 && gp_date.length === 0)
+                {
+                    alert('All Input are Empty!')
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/create"
+                $.ajax({
+                    url:url,
+                    method:'POST',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data:{'from_company_id':from_company_id,'to_company_id':to_company_id,'reference':reference,'from_branch_id':from_project,'to_branch_id':to_project,'gp_date':gp_date,'gp_reference':reference},
+                    success:function(response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            $("#"+outputID).html(response.data)
+                            // Get the current URL
+                            var currentUrl = window.location.href
+                            // Construct the new URL by appending the ref value
+                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference + '&from_p=' + from_project+ '&to_p=' + to_project + '&d=' + gp_date + '&from_c=' + from_company_id + '&to_c=' + to_company_id
+                            // Change the URL without reloading the page
+                            history.pushState({ref: reference}, '', newUrl)
+                        }
+                        else if (response.status === 'warning')
+                        {
+                            alert("Warning:"+response.message)
+                            $("#"+outputID).html('')
+                        }
+                        else if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
+                            // Handle error
+                            console.log('Error:', response.message)
+                        }
+                    },
+                    error:function(xhr)
+                    {
+                        console.log('AJAX Error:', xhr.statusText);
+                    }
+                })
+            },
             fixedAssetOpeningSpecEdit:function (e)
             {
                 const id = $(e).attr('ref')

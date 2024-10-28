@@ -75,6 +75,13 @@
                                             <a class="nav-link" href="{{route('edit.fixed.asset.distribution.with.reference.balance',['faobid'=>\Illuminate\Support\Facades\Request::route('faobid')])}}" title="Edit With Reference"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div> Edit With Reference</a>
                                         @endif
                                 @endif
+                                @if(auth()->user()->hasPermission('fixed_asset_transfer_entry'))
+                                    @if(Route::currentRouteName() == 'fixed.asset.transfer')
+                                        <a class="nav-link" href="{{route('fixed.asset.transfer')}}" title="Distribute Fixed Asset Via Gate Pass (GP) Reference"><div class="sb-nav-link-icon">GP</div> Gate Pass</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('fixed.asset.transfer')}}" title="Distribute Fixed Asset Via Gate Pass (GP) Reference"><div class="sb-nav-link-icon">GP</div> Gate Pass</a>
+                                    @endif
+                                @endif
                                 @if(auth()->user()->hasPermission('fixed_asset_damage'))
                                     @if(Route::currentRouteName() == 'fixed.asset.add')
                                         <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>
@@ -103,13 +110,7 @@
 {{--                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Distribute Fixed Asset Via Materials Purchase Requisition (MRF) Reference"><div class="sb-nav-link-icon">MRF</div> Reference</a>--}}
 {{--                                    @endif--}}
 {{--                                @endif--}}
-                                @if(auth()->user()->hasPermission('distribution_fixed_asset_gp'))
-                                    @if(Route::currentRouteName() == 'fixed.asset.add')
-                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Distribute Fixed Asset Via Gate Pass (GP) Reference"><div class="sb-nav-link-icon">GP</div> Reference</a>
-                                    @else
-                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Distribute Fixed Asset Via Gate Pass (GP) Reference"><div class="sb-nav-link-icon">GP</div> Reference</a>
-                                    @endif
-                                @endif
+
                             </nav>
                         </div>
                     @endif

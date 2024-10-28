@@ -29,9 +29,10 @@
                                     <div class="mb-3">
                                         <label for="permission_parent">Permission Parent<span class="text-danger">*</span></label>
                                         <select class="select-search" name="permission_parent" id="permission_parent" required>
-                                            @foreach($permissions as $p)
-                                                <option value="{!! $p->id !!}" @if(old('permission_parent') == $p->id) selected @endif>{!! $p->display_name !!}</option>
-                                            @endforeach
+                                            <option value="">Pick options...</option>
+                                        @foreach($permissions as $p)
+                                            <option value="{!! $p->id !!}" @if(old('permission_parent') == $p->id) selected @endif>{!! $p->display_name !!}</option>
+                                        @endforeach
                                         </select>
                                     </div>
                                 </div>

@@ -11,6 +11,7 @@ use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\FixedAssetDistribution;
+use App\Http\Controllers\FixedAssetTransferController;
 use App\Http\Controllers\OpReferenceTypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesInterfaceController;
@@ -439,8 +440,8 @@ Route::group(['middleware' => ['auth']],function (){
             });
         });
         # 3.14.2 Fixed Asset Distribution
-        Route::controller(FixedAssetDistribution::class)->group(function (){
-            Route::middleware(['permission:fixed_asset_distribution'])->prefix('fixed-asset-distribution')->group(function (){
+        Route::middleware(['permission:fixed_asset_distribution'])->prefix('fixed-asset-distribution')->group(function (){
+            Route::controller(FixedAssetDistribution::class)->group(function (){
                 Route::match(['get','post'],'index','index')->name('fixed.asset.distribution');
                 Route::middleware(['permission:fixed_asset_with_reference_input'])->group(function (){
                     Route::match(['get','post'],'with-reference-input','openingInput')->name('fixed.asset.distribution.opening.input');
@@ -464,13 +465,19 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::middleware(['permission:fixed_asset_opening_report'])->group(function (){
                     Route::get('opening-report','openingReportView')->name('fixed.asset.distribution.opening.report.view');
                 });
-
                 Route::middleware(['permission:fixed_asset_mrf'])->group(function (){});
                 Route::middleware(['permission:fixed_asset_gp'])->group(function (){});
                 Route::middleware(['permission:fixed_asset_issue'])->group(function (){});
                 Route::middleware(['permission:fixed_asset_damage'])->group(function (){});
                 Route::middleware(['permission:fixed_asset_issue_return'])->group(function (){});
                 Route::post('company-projects','companyProjects');
+            });
+
+            Route::controller(FixedAssetTransferController::class)->group(function (){
+                Route::middleware(['permission:fixed_asset_transfer_entry'])->group(function (){
+                    Route::match(['get'],'index','index')->name('fixed.asset.transfer');
+                    Route::post('create','create')->name('fixed.asset.transfer.create');
+                });
             });
         });
     });
