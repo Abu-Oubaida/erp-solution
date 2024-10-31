@@ -39,12 +39,12 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col mb-1">
-                                <label for="company">From Company<span class="text-danger">*</span></label>
-                                <select id="form_company" name="form_company" class="select-search cursor-pointer" onchange="return Obj.userWiseCompanyProjectPermissions(this,{!! Auth::user()->id !!},'from_project')">
+                                <label for="from_company">From Company<span class="text-danger">*</span></label>
+                                <select id="from_company" name="from_company" class="select-search cursor-pointer" onchange="return Obj.userWiseCompanyProjectPermissions(this,{!! Auth::user()->id !!},'from_project')">
                                     <option value="">Pick options...</option>
                                     @if(count(@$companies))
                                         @foreach($companies as $c)
-                                            <option @if(Request::get('c') !== null && Request::get('c') == $c->id)selected @endif value="{!! $c->id !!}">{!! $c->company_name !!} </option>
+                                            <option @if(Request::get('from_c') !== null && Request::get('from_c') == $c->id)selected @endif value="{!! $c->id !!}">{!! $c->company_name !!} </option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -53,11 +53,11 @@
                                 <label for="project">From Project Name<span class="text-danger">*</span></label>
                                 <select id="from_project" name="from_project" class="select-search cursor-pointer">
                                     <option value="">Pick options...</option>
-                                    {{--                    @if(@$projects !== null)--}}
-                                    {{--                        @foreach($projects as $p)--}}
-                                    {{--                            <option @if(Request::get('project') !== null && Request::get('project') == $p->id)selected @endif value="{!! $p->id !!}">{!! $p->branch_name !!}</option>--}}
-                                    {{--                        @endforeach--}}
-                                    {{--                    @endif--}}
+                            @if(@$from_projects !== null)
+                                @foreach($from_projects as $p)
+                                    <option @if(Request::get('from_p') !== null && Request::get('from_p') == $p->id)selected @endif value="{!! $p->id !!}">{!! $p->branch_name !!}</option>
+                                @endforeach
+                            @endif
                                 </select>
                             </div>
                             <div class="col mb-1">
@@ -66,7 +66,7 @@
                                     <option value="">Pick options...</option>
                                     @if(count(@$companies))
                                         @foreach($companies as $c)
-                                            <option @if(Request::get('c') !== null && Request::get('c') == $c->id)selected @endif value="{!! $c->id !!}">{!! $c->company_name !!} </option>
+                                            <option @if(Request::get('to_c') !== null && Request::get('to_c') == $c->id)selected @endif value="{!! $c->id !!}">{!! $c->company_name !!} </option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -75,11 +75,11 @@
                                 <label for="project">To Project Name<span class="text-danger">*</span></label>
                                 <select id="to_project" name="to_project" class="select-search cursor-pointer">
                                     <option value="">Pick options...</option>
-                                    {{--                    @if(@$projects !== null)--}}
-                                    {{--                        @foreach($projects as $p)--}}
-                                    {{--                            <option @if(Request::get('project') !== null && Request::get('project') == $p->id)selected @endif value="{!! $p->id !!}">{!! $p->branch_name !!}</option>--}}
-                                    {{--                        @endforeach--}}
-                                    {{--                    @endif--}}
+                            @if(@$to_projects !== null)
+                                @foreach($to_projects as $p)
+                                    <option @if(Request::get('to_p') !== null && Request::get('to_p') == $p->id)selected @endif value="{!! $p->id !!}">{!! $p->branch_name !!}</option>
+                                @endforeach
+                            @endif
                                 </select>
                             </div>
                             <div class="col mb-1">
@@ -88,7 +88,7 @@
                             </div>
                             <div class="col">
                                 <label for="gp_date">GP Date<span class="text-danger">*</span></label>
-                                <input class="form-control" value="{!! Request::get('gp_date') !!}" name="gp_date" type="date"  id="gp_date">
+                                <input class="form-control" value="{!! date('Y-m-d',strtotime(Request::get('d'))) !!}" name="gp_date" type="date"  id="gp_date">
                             </div>
                             <div class="col mt-4">
                                 <button class="btn btn-chl-outline float-end" type="button" id="ref-src-btn" onclick="return Obj.gpEntrySearch(this,'fixed-asset-body')">
@@ -110,5 +110,14 @@
         </div>
 
     </div>
+    <script>
+        @if(request()->get('from_c') && request()->get('to_c') && request()->get('to_p') && request()->get('from_p') && request()->get('ref') && request()->get('d'))
+        (function ($) {
+            $(document).ready(function () {
+                Obj.gpEntrySearch(this,'fixed-asset-body')
+            });
+        }(jQuery))
+        @endif
+    </script>
 @stop
 

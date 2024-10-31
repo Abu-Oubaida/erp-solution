@@ -13,6 +13,7 @@ use App\Models\Fixed_asset;
 use App\Models\Fixed_asset_opening_balance;
 use App\Models\Fixed_asset_opening_with_spec;
 use App\Models\fixed_asset_specifications;
+use App\Models\Fixed_asset_transfer_with_spec;
 use App\Models\Op_reference_type;
 use App\Models\Permission;
 use App\Models\PermissionUser;
@@ -206,6 +207,24 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
+    private function getFixedAssetWithRefData($operation_permission_name)
+    {
+        $object = Fixed_asset_opening_balance::with(['withSpecifications','attestedDocuments','branch','createdBy','updatedBy','refType','company']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
+    }
+    private function getFixedAssetWithRefSpecification($operation_permission_name)
+    {
+        $object = Fixed_asset_opening_with_spec::with(['asset','fixed_asset_opening_balance','specification','createdBy','updatedBy','company']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
+    }
     public function getUserCompanyPermissionArray($user_id)
     {
         $userComPerIDs = [];
@@ -232,12 +251,44 @@ trait ParentTraitCompanyWise
         return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
 
-    protected function getFixedAssetStockMaterials($operation_permission_name,$project_id,$company_id)
+    protected function getProjectWiseWithReferenceMaterialsStock($operation_permission_name,$project_id,$company_id): Builder
     {
-        $with_ref_stock = Fixed_asset_opening_balance::with(['withSpecifications','detailsUsingReference','branch','company']);
-        if (!$this->user->isSystemSuperAdmin())
-        {
-            $with_ref_stock = $with_ref_stock->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
-        }
+        return Fixed_asset_opening_with_spec::with(['fixed_asset_opening_balance','specification','asset'])->whereHas('fixed_asset_opening_balance', function ($query) use ($company_id, $project_id) {
+            $query->where('company_id', $company_id)
+                ->where('branch_id', $project_id);
+        });
+    }
+    protected function getProjectWiseTransferMaterialsStock($operation_permission_name,$to_project_id,$to_company_id): Builder
+    {
+        return Fixed_asset_transfer_with_spec::with(['fixed_asset_transfer','specification','asset'])->whereHas('fixed_asset_transfer', function ($query) use ($to_company_id, $to_project_id) {
+            $query->where('to_company_id', $to_company_id)
+                ->where('to_company_id', $to_project_id);
+        });
+    }
+
+    public function getFixedAssetStockMaterials($operation_permission_name,$project_id,$company_id)
+    {
+        $fixed_asset_id = [];
+        $withRef = $this->getProjectWiseWithReferenceMaterialsStock($operation_permission_name,$project_id,$company_id)->pluck('asset_id')->unique()->toArray();
+        $transfer = $this->getProjectWiseTransferMaterialsStock($operation_permission_name,$project_id,$company_id)->pluck('asset_id')->unique()->toArray();
+        $fixed_asset_id = array_merge($withRef,$transfer);
+        // $issue_return--------
+        // $mrf or $mpr---------
+        return $fixed_asset_id;
+    }
+    public function getFixedAssetStockMaterialSpecifications($operation_permission_name,$materials_id,$project_id,$company_id)
+    {
+        $fixed_asset_specification_id = [];
+        $withRef = $this->getProjectWiseWithReferenceMaterialsStock($operation_permission_name,$project_id,$company_id)->where('asset_id',$materials_id)->pluck('spec_id')->unique()->toArray();
+        $transfer = $this->getProjectWiseTransferMaterialsStock($operation_permission_name,$project_id,$company_id)->where('asset_id',$materials_id)->pluck('spec_id')->unique()->toArray();
+        $fixed_asset_specification_id = array_merge($withRef,$transfer);
+        // $issue_return--------
+        // $mrf or $mpr---------
+        return $fixed_asset_specification_id;
+    }
+    public function getFixedAssetSpecificationWiseStockBalance($operation_permission_name,$specification_id,$materials_id,$project_id,$company_id)
+    {
+        $withRef = $this->getProjectWiseWithReferenceMaterialsStock($operation_permission_name,$project_id,$company_id)->where('asset_id',$materials_id)->where('spec_id',$specification_id)->sum('qty');
+        dd($withRef);
     }
 }

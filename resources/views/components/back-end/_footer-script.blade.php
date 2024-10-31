@@ -1,4 +1,3 @@
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.4/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -30,7 +29,7 @@
 <script src="https://cdn.datatables.net/buttons/2.3.1/js/buttons.print.min.js"></script>
 
 <script src="{{url("assets/js/datatables-simple-demo.js")}}"></script>
-<script src="{{url("assets/js/custom.js")}}"></script>
+
 <script src="{{url("assets/js/datatables2.js")}}"></script>
 @if(Route::CurrentRouteName() == 'add.complain'|| Route::CurrentRouteName() == 'edit.my.complain')
 <script>

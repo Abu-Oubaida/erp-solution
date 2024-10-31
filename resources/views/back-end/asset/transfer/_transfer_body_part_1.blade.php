@@ -7,11 +7,11 @@
     })
 </script>
 <div class="col-md-12">
-    <div class="card mb-4">
+    <div class="card mb-4 mt-2">
         <div class="card-header">
             <div class="row">
                 <div class="col">
-                    <h5 class="text-capitalize"><svg class="svg-inline--fa fa-table me-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="table" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M64 256V160H224v96H64zm0 64H224v96H64V320zm224 96V320H448v96H288zM448 256H288V160H448v96zM64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64z"></path></svg> Fixed Asset Transfer</h5>
+                    <h5 class="text-capitalize"><i class="fa-solid fa-arrow-right-arrow-left"></i> Fixed Asset Transfer</h5>
                 </div>
             </div>
         </div>
@@ -21,31 +21,31 @@
                     <div class="row mt-0">
                         <div class="col">
                         @isset($from_company)
-                            <span class="float-start"><strong>From Company: </strong>{!! $from_company->company_name !!}</span>
+                                <span class="float-start"><strong>From Company: </strong><span class="badge bg-success">{!! $from_company->company_name !!}</span></span>
                             <input type="hidden" id="from_company_id_hide" value="{!! $from_company->id !!}">
                         @endisset
                         </div>
                         <div class="col text-center">
                         @isset($from_project)
-                            <span class=""><strong>From Project: </strong>{!! $from_project->branch_name !!}</span>
+                                <span class=""><strong>From Project: </strong><span class="badge bg-success">{!! $from_project->branch_name !!}</span></span>
                             <input type="hidden" id="from_project_id_hide" value="{!! $from_project->id !!}">
                         @endisset
                         </div>
-                        <div class="col">
+                        <div class="col text-center">
                             @isset($to_company)
-                                <span class="float-start"><strong>To Company: </strong>{!! $to_company->company_name !!}</span>
+                                <span class=""><strong>To Company: </strong><span class="badge bg-info">{!! $to_company->company_name !!}</span></span>
                                 <input type="hidden" id="from_company_id_hide" value="{!! $to_company->id !!}">
                             @endisset
                         </div>
                         <div class="col text-center">
                             @isset($to_project)
-                                <span class=""><strong>To Project: </strong>{!! $to_project->branch_name !!}</span>
+                                <span><strong>To Project: </strong><span class="badge bg-info">{!! $to_project->branch_name !!}</span></span>
                                 <input type="hidden" id="from_project_id_hide" value="{!! $to_project->id !!}">
                             @endisset
                         </div>
-                        <div class="col">
+                        <div class="col text-center">
                             @isset($gp_reference)
-                            <span class="float-end"><strong>Reference: </strong>GP-{!! $gp_reference !!}</span>
+                            <span><strong>Reference: </strong>GP-{!! $gp_reference !!}</span>
                             <input type="hidden" id="gp_ref_hide" value="{!! $gp_reference !!}">
                             @endisset
                         </div>
@@ -63,7 +63,7 @@
                 <div class="col-md-3">
                     <div class="mb-1">
                         <label for="recourse_code">Materials<span class="text-danger">*</span></label>
-                        <select class="select-search" id="materials_id" onchange="return Obj.getFixedAssetSpecification(this)">
+                        <select class="select-search" id="materials_id" onchange="Obj.gpMaterialsSpecificationSearch(this,'specification')">
                             <option value="">Pick options...</option>
                             @if(count($fixed_assets))
                                 @foreach($fixed_assets as $fx)
@@ -76,7 +76,7 @@
                 <div class="col-md-3">
                     <div class="mb-1">
                         <label for="specification">Specification<span class="text-danger">*</span></label>
-                        <select class="select-search" id="specification" >
+                        <select class="select-search" id="specification" onchange="return Obj.gpMaterialsSpecificationWiseStockAndRateSearch(this,'rate')">
                             <option value="">Pick options...</option>
                         </select>
                     </div>
@@ -93,10 +93,20 @@
                         <input class="form-control" id="rate" onfocusout="return Obj.priceTotal(this, 'qty','total')" type="text" placeholder="Rate" value="" required/>
                     </div>
                 </div>
-                <div class="col-md-1">
-                    <div class="mb-1">
-                        <label for="qty">Qty.<span class="text-danger">*</span></label>
-                        <input class="form-control" onfocusout="return Obj.priceTotal(this, 'rate','total')" id="qty" type="text" placeholder="Qty" value="" required/>
+                <div class="col-md-3">
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-1">
+                                <label for="stock">Stock Balance<span class="text-danger">*</span></label>
+                                <input class="form-control bg-secondary" id="stock" type="text" placeholder="Stock Balance" value="" required readonly/>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-1">
+                                <label for="qty">Qty.<span class="text-danger">*</span></label>
+                                <input class="form-control" onfocusout="return Obj.priceTotal(this, 'rate','total')" id="qty" type="text" placeholder="Qty" value="" required/>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-1">
@@ -125,7 +135,7 @@
             </div>
             <hr>
             <div>
-                @include('back-end.asset._fixed_asset_opening_body_list')
+{{--                @include('back-end.asset._fixed_asset_opening_body_list')--}}
             </div>
         </div>
     </div>

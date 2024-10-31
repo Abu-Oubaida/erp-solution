@@ -1022,13 +1022,12 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             },
             gpEntrySearch:function (e, outputID)
             {
-                const from_company_id = $("#form_company").val()
+                const from_company_id = $("#from_company").val()
                 const to_company_id = $("#to_company").val()
                 const reference = $("#gp_ref").val()
                 const from_project = $("#from_project").val()
                 const to_project = $("#to_project").val()
                 const gp_date = $("#gp_date").val()
-                alert(gp_date);
                 if (from_company_id.length === 0 && to_company_id.length === 0 && reference.length === 0 && from_project.length === 0 && to_project.length === 0 && gp_date.length === 0)
                 {
                     alert('All Input are Empty!')
@@ -1055,13 +1054,90 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         else if (response.status === 'warning')
                         {
                             alert("Warning:"+response.message)
-                            $("#"+outputID).html('')
+                            // $("#"+outputID).html('')
                         }
                         else if (response.status === 'error')
                         {
                             alert("Error:"+response.message)
                             // Handle error
-                            console.log('Error:', response.message)
+                            // console.log('Error:', response.message)
+                        }
+                    },
+                    error:function(xhr)
+                    {
+                        console.log('AJAX Error:', xhr.statusText);
+                    }
+                })
+            },
+            gpMaterialsSpecificationSearch:function (e,outputID)
+            {
+                const from_company_id = $("#from_company").val()
+                const from_project = $("#from_project").val()
+                const materials_id = $(e).val()
+                if (from_company_id.length === 0 && from_project.length === 0  && materials_id.length === 0 )
+                {
+                    alert('All Input are Empty!')
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/material-specification-search"
+                $.ajax({
+                    url:url,
+                    method:'POST',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data:{'from_company_id':from_company_id,'from_branch_id':from_project,'materials_id':materials_id},
+                    success:function(response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            updateSelectBoxSingleOption(response.data,outputID,'id','specification')
+                            $("#unite").val(response.data[0].fixed_asset.unit)
+                        }
+                        else if (response.status === 'warning')
+                        {
+                            alert("Warning:"+response.message)
+                        }
+                        else if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
+                        }
+                    },
+                    error:function(xhr)
+                    {
+                        console.log('AJAX Error:', xhr.statusText);
+                    }
+                })
+            },
+            gpMaterialsSpecificationWiseStockAndRateSearch:function (e,outputID)
+            {
+                const from_company_id = $("#from_company").val()
+                const from_project = $("#from_project").val()
+                const materials_id = $("#materials_id").val()
+                const spec_id = $(e).val()
+                if (from_company_id.length === 0 && from_project.length === 0  && materials_id.length === 0 && spec_id.length === 0 )
+                {
+                    alert('All Input are Empty!')
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/material-specification-wise-stock-rate-search"
+                $.ajax({
+                    url:url,
+                    method:'POST',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data:{'from_company_id':from_company_id,'from_branch_id':from_project,'materials_id':materials_id,'spec_id':spec_id},
+                    success:function(response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            // updateSelectBoxSingleOption(response.data,outputID,'id','specification')
+                            // $("#unite").val(response.data[0].fixed_asset.unit)
+                        }
+                        else if (response.status === 'warning')
+                        {
+                            alert("Warning:"+response.message)
+                        }
+                        else if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
                         }
                     },
                     error:function(xhr)

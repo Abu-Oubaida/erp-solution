@@ -477,6 +477,8 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::middleware(['permission:fixed_asset_transfer_entry'])->group(function (){
                     Route::match(['get'],'index','index')->name('fixed.asset.transfer');
                     Route::post('create','create')->name('fixed.asset.transfer.create');
+                    Route::post('material-specification-search','materialWiseSpecification');
+                    Route::post('material-specification-wise-stock-rate-search','materialSpecificationWiseStockRate');
                 });
             });
         });

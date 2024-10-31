@@ -101,7 +101,7 @@ class FixedAssetDistribution extends Controller
             return view('back-end.asset.fixed-asset-opening',compact('projects','companies','ref_types'));
         }
         else{
-            $fixed_asset_with_ref = $this->fixedAssetOpeningBalances($permission)->where('company_id',$company_id);
+            $fixed_asset_with_ref = $this->getFixedAssetWithRefData($permission)->where('company_id',$company_id);
             if (!empty($reference))
             {
                 $withRefData = $fixed_asset_with_ref->where('references',$reference)->first();
@@ -244,13 +244,14 @@ class FixedAssetDistribution extends Controller
     public function fixedAssetSpecification(Request $request): JsonResponse
     {
         try {
+            $permission = $this->permissions()->fixed_asset_with_reference_input;
             $request->validate([
                 'id'=>['required','string','exists:fixed_assets,id'],
             ]);
             if ($request->isMethod('post'))
             {
                 extract($request->post());
-                $spec = $this->fixedAssetSpecifications($id)->get();
+                $spec = $this->getFixedAssetSpecification($permission)->where('fixed_asset_id',$id)->get();
                 return \response()->json([
                     'status'=>'success',
                     'data'=>$spec,
@@ -271,7 +272,7 @@ class FixedAssetDistribution extends Controller
     }
     public function addFixedAssetOpening(Request $request)
     {
-        try {
+//        try {
             $permission = $this->permissions()->fixed_asset_with_reference_input;
             $request->validate([
                 'opening_date'    => ['required','date'],
@@ -289,7 +290,7 @@ class FixedAssetDistribution extends Controller
             if ($request->isMethod('post'))
             {
                 extract($request->post());
-                $opening = Fixed_asset_opening_balance::with(['withSpecifications'])->where('company_id',$this->user->company_id)->where('branch_id',$project_id)->where('references',$reference)->first();
+                $opening = $this->getFixedAssetWithRefData($permission)->where('branch_id',$project_id)->where('references',$reference)->first();
                 if (is_null($opening) || empty($opening))
                 {
                     $opening = Fixed_asset_opening_balance::create([
@@ -317,8 +318,8 @@ class FixedAssetDistribution extends Controller
 //                }
 //                else
 //                {
-                    $base_table_data = Fixed_asset_opening_balance::where('company_id',$this->user->company_id)->firstWhere('references',$reference);
-                    $opening_materials_obj = Fixed_asset_opening_with_spec::where('opening_asset_id',$base_table_data->id)->where('references',$base_table_data->references)->where('company_id',$this->user->company_id);
+                    $base_table_data = $this->getFixedAssetWithRefData($permission)->where('references',$reference)->first();
+                    $opening_materials_obj = $this->getFixedAssetWithRefSpecification($permission)->where('opening_asset_id',$base_table_data->id)->where('references',$base_table_data->references);
                     $omt1 = $opening_materials_obj;
                     if ($omt1->where('asset_id',$materials_id)->where('spec_id',$specification)->count() > 0)
                     {
@@ -344,7 +345,7 @@ class FixedAssetDistribution extends Controller
                         ]);
                     }
 //                }
-                $withRefData = $this->fixedAssetOpeningBalances($permission)->where('company_id',$company_id)->where('branch_id',$project_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
+                $withRefData = $this->getFixedAssetWithRefData($permission)->where('company_id',$company_id)->where('branch_id',$project_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
                 $view = view('back-end.asset.__edit_fixed_asset_opening_body_list',compact('withRefData'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -356,13 +357,13 @@ class FixedAssetDistribution extends Controller
                 'status'=>'error',
                 'message'=>'Request not supported!'
             ],200);
-        }catch (\Throwable $exception)
-        {
-            return \response()->json([
-                'status'=>'error',
-                'message'=> $exception->getMessage(),
-            ],200);
-        }
+//        }catch (\Throwable $exception)
+//        {
+//            return \response()->json([
+//                'status'=>'error',
+//                'message'=> $exception->getMessage(),
+//            ],200);
+//        }
     }
 
     public function editFixedAssetOpening(Request $request,$faobid)
@@ -370,7 +371,7 @@ class FixedAssetDistribution extends Controller
         try {
             $permission = $this->permissions()->edit_fixed_asset_distribution_with_reference;
             $id = Crypt::decryptString($faobid);
-            $item = $this->fixedAssetOpeningBalances($permission)->where('id',$id)->first();
+            $item = $this->getFixedAssetWithRefData($permission)->where('id',$id)->first();
             $projects = $this->getUserProjectPermissions($this->user->id,$permission)->get();
 //            $projects = $this->getUserWiseProjects($this->user->id);
             $ref_types = $this->refTypes()->get();
@@ -402,8 +403,8 @@ class FixedAssetDistribution extends Controller
                 'narration' => ['sometimes','nullable','string'],
             ]);
             extract($request->post());
-            $data = $this->fixedAssetOpeningBalances($permission)->where('id',$id)->first();
-            $update = $this->fixedAssetOpeningBalances($permission)->where('id',$id)->update([
+            $data = $this->getFixedAssetWithRefData($permission)->where('id',$id)->first();
+            $update = $this->getFixedAssetWithRefData($permission)->where('id',$id)->update([
                 'company_id'=>$company_id,
                 'references'=>$reference,
                 'ref_type_id'=>$r_type,

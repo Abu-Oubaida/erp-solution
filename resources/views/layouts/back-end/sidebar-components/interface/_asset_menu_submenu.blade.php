@@ -2,14 +2,14 @@
 
     @if(Request::segment(1) == "fixed-asset" || Request::segment(1) == "fixed-asset-distribution")
         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#fixedAssetOption" aria-expanded="true" aria-controls="fixedAssetOption">
-            <div class="sb-nav-link-icon"><i class="fas fa-solid fa-f"></i><i class="fas fa-solid fa-a"></i></div>
+            <div class="sb-nav-link-icon"><i class="fa-solid fa-folder-tree"></i></div>
             Fixed Asset
             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
         </a>
         <div class="collapse show" id="fixedAssetOption" aria-labelledby="headingOne" data-bs-parent="#fixedAssetOption">
     @else
         <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#fixedAssetOption" aria-expanded="false" aria-controls="fixedAssetOption">
-            <div class="sb-nav-link-icon"><i class="fas fa-solid fa-f"></i><i class="fas fa-solid fa-a"></i></div>
+            <div class="sb-nav-link-icon"><i class="fa-solid fa-folder-tree"></i></div>
             Fixed Asset
             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
         </a>

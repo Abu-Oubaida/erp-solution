@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\fixed_asset_specifications;
 use App\Traits\ParentTraitCompanyWise;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -16,18 +18,28 @@ class FixedAssetTransferController extends Controller
             return $next($request);
         });
     }
-    public function index()
+    public function index(Request $request)
     {
         try {
             $permission = $this->permissions()->fixed_asset_transfer_entry;
+            $from_projects = null;
+            $to_projects = null;
+            if ($request->get('from_p') && $request->get('from_c'))
+            {
+                $from_projects = $this->getBranch($permission)->where('company_id', $request->get('from_c'))->get();
+            }
+            if ($request->get('to_p') && $request->get('to_c'))
+            {
+                $to_projects = $this->getBranch($permission)->where('company_id', $request->get('to_c'))->get();
+            }
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            return view('back-end.asset.transfer.index',compact('companies'));
+            return view('back-end.asset.transfer.index',compact('companies','from_projects','to_projects'));
         }catch (\Throwable $exception){
             return back()->with('error', $exception->getMessage());
         }
     }
 
-    public function create(Request $request)
+    public function create(Request $request): JsonResponse
     {
         try {
             if ($request->isMethod('POST')) {
@@ -43,11 +55,19 @@ class FixedAssetTransferController extends Controller
                 extract($data);
                 $companies = $this->getCompanyModulePermissionWise($permission);
                 $branches = $this->getBranch($permission);
-                $from_company = $companies->select(['id','company_name'])->where('id',$from_company_id)->first();
-                $to_company = $companies->select(['id','company_name'])->where('id',$to_company_id)->first();
-                $from_project = $branches->select(['id','branch_name'])->where('company_id',$from_company_id)->where('id',$from_branch_id)->first();
-                $to_project = $branches->select(['id','branch_name'])->where('company_id',$to_company_id)->where('id',$to_branch_id)->first();
+                $from_company = $this->getCompanyModulePermissionWise($permission)->where('id',$from_company_id)->first();
+                $to_company = $this->getCompanyModulePermissionWise($permission)->where('id',$to_company_id)->first();
+                $from_project = $this->getBranch($permission)->select(['id','branch_name'])->where('company_id',$from_company_id)->where('id',$from_branch_id)->first();
+                $to_project = $this->getBranch($permission)->select(['id','branch_name'])->where('company_id',$to_company_id)->where('id',$to_branch_id)->first();
+                $fixed_asset_ids  = $this->getFixedAssetStockMaterials($permission,$from_project->id,$from_company->id);
 
+                $fixed_assets = $this->getFixedAssets($permission)->whereIn('id',$fixed_asset_ids)->get();
+                $view = view('back-end/asset/transfer/_transfer_body_part_1',compact('fixed_assets','from_company','to_company','from_project','to_project','gp_date','gp_reference'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $view,
+                    'message' => 'Data process successfully.'
+                ]);
             }
             return response()->json([
                 'status'=>'error',
@@ -63,5 +83,66 @@ class FixedAssetTransferController extends Controller
     public function store(Request $request)
     {
 
+    }
+
+    public function materialWiseSpecification(Request $request)
+    {
+        try {
+            if ($request->isMethod('POST')) {
+                $permission = $this->permissions()->fixed_asset_transfer_entry;
+                $data = $request->validate([
+                    'from_company_id' => ['sometimes','string', 'required', 'exists:company_infos,id'],
+                    'from_branch_id' => ['sometimes','string', 'required', 'exists:branches,id'],
+                    'materials_id'  =>  ['sometimes','string', 'required', 'exists:fixed_assets,id'],
+                ]);
+                extract($data);
+                $fixed_asset_specification_ids  = $this->getFixedAssetStockMaterialSpecifications($permission,$materials_id,$from_branch_id,$from_company_id);
+                $fixed_asset_specifications = $this->getFixedAssetSpecification($permission)->whereIn('id',$fixed_asset_specification_ids)->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $fixed_asset_specifications,
+                    'message' => 'Data process successfully.'
+                ]);
+            }
+            return response()->json([
+                'status'=>'error',
+                'message'=>'Request method not allowed.'
+            ]);
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+    public function materialSpecificationWiseStockRate(Request $request)
+    {
+        try {
+            if ($request->isMethod('POST')) {
+                $permission = $this->permissions()->fixed_asset_transfer_entry;
+                $data = $request->validate([
+                    'from_company_id' => ['sometimes','string', 'required', 'exists:company_infos,id'],
+                    'from_branch_id' => ['sometimes','string', 'required', 'exists:branches,id'],
+                    'materials_id'  =>  ['sometimes','string', 'required', 'exists:fixed_assets,id'],
+                    'spec_id'  =>  ['sometimes','string', 'required', 'exists:fixed_asset_specifications,id'],
+                ]);
+                extract($data);
+                $this->getFixedAssetSpecificationWiseStockBalance($permission,$spec_id,$materials_id,$from_branch_id,$from_company_id);
+//                return response()->json([
+//                    'status' => 'success',
+//                    'data' => $fixed_asset_specifications,
+//                    'message' => 'Data process successfully.'
+//                ]);
+            }
+            return response()->json([
+                'status'=>'error',
+                'message'=>'Request method not allowed.'
+            ]);
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
     }
 }
