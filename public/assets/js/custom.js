@@ -1033,7 +1033,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     alert('All Input are Empty!')
                     return false
                 }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/create"
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/gp-create"
                 $.ajax({
                     url:url,
                     method:'POST',

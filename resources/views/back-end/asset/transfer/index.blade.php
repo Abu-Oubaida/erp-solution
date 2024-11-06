@@ -88,7 +88,7 @@
                             </div>
                             <div class="col">
                                 <label for="gp_date">GP Date<span class="text-danger">*</span></label>
-                                <input class="form-control" value="{!! date('Y-m-d',strtotime(Request::get('d'))) !!}" name="gp_date" type="date"  id="gp_date">
+                                <input class="form-control" value="{!! Request::get('d') !== null ?date('Y-m-d',strtotime(Request::get('d'))):'' !!}" name="gp_date" type="date"  id="gp_date">
                             </div>
                             <div class="col mt-4">
                                 <button class="btn btn-chl-outline float-end" type="button" id="ref-src-btn" onclick="return Obj.gpEntrySearch(this,'fixed-asset-body')">
