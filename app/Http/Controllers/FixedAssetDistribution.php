@@ -433,7 +433,7 @@ class FixedAssetDistribution extends Controller
             {
                 if ($request->hasFile('attachment'))
                 {
-                    $res = $this->fixed_asset_opening_balance_documents($request->file('attachment'),$id);
+                    $res = $this->fixed_asset_opening_balance_documents($request->file('attachment'),$id,$permission);
                     if ($res)
                     {
                         return back()->with('success','Data updated successfully.');
@@ -450,13 +450,15 @@ class FixedAssetDistribution extends Controller
     public function editFixedAssetOpeningSpec(Request $request)
     {
         try {
+            $permission = $this->permissions()->fixed_asset_with_reference_input;
             $request->validate([
                 'id'=>['required',Rule::exists('fixed_asset_opening_with_specs','id')],
             ]);
             if ($request->isMethod('post'))
             {
                 extract($request->post());
-                $data = Fixed_asset_opening_with_spec::with(['asset','specification'])->where('company_id',$this->user->company_id)->whereId($id)->first();
+                $data = $this->getFixedAssetWithRefSpecification($permission)->whereId($id)->first();
+//                $data = Fixed_asset_opening_with_spec::with(['asset','specification'])->where('company_id',$this->user->company_id)->whereId($id)->first();
                 $view = view('back-end.asset.__edit_fixed_asset_ope_spec',compact('data'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -480,6 +482,7 @@ class FixedAssetDistribution extends Controller
     public function updateFixedAssetOpeningSpec(Request $request)
     {
         try {
+            $permission = $this->permissions()->fixed_asset_with_reference_input;
             $request->validate([
                 'opening_date'    => ['required','date'],
                 'id' => ['required','string','exists:fixed_asset_opening_with_specs,id'],
@@ -491,7 +494,7 @@ class FixedAssetDistribution extends Controller
             if ($request->isMethod('post'))
             {
                 extract($request->post());
-                $update_data = Fixed_asset_opening_with_spec::where('id', $id)->first();
+                $update_data = $this->getFixedAssetWithRefSpecification($permission)->where('id', $id)->first();
 
                 if ($update_data) {
                     $update_data->update([
@@ -507,7 +510,7 @@ class FixedAssetDistribution extends Controller
                     // Refresh the model instance to get the updated data
                     $update_data = $update_data->fresh();
                 }
-                $withRefData = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$this->user->company_id)->where('references',$update_data->references)->orderBy('created_at','DESC')->first();
+                $withRefData = $this->getFixedAssetWithRefData($permission)->where('references',$update_data->references)->orderBy('created_at','DESC')->first();
                 $view = view('back-end.asset.__edit_fixed_asset_opening_body_list',compact('withRefData'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -531,6 +534,7 @@ class FixedAssetDistribution extends Controller
     public function deleteFixedAssetOpeningSpec(Request $request)
     {
         try {
+            $permission = $this->permissions()->fixed_asset_with_reference_input;
             $request->validate([
                 'id' => ['required','string','exists:fixed_asset_opening_with_specs,id'],
             ]);
@@ -545,7 +549,7 @@ class FixedAssetDistribution extends Controller
                     // Refresh the model instance to get the updated data
                     $update_data = $update_data->fresh();
                 }
-                $withRefData = Fixed_asset_opening_balance::with(['withSpecifications','withSpecifications.asset','withSpecifications.specification','branch'])->where('company_id',$this->user->company_id)->where('references',$reference)->orderBy('created_at','DESC')->first();
+                $withRefData = $this->getFixedAssetWithRefData($permission)->where('references',$reference)->orderBy('created_at','DESC')->first();
                 $view = view('back-end.asset.__edit_fixed_asset_opening_body_list',compact('withRefData'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -662,6 +666,7 @@ class FixedAssetDistribution extends Controller
     public function finalUpdateFixedAssetOpeningSpec(Request $request): Redirector|RedirectResponse|Application
     {
         try {
+            $permission = $this->permissions()->fixed_asset_with_reference_input;
             $request->validate([
                 'id' => ['required','string',Rule::exists('fixed_asset_opening_balances','id')->where('status',5)],
                 'attachment.*' => ['sometimes','nullable','file','max:512000'],
@@ -670,7 +675,7 @@ class FixedAssetDistribution extends Controller
             {
                 extract($request->post());
 
-                if (Fixed_asset_opening_with_spec::where('opening_asset_id',$id)->where('company_id',$this->user->company_id)->count() <= 0)
+                if ($this->getFixedAssetWithRefSpecification($permission)->where('opening_asset_id',$id)->count() <= 0)
                 {
                     return back()->with('warning','There is no fixed asset opening balances for this reference.');
                 }
@@ -684,12 +689,12 @@ class FixedAssetDistribution extends Controller
                 {
                     if ($request->hasFile('attachment'))
                     {
-                        $res = $this->fixed_asset_opening_balance_documents($request->file('attachment'),$id);
+                        $res = $this->fixed_asset_opening_balance_documents($request->file('attachment'),$id,$permission);
                         if ($res)
                         {
                             return back()->with('success','Data updated successfully.');
                         }
-                        return back()->with('warning','Data updated successfully. But some error occurred to upload documents.');
+                        return back()->with('warning','Data updated successfully. But some error occurred to upload documents.')->withInput();
                     }
                 }
                 return redirect(route('fixed.asset.distribution.opening.input'))->with('success','Data final update successfully.');
@@ -700,7 +705,7 @@ class FixedAssetDistribution extends Controller
         }
         return back()->with('error','Request not supported!');
     }
-    protected function fixed_asset_opening_balance_documents($documents,$ref_id)
+    protected function fixed_asset_opening_balance_documents($documents,$ref_id,$operation_name)
     {
         try {
             $id = $ref_id;
@@ -721,7 +726,7 @@ class FixedAssetDistribution extends Controller
                     'created_by'=>$this->user->id,
                 ]);
             }
-            return Fixed_asset_opening_balance_document::where('company_id',$this->user->company_id)->where('opening_asset_id',$id)->get();
+            return Fixed_asset_opening_balance_document::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_name))->where('opening_asset_id',$id)->get();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

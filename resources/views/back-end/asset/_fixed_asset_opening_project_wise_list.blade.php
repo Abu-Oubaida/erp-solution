@@ -4,23 +4,24 @@
             @if(isset($fixed_asset_with_ref_report_list))
             <div class="row">
                 <div class="col-md-12">
-                    <table @if(count($fixed_asset_with_ref_report_list))id="userTable" class="display" @else class="table" @endif style="width: 100%">
+                    <table @if(count($fixed_asset_with_ref_report_list))id="userTable" class="display" @else class="table" @endif style="width: 100%; font-size: 14px">
                         <thead>
                         <tr>
                             <th>SL.</th>
                             <th>Company</th>
                             <th>Project</th>
                             <th>Date</th>
-                            <th>Reference Type</th>
+                            <th title="Reference Type">Type</th>
                             <th>Reference</th>
                             <th>Status</th>
-                            <th>Resource Count</th>
+                            <th title="Resource Count">Resource</th>
+                            <th title="Total Amount">Total</th>
                             <th>Documents</th>
                             <th>Narration</th>
                             <th>Created By</th>
-                            <th>Created Date</th>
+                            <th title="Created Date">Created</th>
                             <th>Updated By</th>
-                            <th>Updated Date</th>
+                            <th title="Updated Date">Updated</th>
                             <th>Action</th>
                         </tr>
                         </thead>
@@ -31,16 +32,17 @@
                             <th>Company</th>
                             <th>Project</th>
                             <th>Date</th>
-                            <th>Reference Type</th>
+                            <th title="Reference Type">Type</th>
                             <th>Reference</th>
                             <th>Status</th>
-                            <th>Resource Count</th>
+                            <th title="Resource Count">Resource</th>
+                            <th title="Total Amount">Total</th>
                             <th>Documents</th>
                             <th>Narration</th>
                             <th>Created By</th>
-                            <th>Created Date</th>
+                            <th title="Created Date">Created</th>
                             <th>Updated By</th>
-                            <th>Updated Date</th>
+                            <th title="Updated Date">Updated</th>
                             <th>Action</th>
                         </tr>
                         </tfoot>
@@ -66,6 +68,15 @@
                                         @endif
                                     </td>
                                     <td>{!! count($pwr->withSpecifications) !!}</td>
+                                    <td>
+                                        @php($total = 0)
+                                        @if(count($pwr->withSpecifications))
+                                            @foreach($pwr->withSpecifications as $fs)
+                                                @php($total += ($fs->rate*$fs->qty))
+                                            @endforeach
+                                        @endif
+                                        {!! $total !!}/=
+                                    </td>
                                     <td>
                                         @if(isset($pwr->attestedDocuments) && count($pwr->attestedDocuments))
                                             @php($i = 1)

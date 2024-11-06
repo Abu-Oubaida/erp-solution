@@ -14,6 +14,7 @@
         body {
             padding: 0.5cm;
             font-family: "Times New Roman";
+            font-size: 12px;
         }
         table {
             width: 100%;
@@ -78,7 +79,7 @@
                         <td class="underline">{!! $withRefData->branch->address !!}</td>
                     </tr>
                     <tr>
-                        <th>Purpose of use</th>
+                        <th style="width: 32%">Purpose of use</th>
                         <th>: </th>
                         <td class="underline">{!! $withRefData->purpose !!}</td>
                     </tr>
@@ -164,9 +165,9 @@
                         @endforeach
 
                         <tr>
-                            <th colspan="6">Total Price:</th>
-                            <th>{!! $total_qnt !!}</th>
-                            <th>{!! $total !!}</th>
+                            <th colspan="6">Total Price Amount:</th>
+                            <th>{!! $total_qnt !!}/=</th>
+                            <th>{!! $total !!}/=</th>
                             <th colspan="2"></th>
                         </tr>
                     @else
@@ -176,6 +177,7 @@
                     @endif
                     </tbody>
                 </table>
+                <div class="mb-5"><strong>Narration:</strong> <span>{!! $withRefData->narration !!}</span></div>
             </div>
         </div>
         <footer class="row print-footer" style="bottom: 0;width: 100%;">

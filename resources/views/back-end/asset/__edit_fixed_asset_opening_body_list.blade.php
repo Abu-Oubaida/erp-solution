@@ -1,4 +1,4 @@
-<table @if(isset($withRefData->withSpecifications) && count($withRefData->withSpecifications)) id="simpleDataTable2" @endif class="table display">
+<table @if(isset($withRefData->withSpecifications) && count($withRefData->withSpecifications)) id="simpleDataTableCustom" @endif class="table display">
     <thead>
     <tr>
         <th>SL.</th>
@@ -45,7 +45,7 @@
 <script>
     (function ($){
         $(document).ready(function(){
-            $('#simpleDataTable2').DataTable({
+            $('#simpleDataTableCustom').DataTable({
                 dom: 'lfrtip',
                 lengthMenu: [[5, 10, 15, 25, 50, 100, -1],[5, 10, 15, 25, 50, 100, "ALL"]],
                 pageLength: 15,
