@@ -127,12 +127,13 @@ class FixedAssetTransferController extends Controller
                     'spec_id'  =>  ['sometimes','string', 'required', 'exists:fixed_asset_specifications,id'],
                 ]);
                 extract($data);
-                $this->getFixedAssetSpecificationWiseStockBalance($permission,$spec_id,$materials_id,$from_branch_id,$from_company_id);
-//                return response()->json([
-//                    'status' => 'success',
-//                    'data' => $fixed_asset_specifications,
-//                    'message' => 'Data process successfully.'
-//                ]);
+                $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$spec_id,$materials_id,$from_branch_id,$from_company_id);
+                $rate = $this->getFixedAssetSpecificationWiseStockRate($permission,$spec_id,$materials_id,$from_branch_id,$from_company_id);
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['stock'=>$stock,'rate'=>$rate],
+                    'message' => 'Data process successfully.'
+                ]);
             }
             return response()->json([
                 'status'=>'error',

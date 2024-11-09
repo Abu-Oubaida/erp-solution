@@ -941,6 +941,56 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     {
                         if (response.status === 'success')
                         {
+                            // $('#opening-materials-list').html(response.data)
+                            $('#load-view').html(response.data)
+                        }
+                        else if (response.status === 'warning')
+                        {
+                            alert("Warning: "+response.message)
+                            console.log('Error:', response)
+                        }
+                        else if (response.status === 'error')
+                        {
+                            alert("Error: "+response.message)
+                            // Handle error
+                            console.log('Error:', response)
+                        }
+                    },
+                    error(xhr)
+                    {
+                        // Handle general AJAX errors
+                        console.log('AJAX Error:', xhr.statusText);
+                    }
+                })
+            },
+            fixedAssetOpeningEditList:function (e){
+                const opdate = $('#date').val()
+                const company_id = $('#company_id_hide').val()
+                const reference = $('#ref_hide').val()
+                const r_type = $('#r_type_id_hide').val()
+                const project_id = $('#project_id_hide').val()
+                const materials_id = $('#materials_id').val()
+                const specification = $('#specification').val()
+                const rate = $('#rate').val()
+                const qty = $('#qty').val()
+                const purpose = $('#purpose').val()
+                const remarks = $('#remarks').val()
+                if (opdate.length === 0 || company_id.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || r_type.length === 0)
+                {
+                    alert('All field are required')
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/edit-fixed-asset-opening";
+                $.ajax({
+                    url:url,
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data: {'opening_date':opdate,'company_id':company_id,'reference':reference,'r_type':r_type,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
+                    success(response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            // $('#opening-materials-list').html(response.data)
                             $('#opening-materials-list').html(response.data)
                         }
                         else if (response.status === 'warning')
@@ -972,6 +1022,24 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     output.val('')
                 }
                 output.val(parseFloat(Number(input*self)))
+            },
+            priceTotalForTransfer:function (e,actionID)
+            {
+                const output = $("#"+actionID)
+                let qty = parseFloat($("#qty").val())
+                const stock = parseFloat($("#stock").val())
+                const rate = parseFloat($("#rate").val())
+                if (qty.length === 0 || rate.length === 0)
+                {
+                    output.val('')
+                }
+                if (stock<qty)
+                {
+                    $("#qty").val(stock)
+                    qty = stock
+                    alert("Quantity can't gather then Stock Balance")
+                }
+                output.val(parseFloat(Number(qty*rate)))
             },
             fixedAssetOpeningSearch:function (e, outputID)
             {
@@ -1128,16 +1196,24 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     {
                         if (response.status === 'success')
                         {
-                            // updateSelectBoxSingleOption(response.data,outputID,'id','specification')
-                            // $("#unite").val(response.data[0].fixed_asset.unit)
+                            $('#rate').val(response.data.rate)
+                            $('#stock').val(response.data.stock)
+                            $("#qty").val('')
+                            // console.log(response.data)
                         }
                         else if (response.status === 'warning')
                         {
                             alert("Warning:"+response.message)
+                            $('#rate').val('')
+                            $('#stock').val('')
+                            $("#qty").val('')
                         }
                         else if (response.status === 'error')
                         {
                             alert("Error:"+response.message)
+                            $('#rate').val('')
+                            $('#stock').val('')
+                            $("#qty").val('')
                         }
                     },
                     error:function(xhr)

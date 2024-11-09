@@ -140,6 +140,7 @@
                                         </div>
                                     </div>
                                     <input type="hidden" id="ref_hide" value="{!! isset($item->references)?$item->references:'' !!}">
+                                    <input type="hidden" id="company_id_hide" value="{!! isset($item->company_id)?$item->company_id:'' !!}">
                                     <input type="hidden" id="project_id_hide" value="{!! isset($item->branch_id)?$item->branch_id:'' !!}">
                                     <input type="hidden" id="r_type_id_hide" value="{!! isset($item->ref_type_id)?$item->ref_type_id:'' !!}">
                                     <div class="col-md-3">
@@ -201,7 +202,7 @@
                                     </div>
                                     <div class="col">
                                         <div class="mb-3 mt-4 float-end">
-                                            <button class="btn btn-chl-outline btn-sm" type="button" onclick="return Obj.fixedAssetOpeningAddList(this)"> <i class="fas fa-plus"></i> Add</button>
+                                            <button class="btn btn-chl-outline btn-sm" type="button" onclick="return Obj.fixedAssetOpeningEditList(this)"> <i class="fas fa-plus"></i> Add</button>
                                         </div>
                                     </div>
                                 </div>

@@ -255,14 +255,24 @@ trait ParentTraitCompanyWise
     {
         return Fixed_asset_opening_with_spec::with(['fixed_asset_opening_balance','specification','asset'])->whereHas('fixed_asset_opening_balance', function ($query) use ($company_id, $project_id) {
             $query->where('company_id', $company_id)
-                ->where('branch_id', $project_id);
+                ->where('branch_id', $project_id)
+                ->where('status',1);
         });
     }
     protected function getProjectWiseTransferMaterialsStock($operation_permission_name,$to_project_id,$to_company_id): Builder
     {
         return Fixed_asset_transfer_with_spec::with(['fixed_asset_transfer','specification','asset'])->whereHas('fixed_asset_transfer', function ($query) use ($to_company_id, $to_project_id) {
             $query->where('to_company_id', $to_company_id)
-                ->where('to_company_id', $to_project_id);
+                ->where('to_company_id', $to_project_id)
+                ->where('status','<=',1);
+        });
+    }
+    protected function getProjectWiseTransferMaterialsOut($operation_permission_name,$from_project_id,$from_company_id): Builder
+    {
+        return Fixed_asset_transfer_with_spec::with(['fixed_asset_transfer','specification','asset'])->whereHas('fixed_asset_transfer', function ($query) use ($from_company_id, $from_project_id) {
+            $query->where('from_company_id', $from_company_id)
+                ->where('from_company_id', $from_project_id)
+                ->where('status','<=',1);
         });
     }
 
@@ -289,6 +299,27 @@ trait ParentTraitCompanyWise
     public function getFixedAssetSpecificationWiseStockBalance($operation_permission_name,$specification_id,$materials_id,$project_id,$company_id)
     {
         $withRef = $this->getProjectWiseWithReferenceMaterialsStock($operation_permission_name,$project_id,$company_id)->where('asset_id',$materials_id)->where('spec_id',$specification_id)->sum('qty');
-        dd($withRef);
+        $transferIn = $this->getProjectWiseTransferMaterialsStock($operation_permission_name,$project_id,$company_id)->where('asset_id',$materials_id)->sum('qty');
+        $transferOut = $this->getProjectWiseTransferMaterialsOut($operation_permission_name,$project_id,$company_id)->where('asset_id',$materials_id)->sum('qty');
+        $transferStock = ($transferIn - $transferOut);
+        // $issue_return--------
+        // $mrf or $mpr---------
+        return (float) ($withRef+$transferStock);
+    }
+
+    public function getFixedAssetSpecificationWiseStockRate($operation_permission_name,$specification_id,$materials_id,$project_id,$company_id)
+    {
+        $count = 0;
+        $withRef = $this->getProjectWiseWithReferenceMaterialsStock($operation_permission_name,$project_id,$company_id)->where('asset_id',$materials_id)->where('spec_id',$specification_id)->avg('rate');
+        if ($withRef > 0)
+        {
+            $count++;
+        }
+        $transferIn = $this->getProjectWiseTransferMaterialsStock($operation_permission_name,$project_id,$company_id)->where('asset_id',$materials_id)->avg('rate');
+        if ($transferIn > 0)
+        {
+            $count++;
+        }
+        return (float) (($withRef+$transferIn)/$count);
     }
 }

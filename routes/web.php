@@ -455,6 +455,7 @@ Route::group(['middleware' => ['auth']],function (){
                     Route::put('final-update-fixed-asset-opening-spec','finalUpdateFixedAssetOpeningSpec')->name('fixed.asset.distribution.update');
                     Route::get('fixed-asset-opening-print/{assetID}','printFixedAssetWithReference')->name('fixed.asset.with.reference.print');
                 });
+                Route::post('edit-fixed-asset-opening','editFixedAssetOpeningList');
                 Route::middleware(['permission:edit_fixed_asset_distribution_with_reference'])->group(function (){
                     Route::match(['get','put'],'edit-fixed-asset-opening-balance/{faobid}','editFixedAssetOpening')->name('edit.fixed.asset.distribution.with.reference.balance');
                     Route::delete('delete-fixed-asset-with-ref-document','destroyWithRefDocument')->name('fixed.asset.with.ref.document.delete');

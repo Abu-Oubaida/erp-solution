@@ -83,14 +83,14 @@
                 </div>
                 <div class="col-md-1">
                     <div class="mb-1">
-                        <label for="unite">Unite<span class="text-danger">*</span></label>
-                        <input class="form-control bg-secondary text-white" id="unite" type="text" placeholder="Unite" value="" required readonly/>
+                        <label for="rate">Rate<span class="text-danger">*</span></label>
+                        <input class="form-control" id="rate" onfocusout="return Obj.priceTotalForTransfer(this,'total')" type="text" placeholder="Rate" value="" required/>
                     </div>
                 </div>
                 <div class="col-md-1">
                     <div class="mb-1">
-                        <label for="ref">Rate<span class="text-danger">*</span></label>
-                        <input class="form-control" id="rate" onfocusout="return Obj.priceTotal(this, 'qty','total')" type="text" placeholder="Rate" value="" required/>
+                        <label for="unite">Unite<span class="text-danger">*</span></label>
+                        <input class="form-control bg-secondary text-white" id="unite" type="text" placeholder="Unite" value="" required readonly/>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -98,13 +98,13 @@
                         <div class="col">
                             <div class="mb-1">
                                 <label for="stock">Stock Balance<span class="text-danger">*</span></label>
-                                <input class="form-control bg-secondary" id="stock" type="text" placeholder="Stock Balance" value="" required readonly/>
+                                <input class="form-control bg-secondary text-white" id="stock" type="text" placeholder="Stock Balance" value="" required readonly/>
                             </div>
                         </div>
                         <div class="col">
                             <div class="mb-1">
                                 <label for="qty">Qty.<span class="text-danger">*</span></label>
-                                <input class="form-control" onfocusout="return Obj.priceTotal(this, 'rate','total')" id="qty" type="text" placeholder="Qty" value="" required/>
+                                <input class="form-control" onfocusout="return Obj.priceTotalForTransfer(this,'total')" id="qty" type="text" placeholder="Qty" value="" required/>
                             </div>
                         </div>
                     </div>
