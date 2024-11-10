@@ -790,6 +790,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\Fixed_asset_opening_with_spec' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_opening_with_spec.php',
         'App\\Models\\Fixed_asset_opening_with_spec_delete_history' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_opening_with_spec_delete_history.php',
         'App\\Models\\Fixed_asset_transfer' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_transfer.php',
+        'App\\Models\\Fixed_asset_transfer_document' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_transfer_document.php',
         'App\\Models\\Fixed_asset_transfer_with_spec' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_transfer_with_spec.php',
         'App\\Models\\Fixed_asset_with_ref_document_delete_history' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_with_ref_document_delete_history.php',
         'App\\Models\\Material_type' => __DIR__ . '/../..' . '/app/Models/Material_type.php',

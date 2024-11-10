@@ -13,6 +13,7 @@ use App\Models\Fixed_asset;
 use App\Models\Fixed_asset_opening_balance;
 use App\Models\Fixed_asset_opening_with_spec;
 use App\Models\fixed_asset_specifications;
+use App\Models\Fixed_asset_transfer;
 use App\Models\Fixed_asset_transfer_with_spec;
 use App\Models\Op_reference_type;
 use App\Models\Permission;
@@ -26,11 +27,11 @@ use Illuminate\Database\Eloquent\Builder;
 trait ParentTraitCompanyWise
 {
     use AuthTrait, PermissionTrait;
-    protected function getSelfInfo()
+    public function getSelfInfo()
     {
         return User::with(['permissions','department','designation','branch','getCompany','companyPermissions','roles'])->where('id',$this->user->id)->first();
     }
-    protected function getUser($operation_permission_name)
+    public function getUser($operation_permission_name)
     {
         $object = User::with(['permissions','department','designation','branch','getCompany','companyPermissions'])->where('status',1);
         if ($this->user->isSystemSuperAdmin())
@@ -39,7 +40,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
-    protected function getUserAll()
+    public function getUserAll()
     {
         $object = User::with(['permissions','department','designation','branch','getCompany']);
         if ($this->user->isSystemSuperAdmin())
@@ -48,7 +49,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company',$this->getUserCompanyPermissionsArray());
     }
-    protected function getBranch($operation_permission_name)
+    public function getBranch($operation_permission_name)
     {
         $object = branch::with(['branchType','createdBy','updatedBy','company']);
         if($this->user->isSystemSuperAdmin())
@@ -57,7 +58,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
-    protected function getProject()
+    public function getProject()
     {
         $object = branch::with(['branchType','createdBy','updatedBy','company']);
         if($this->user->isSystemSuperAdmin())
@@ -66,7 +67,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
-    protected function getBranchType($operation_permission_name)
+    public function getBranchType($operation_permission_name)
     {
         $object = BranchType::with(['getBranches','createdBy','updatedBy','company']);
         if ($this->user->isSystemSuperAdmin())
@@ -75,7 +76,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
-    protected function getDepartment($operation_permission_name)
+    public function getDepartment($operation_permission_name)
     {
         $object = department::with(['createdBy','updatedBy','getUsers','company']);
         if ($this->user->isSystemSuperAdmin())
@@ -85,7 +86,7 @@ trait ParentTraitCompanyWise
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
 
-    protected function getDesignation($operation_permission_name)
+    public function getDesignation($operation_permission_name)
     {
         $object = Designation::with(['createdBy','updatedBy','getUsers','company']);
         if ($this->user->isSystemSuperAdmin())
@@ -95,7 +96,7 @@ trait ParentTraitCompanyWise
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
 
-    protected function getRole($operation_permission_name)
+    public function getRole($operation_permission_name)
     {
         $object = Role::with(['createdBy','updatedBy','getUsers','company']);
         if ($this->user->isSystemSuperAdmin())
@@ -105,7 +106,7 @@ trait ParentTraitCompanyWise
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name))->where('id','>=',$this->user->roles()->first()->id);
     }
 
-    protected function getCompanyModulePermissionWise($operation_permission_name)
+    public function getCompanyModulePermissionWise($operation_permission_name)
     {
         $permission = permission::where('name',$operation_permission_name)->first();
         $companyModulePermission = CompanyModulePermission::whereIn('company_id',$this->getUserCompanyPermissionsArray())->where('module_id',$permission->id)->pluck('company_id')->unique()->toArray();
@@ -133,12 +134,12 @@ trait ParentTraitCompanyWise
         return $object->whereIn('id',$this->getUserCompanyPermissionsArray())->whereIn('id',$companyPermissionIDs);
     }
 
-    protected function getCompanyModulePermissionWiseArray($operation_permission_name)
+    public function getCompanyModulePermissionWiseArray($operation_permission_name)
     {
         return $this->getCompanyModulePermissionWise($operation_permission_name)->pluck('id')->unique()->toArray();
 //        return $this->getCompanyModulePermissionWise($operation_permission_name)->pluck('id')->unique()->toArray();
     }
-    protected function getCompany()
+    public function getCompany()
     {
         $object = company_info::with(['createdBy','updatedBy','users','companyType','fixedAssets','permissionUsers']);
         if ($this->user->isSystemSuperAdmin())
@@ -147,7 +148,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('id',$this->getUserCompanyPermissionsArray());
     }
-    private function getUserCompanyPermissionsArray()
+    public function getUserCompanyPermissionsArray()
     {
         $userComPerIDs = [];
         $userCompanyPermissions = UserCompanyPermission::where('user_id',$this->user->id)->get();
@@ -157,7 +158,7 @@ trait ParentTraitCompanyWise
         $userComPerIDs[] = (integer)$this->user->company_id;
         return $userComPerIDs;
     }
-    protected function companyWisePermissionUsers($company_id,$operation_permission_name)
+    public function companyWisePermissionUsers($company_id,$operation_permission_name)
     {
         $userIDs = $this->companyWisePermissionUserArray($company_id,$operation_permission_name);
         return $this->getUser($operation_permission_name)->whereIn('id',$userIDs)->whereDoesntHave('roles', function ($query) {
@@ -165,13 +166,13 @@ trait ParentTraitCompanyWise
 //                ->orWhere('name', 'systemadmin'); // Add other roles if needed
         });
     }
-    protected function companyWisePermissionUserArray($company_id,$operation_permission_name): array
+    public function companyWisePermissionUserArray($company_id,$operation_permission_name): array
     {
         $userCompanyPermissions = userCompanyPermission::where('company_id', $company_id)->pluck('user_id')->unique()->toArray();
         $users = $this->getUser($operation_permission_name)->where('company',$company_id)->pluck('id')->unique()->toArray();
         return array_merge($userCompanyPermissions,$users);
     }
-    protected function getUserProjectPermissions($user_id,$permission)
+    public function getUserProjectPermissions($user_id,$permission)
     {
         $object = branch::with(['getUsers','company']);
         if ($this->user->isSystemSuperAdmin())
@@ -185,11 +186,11 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->whereIn('id',$this->userProjectPermissionArray($user_id));
     }
-    private function userProjectPermissionArray($user_id)
+    public function userProjectPermissionArray($user_id)
     {
         return userProjectPermission::where('user_id',$user_id)->get()->pluck('project_id')->unique()->toArray();
     }
-    protected function getFixedAssets($operation_permission_name)
+    public function getFixedAssets($operation_permission_name)
     {
         $object = Fixed_asset::with(['company','specifications','createdBy','updatedBy','withRefUses']);
         if ($this->user->isSystemSuperAdmin())
@@ -198,7 +199,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
-    private function getFixedAssetSpecification($operation_permission_name)
+    public function getFixedAssetSpecification($operation_permission_name)
     {
         $object = fixed_asset_specifications::with(['company','fixed_asset','createdBy','createdBy','fixedWithRefData']);
         if ($this->user->isSystemSuperAdmin())
@@ -207,7 +208,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
-    private function getFixedAssetWithRefData($operation_permission_name)
+    public function getFixedAssetWithRefData($operation_permission_name)
     {
         $object = Fixed_asset_opening_balance::with(['withSpecifications','attestedDocuments','branch','createdBy','updatedBy','refType','company']);
         if ($this->user->isSystemSuperAdmin())
@@ -216,7 +217,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
-    private function getFixedAssetWithRefSpecification($operation_permission_name)
+    public function getFixedAssetWithRefSpecification($operation_permission_name)
     {
         $object = Fixed_asset_opening_with_spec::with(['asset','fixed_asset_opening_balance','specification','createdBy','updatedBy','company']);
         if ($this->user->isSystemSuperAdmin())
@@ -225,6 +226,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
+
     public function getUserCompanyPermissionArray($user_id)
     {
         $userComPerIDs = [];
@@ -236,12 +238,12 @@ trait ParentTraitCompanyWise
         $userComPerIDs[] = (integer)$userDefaultCompanyID->company;
         return $userComPerIDs;
     }
-    protected function getBloodGroup()
+    public function getBloodGroup()
     {
         return BloodGroup::all();
     }
 
-    protected function getOperationReferenceType()
+    public function getOperationReferenceType()
     {
         $object = Op_reference_type::with(['createdBy','updatedBy','company','fixedAssetOpening']);
         if ($this->user->isSystemSuperAdmin())
@@ -251,7 +253,7 @@ trait ParentTraitCompanyWise
         return $object->whereIn('company_id',$this->getUserCompanyPermissionsArray());
     }
 
-    protected function getProjectWiseWithReferenceMaterialsStock($operation_permission_name,$project_id,$company_id): Builder
+    public function getProjectWiseWithReferenceMaterialsStock($operation_permission_name,$project_id,$company_id): Builder
     {
         return Fixed_asset_opening_with_spec::with(['fixed_asset_opening_balance','specification','asset'])->whereHas('fixed_asset_opening_balance', function ($query) use ($company_id, $project_id) {
             $query->where('company_id', $company_id)
@@ -259,7 +261,7 @@ trait ParentTraitCompanyWise
                 ->where('status',1);
         });
     }
-    protected function getProjectWiseTransferMaterialsStock($operation_permission_name,$to_project_id,$to_company_id): Builder
+    public function getProjectWiseTransferMaterialsStock($operation_permission_name,$to_project_id,$to_company_id): Builder
     {
         return Fixed_asset_transfer_with_spec::with(['fixed_asset_transfer','specification','asset'])->whereHas('fixed_asset_transfer', function ($query) use ($to_company_id, $to_project_id) {
             $query->where('to_company_id', $to_company_id)
@@ -267,7 +269,7 @@ trait ParentTraitCompanyWise
                 ->where('status','<=',1);
         });
     }
-    protected function getProjectWiseTransferMaterialsOut($operation_permission_name,$from_project_id,$from_company_id): Builder
+    public function getProjectWiseTransferMaterialsOut($operation_permission_name,$from_project_id,$from_company_id): Builder
     {
         return Fixed_asset_transfer_with_spec::with(['fixed_asset_transfer','specification','asset'])->whereHas('fixed_asset_transfer', function ($query) use ($from_company_id, $from_project_id) {
             $query->where('from_company_id', $from_company_id)
@@ -321,5 +323,32 @@ trait ParentTraitCompanyWise
             $count++;
         }
         return (float) (($withRef+$transferIn)/$count);
+    }
+    public function getFixedAssetGpAll($operation_permission_name)
+    {
+        $object = Fixed_asset_transfer::with(['specifications','documents','branchFrom','branchTo','createdBy','updatedBy','companyFrom','companyTo','specificationsByReference']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('to_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name))->orWhereIn('from_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
+    }
+    public function getFixedAssetGpDataIn($operation_permission_name)
+    {
+        $object = Fixed_asset_transfer::with(['specifications','documents','branchFrom','branchTo','createdBy','updatedBy','companyFrom','companyTo','specificationsByReference']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object->whereIn('to_company_id',$this->getCompany()->pluck('id')->unique()->toArray());
+        }
+        return $object->whereIn('to_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
+    }
+    public function getFixedAssetGpDataOut($operation_permission_name)
+    {
+        $object = Fixed_asset_transfer::with(['specifications','documents','branchFrom','branchTo','createdBy','updatedBy','companyFrom','companyTo','specificationsByReference']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object->whereIn('from_company_id',$this->getCompany()->pluck('id')->unique()->toArray());
+        }
+        return $object->whereIn('from_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
 }

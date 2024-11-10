@@ -83,14 +83,15 @@ class FixedAssetTransferController extends Controller
     public function addToListFixedAssetGp(Request $request)
     {
         try {
+            $permission = $this->permissions()->fixed_asset_transfer_entry;
             if ($request->isMethod('POST')) {
                 $data = $request->validate([
-                    'from_company_id' => ['sometimes','string', 'required', 'exists:company_infos,id'],
-                    'to_company_id' => ['sometimes','string', 'required', 'exists:company_infos,id'],
-                    'from_project_id' => ['sometimes','string', 'required', 'exists:branches,id'],
-                    'to_project_id' => ['sometimes','string', 'required', 'exists:branches,id'],
-                    'gp_date' => ['sometimes','date', 'date_format:Y-m-d'],
-                    'reference' => ['sometimes','string'],
+                    'from_company_id' => ['string', 'required', 'exists:company_infos,id'],
+                    'to_company_id' => ['string', 'required', 'exists:company_infos,id'],
+                    'from_project_id' => ['string', 'required', 'exists:branches,id'],
+                    'to_project_id' => ['string', 'required', 'exists:branches,id'],
+                    'gp_date' => ['date', 'date_format:Y-m-d'],
+                    'reference' => ['required','string'],
                     'materials_id'=>    ['required','string','exists:fixed_assets,id',],
                     'specification'=>   ['required','string','exists:fixed_asset_specifications,id'],
                     'rate'  =>  ['required','numeric'],
@@ -100,6 +101,41 @@ class FixedAssetTransferController extends Controller
                     'remarks'=> ['sometimes','nullable','string'],
                 ]);
                 extract($data);
+                //Work running here
+                $previousData = $this->getFixedAssetGpAll($permission)->where('to_company_id',$to_company_id)->where('from_company_id',$from_company_id)->where('from_project_id',$from_project_id)->where('to_project_id',$to_project_id)->where('reference',$reference)->first();
+                if ($previousData == null)
+                {
+                    $ref_duplicate = $this->getFixedAssetGpAll($permission)->where('reference',$reference)->first();
+                    if ($ref_duplicate !== null)
+                    {
+                        return response()->json([
+                            'status' => 'warning',
+                            'message' => 'This reference already exists.'
+                        ]);
+                    }
+                    //At 1st need to entry in Fixed_asset_transfer
+                    $previousData = $this->getFixedAssetGpAll($permission)->create([
+                        'status' => 0,// 0=running
+                        'data' => date('d-m-Y',strtotime($gp_date)),
+                        'reference' => $reference,
+                        'from_company_id' => $from_company_id,
+                        'from_project_id' => $from_project_id,
+                        'to_company_id' => $to_company_id,
+                        'to_project_id' => $to_project_id,
+                        'created_by' => $this->user->id,
+                        'updated_by' => null,
+                        'created_at' => now(),
+                        'updated_at' => null,
+                    ]);
+                }
+                if ($previousData)
+                {
+                    //Need to entry Fixed_asset_transfer_with_specs
+                }
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Something went wrong. Please try again later.'
+                ]);
             }
             return response()->json([
                 'status'=>'error',
