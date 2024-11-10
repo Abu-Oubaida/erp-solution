@@ -1012,6 +1012,111 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            fixedAssetGpAddList:function (e){
+                const gp_date = $('#gp_date_hidden').val()
+                const from_company_id = $('#from_company_id_hide').val()
+                const to_company_id = $('#to_company_id_hide').val()
+                const gp_reference = $('#gp_ref_hide').val()
+                const from_project_id = $('#from_project_id_hide').val()
+                const to_project_id = $('#to_project_id_hide').val()
+                const materials_id = $('#materials_id').val()
+                const specification = $('#specification').val()
+                const rate = $('#rate').val()
+                const qty = $('#qty').val()
+                const stock = $('#stock').val()
+                const purpose = $('#purpose').val()
+                const remarks = $('#remarks').val()
+                if (gp_date.length === 0 || from_company_id.length === 0 || to_company_id.length === 0 || gp_reference.length === 0 || from_project_id.length === 0 || to_project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || stock.length === 0)
+                {
+                    alert('All field are required')
+                    return false
+                }
+                if (parseFloat(stock) < parseFloat(qty))
+                {
+                    alert("Quantity can't gather then Stock Blanch")
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/add-to-list-fixed-asset-gp";
+                $.ajax({
+                    url:url,
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data: {'gp_date':gp_date,'from_company_id':from_company_id ,'to_company_id':to_company_id,'reference':gp_reference,'from_project_id':from_project_id,'to_project_id':to_project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'stock':stock,'purpose':purpose,'remarks':remarks},
+                    success(response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            // $('#opening-materials-list').html(response.data)
+                            $('#load-view').html(response.data)
+                        }
+                        else if (response.status === 'warning')
+                        {
+                            alert("Warning: "+response.message)
+                            console.log('Error:', response)
+                        }
+                        else if (response.status === 'error')
+                        {
+                            alert("Error: "+response.message)
+                            // Handle error
+                            console.log('Error:', response)
+                        }
+                    },
+                    error(xhr)
+                    {
+                        // Handle general AJAX errors
+                        console.log('AJAX Error:', xhr.statusText);
+                    }
+                })
+            },
+            fixedAssetGpEditList:function (e){
+                const opdate = $('#date').val()
+                const company_id = $('#company_id_hide').val()
+                const reference = $('#ref_hide').val()
+                const r_type = $('#r_type_id_hide').val()
+                const project_id = $('#project_id_hide').val()
+                const materials_id = $('#materials_id').val()
+                const specification = $('#specification').val()
+                const rate = $('#rate').val()
+                const qty = $('#qty').val()
+                const purpose = $('#purpose').val()
+                const remarks = $('#remarks').val()
+                if (opdate.length === 0 || company_id.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || r_type.length === 0)
+                {
+                    alert('All field are required')
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/edit-fixed-asset-opening";
+                $.ajax({
+                    url:url,
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data: {'opening_date':opdate,'company_id':company_id,'reference':reference,'r_type':r_type,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
+                    success(response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            // $('#opening-materials-list').html(response.data)
+                            $('#opening-materials-list').html(response.data)
+                        }
+                        else if (response.status === 'warning')
+                        {
+                            alert("Warning: "+response.message)
+                            console.log('Error:', response)
+                        }
+                        else if (response.status === 'error')
+                        {
+                            alert("Error: "+response.message)
+                            // Handle error
+                            console.log('Error:', response)
+                        }
+                    },
+                    error(xhr)
+                    {
+                        // Handle general AJAX errors
+                        console.log('AJAX Error:', xhr.statusText);
+                    }
+                })
+            },
             priceTotal:function (e,inputID,actionID)
             {
                 const input = parseFloat($("#"+inputID).val())

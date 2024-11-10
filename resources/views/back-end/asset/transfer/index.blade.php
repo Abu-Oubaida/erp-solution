@@ -3,8 +3,8 @@
     <div class="container-fluid px-4">
         <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
         <div class="row">
-            <div class="col-md-10">
-                <ol class="breadcrumb mb-4">
+            <div class="col-md-12">
+                <ol class="breadcrumb mb-2">
                     <li class="breadcrumb-item">
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
@@ -16,7 +16,6 @@
                     </li>
                 </ol>
             </div>
-
         </div>
         <div class="row">
             <div class="col-md-12">
@@ -24,13 +23,13 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h3><i class="fas fa-edit"></i> Gate Pass Entry</h3>
+                                <h4 class="mb-0"><i class="fas fa-edit"></i> Gate Pass Entry</h4>
                             </div>
                             <div class="col">
-                                <button class="btn btn-outline-primary float-end m-1" type="button" id="ref-src-btn" onclick="return window.location.reload()">
+                                <button class="btn btn-sm btn-outline-primary float-end m-1 mb-0" type="button" id="ref-src-btn" onclick="return window.location.reload()">
                                     <i class="fa fa-refresh"></i> Refresh
                                 </button>
-                                <a href="{!! route('fixed.asset.transfer') !!}" class="btn btn-outline-info float-end m-1" type="button" id="ref-src-btn">
+                                <a href="{!! route('fixed.asset.transfer') !!}" class="btn btn-sm btn-outline-info float-end m-1 mb-0" type="button" id="ref-src-btn">
                                     <i class="fa-solid fa-file-circle-plus"></i> New Input
                                 </a>
                             </div>
@@ -38,7 +37,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col mb-1">
+                            <div class="col">
                                 <label for="from_company">From Company<span class="text-danger">*</span></label>
                                 <select id="from_company" name="from_company" class="select-search cursor-pointer" onchange="return Obj.userWiseCompanyProjectPermissions(this,{!! Auth::user()->id !!},'from_project')">
                                     <option value="">Pick options...</option>
@@ -49,7 +48,7 @@
                                     @endif
                                 </select>
                             </div>
-                            <div class="col mb-1">
+                            <div class="col">
                                 <label for="project">From Project Name<span class="text-danger">*</span></label>
                                 <select id="from_project" name="from_project" class="select-search cursor-pointer">
                                     <option value="">Pick options...</option>
@@ -60,7 +59,7 @@
                             @endif
                                 </select>
                             </div>
-                            <div class="col mb-1">
+                            <div class="col">
                                 <label for="company">To Company<span class="text-danger">*</span></label>
                                 <select id="to_company" name="to_company" class="select-search cursor-pointer" onchange="return Obj.userWiseCompanyProjectPermissions(this,{!! Auth::user()->id !!},'to_project')">
                                     <option value="">Pick options...</option>
@@ -71,7 +70,7 @@
                                     @endif
                                 </select>
                             </div>
-                            <div class="col mb-1">
+                            <div class="col">
                                 <label for="project">To Project Name<span class="text-danger">*</span></label>
                                 <select id="to_project" name="to_project" class="select-search cursor-pointer">
                                     <option value="">Pick options...</option>
@@ -82,7 +81,7 @@
                             @endif
                                 </select>
                             </div>
-                            <div class="col mb-1">
+                            <div class="col">
                                 <label for="ref">GP Reference No<span class="text-danger">*</span></label>
                                 <input class="form-control" value="{!! Request::get('ref') !!}" type="text" placeholder="GP Reference number..." id="gp_ref">
                             </div>

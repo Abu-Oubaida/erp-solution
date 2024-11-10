@@ -480,6 +480,7 @@ Route::group(['middleware' => ['auth']],function (){
                     Route::post('gp-create','create')->name('fixed.asset.transfer.create');
                     Route::post('material-specification-search','materialWiseSpecification');
                     Route::post('material-specification-wise-stock-rate-search','materialSpecificationWiseStockRate');
+                    Route::post('add-to-list-fixed-asset-gp','addToListFixedAssetGp');
                 });
             });
         });

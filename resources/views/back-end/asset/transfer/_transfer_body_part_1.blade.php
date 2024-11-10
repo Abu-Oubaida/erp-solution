@@ -7,11 +7,11 @@
     })
 </script>
 <div class="col-md-12">
-    <div class="card mb-4 mt-2">
+    <div class="card mb-1 mt-1">
         <div class="card-header">
             <div class="row">
                 <div class="col">
-                    <h5 class="text-capitalize"><i class="fa-solid fa-arrow-right-arrow-left"></i> Fixed Asset Transfer</h5>
+                    <h5 class="text-capitalize mb-0"><i class="fa-solid fa-arrow-right-arrow-left"></i> Fixed Asset Transfer</h5>
                 </div>
             </div>
         </div>
@@ -34,13 +34,13 @@
                         <div class="col text-center">
                             @isset($to_company)
                                 <span class=""><strong>To Company: </strong><span class="badge bg-info">{!! $to_company->company_name !!}</span></span>
-                                <input type="hidden" id="from_company_id_hide" value="{!! $to_company->id !!}">
+                                <input type="hidden" id="to_company_id_hide" value="{!! $to_company->id !!}">
                             @endisset
                         </div>
                         <div class="col text-center">
                             @isset($to_project)
                                 <span><strong>To Project: </strong><span class="badge bg-info">{!! $to_project->branch_name !!}</span></span>
-                                <input type="hidden" id="from_project_id_hide" value="{!! $to_project->id !!}">
+                                <input type="hidden" id="to_project_id_hide" value="{!! $to_project->id !!}">
                             @endisset
                         </div>
                         <div class="col text-center">
@@ -133,9 +133,41 @@
                     </div>
                 </div>
             </div>
-            <hr>
-            <div>
-{{--                @include('back-end.asset._fixed_asset_opening_body_list')--}}
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="row">
+                <h5 class="m-0"><i class="fas fa-list"></i> Added item List</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12" id="opening-materials-list">
+                    @include('back-end.asset.transfer.__list_table_only')
+                </div>
+                {{--                    @if(isset($withRefData->withSpecifications) && count($withRefData->withSpecifications))--}}
+                <form action="{!! route('fixed.asset.distribution.update') !!}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    @method('put')
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div>
+                                <label for="remarks">Narration:</label>
+                                <textarea class="form-control form-control-sm"  id="narration" name="narration">{!! (old('narration')?old('narration'):'') !!}</textarea>
+                                {{--                                        <input type="hidden" name="id" value="{!! //$withRefData->id !!}">--}}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="remarks">Attachments:</label>
+                            <input class="form-control" type="file" name="attachment[]" id="attachment" multiple>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-lg btn-outline-success float-end mt-4" type="submit"><i class="fas fa-save"></i> Final Update</button>
+                        </div>
+                    </div>
+                </form>
+                {{--                    @endif--}}
             </div>
         </div>
     </div>

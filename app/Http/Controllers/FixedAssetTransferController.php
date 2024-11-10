@@ -80,6 +80,38 @@ class FixedAssetTransferController extends Controller
             ]);
         }
     }
+    public function addToListFixedAssetGp(Request $request)
+    {
+        try {
+            if ($request->isMethod('POST')) {
+                $data = $request->validate([
+                    'from_company_id' => ['sometimes','string', 'required', 'exists:company_infos,id'],
+                    'to_company_id' => ['sometimes','string', 'required', 'exists:company_infos,id'],
+                    'from_project_id' => ['sometimes','string', 'required', 'exists:branches,id'],
+                    'to_project_id' => ['sometimes','string', 'required', 'exists:branches,id'],
+                    'gp_date' => ['sometimes','date', 'date_format:Y-m-d'],
+                    'reference' => ['sometimes','string'],
+                    'materials_id'=>    ['required','string','exists:fixed_assets,id',],
+                    'specification'=>   ['required','string','exists:fixed_asset_specifications,id'],
+                    'rate'  =>  ['required','numeric'],
+                    'stock' =>  ['required','numeric','gte:qty'],
+                    'qty'   =>  ['required','numeric','lte:stock'],
+                    'purpose'=> ['sometimes','nullable','string'],
+                    'remarks'=> ['sometimes','nullable','string'],
+                ]);
+                extract($data);
+            }
+            return response()->json([
+                'status'=>'error',
+                'message'=>'Request method not allowed.'
+            ]);
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
     public function store(Request $request)
     {
 
