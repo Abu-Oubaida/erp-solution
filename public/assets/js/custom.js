@@ -1026,6 +1026,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 const stock = $('#stock').val()
                 const purpose = $('#purpose').val()
                 const remarks = $('#remarks').val()
+                alert(gp_date)
                 if (gp_date.length === 0 || from_company_id.length === 0 || to_company_id.length === 0 || gp_reference.length === 0 || from_project_id.length === 0 || to_project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || stock.length === 0)
                 {
                     alert('All field are required')
@@ -1047,7 +1048,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         if (response.status === 'success')
                         {
                             // $('#opening-materials-list').html(response.data)
-                            $('#load-view').html(response.data)
+                            $('#materials-list').html(response.data.view)
                         }
                         else if (response.status === 'warning')
                         {

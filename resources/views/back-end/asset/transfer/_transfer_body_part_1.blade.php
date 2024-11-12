@@ -129,7 +129,7 @@
                 </div>
                 <div class="col">
                     <div class="mb-3 mt-4 float-end">
-                        <button class="btn btn-chl-outline btn-sm" type="button" onclick="return Obj.fixedAssetOpeningAddList(this)"> <i class="fas fa-plus"></i> Add</button>
+                        <button class="btn btn-chl-outline btn-sm" type="button" onclick="return Obj.fixedAssetGpAddList(this)"> <i class="fas fa-plus"></i> Add</button>
                     </div>
                 </div>
             </div>
@@ -143,7 +143,7 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-12" id="opening-materials-list">
+                <div class="col-md-12" id="materials-list">
                     @include('back-end.asset.transfer.__list_table_only')
                 </div>
                 {{--                    @if(isset($withRefData->withSpecifications) && count($withRefData->withSpecifications))--}}

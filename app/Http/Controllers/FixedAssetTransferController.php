@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\fixed_asset_specifications;
 use App\Traits\ParentTraitCompanyWise;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class FixedAssetTransferController extends Controller
 {
@@ -60,9 +62,15 @@ class FixedAssetTransferController extends Controller
                 $from_project = $this->getBranch($permission)->select(['id','branch_name'])->where('company_id',$from_company_id)->where('id',$from_branch_id)->first();
                 $to_project = $this->getBranch($permission)->select(['id','branch_name'])->where('company_id',$to_company_id)->where('id',$to_branch_id)->first();
                 $fixed_asset_ids  = $this->getFixedAssetStockMaterials($permission,$from_project->id,$from_company->id);
-
                 $fixed_assets = $this->getFixedAssets($permission)->whereIn('id',$fixed_asset_ids)->get();
-                $view = view('back-end/asset/transfer/_transfer_body_part_1',compact('fixed_assets','from_company','to_company','from_project','to_project','gp_date','gp_reference'))->render();
+                $transferData = $this->getFixedAssetGpAll($permission)->where('reference',$gp_reference)->first();
+//                if ($transferData && $transferData->status >= 1 ) {
+//                    $view = view('back-end/asset/transfer/_fixed_asset_transfer_list_active',compact('transferData'))->render();
+//                }
+//                else
+//                {
+                    $view = view('back-end/asset/transfer/_transfer_body_part_1',compact('fixed_assets','from_company','to_company','from_project','to_project','gp_date','gp_reference','transferData'))->render();
+//                }
                 return response()->json([
                     'status' => 'success',
                     'data' => $view,
@@ -90,7 +98,7 @@ class FixedAssetTransferController extends Controller
                     'to_company_id' => ['string', 'required', 'exists:company_infos,id'],
                     'from_project_id' => ['string', 'required', 'exists:branches,id'],
                     'to_project_id' => ['string', 'required', 'exists:branches,id'],
-                    'gp_date' => ['date', 'date_format:Y-m-d'],
+                    'gp_date' => ['date', 'date_format:d-M-y'],
                     'reference' => ['required','string'],
                     'materials_id'=>    ['required','string','exists:fixed_assets,id',],
                     'specification'=>   ['required','string','exists:fixed_asset_specifications,id'],
@@ -116,7 +124,7 @@ class FixedAssetTransferController extends Controller
                     //At 1st need to entry in Fixed_asset_transfer
                     $previousData = $this->getFixedAssetGpAll($permission)->create([
                         'status' => 0,// 0=running
-                        'data' => date('d-m-Y',strtotime($gp_date)),
+                        'date' => Carbon::createFromFormat('d-m-Y', $gp_date)->format('Y-m-d'),
                         'reference' => $reference,
                         'from_company_id' => $from_company_id,
                         'from_project_id' => $from_project_id,
@@ -130,7 +138,47 @@ class FixedAssetTransferController extends Controller
                 }
                 if ($previousData)
                 {
-                    //Need to entry Fixed_asset_transfer_with_specs
+                    $specificationData = $this->getFixedAssetGpSpecificationAll($permission)->where(function ($query) use ($previousData, $reference){
+                        $query->where('transfer_id',$previousData->id)->orWhere('reference',$reference);
+                    })->where('asset_id',$materials_id)->where('spec_id',$specification)->first();
+                    if ($specificationData)
+                    {
+                        return response()->json([
+                            'status' => 'warning',
+                            'message' => 'This reference already exists.'
+                        ]);
+                    }
+                    $specificationDataNew = $this->getFixedAssetGpSpecificationAll($permission)->create([
+                        'date' => date('d-m-Y',strtotime($gp_date)),
+                        'transfer_id' => $previousData->id,
+                        'reference' => $reference,
+                        'asset_id' => $materials_id,
+                        'spec_id' => $specification,
+                        'rate' => $rate,
+                        'qty' => $qty,
+                        'purpose' => $purpose,
+                        'remarks' => $remarks,
+                        'created_by' => $this->user->id,
+                        'updated_by' => null,
+                        'created_at' => now(),
+                        'updated_at' => null,
+                    ]);
+                    if ($specificationDataNew)
+                    {
+                        $transferData = $this->getFixedAssetGpAll($permission)->where(function ($query) use ($previousData, $reference){
+                            $query->where('transfer_id',$previousData->id)->orWhere('reference',$reference);
+                        })->first();
+                        $view = view('back-end/asset/transfer/__list_table_only',compact('transferData'))->render();
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Data process successfully.',
+                            'data' => ['view' => $view,'data'=>$transferData],
+                        ]);
+                    }
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Something went wrong.',
+                    ]);
                 }
                 return response()->json([
                     'status' => 'error',

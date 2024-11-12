@@ -21,4 +21,12 @@ class Fixed_asset_transfer_with_spec extends Model
     {
         return $this->belongsTo(fixed_asset_specifications::class,'spec_id');
     }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
 }

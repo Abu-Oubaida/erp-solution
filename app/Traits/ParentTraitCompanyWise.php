@@ -351,4 +351,8 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('from_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
     }
+    public function getFixedAssetGpSpecificationAll($operation_permission_name)
+    {
+        return Fixed_asset_transfer_with_spec::with(['specification','asset','fixed_asset_transfer','createdBy','updatedBy']);
+    }
 }

@@ -1,4 +1,4 @@
-<table @if(isset($withRefData->withSpecifications) && count($withRefData->withSpecifications)) id="simpleDataTableCustom" @endif class="table display">
+<table @if(isset($transferData->specifications) && count($transferData->specifications)) id="simpleDataTableCustom" @endif class="table display">
     <thead>
     <tr>
         <th>SL.</th>
@@ -15,23 +15,23 @@
     </tr>
     </thead>
     <tbody>
-    @if(isset($withRefData->withSpecifications) && count($withRefData->withSpecifications))
+    @if(isset($transferData->specifications) && count($transferData->specifications))
         @php($n=1)
-        @foreach($withRefData->withSpecifications as $opm)
+        @foreach($transferData->specifications as $tm)
             <tr>
                 <td>{!! $n++ !!}</td>
-                <td>{!! date('d-M-Y', strtotime($opm->date)) !!}</td>
-                <td>{!! $opm->asset->materials_name !!} ({!! $opm->asset->recourse_code !!})</td>
-                <td>{!! ($opm->spec_id == '0')?'None':$opm->specification->specification !!}</td>
-                <td>{!! $opm->asset->unit !!}</td>
-                <td>{!! $opm->rate !!}</td>
-                <td>{!! $opm->qty !!}</td>
-                <td>{!! (float)($opm->qty * $opm->rate) !!}</td>
-                <td>{!! (isset($opm->purpose))?$opm->purpose:'' !!}</td>
-                <td>{!! (isset($opm->remarks))?$opm->remarks:'' !!}</td>
+                <td>{!! date('d-M-Y', strtotime($tm->date)) !!}</td>
+                <td>{!! $tm->asset->materials_name !!} ({!! $tm->asset->recourse_code !!})</td>
+                <td>{!! ($tm->spec_id == '0')?'None':$tm->specification->specification !!}</td>
+                <td>{!! $tm->asset->unit !!}</td>
+                <td>{!! $tm->rate !!}</td>
+                <td>{!! $tm->qty !!}</td>
+                <td>{!! (float)($tm->qty * $tm->rate) !!}</td>
+                <td>{!! (isset($tm->purpose))?$tm->purpose:'' !!}</td>
+                <td>{!! (isset($tm->remarks))?$tm->remarks:'' !!}</td>
                 <td>
-                    <button class="text-success border-0 inline-block bg-none" ref="{!! $opm->id !!}" onclick="return Obj.fixedAssetOpeningSpecEdit(this)"><i class="fas fa-edit"></i></button>
-                    <button class="text-danger border-0 inline-block bg-none" ref="{!! $opm->id !!}" onclick="return Obj.deleteFixedAssetOpeningSpec(this)"><i class="fas fa-trash"></i></button>
+                    <button class="text-success border-0 inline-block bg-none" ref="{!! $tm->id !!}" onclick="return Obj.fixedAssetTransferSpecEdit(this)"><i class="fas fa-edit"></i></button>
+                    <button class="text-danger border-0 inline-block bg-none" ref="{!! $tm->id !!}" onclick="return Obj.deleteFixedAssetTransferSpec(this)"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>
         @endforeach
