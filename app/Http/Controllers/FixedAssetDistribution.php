@@ -651,7 +651,8 @@ class FixedAssetDistribution extends Controller
                     'data'=>$view,
                     'message'=>'Data deleted successfully.'
                 ],200);
-            }return \response()->json([
+            }
+            return \response()->json([
                 'status'=>'error',
                 'message'=>'Request not supported!'
             ],500);

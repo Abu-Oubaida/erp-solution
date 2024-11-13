@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\fixed_asset_specifications;
+use App\Models\Fixed_asset_transfer;
+use App\Models\Fixed_asset_transfer_with_spec;
+use App\Models\Fixed_asset_transfer_with_spec_delete_history;
+use App\Rules\GpUniqueRefCheck;
 use App\Traits\ParentTraitCompanyWise;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -51,7 +55,23 @@ class FixedAssetTransferController extends Controller
                     'to_company_id' => ['sometimes','string', 'required', 'exists:company_infos,id'],
                     'from_branch_id' => ['sometimes','string', 'required', 'exists:branches,id'],
                     'to_branch_id' => ['sometimes','string', 'required', 'exists:branches,id'],
-                    'gp_reference' => ['sometimes','string', Rule::unique('fixed_asset_transfers','reference')->where('from_company_id',$request->post('from_company_id'))],
+                    'gp_reference' => ['sometimes','string', function ($attribute, $value, $fail) use ($request) {
+                        $existingRecord = Fixed_asset_transfer::where('reference', $value)->first();
+                        if ($existingRecord) {
+                            if ($existingRecord->status != 0) {
+                                // Fail if reference exists with a non-zero status
+                                $fail("The reference is already in use.");
+                            } elseif (
+                                // Allow only if all required fields match when status is 0
+                                $existingRecord->from_company_id != $request->post('from_company_id') ||
+                                $existingRecord->to_company_id != $request->post('to_company_id') ||
+                                $existingRecord->from_project_id != $request->post('from_branch_id') ||
+                                $existingRecord->to_project_id != $request->post('to_branch_id')
+                            ) {
+                                $fail("The reference exists but does not match the required company and project details.");
+                            }
+                        }
+                    },],
                     'gp_date' => ['sometimes','date', 'date_format:Y-m-d'],
                 ]);
                 extract($data);
@@ -109,6 +129,14 @@ class FixedAssetTransferController extends Controller
                     'remarks'=> ['sometimes','nullable','string'],
                 ]);
                 extract($data);
+                $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$specification,$materials_id,$from_project_id,$from_company_id);
+                if ($stock<$qty)
+                {
+                    return response()->json([
+                        'status'=>'error',
+                        'message'=>'Requisition quantity cannot be greater than available stock balance.'
+                    ]);
+                }
                 //Work running here
                 $previousData = $this->getFixedAssetGpAll($permission)->where('to_company_id',$to_company_id)->where('from_company_id',$from_company_id)->where('from_project_id',$from_project_id)->where('to_project_id',$to_project_id)->where('reference',$reference)->first();
                 if ($previousData == null)
@@ -124,7 +152,7 @@ class FixedAssetTransferController extends Controller
                     //At 1st need to entry in Fixed_asset_transfer
                     $previousData = $this->getFixedAssetGpAll($permission)->create([
                         'status' => 0,// 0=running
-                        'date' => Carbon::createFromFormat('d-m-Y', $gp_date)->format('Y-m-d'),
+                        'date' => date('Y-m-d H:i:s' , strtotime($gp_date)),
                         'reference' => $reference,
                         'from_company_id' => $from_company_id,
                         'from_project_id' => $from_project_id,
@@ -145,11 +173,11 @@ class FixedAssetTransferController extends Controller
                     {
                         return response()->json([
                             'status' => 'warning',
-                            'message' => 'This reference already exists.'
+                            'message' => 'This item already exists.'
                         ]);
                     }
                     $specificationDataNew = $this->getFixedAssetGpSpecificationAll($permission)->create([
-                        'date' => date('d-m-Y',strtotime($gp_date)),
+                        'date' => date('Y-m-d H:i:s' , strtotime($gp_date)),
                         'transfer_id' => $previousData->id,
                         'reference' => $reference,
                         'asset_id' => $materials_id,
@@ -166,7 +194,7 @@ class FixedAssetTransferController extends Controller
                     if ($specificationDataNew)
                     {
                         $transferData = $this->getFixedAssetGpAll($permission)->where(function ($query) use ($previousData, $reference){
-                            $query->where('transfer_id',$previousData->id)->orWhere('reference',$reference);
+                            $query->where('id',$previousData->id)->orWhere('reference',$reference);
                         })->first();
                         $view = view('back-end/asset/transfer/__list_table_only',compact('transferData'))->render();
                         return response()->json([
@@ -196,11 +224,119 @@ class FixedAssetTransferController extends Controller
             ]);
         }
     }
+    public function deleteFixedAssetTransferSpec(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->fixed_asset_transfer_entry;
+            if ($request->isMethod('delete'))
+            {
+                $data = $request->validate([
+                    'id' => ['required','numeric','exists:fixed_asset_transfer_with_specs,id'],
+                ]);
+                extract($data);
+                if ($request->isMethod('delete'))
+                {
+                    extract($request->post());
+                    $update_data = Fixed_asset_transfer_with_spec::where('id', $id)->first();
+                    $reference = $update_data->reference;
+                    if ($update_data) {
+                        $this->delete_fixed_asset_transfer_balance_spec($update_data->id);
+
+                        // Refresh the model instance to get the updated data
+                        $update_data = $update_data->fresh();
+                    }
+                    $transferData = $this->getFixedAssetGpAll($permission)->where('reference',$reference)->orderBy('created_at','DESC')->first();
+                    $view = view('back-end/asset/transfer/__list_table_only',compact('transferData'))->render();
+                    return \response()->json([
+                        'status'=>'success',
+                        'data'=>['view' => $view,'data'=>$transferData],
+                        'message'=>'Data deleted successfully.'
+                    ],200);
+                }
+            }
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Request method not allowed.'
+            ]);
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+    public function editFixedAssetTransferSpec(Request $request)
+    {
+        try {
+            if ($request->isMethod('put'))
+            {
+                $permission = $this->permissions()->fixed_asset_with_reference_input;
+                $inputData = $request->validate([
+                    'id'=>['required',Rule::exists('fixed_asset_transfer_with_specs','id')],
+                ]);
+                extract($inputData);
+                $data = $this->getFixedAssetGpSpecificationAll($permission)->whereId($id)->first();
+                if ($data == null)
+                {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Data not found.'
+                    ]);
+                }
+                $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$data->spec_id,$data->asset_id,$data->fixed_asset_transfer->from_project_id,$data->fixed_asset_transfer->from_company_id);
+                $view = view('back-end/asset/transfer/__edit_fixed_asset_gp_spec',compact('data','stock'))->render();
+                return \response()->json([
+                    'status'=>'success',
+                    'data'=>['view' => $view,'data'=>$data],
+                    'message'=>'Request processed successfully.'
+                ]);
+            }
+            return \response()->json([
+                'status'=>'error',
+                'message'=>'Request not supported!'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return \response()->json([
+                'status'=>'error',
+                'message'=> $exception->getMessage(),
+            ]);
+        }
+    }
     public function store(Request $request)
     {
 
     }
-
+    protected function delete_fixed_asset_transfer_balance_spec($id)
+    {
+        try {
+            $data = Fixed_asset_transfer_with_spec::where('id', $id)->first();
+            if ($data) {
+                Fixed_asset_transfer_with_spec_delete_history::create([
+                    'old_id'=>$data->id,
+                    'date'=>$data->date,
+                    'transfer_id'=>$data->transfer_id,
+                    'reference'=>$data->reference,
+                    'asset_id'=>$data->asset_id,
+                    'spec_id'=>$data->spec_id,
+                    'rate'=>$data->rate,
+                    'qty'=>$data->qty,
+                    'purpose'=>$data->purpose,
+                    'remarks'=>$data->remarks,
+                    'created_by'=>$data->created_by,
+                    'updated_by'=>$data->updated_by,
+                    'old_created_at'=>$data->created_at,
+                    'old_updated_at'=>$data->updated_at,
+                    'deleted_by'=>$this->user->id
+                ]);
+                return $data->delete();
+            }
+            return false;
+        }catch (\Throwable $exception)
+        {
+            return $exception;
+        }
+    }
     public function materialWiseSpecification(Request $request)
     {
         try {
@@ -244,7 +380,7 @@ class FixedAssetTransferController extends Controller
                 ]);
                 extract($data);
                 $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$spec_id,$materials_id,$from_branch_id,$from_company_id);
-                $rate = $this->getFixedAssetSpecificationWiseStockRate($permission,$spec_id,$materials_id,$from_branch_id,$from_company_id);
+                $rate = $this->getFixedAssetSpecificationWiseRate($permission,$spec_id,$materials_id,$from_branch_id,$from_company_id);
                 return response()->json([
                     'status' => 'success',
                     'data' => ['stock'=>$stock,'rate'=>$rate],

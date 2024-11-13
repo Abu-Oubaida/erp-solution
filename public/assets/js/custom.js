@@ -1026,10 +1026,20 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 const stock = $('#stock').val()
                 const purpose = $('#purpose').val()
                 const remarks = $('#remarks').val()
-                alert(gp_date)
                 if (gp_date.length === 0 || from_company_id.length === 0 || to_company_id.length === 0 || gp_reference.length === 0 || from_project_id.length === 0 || to_project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || stock.length === 0)
                 {
                     alert('All field are required')
+                    return false
+                }
+                if (parseFloat(qty) === 0)
+                {
+                    qty.val(0)
+                    return false
+                }
+                if (parseFloat(stock) <= 0)
+                {
+                    qty.val(0)
+                    alert("Not within the stock quantity.")
                     return false
                 }
                 if (parseFloat(stock) < parseFloat(qty))
@@ -1069,35 +1079,23 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
-            fixedAssetGpEditList:function (e){
-                const opdate = $('#date').val()
-                const company_id = $('#company_id_hide').val()
-                const reference = $('#ref_hide').val()
-                const r_type = $('#r_type_id_hide').val()
-                const project_id = $('#project_id_hide').val()
-                const materials_id = $('#materials_id').val()
-                const specification = $('#specification').val()
-                const rate = $('#rate').val()
-                const qty = $('#qty').val()
-                const purpose = $('#purpose').val()
-                const remarks = $('#remarks').val()
-                if (opdate.length === 0 || company_id.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || r_type.length === 0)
-                {
-                    alert('All field are required')
+            fixedAssetTransferSpecEdit:function (e){
+                const id = $(e).attr('ref')
+                if (id.length === 0)
                     return false
-                }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/edit-fixed-asset-opening";
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/edit-fixed-asset-transfer-spec"
                 $.ajax({
-                    url:url,
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    method: "POST",
-                    data: {'opening_date':opdate,'company_id':company_id,'reference':reference,'r_type':r_type,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
-                    success(response)
+                    url: url,
+                    method:'PUT',
+                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data:{'id':id},
+                    success:function (response)
                     {
                         if (response.status === 'success')
                         {
-                            // $('#opening-materials-list').html(response.data)
-                            $('#opening-materials-list').html(response.data)
+                            const view = response.data.view
+                            $('#fixed-asset-spec-edit').html(view)
+                            $('#editModal').modal('show')
                         }
                         else if (response.status === 'warning')
                         {
@@ -1110,13 +1108,41 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                             // Handle error
                             console.log('Error:', response)
                         }
-                    },
-                    error(xhr)
-                    {
-                        // Handle general AJAX errors
-                        console.log('AJAX Error:', xhr.statusText);
                     }
+
                 })
+            },
+            deleteFixedAssetTransferSpec:function (e)
+            {
+                if (confirm('Are you sure delete this data?'))
+                {
+                    const id = $(e).attr('ref')
+                    if (id.length === 0)
+                        return false
+                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-transfer-spec"
+                    $.ajax({
+                        url: url,
+                        method:'DELETE',
+                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        data:{'id':id},
+                        success:function (response)
+                        {
+                            if (response.status === 'success')
+                            {
+                                alert(response.message)
+                                const view = response.data.view
+                                $('#materials-list').html(view)
+                            }
+                            if (response.status === 'error')
+                            {
+                                alert("Error:"+response.message)
+                                // Handle error
+                            }
+                            return false
+                        }
+
+                    })
+                }
             },
             priceTotal:function (e,inputID,actionID)
             {
@@ -1129,12 +1155,12 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 }
                 output.val(parseFloat(Number(input*self)))
             },
-            priceTotalForTransfer:function (e,actionID)
+            priceTotalForTransfer:function (e,actionID,qty_id,stock_id,rate_id)
             {
                 const output = $("#"+actionID)
-                let qty = parseFloat($("#qty").val())
-                const stock = parseFloat($("#stock").val())
-                const rate = parseFloat($("#rate").val())
+                let qty = parseFloat($("#"+qty_id).val())
+                const stock = parseFloat($("#"+stock_id).val())
+                const rate = parseFloat($("#"+rate_id).val())
                 if (qty.length === 0 || rate.length === 0)
                 {
                     output.val('')

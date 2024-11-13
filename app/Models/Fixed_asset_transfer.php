@@ -43,6 +43,6 @@ class Fixed_asset_transfer extends Model
     }
     public function specificationsByReference()
     {
-        return $this->hasMany(Fixed_asset_opening_with_spec::class,'reference','reference');
+        return $this->hasMany(Fixed_asset_transfer_with_spec::class,'reference','reference');
     }
 }

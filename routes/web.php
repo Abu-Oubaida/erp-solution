@@ -481,6 +481,8 @@ Route::group(['middleware' => ['auth']],function (){
                     Route::post('material-specification-search','materialWiseSpecification');
                     Route::post('material-specification-wise-stock-rate-search','materialSpecificationWiseStockRate');
                     Route::post('add-to-list-fixed-asset-gp','addToListFixedAssetGp');
+                    Route::delete('delete-fixed-asset-transfer-spec','deleteFixedAssetTransferSpec');
+                    Route::put('edit-fixed-asset-transfer-spec','editFixedAssetTransferSpec');
                 });
             });
         });
