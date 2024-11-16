@@ -1,10 +1,10 @@
 <div class="col-md-12">
     <div class="card mb-4">
         <div class="card-body">
-            @if(isset($transferData))
+            @if(isset($transferDatas))
             <div class="row">
                 <div class="col-md-12">
-                    <table @if(count($transferData))id="userTable" class="display" @else class="table" @endif style="width: 100%;">
+                    <table @if(count($transferDatas))id="userTable" class="display" @else class="table" @endif style="width: 100%;">
                         <thead>
                         <tr>
                             <th>SL.</th>
@@ -26,7 +26,7 @@
                             <th>Action</th>
                         </tr>
                         </thead>
-                        @if(count($fixed_asset_with_ref_report_list))
+                        @if(count($transferDatas))
                         <tfoot>
                         <tr>
                             <th>SL.</th>
@@ -50,69 +50,68 @@
                         </tfoot>
                         @endif
                         <tbody>
-                        @if(count($fixed_asset_with_ref_report_list))
+                        @if(count($transferDatas))
                             @php($n=1)
-                            @foreach($fixed_asset_with_ref_report_list as $pwr)
+                            @foreach($transferDatas as $td)
                                 <tr class="text-center text-capitalize">
                                     <td>{!! $n++ !!}</td>
-                                    <td>{!! $pwr->company->company_name !!}</td>
-                                    <td>{!! $pwr->branch->branch_name !!}</td>
-                                    <td>{!! date('d-M-Y', strtotime($pwr->date)) !!}</td>
-                                    <td>{!! $pwr->refType->name !!}</td>
-                                    <td>{!! $pwr->references !!}</td>
+                                    <td>{!! date('d-Y-y',strtotime($td->date)) !!}</td>
+                                    <td>{!! $td->reference !!}</td>
+                                    <td>{!! $td->companyFrom->company_name !!}</td>
+                                    <td>{!! $td->branchFrom->branch_name !!}</td>
+                                    <td>{!! $td->companyTo->company_name !!}</td>
+                                    <td>{!! $td->branchTo->branch_name !!}</td>
                                     <td>
-                                        @if($pwr->status == 1) <span class="badge bg-success">Active</span>
-                                        @elseif($pwr->status == 2) <span class="badge bg-info">Approved</span>
-                                        @elseif($pwr->status == 3) <span class="badge bg-warning">Pending</span>
-                                        @elseif($pwr->status == 4) <span class="badge bg-dark">Declined</span>
-                                        @elseif($pwr->status == 5) <span class="badge bg-primary">Processing</span>
-                                        @else <span class="badge bg-danger">Inactive</span>
+                                        @if($td->status == 0)
+                                            <span class="badge bg-info">Processing</span>
+                                        @else
+                                            <span class="badge bg-success">Stage-{!! $td->status !!}</span>
                                         @endif
                                     </td>
-                                    <td>{!! count($pwr->withSpecifications) !!}</td>
+                                    <td>{!! count($td->specifications) !!}</td>
                                     <td>
                                         @php($total = 0)
-                                        @if(count($pwr->withSpecifications))
-                                            @foreach($pwr->withSpecifications as $fs)
+                                        @if(count($td->specifications))
+                                            @foreach($td->specifications as $fs)
                                                 @php($total += ($fs->rate*$fs->qty))
                                             @endforeach
                                         @endif
                                         {!! $total !!}/=
                                     </td>
                                     <td>
-                                        @if(isset($pwr->attestedDocuments) && count($pwr->attestedDocuments))
-                                            @php($i = 1)
-                                            <ol>
-                                            @foreach($pwr->attestedDocuments as $d)
-                                                <li><a href="{!! url($d->document_url.$d->document_name) !!}" target="_blank">Document {!! $i++ !!}</a></li>
-                                            @endforeach
-                                            </ol>
-                                        @endif
+{{--                                        @if(isset($td->attestedDocuments) && count($td->attestedDocuments))--}}
+{{--                                            @php($i = 1)--}}
+{{--                                            <ol>--}}
+{{--                                            @foreach($td->attestedDocuments as $d)--}}
+{{--                                                <li><a href="{!! url($d->document_url.$d->document_name) !!}" target="_blank">Document {!! $i++ !!}</a></li>--}}
+{{--                                            @endforeach--}}
+{{--                                            </ol>--}}
+{{--                                        @endif--}}
                                     </td>
-                                    <td>{!! $pwr->narration !!}</td>
-                                    <td>{!! (isset($pwr->createdBy->name))?$pwr->createdBy->name:'-' !!}</td>
-                                    <td>{!! date('d-M-Y', strtotime($pwr->created_at)) !!}</td>
-                                    <td>{!! (isset($pwr->updatedBy->name))?$pwr->updatedBy->name:'-' !!}</td>
-                                    <td>{!! (isset($pwr->updatedBy->name))?date('d-M-Y', strtotime($pwr->updated_at)):'-' !!}</td>
+                                    <td>{!! $td->narration !!}</td>
+                                    <td>{!! (isset($td->createdBy->name))?$td->createdBy->name:'-' !!}</td>
+                                    <td>{!! date('d-M-Y', strtotime($td->created_at)) !!}</td>
+                                    <td>{!! (isset($td->updatedBy->name))?$td->updatedBy->name:'-' !!}</td>
+                                    <td>{!! (isset($td->updatedBy->name))?date('d-M-Y', strtotime($td->updated_at)):'-' !!}</td>
                                     <td class="text-center">
-                                        @if($pwr->status == 5)
-                                            <a href="{!! url(route('fixed.asset.distribution.opening.input',['ref'=>$pwr->references,'project'=>$pwr->branch->id,'rt'=>$pwr->refType->id,'c'=>$pwr->company_id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>
-                                            <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $pwr->id !!}" ><i class="fas fa-trash"></i></button>
-                                        @else
-                                            <a href="{!! route('fixed.asset.with.reference.print',['assetID'=>\Illuminate\Support\Facades\Crypt::encryptString($pwr->id)]) !!}" class="text-success border-0 inline-block bg-none" target="_blank"><i class="fas fa-print"></i></a>
-                                            @if(auth()->user()->hasPermission('edit_fixed_asset_distribution_with_reference'))
-                                                <a href="{!! route('edit.fixed.asset.distribution.with.reference.balance',['faobid'=>\Illuminate\Support\Facades\Crypt::encryptString($pwr->id)]) !!}" class="text-info"><i class="fas fa-edit"></i></a>
-                                            @endif
-                                            @if(auth()->user()->hasPermission('delete_fixed_asset_opening_balance'))
-                                                <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $pwr->id !!}" ><i class="fas fa-trash"></i></button>
-                                            @endif
-                                        @endif
+{{--                                        @if($td->status == 5)--}}
+{{--                                            <a href="{!! url(route('fixed.asset.distribution.opening.input',['ref'=>$td->references,'project'=>$td->branch->id,'rt'=>$td->refType->id,'c'=>$td->company_id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>--}}
+{{--                                            <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $td->id !!}" ><i class="fas fa-trash"></i></button>--}}
+{{--                                        @else--}}
+{{--                                            <a href="{!! route('fixed.asset.with.reference.print',['assetID'=>\Illuminate\Support\Facades\Crypt::encryptString($td->id)]) !!}" class="text-success border-0 inline-block bg-none" target="_blank"><i class="fas fa-print"></i></a>--}}
+{{--                                            @if(auth()->user()->hasPermission('edit_fixed_asset_distribution_with_reference'))--}}
+{{--                                                <a href="{!! route('edit.fixed.asset.distribution.with.reference.balance',['faobid'=>\Illuminate\Support\Facades\Crypt::encryptString($td->id)]) !!}" class="text-info"><i class="fas fa-edit"></i></a>--}}
+{{--                                            @endif--}}
+{{--                                            @if(auth()->user()->hasPermission('delete_fixed_asset_opening_balance'))--}}
+{{--                                                <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $td->id !!}" ><i class="fas fa-trash"></i></button>--}}
+{{--                                            @endif--}}
+{{--                                        @endif--}}
                                     </td>
                                 </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="14" class="text-center">Not Found</td>
+                                <td colspan="17" class="text-center">Not Found</td>
                             </tr>
                         @endif
                         </tbody>
@@ -123,7 +122,7 @@
         </div>
     </div>
 </div>
-@if(count($fixed_asset_with_ref_report_list))
+@if(count($transferDatas))
 <script>
 (function ($){
     $(document).ready(function(){

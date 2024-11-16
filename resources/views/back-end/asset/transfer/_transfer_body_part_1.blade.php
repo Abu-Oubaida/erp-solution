@@ -144,7 +144,11 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12" id="materials-list">
-                    @include('back-end.asset.transfer.__list_table_only')
+                    @if(@$transferDatas){{--Report Part--}}
+                        @include('back-end.asset.transfer._fixed_asset_transfer_list_active')
+                    @elseif(@$transferData){{--Input Part--}}
+                        @include('back-end.asset.transfer.__list_table_only')
+                    @endif
                 </div>
                 <div class="modal modal-xl fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -168,11 +172,12 @@
                         </div>
                     </div>
                 </div>
-                {{--                    @if(isset($withRefData->withSpecifications) && count($withRefData->withSpecifications))--}}
-                <form action="{!! route('fixed.asset.distribution.update') !!}" method="post" enctype="multipart/form-data">
+                @if(@$transferData)
+                <form action="{!! route('fixed.asset.transfer.update') !!}" method="post" enctype="multipart/form-data">
                     @csrf
                     @method('put')
                     <div class="row">
+                        <input type="hidden" name="ref_id" value="{!! $transferData->id !!}">
                         <div class="col-md-6">
                             <div>
                                 <label for="remarks">Narration:</label>
@@ -189,7 +194,7 @@
                         </div>
                     </div>
                 </form>
-                {{--                    @endif--}}
+                @endif
             </div>
         </div>
     </div>

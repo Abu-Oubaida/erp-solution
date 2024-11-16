@@ -49,13 +49,13 @@ class FixedAssetTransferController extends Controller
     {
         try {
             if ($request->isMethod('POST')) {
-                $permission = $this->permissions()->fixed_asset_transfer_entry;
+                $permission_entry = $this->permissions()->fixed_asset_transfer_entry;
                 $data = $request->validate([
-                    'from_company_id' => ['sometimes','string', 'required', 'exists:company_infos,id'],
-                    'to_company_id' => ['sometimes','string', 'required', 'exists:company_infos,id'],
-                    'from_branch_id' => ['sometimes','string', 'required', 'exists:branches,id'],
-                    'to_branch_id' => ['sometimes','string', 'required', 'exists:branches,id'],
-                    'gp_reference' => ['sometimes','string', function ($attribute, $value, $fail) use ($request) {
+                    'from_company_id' => ['sometimes','string', 'nullable', 'exists:company_infos,id'],
+                    'to_company_id' => ['sometimes','string', 'nullable', 'exists:company_infos,id'],
+                    'from_branch_id' => ['sometimes','string', 'nullable', 'exists:branches,id'],
+                    'to_branch_id' => ['sometimes','string', 'nullable', 'exists:branches,id'],
+                    'gp_reference' => ['sometimes','string','nullable', function ($attribute, $value, $fail) use ($request) {
                         $existingRecord = Fixed_asset_transfer::where('reference', $value)->first();
                         if ($existingRecord) {
                             if ($existingRecord->status != 0) {
@@ -72,30 +72,99 @@ class FixedAssetTransferController extends Controller
                             }
                         }
                     },],
-                    'gp_date' => ['sometimes','date', 'date_format:Y-m-d'],
+                    'gp_date' => ['sometimes','nullable','date', 'date_format:Y-m-d'],
                 ]);
                 extract($data);
-                $companies = $this->getCompanyModulePermissionWise($permission);
-                $branches = $this->getBranch($permission);
-                $from_company = $this->getCompanyModulePermissionWise($permission)->where('id',$from_company_id)->first();
-                $to_company = $this->getCompanyModulePermissionWise($permission)->where('id',$to_company_id)->first();
-                $from_project = $this->getBranch($permission)->select(['id','branch_name'])->where('company_id',$from_company_id)->where('id',$from_branch_id)->first();
-                $to_project = $this->getBranch($permission)->select(['id','branch_name'])->where('company_id',$to_company_id)->where('id',$to_branch_id)->first();
-                $fixed_asset_ids  = $this->getFixedAssetStockMaterials($permission,$from_project->id,$from_company->id);
-                $fixed_assets = $this->getFixedAssets($permission)->whereIn('id',$fixed_asset_ids)->get();
-                $transferData = $this->getFixedAssetGpAll($permission)->where('reference',$gp_reference)->first();
-//                if ($transferData && $transferData->status >= 1 ) {
-//                    $view = view('back-end/asset/transfer/_fixed_asset_transfer_list_active',compact('transferData'))->render();
-//                }
-//                else
-//                {
-                    $view = view('back-end/asset/transfer/_transfer_body_part_1',compact('fixed_assets','from_company','to_company','from_project','to_project','gp_date','gp_reference','transferData'))->render();
-//                }
-                return response()->json([
-                    'status' => 'success',
-                    'data' => $view,
-                    'message' => 'Data process successfully.'
-                ]);
+                $companies = $this->getCompanyModulePermissionWise($permission_entry);
+                $branches = $this->getBranch($permission_entry);
+                $from_company = $this->getCompanyModulePermissionWise($permission_entry)->where('id',$from_company_id)->first();
+                $to_company = $this->getCompanyModulePermissionWise($permission_entry)->where('id',$to_company_id)->first();
+                $from_project = $this->getBranch($permission_entry)->select(['id','branch_name'])->where('company_id',$from_company_id)->where('id',$from_branch_id)->first();
+                $to_project = $this->getBranch($permission_entry)->select(['id','branch_name'])->where('company_id',$to_company_id)->where('id',$to_branch_id)->first();
+                $fixed_asset_ids  = $this->getFixedAssetStockMaterials($permission_entry,$from_project->id,$from_company->id);
+                $fixed_assets = $this->getFixedAssets($permission_entry)->whereIn('id',$fixed_asset_ids)->get();
+                if (!empty($from_company_id) && !empty($from_branch_id) && !empty($to_company_id) && !empty($to_branch_id) && !empty($gp_reference))//Input Part
+                {
+                    $transferData = $this->getFixedAssetGpAll($permission_entry)->where('reference',$gp_reference)->first();
+                    if ($transferData && $transferData->status >= 1 ) {
+                        if ($this->user->hasPermission('fixed_asset_transfer_list')) {
+                            $transferDatas = $this->getFixedAssetGpAll($permission_entry)->where('reference',$gp_reference)->get();
+                            $view = view('back-end/asset/transfer/_fixed_asset_transfer_list_active',compact('transferDatas'))->render();
+                            return response()->json([
+                                'status' => 'success',
+                                'data' => ['view'=>$view,'data'=>$transferDatas],
+                                'message' => 'Data process successfully.'
+                            ]);
+                        }
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'You do not have permission to access this page.'
+                        ]);
+                    }
+                    else
+                    {
+                        if (is_null($gp_date))
+                        {
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'Gp date is required.'
+                            ]);
+                        }
+                        if ($this->user->hasPermission('fixed_asset_transfer_entry')) {
+                            $view = view('back-end/asset/transfer/_transfer_body_part_1',compact('fixed_assets','from_company','to_company','from_project','to_project','gp_date','gp_reference','transferData'))->render();
+                            return response()->json([
+                                'status' => 'success',
+                                'data' => ['view'=>$view,'data'=>$transferData],
+                                'message' => 'Data process successfully.'
+                            ]);
+                        }
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'You do not have permission to access this page.'
+                        ]);
+                    }
+                }
+                else{
+                    if ($this->user->hasPermission('fixed_asset_transfer_list'))//Report part
+                    {
+                        $transferDatas = $this->getFixedAssetGpAll('fixed_asset_transfer_list');
+                        if (!empty($from_company_id) && empty($from_branch_id) && empty($to_company_id) && empty($to_branch_id) && empty($gp_reference)) {
+                            $transferDatas->where('from_company_id')->get();
+                        }
+                        elseif (!empty($from_company_id) && !empty($from_branch_id) && empty($to_company_id) && empty($to_branch_id) && empty($gp_reference))
+                        {
+                            $transferDatas->where('from_company_id')->where('from_project_id',$from_branch_id)->get();
+                        }
+                        elseif (!empty($from_company_id) && !empty($from_branch_id) && !empty($to_company_id) && empty($to_branch_id) && empty($gp_reference))
+                        {
+                            $transferDatas->where('from_company_id')->where('from_project_id',$from_branch_id)->where('to_company_id',$to_company_id)->get();
+                        }
+                        elseif (!empty($from_company_id) && !empty($from_branch_id) && !empty($to_company_id) && !empty($to_branch_id) && empty($gp_reference))
+                        {
+                            $transferDatas->where('from_company_id')->where('from_project_id',$from_branch_id)->where('to_company_id',$to_company_id)->where('to_project_id',$to_branch_id)->get();
+                        }
+                        else{
+                            $transferDatas = null;
+                        }
+                        if ($transferDatas)
+                        {
+                            $view = view('back-end/asset/transfer/_fixed_asset_transfer_list_active',compact('transferDatas'))->render();
+                            return response()->json([
+                                'status' => 'success',
+                                'data' => ['view'=>$view,'data'=>$transferDatas],
+                                'message' => 'Data process successfully.'
+                            ]);
+                        }
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Data not found.'
+                        ]);
+                    }
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'You do not have permission to access this page.'
+                    ]);
+                }
             }
             return response()->json([
                 'status'=>'error',
@@ -268,9 +337,9 @@ class FixedAssetTransferController extends Controller
     public function editFixedAssetTransferSpec(Request $request)
     {
         try {
-            if ($request->isMethod('put'))
+            if ($request->isMethod('post'))
             {
-                $permission = $this->permissions()->fixed_asset_with_reference_input;
+                $permission = $this->permissions()->fixed_asset_transfer_entry;
                 $inputData = $request->validate([
                     'id'=>['required',Rule::exists('fixed_asset_transfer_with_specs','id')],
                 ]);
@@ -300,6 +369,28 @@ class FixedAssetTransferController extends Controller
             return \response()->json([
                 'status'=>'error',
                 'message'=> $exception->getMessage(),
+            ]);
+        }
+    }
+    public function updateFixedAssetTransferSpec(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $permission = $this->permissions()->fixed_asset_transfer_entry;
+                $inputData = $request->validate([
+
+                ]);
+                extract($inputData);
+            }
+            return \response()->json([
+                'status'=>'error',
+                'message'=>'Request not supported!'
+            ]);
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status'=>'error',
+                'message'=>$exception->getMessage()
             ]);
         }
     }

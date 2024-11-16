@@ -47,7 +47,7 @@
         </div>
         <div class="col">
             <div class="mb-3 mt-4 float-end">
-                <button class="btn btn-chl-outline btn-sm" type="button" onclick="return Obj.updateFixedAssetOpeningSpec(this)"> <i class="fas fa-save"></i> Update</button>
+                <button class="btn btn-chl-outline btn-sm" type="button" onclick="return Obj.fixedAssetTransferSpecUpdate(this)"> <i class="fas fa-save"></i> Update</button>
             </div>
         </div>
     </div>

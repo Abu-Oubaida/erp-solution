@@ -1086,7 +1086,40 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 const url = window.location.origin + sourceDir + "/fixed-asset-distribution/edit-fixed-asset-transfer-spec"
                 $.ajax({
                     url: url,
-                    method:'PUT',
+                    method:'POST',
+                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data:{'id':id},
+                    success:function (response)
+                    {
+                        if (response.status === 'success')
+                        {
+                            const view = response.data.view
+                            $('#fixed-asset-spec-edit').html(view)
+                            $('#editModal').modal('show')
+                        }
+                        else if (response.status === 'warning')
+                        {
+                            alert("Warning: "+response.message)
+                            console.log('Error:', response)
+                        }
+                        else if (response.status === 'error')
+                        {
+                            alert("Error: "+response.message)
+                            // Handle error
+                            console.log('Error:', response)
+                        }
+                    }
+
+                })
+            },
+            fixedAssetTransferSpecUpdate:function (e){
+                const id = $(e).attr('ref')
+                if (id.length === 0)
+                    return false
+                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/update-fixed-asset-transfer-spec"
+                $.ajax({
+                    url: url,
+                    method:'POST',
                     headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     data:{'id':id},
                     success:function (response)
@@ -1228,7 +1261,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 const from_project = $("#from_project").val()
                 const to_project = $("#to_project").val()
                 const gp_date = $("#gp_date").val()
-                if (from_company_id.length === 0 && to_company_id.length === 0 && reference.length === 0 && from_project.length === 0 && to_project.length === 0 && gp_date.length === 0)
+                if (from_company_id.length === 0 && to_company_id.length === 0 && reference.length === 0 && from_project.length === 0 && to_project.length === 0)
                 {
                     alert('All Input are Empty!')
                     return false
@@ -1243,11 +1276,13 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     {
                         if (response.status === 'success')
                         {
-                            $("#"+outputID).html(response.data)
+                            $("#"+outputID).html(response.data.view)
+                            let data = response.data.data
                             // Get the current URL
                             var currentUrl = window.location.href
                             // Construct the new URL by appending the ref value
-                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference + '&from_p=' + from_project+ '&to_p=' + to_project + '&d=' + gp_date + '&from_c=' + from_company_id + '&to_c=' + to_company_id
+                            var newUrl = currentUrl.split('?')[0] + '?ref=' + data.reference + '&from_p=' + data.from_project_id+ '&to_p=' + to_project + '&d=' + data.date + '&from_c=' + from_company_id + '&to_c=' + to_company_id
+                            $("#gp_date").val(data.date)
                             // Change the URL without reloading the page
                             history.pushState({ref: reference}, '', newUrl)
                         }
