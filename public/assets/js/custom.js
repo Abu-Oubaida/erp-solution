@@ -1113,22 +1113,28 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 })
             },
             fixedAssetTransferSpecUpdate:function (e){
-                const id = $(e).attr('ref')
-                if (id.length === 0)
+                const gp_date = $('#edit-date').val()
+                const id = $('#edit-id').val()
+                const rate = $('#rate-edit').val()
+                const qty = $('#qty-edit').val()
+                const purpose = $('#edit-purpose').val()
+                const remarks = $('#edit-remarks').val()
+                if (id.length === 0 || gp_date.length === 0 || rate.length === 0 || qty.length === 0 )
                     return false
                 const url = window.location.origin + sourceDir + "/fixed-asset-distribution/update-fixed-asset-transfer-spec"
                 $.ajax({
                     url: url,
-                    method:'POST',
+                    method:'PUT',
                     headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'id':id},
+                    data:{'id':id,'gp_date':gp_date,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
                     success:function (response)
                     {
                         if (response.status === 'success')
                         {
                             const view = response.data.view
-                            $('#fixed-asset-spec-edit').html(view)
-                            $('#editModal').modal('show')
+                            alert(response.message)
+                            $('#editModal').modal('hide')
+                            $('#materials-list').html(view)
                         }
                         else if (response.status === 'warning')
                         {
@@ -1176,6 +1182,59 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 
                     })
                 }
+            },
+            gpFinalUpdate:function (e)
+            {
+                // Validate required fields
+                if ($('#gp_ref_hide').val().length === 0) {
+                    alert('Reference is required!');
+                    return false;
+                }
+
+                // Build FormData object
+                const formData = new FormData();
+                formData.append('gp_date', $('#gp_date_hidden').val());
+                formData.append('from_company', $('#from_company_id_hide').val());
+                formData.append('to_company', $('#to_company_id_hide').val());
+                formData.append('from_project', $('#from_project_id_hide').val());
+                formData.append('to_project', $('#to_project_id_hide').val());
+                formData.append('reference', $('#gp_ref_hide').val());
+                formData.append('narration', $('#narration').val());
+
+                // Append multiple files (if any)
+                const files = $('#attachments')[0].files;
+                if (files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append(`attachments[${i}]`, files[i]);
+                    }
+                }
+
+                // Prepare URL
+                const url =
+                    window.location.origin + sourceDir + "/fixed-asset-distribution/final-update-fixed-asset-transfer";
+
+                // AJAX request
+                $.ajax({
+                    url: url,
+                    method: 'post', // Change to POST for better compatibility
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            alert(response.message);
+                            window.location.reload();
+                        } else if (response.status === 'error') {
+                            alert("Error: " + response.message);
+                            // Additional error handling
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
             },
             priceTotal:function (e,inputID,actionID)
             {
@@ -1276,15 +1335,35 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     {
                         if (response.status === 'success')
                         {
-                            $("#"+outputID).html(response.data.view)
+                            let ref = reference
+                            let date = gp_date
+                            let f_p = from_project
+                            let t_p = to_project
+                            let f_c = from_company_id
+                            let t_c = to_company_id
                             let data = response.data.data
+                            let view = response.data.view
+                            if (typeof data !== "undefined" && data !== null)
+                            {
+                                ref = data.reference
+                                date = data.date
+                                f_c = data.from_company_id
+                                t_c = data.to_company_id
+                                f_p = data.from_project_id
+                                t_p = data.to_project_id
+                            }
+                            if (ref.length === 0)
+                            {
+                                date = null
+                            }
                             // Get the current URL
                             var currentUrl = window.location.href
                             // Construct the new URL by appending the ref value
-                            var newUrl = currentUrl.split('?')[0] + '?ref=' + data.reference + '&from_p=' + data.from_project_id+ '&to_p=' + to_project + '&d=' + data.date + '&from_c=' + from_company_id + '&to_c=' + to_company_id
-                            $("#gp_date").val(data.date)
+                            var newUrl = currentUrl.split('?')[0] + '?ref=' + ref + '&from_p=' + f_p+ '&to_p=' + t_p + '&d=' + date + '&from_c=' + f_c + '&to_c=' + t_c
+                            $("#gp_date").val(date)
                             // Change the URL without reloading the page
                             history.pushState({ref: reference}, '', newUrl)
+                            $("#"+outputID).html(view)
                         }
                         else if (response.status === 'warning')
                         {
@@ -1366,6 +1445,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                             $('#rate').val(response.data.rate)
                             $('#stock').val(response.data.stock)
                             $("#qty").val('')
+                            $("#total").val('')
                             // console.log(response.data)
                         }
                         else if (response.status === 'warning')
@@ -1374,6 +1454,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                             $('#rate').val('')
                             $('#stock').val('')
                             $("#qty").val('')
+                            $("#total").val('')
                         }
                         else if (response.status === 'error')
                         {
@@ -1381,6 +1462,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                             $('#rate').val('')
                             $('#stock').val('')
                             $("#qty").val('')
+                            $("#total").val('')
                         }
                     },
                     error:function(xhr)

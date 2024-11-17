@@ -110,7 +110,7 @@
 
     </div>
     <script>
-        @if(request()->get('from_c') && request()->get('to_c') && request()->get('to_p') && request()->get('from_p') && request()->get('ref') && request()->get('d'))
+        @if(request()->get('from_c') || request()->get('to_c') || request()->get('to_p') || request()->get('from_p') || request()->get('ref'))
         (function ($) {
             $(document).ready(function () {
                 Obj.gpEntrySearch(this,'fixed-asset-body')

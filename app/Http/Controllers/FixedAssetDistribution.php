@@ -770,7 +770,7 @@ class FixedAssetDistribution extends Controller
             $permission = $this->permissions()->fixed_asset_with_reference_input;
             $request->validate([
                 'id' => ['required','string',Rule::exists('fixed_asset_opening_balances','id')->where('status',5)],
-                'attachment.*' => ['sometimes','nullable','file','max:512000'],
+                'attachment.*' => ['sometimes','nullable','file','mimes:jpg,jpeg,png,gif,pdf,doc,docx','max:512000'],
             ]);
             if ($request->isMethod('put'))
             {
@@ -820,7 +820,7 @@ class FixedAssetDistribution extends Controller
                     return redirect()->back()->with('error', 'Documents uploaded error.');
                 }
                 Fixed_asset_opening_balance_document::create([
-                    'company_id'=>$this->user->company_id,
+                    'company_id'=>$f_a_o_b->company_id,
                     'opening_asset_id'=>$f_a_o_b->id,
                     'document_name'=>$fileName,
                     'document_url'=>$this->document_path,

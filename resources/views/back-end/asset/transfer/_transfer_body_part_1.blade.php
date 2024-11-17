@@ -148,6 +148,8 @@
                         @include('back-end.asset.transfer._fixed_asset_transfer_list_active')
                     @elseif(@$transferData){{--Input Part--}}
                         @include('back-end.asset.transfer.__list_table_only')
+                    @else
+                        <h4 class="text-center text-danger">No item are listed!</h4>
                     @endif
                 </div>
                 <div class="modal modal-xl fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -172,29 +174,22 @@
                         </div>
                     </div>
                 </div>
-                @if(@$transferData)
-                <form action="{!! route('fixed.asset.transfer.update') !!}" method="post" enctype="multipart/form-data">
-                    @csrf
-                    @method('put')
-                    <div class="row">
-                        <input type="hidden" name="ref_id" value="{!! $transferData->id !!}">
-                        <div class="col-md-6">
-                            <div>
-                                <label for="remarks">Narration:</label>
-                                <textarea class="form-control form-control-sm"  id="narration" name="narration">{!! (old('narration')?old('narration'):'') !!}</textarea>
-                                {{--                                        <input type="hidden" name="id" value="{!! //$withRefData->id !!}">--}}
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <label for="remarks">Attachments:</label>
-                            <input class="form-control" type="file" name="attachment[]" id="attachment" multiple>
-                        </div>
-                        <div class="col-md-4">
-                            <button class="btn btn-lg btn-outline-success float-end mt-4" type="submit"><i class="fas fa-save"></i> Final Update</button>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div>
+                            <label for="remarks">Narration:</label>
+                            <textarea class="form-control form-control-sm"  id="narration" name="narration"></textarea>
+                            {{--                                        <input type="hidden" name="id" value="{!! //$withRefData->id !!}">--}}
                         </div>
                     </div>
-                </form>
-                @endif
+                    <div class="col-md-2">
+                        <label for="remarks">Attachments:</label>
+                        <input class="form-control" type="file" name="attachments[]" id="attachments" multiple>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-lg btn-outline-success float-end mt-4" type="submit" onclick="Obj.gpFinalUpdate(this)"><i class="fas fa-save"></i> Final Update</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

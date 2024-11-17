@@ -55,7 +55,7 @@
                             @foreach($transferDatas as $td)
                                 <tr class="text-center text-capitalize">
                                     <td>{!! $n++ !!}</td>
-                                    <td>{!! date('d-Y-y',strtotime($td->date)) !!}</td>
+                                    <td>{!! date('d-M-y',strtotime($td->date)) !!}</td>
                                     <td>{!! $td->reference !!}</td>
                                     <td>{!! $td->companyFrom->company_name !!}</td>
                                     <td>{!! $td->branchFrom->branch_name !!}</td>

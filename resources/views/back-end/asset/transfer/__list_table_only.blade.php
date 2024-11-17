@@ -2,7 +2,7 @@
     <thead>
     <tr>
         <th>SL.</th>
-        <th>Date</th>
+        <th>Entry Date</th>
         <th>Materials (Code)</th>
         <th>Specifications</th>
         <th>Unit</th>
@@ -20,7 +20,7 @@
         @foreach($transferData->specifications as $tm)
             <tr>
                 <td>{!! $n++ !!}</td>
-                <td>{!! date('d-M-Y', strtotime($tm->date)) !!}</td>
+                <td>{!! date('d-M-Y', strtotime($tm->created_at)) !!}</td>
                 <td>{!! $tm->asset->materials_name !!} ({!! $tm->asset->recourse_code !!})</td>
                 <td>{!! ($tm->spec_id == '0')?'None':$tm->specification->specification !!}</td>
                 <td>{!! $tm->asset->unit !!}</td>
