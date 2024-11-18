@@ -3,8 +3,8 @@
         <div class="card-body">
             @if(isset($transferDatas))
             <div class="row">
-                <div class="col-md-12">
-                    <table @if(count($transferDatas))id="userTable" class="display" @else class="table" @endif style="width: 100%;">
+                <div class="col-md-12" style="font-size: 13px">
+                    <table @if(count($transferDatas))id="userTable" class="display table-hover table-sm" @else class="table" @endif style="width: 100%; margin: 0; padding: 0; ">
                         <thead>
                         <tr>
                             <th>SL.</th>
@@ -78,15 +78,15 @@
                                         @endif
                                         {!! $total !!}/=
                                     </td>
-                                    <td>
-{{--                                        @if(isset($td->attestedDocuments) && count($td->attestedDocuments))--}}
-{{--                                            @php($i = 1)--}}
-{{--                                            <ol>--}}
-{{--                                            @foreach($td->attestedDocuments as $d)--}}
-{{--                                                <li><a href="{!! url($d->document_url.$d->document_name) !!}" target="_blank">Document {!! $i++ !!}</a></li>--}}
-{{--                                            @endforeach--}}
-{{--                                            </ol>--}}
-{{--                                        @endif--}}
+                                    <td class="">
+                                        @if(isset($td->documents) && count($td->documents))
+                                            @php($i = 1)
+                                            <ul class="m-0 p-0 d-block text-decoration-none" style="text-align: left">
+                                            @foreach($td->documents as $d)
+                                                <li class="d-block m-0 p-0"><a href="{!! url($d->document_url.$d->document_name) !!}" target="_blank" title="{!! $d->document_name !!}">Document-{!! $i++ !!}</a></li>
+                                            @endforeach
+                                            </ul>
+                                        @endif
                                     </td>
                                     <td>{!! $td->narration !!}</td>
                                     <td>{!! (isset($td->createdBy->name))?$td->createdBy->name:'-' !!}</td>
@@ -94,8 +94,8 @@
                                     <td>{!! (isset($td->updatedBy->name))?$td->updatedBy->name:'-' !!}</td>
                                     <td>{!! (isset($td->updatedBy->name))?date('d-M-Y', strtotime($td->updated_at)):'-' !!}</td>
                                     <td class="text-center">
-{{--                                        @if($td->status == 5)--}}
-{{--                                            <a href="{!! url(route('fixed.asset.distribution.opening.input',['ref'=>$td->references,'project'=>$td->branch->id,'rt'=>$td->refType->id,'c'=>$td->company_id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>--}}
+                                        @if($td->status <= 0)
+                                            <a href="{!! url(route('fixed.asset.transfer',['ref'=>$td->reference,'from_p'=>$td->from_project_id,'to_p'=>$td->to_project_id,'d'=>$td->date,'from_c'=>$td->from_company_id,'to_c'=>$td->to_company_id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>
 {{--                                            <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $td->id !!}" ><i class="fas fa-trash"></i></button>--}}
 {{--                                        @else--}}
 {{--                                            <a href="{!! route('fixed.asset.with.reference.print',['assetID'=>\Illuminate\Support\Facades\Crypt::encryptString($td->id)]) !!}" class="text-success border-0 inline-block bg-none" target="_blank"><i class="fas fa-print"></i></a>--}}
@@ -105,7 +105,7 @@
 {{--                                            @if(auth()->user()->hasPermission('delete_fixed_asset_opening_balance'))--}}
 {{--                                                <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $td->id !!}" ><i class="fas fa-trash"></i></button>--}}
 {{--                                            @endif--}}
-{{--                                        @endif--}}
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

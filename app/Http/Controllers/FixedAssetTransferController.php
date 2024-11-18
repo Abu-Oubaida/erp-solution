@@ -87,6 +87,17 @@ class FixedAssetTransferController extends Controller
                     $fixed_asset_ids  = $this->getFixedAssetStockMaterials($permission_entry,$from_project->id,$from_company->id);//error
                     $fixed_assets = $this->getFixedAssets($permission_entry)->whereIn('id',$fixed_asset_ids)->get();
                     $transferData = $this->getFixedAssetGpAll($permission_entry)->where('reference',$gp_reference)->first();
+                    if (!empty($transferData))
+                    {
+                        if ($transferData->from_company_id != $from_company_id || $transferData->to_company_id != $to_company_id || $transferData->from_project_id != $from_branch_id || $transferData->to_project_id != $to_branch_id)
+                        {
+                            return response()->json([
+                                'status' => 'error',
+                                'data' => ['view'=>''],
+                                'message' => 'The reference number already exists. But selected other information is incorrect.'
+                            ]);
+                        }
+                    }
                     if ($transferData && $transferData->status >= 1 ) {
                         if ($this->user->hasPermission('fixed_asset_transfer_list')) {
                             $transferDatas = $this->getFixedAssetGpAll($permission_entry)->where('reference',$gp_reference)->get();
@@ -112,6 +123,10 @@ class FixedAssetTransferController extends Controller
                             ]);
                         }
                         if ($this->user->hasPermission('fixed_asset_transfer_entry')) {
+                            if (is_null($gp_date))
+                            {
+                                $gp_date = $transferData->date;
+                            }
                             $view = view('back-end/asset/transfer/_transfer_body_part_1',compact('fixed_assets','from_company','to_company','from_project','to_project','gp_date','gp_reference','transferData'))->render();
                             return response()->json([
                                 'status' => 'success',
@@ -143,6 +158,14 @@ class FixedAssetTransferController extends Controller
                         elseif (!empty($from_company_id) && !empty($from_branch_id) && !empty($to_company_id) && !empty($to_branch_id) && empty($gp_reference))
                         {
                             $transferDatas= $Data->where('from_company_id',$from_company_id)->where('from_project_id',$from_branch_id)->where('to_company_id',$to_company_id)->where('to_project_id',$to_branch_id)->get();
+                        }
+                        elseif ((empty($from_company_id) || empty($from_branch_id)) && !empty($to_company_id) && empty($to_branch_id) && empty($gp_reference))
+                        {
+                            $transferDatas= $Data->where('to_company_id',$to_company_id)->get();
+                        }
+                        elseif ((empty($from_company_id) || empty($from_branch_id)) && !empty($to_company_id) && !empty($to_branch_id) && empty($gp_reference))
+                        {
+                            $transferDatas= $Data->where('to_company_id',$to_company_id)->where('to_project_id',$to_branch_id)->get();
                         }
                         else{
                             $transferDatas = null;
@@ -206,6 +229,17 @@ class FixedAssetTransferController extends Controller
                         'status'=>'error',
                         'message'=>'Requisition quantity cannot be greater than available stock balance.'
                     ]);
+                }
+                if ($to_company_id && $materials_id)
+                {
+                    $item = $this->getFixedAssets($permission)->where('id',$materials_id)->first();
+                    if ($item && !($this->getFixedAssets($permission)->where('company_id',$to_company_id)->where('materials_name','like',"%{$item->materials_name}%")->exists()))
+                    {
+                        return response()->json([
+                            'status'=>'error',
+                            'message'=>'The selected materials are not available in the specified destination company.'
+                        ]);
+                    }
                 }
                 //Work running here
                 $previousData = $this->getFixedAssetGpAll($permission)->where('to_company_id',$to_company_id)->where('from_company_id',$from_company_id)->where('from_project_id',$from_project_id)->where('to_project_id',$to_project_id)->where('reference',$reference)->first();
@@ -425,7 +459,7 @@ class FixedAssetTransferController extends Controller
 
     public function finalUpdateTransfer(Request $request)
     {
-//        try {
+        try {
             if ($request->isMethod('post'))
             {
                 $permission = $this->permissions()->fixed_asset_transfer_entry;
@@ -437,7 +471,7 @@ class FixedAssetTransferController extends Controller
                     'gp_date' => ['date', 'date_format:d-M-y'],
                     'reference' => ['required','string','exists:fixed_asset_transfers,reference'],
                     'narration' => ['sometimes','nullable','string'],
-                    'attachments' => ['sometimes', 'array'],
+                    'attachments' => ['sometimes','sometimes', 'array'],
                     'attachments.*' => ['nullable','file','mimes:jpg,jpeg,png,gif,pdf,doc,docx','max:512000'],
                 ]);
                 extract($inputData);
@@ -454,13 +488,20 @@ class FixedAssetTransferController extends Controller
                         $res = $this->fixed_asset_transfer_documents($request->file('attachments'),$this->getFixedAssetGpAll($permission)->where('reference', $reference)->first()->id,$permission);
                         if ($res)
                         {
-                            return back()->with('success','Data updated successfully.');
+                            return response()->json([
+                                'status' => 'success',
+                                'message'=>'Data updated successfully with attachments.',
+                            ]);
                         }
                         return response()->json([
-                            'status' => 'success',
-                            'message'=>'Data updated successfully.'
+                            'status' => 'error',
+                            'message'=>'Data updated successfully without attachments.',
                         ]);
                     }
+                    return response()->json([
+                        'status' => 'success',
+                        'message'=>'Data updated successfully.'
+                    ]);
                 }
                 return response()->json([
                     'status'=>'error',
@@ -471,12 +512,12 @@ class FixedAssetTransferController extends Controller
                 'status'=>'error',
                 'message'=>'Request not supported!'
             ]);
-//        }catch (\Throwable $exception) {
-//            return response()->json([
-//                'status'=>'error',
-//                'message'=>$exception->getMessage()
-//            ]);
-//        }
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status'=>'error',
+                'message'=>$exception->getMessage()
+            ]);
+        }
     }
     public function store(Request $request)
     {

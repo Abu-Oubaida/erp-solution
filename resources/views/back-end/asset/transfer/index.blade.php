@@ -29,8 +29,8 @@
                                 <button class="btn btn-sm btn-outline-primary float-end m-1 mb-0" type="button" id="ref-src-btn" onclick="return window.location.reload()">
                                     <i class="fa fa-refresh"></i> Refresh
                                 </button>
-                                <a href="{!! route('fixed.asset.transfer') !!}" class="btn btn-sm btn-outline-info float-end m-1 mb-0" type="button" id="ref-src-btn">
-                                    <i class="fa-solid fa-file-circle-plus"></i> New Input
+                                <a href="{!! route('fixed.asset.transfer') !!}" class="btn btn-sm btn-outline-success float-end m-1 mb-0" type="button" id="ref-src-btn">
+                                    <i class="fa-solid fa-file-circle-plus"></i> New Entry
                                 </a>
                             </div>
                         </div>
@@ -98,7 +98,7 @@
                     </div>
                 </div>
             </div>
-            <div id="fixed-asset-body">
+            <div id="fixed-asset-body" class="mt-1">
 {{--                @if(isset($fixed_asset_with_ref_report_list))--}}
 {{--                    @include('back-end.asset._fixed_asset_opening_project_wise_list')--}}
 {{--                @endif--}}

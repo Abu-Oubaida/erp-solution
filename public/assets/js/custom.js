@@ -1373,6 +1373,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         else if (response.status === 'error')
                         {
                             alert("Error:"+response.message)
+                            $("#"+outputID).html('')
                             // Handle error
                             // console.log('Error:', response.message)
                         }

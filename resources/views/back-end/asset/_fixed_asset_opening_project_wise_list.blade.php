@@ -3,8 +3,8 @@
         <div class="card-body">
             @if(isset($fixed_asset_with_ref_report_list))
             <div class="row">
-                <div class="col-md-12">
-                    <table @if(count($fixed_asset_with_ref_report_list))id="userTable" class="display" @else class="table" @endif style="width: 100%;">
+                <div class="col-md-12" style="font-size: 13px">
+                    <table @if(count($fixed_asset_with_ref_report_list))id="userTable" class="display" @else class="table" @endif style="width: 100%; margin: 0; padding: 0; ">
                         <thead>
                         <tr>
                             <th>SL.</th>

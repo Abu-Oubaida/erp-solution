@@ -61,7 +61,7 @@ class UserController extends Controller
                 $companies = $this->getCompanyModulePermissionWise($permission)->get();
                 $depts = $this->getDepartment($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
                 $branches = $this->getBranch($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
-                $roles = $this->getRole()->get();
+                $roles = $this->getRole($permission)->get();
                 $designations = $this->getDesignation($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
                 return view('back-end.user.add',compact('depts','branches','roles','designations','companies'))->render();
             }

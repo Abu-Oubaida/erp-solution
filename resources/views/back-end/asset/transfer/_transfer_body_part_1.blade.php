@@ -178,13 +178,15 @@
                     <div class="col-md-6">
                         <div>
                             <label for="remarks">Narration:</label>
-                            <textarea class="form-control form-control-sm"  id="narration" name="narration"></textarea>
-                            {{--                                        <input type="hidden" name="id" value="{!! //$withRefData->id !!}">--}}
+                            <textarea class="form-control form-control-sm"  id="narration" name="narration">{!! (@$transferData && $transferData->narration)? $transferData->narration:''!!}</textarea>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <label for="remarks">Attachments:</label>
                         <input class="form-control" type="file" name="attachments[]" id="attachments" multiple>
+                        @if(@$transferData && $transferData->documents)
+                            <label>Attached Documents: {!! count($transferData->documents) !!}</label>
+                        @endif
                     </div>
                     <div class="col-md-4">
                         <button class="btn btn-lg btn-outline-success float-end mt-4" type="submit" onclick="Obj.gpFinalUpdate(this)"><i class="fas fa-save"></i> Final Update</button>
