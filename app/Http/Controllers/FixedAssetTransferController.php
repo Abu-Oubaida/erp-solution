@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\fixed_asset_specifications;
 use App\Models\Fixed_asset_transfer;
+use App\Models\Fixed_asset_transfer_delete_history;
 use App\Models\Fixed_asset_transfer_document;
 use App\Models\Fixed_asset_transfer_with_spec;
 use App\Models\Fixed_asset_transfer_with_spec_delete_history;
@@ -639,6 +640,75 @@ class FixedAssetTransferController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $exception->getMessage()
+            ]);
+        }
+    }
+    protected function delete_fixed_asset_opening_balance($id)
+    {
+        try {
+            $data = Fixed_asset_transfer::where('id', $id)->first();
+            if ($data) {
+                Fixed_asset_transfer_delete_history::create([
+                    'old_id'=>$data->id,
+                    'date'=>$data->date,
+                    'references'=>$data->reference,
+                    'branch_id'=>$data->branch_id,
+                    'from_company_id'=>$data->from_company_id,
+                    'to_company_id'=>$data->to_company_id,
+                    'status'=>$data->status,
+                    'created_by'=>$data->created_by,
+                    'updated_by'=>$data->updated_by,
+                    'narration'=>$data->narration,
+                    'old_created_at'=>$data->created_at,
+                    'old_updated_at'=>$data->updated_at,
+                    'deleted_by'=>$this->user->id
+                ]);
+                return $data->delete();
+            }
+            return false;
+        }catch (\Throwable $exception)
+        {
+            return $exception;
+        }
+    }
+    public function deleteFixedAssetRunningTransfer(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->delete_fixed_asset_transfer;
+            if ($request->isMethod('delete'))
+            {
+                $validatedData = $request->validate([
+                    'id' => ['required','string','exists:fixed_asset_transfers,id'],
+                ]);
+                extract($validatedData);
+                $deleteData = $this->getFixedAssetGpAll($permission)->where('id', $id)->first();
+                if ($deleteData) {
+                    if (count($deleteData->withSpecifications))
+                    {
+                        foreach ($deleteData->withSpecifications as $specification)
+                        {
+                            $this->delete_fixed_asset_transfer_balance_spec($specification->id);
+                        }
+                    }
+                    $this->delete_fixed_asset_opening_balance($deleteData->id);
+                    return \response()->json([
+                        'status'=>'success',
+                        'message'=>'Data deleted successfully.'
+                    ]);
+                }
+                return \response()->json([
+                    'status'=>'error',
+                    'message'=>'Data deleted not possible.'
+                ]);
+            }return \response()->json([
+                'status'=>'error',
+                'message'=>'Request not supported!'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return \response()->json([
+                'status'=>'error',
+                'message'=> $exception->getMessage(),
             ]);
         }
     }

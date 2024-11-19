@@ -485,6 +485,7 @@ Route::group(['middleware' => ['auth']],function (){
                     Route::post('edit-fixed-asset-transfer-spec','editFixedAssetTransferSpec');
                     Route::put('update-fixed-asset-transfer-spec','updateFixedAssetTransferSpec');
                     Route::post('final-update-fixed-asset-transfer','finalUpdateTransfer')->name('fixed.asset.transfer.final.update');
+                    Route::delete('delete-fixed-asset-running-transfer','deleteFixedAssetRunningTransfer')->name('fixed.asset.running.transfer.delete');
                 });
                 Route::middleware(['permission:fixed_asset_transfer_list'])->group(function (){
                     Route::match(['get'],'gp-index','index')->name('fixed.asset.transfer');

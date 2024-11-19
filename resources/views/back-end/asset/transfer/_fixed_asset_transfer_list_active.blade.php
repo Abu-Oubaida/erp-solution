@@ -96,8 +96,8 @@
                                     <td class="text-center">
                                         @if($td->status <= 0)
                                             <a href="{!! url(route('fixed.asset.transfer',['ref'=>$td->reference,'from_p'=>$td->from_project_id,'to_p'=>$td->to_project_id,'d'=>$td->date,'from_c'=>$td->from_company_id,'to_c'=>$td->to_company_id])) !!}" target="_blank"><i class="fas fa-edit"></i></a>
-{{--                                            <button onclick="return Obj.deleteFixedAssetOpening(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $td->id !!}" ><i class="fas fa-trash"></i></button>--}}
-{{--                                        @else--}}
+                                            <button onclick="return Obj.deleteFixedAssetRunningTransfer(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $td->id !!}" ><i class="fas fa-trash"></i></button>
+                                        @else
 {{--                                            <a href="{!! route('fixed.asset.with.reference.print',['assetID'=>\Illuminate\Support\Facades\Crypt::encryptString($td->id)]) !!}" class="text-success border-0 inline-block bg-none" target="_blank"><i class="fas fa-print"></i></a>--}}
 {{--                                            @if(auth()->user()->hasPermission('edit_fixed_asset_distribution_with_reference'))--}}
 {{--                                                <a href="{!! route('edit.fixed.asset.distribution.with.reference.balance',['faobid'=>\Illuminate\Support\Facades\Crypt::encryptString($td->id)]) !!}" class="text-info"><i class="fas fa-edit"></i></a>--}}

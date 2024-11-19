@@ -1422,6 +1422,40 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            deleteFixedAssetRunningTransfer:function (e)
+            {
+                if (confirm("Are you sure to delete this data?"))
+                {
+                    const id = $(e).attr('ref')
+                    if (id.length === 0)
+                    {
+                        return false
+                    }
+                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-running-transfer"
+                    $.ajax({
+                        url: url,
+                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        method: "DELETE",
+                        data:{'id':id},
+                        success:function (response)
+                        {
+                            if (response.status === 'success')
+                            {
+                                alert(response.message)
+                                const view = response.data
+                                window.location.reload()
+                            }
+                            if (response.status === 'error')
+                            {
+                                alert("Error:"+response.message)
+                                // Handle error
+                            }
+                            return false
+                        }
+                    })
+                }
+                return false
+            },
             gpMaterialsSpecificationWiseStockAndRateSearch:function (e,outputID)
             {
                 const from_company_id = $("#from_company").val()

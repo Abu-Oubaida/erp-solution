@@ -122,6 +122,7 @@ return array(
     'App\\Models\\Fixed_asset_transfer_with_spec' => $baseDir . '/app/Models/Fixed_asset_transfer_with_spec.php',
     'App\\Models\\Fixed_asset_transfer_with_spec_delete_history' => $baseDir . '/app/Models/Fixed_asset_transfer_with_spec_delete_history.php',
     'App\\Models\\Fixed_asset_with_ref_document_delete_history' => $baseDir . '/app/Models/Fixed_asset_with_ref_document_delete_history.php',
+    'App\\Models\\Fixed_assset_transfer_detete_history' => $baseDir . '/app/Models/Fixed_assset_transfer_detete_history.php',
     'App\\Models\\Material_type' => $baseDir . '/app/Models/Material_type.php',
     'App\\Models\\Op_reference_type' => $baseDir . '/app/Models/Op_reference_type.php',
     'App\\Models\\Permission' => $baseDir . '/app/Models/Permission.php',
