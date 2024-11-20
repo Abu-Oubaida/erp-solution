@@ -15,13 +15,17 @@ class CheckPermission
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, $permission)
+    public function handle(Request $request, Closure $next, $permissions)
     {
-        if (! Auth::user()->hasPermission($permission)) {
-//            abort(403, 'Unauthorized action.');
-            return back()->with('error','403!Unauthorized action.');
+        $user = Auth::user();
+
+        foreach ($permissions as $permission) {
+            if ($user->hasPermission($permission)) {
+                return $next($request);
+            }
         }
 
-        return $next($request);
+        // Redirect back with an error if none of the permissions are matched
+        return back()->with('error', '403! Unauthorized action.');
     }
 }

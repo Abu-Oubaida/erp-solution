@@ -474,21 +474,28 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::post('company-projects','companyProjects');
             });
 
-            Route::controller(FixedAssetTransferController::class)->group(function (){
-                Route::middleware(['permission:fixed_asset_transfer_entry'])->group(function (){
-                    Route::match(['get'],'gp-index','index')->name('fixed.asset.transfer');
-                    Route::post('gp-create','create')->name('fixed.asset.transfer.create');
-                    Route::post('material-specification-search','materialWiseSpecification');
-                    Route::post('material-specification-wise-stock-rate-search','materialSpecificationWiseStockRate');
-                    Route::post('add-to-list-fixed-asset-gp','addToListFixedAssetGp');
-                    Route::delete('delete-fixed-asset-transfer-spec','deleteFixedAssetTransferSpec');
-                    Route::post('edit-fixed-asset-transfer-spec','editFixedAssetTransferSpec');
-                    Route::put('update-fixed-asset-transfer-spec','updateFixedAssetTransferSpec');
-                    Route::post('final-update-fixed-asset-transfer','finalUpdateTransfer')->name('fixed.asset.transfer.final.update');
-                    Route::delete('delete-fixed-asset-running-transfer','deleteFixedAssetRunningTransfer')->name('fixed.asset.running.transfer.delete');
-                });
-                Route::middleware(['permission:fixed_asset_transfer_list'])->group(function (){
-                    Route::match(['get'],'gp-index','index')->name('fixed.asset.transfer');
+            Route::middleware(['permission:fixed_asset_transfer'])->group(function (){
+                Route::controller(FixedAssetTransferController::class)->group(function (){
+                    Route::middleware(['permission:fixed_asset_transfer_entry, fixed_asset_transfer_list'])->group(function (){
+                        Route::match(['get'],'gp-index','index')->name('fixed.asset.transfer');
+                    });
+                    Route::middleware(['permission:fixed_asset_transfer_entry'])->group(function (){
+                        Route::post('gp-create','create')->name('fixed.asset.transfer.create');
+                        Route::post('material-specification-search','materialWiseSpecification');
+                        Route::post('material-specification-wise-stock-rate-search','materialSpecificationWiseStockRate');
+                        Route::post('add-to-list-fixed-asset-gp','addToListFixedAssetGp');
+                        Route::delete('delete-fixed-asset-transfer-spec','deleteFixedAssetTransferSpec');
+                        Route::post('edit-fixed-asset-transfer-spec','editFixedAssetTransferSpec');
+                        Route::put('update-fixed-asset-transfer-spec','updateFixedAssetTransferSpec');
+                        Route::post('final-update-fixed-asset-transfer','store')->name('fixed.asset.transfer.final.update');
+                    });
+                    Route::middleware(['permission:fixed_asset_transfer_entry, edit_fixed_asset_transfer'])->group(function (){
+                        Route::match(['get','put'],'edit-fixed-asset-transfer','edit')->name('edit.fixed.asset.transfer');
+                    });
+                    Route::middleware(['permission:fixed_asset_transfer_entry, delete_fixed_asset_transfer'])->group(function (){
+                        Route::delete('delete-fixed-asset-transfer','deleteFixedAssetRunningTransfer')->name('fixed.asset.transfer.delete');
+                    });
+                    Route::match(['get','post'],'fixed-asset-transfer-print','fixedAssetTransferPrint')->name('fixed.asset.transfer.print');
                 });
             });
         });

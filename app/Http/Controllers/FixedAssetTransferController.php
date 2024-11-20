@@ -6,6 +6,7 @@ use App\Models\fixed_asset_specifications;
 use App\Models\Fixed_asset_transfer;
 use App\Models\Fixed_asset_transfer_delete_history;
 use App\Models\Fixed_asset_transfer_document;
+use App\Models\Fixed_asset_transfer_document_delete_history;
 use App\Models\Fixed_asset_transfer_with_spec;
 use App\Models\Fixed_asset_transfer_with_spec_delete_history;
 use App\Rules\GpUniqueRefCheck;
@@ -13,6 +14,7 @@ use App\Traits\ParentTraitCompanyWise;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -460,6 +462,10 @@ class FixedAssetTransferController extends Controller
 
     public function finalUpdateTransfer(Request $request)
     {
+        $this->store($request);
+    }
+    public function store(Request $request)
+    {
         try {
             if ($request->isMethod('post'))
             {
@@ -519,10 +525,6 @@ class FixedAssetTransferController extends Controller
                 'message'=>$exception->getMessage()
             ]);
         }
-    }
-    public function store(Request $request)
-    {
-
     }
     protected function fixed_asset_transfer_documents($documents,$ref_id,$operation_name)
     {
@@ -643,18 +645,19 @@ class FixedAssetTransferController extends Controller
             ]);
         }
     }
-    protected function delete_fixed_asset_opening_balance($id)
+    protected function delete_fixed_asset_transfer_balance($id)
     {
         try {
             $data = Fixed_asset_transfer::where('id', $id)->first();
             if ($data) {
-                Fixed_asset_transfer_delete_history::create([
+                $insert = Fixed_asset_transfer_delete_history::create([
                     'old_id'=>$data->id,
                     'date'=>$data->date,
-                    'references'=>$data->reference,
-                    'branch_id'=>$data->branch_id,
+                    'reference'=>$data->reference,
                     'from_company_id'=>$data->from_company_id,
                     'to_company_id'=>$data->to_company_id,
+                    'from_branch_id'=>$data->from_project_id,
+                    'to_branch_id'=>$data->to_project_id,
                     'status'=>$data->status,
                     'created_by'=>$data->created_by,
                     'updated_by'=>$data->updated_by,
@@ -663,12 +666,42 @@ class FixedAssetTransferController extends Controller
                     'old_updated_at'=>$data->updated_at,
                     'deleted_by'=>$this->user->id
                 ]);
-                return $data->delete();
+                if ($insert) {
+                    return (bool)$data->delete();
+                }
             }
             return false;
         }catch (\Throwable $exception)
         {
-            return $exception;
+            return false;
+        }
+    }
+    public function deleteFixedAssetDocuments($transfer_id)
+    {
+        try {
+            $documents = Fixed_asset_transfer_document::where('transfer_id', $transfer_id)->get();
+            if ($documents && count($documents)) {
+                foreach ($documents as $document) {
+                    Fixed_asset_transfer_document_delete_history::create([
+                        'old_id'=>$document->id,
+                        'from_company_id'=>$document->from_company_id,
+                        'to_company_id'=>$document->to_company_id,
+                        'transfer_id'=>$document->transfer_id,
+                        'document_name'=>$document->document_name,
+                        'document_url'=>$document->document_url,
+                        'created_by'=>$document->created_by,
+                        'updated_by'=>$document->updated_by,
+                        'deleted_by'=>$this->user->id,
+                        'old_created_at'=>$document->created_at,
+                        'old_updated_at'=>$document->updated_at,
+                        'created_at'=>now(),
+                    ]);
+                }
+                return (bool)$documents->delete();
+            }
+        }catch (\Throwable $exception)
+        {
+            return false;
         }
     }
     public function deleteFixedAssetRunningTransfer(Request $request)
@@ -683,22 +716,41 @@ class FixedAssetTransferController extends Controller
                 extract($validatedData);
                 $deleteData = $this->getFixedAssetGpAll($permission)->where('id', $id)->first();
                 if ($deleteData) {
-                    if (count($deleteData->withSpecifications))
+                    if ($deleteData->status != 0) {
+                        if (!$this->user->hasPermission('delete_fixed_asset_transfer')) {
+                            return response()->json([
+                                'status'=>'error',
+                                'message'=>'You do not have permission to delete this fixed asset transfer.'
+                            ]);
+                        }
+                    }
+                    if (count($deleteData->specifications))
                     {
-                        foreach ($deleteData->withSpecifications as $specification)
+                        foreach ($deleteData->specifications as $specification)
                         {
                             $this->delete_fixed_asset_transfer_balance_spec($specification->id);
                         }
                     }
-                    $this->delete_fixed_asset_opening_balance($deleteData->id);
+                    if (count($deleteData->documents))
+                    {
+                        $this->deleteFixedAssetDocuments($deleteData->id);
+                    }
+                    $deleteTransfer = $this->delete_fixed_asset_transfer_balance($deleteData->id);
+                    if ($deleteTransfer)
+                    {
+                        return \response()->json([
+                            'status'=>'success',
+                            'message'=>'Data deleted successfully.'
+                        ]);
+                    }
                     return \response()->json([
-                        'status'=>'success',
-                        'message'=>'Data deleted successfully.'
+                        'status'=>'error',
+                        'message'=>'Failed to delete data'
                     ]);
                 }
                 return \response()->json([
                     'status'=>'error',
-                    'message'=>'Data deleted not possible.'
+                    'message'=>'Data not found!'
                 ]);
             }return \response()->json([
                 'status'=>'error',
@@ -710,6 +762,29 @@ class FixedAssetTransferController extends Controller
                 'status'=>'error',
                 'message'=> $exception->getMessage(),
             ]);
+        }
+    }
+
+    public function editFixedAssetTransfer(Request $request,$fatid)
+    {
+        try {
+            $permission = $this->permissions()->fixed_asset_distribution;
+            $id = Crypt::decryptString($fatid);
+            $item = $this->getFixedAssetGpAll($permission)->where('id',$id)->first();
+            $projects = $this->getUserProjectPermissions($this->user->id,$permission)->get();
+            $fixed_assets = $this->FixedAssets($permission)->where('company_id',$item->from_company_id)->get();
+            $spec = $this->fixedAssetSpecifications($id)->get();
+            $companies = $this->getCompany()->get();
+            if ($request->isMethod('PUT'))
+            {
+                return $this->updateFixedAssetOpening($request, $id);
+            }
+            $view = view('back-end.asset.edit-fixed-asset-opening',compact('id','projects','fixed_assets','spec','item','companies'))->render();
+            return $view;
+
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
         }
     }
 }

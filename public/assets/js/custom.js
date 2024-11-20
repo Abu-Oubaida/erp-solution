@@ -1431,7 +1431,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     {
                         return false
                     }
-                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-running-transfer"
+                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-transfer"
                     $.ajax({
                         url: url,
                         headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
