@@ -98,7 +98,7 @@
                                             <a href="{!! url(route('fixed.asset.transfer',['ref'=>$td->reference,'from_p'=>$td->from_project_id,'to_p'=>$td->to_project_id,'d'=>$td->date,'from_c'=>$td->from_company_id,'to_c'=>$td->to_company_id])) !!}" target="_blank" title="View"><i class="fas fa-eye"></i></a>
                                         @endif
                                         @if(auth()->user()->hasPermission('edit_fixed_asset_transfer') && $td->status > 0)
-                                            <a href="{!! route('edit.fixed.asset.transfer',['fatid'=>\Illuminate\Support\Facades\Crypt::encryptString($td->id)]) !!}" class="text-info" title="Edit"><i class="fas fa-edit"></i></a>
+                                            <a href="{!! route('edit.fixed.asset.transfer',['ftid'=>\Illuminate\Support\Facades\Crypt::encryptString($td->id)]) !!}" class="text-info" title="Edit"><i class="fas fa-edit"></i></a>
                                         @endif
                                         @if(auth()->user()->hasPermission('delete_fixed_asset_transfer') || $td->status <= 0)
                                             <button onclick="return Obj.deleteFixedAssetRunningTransfer(this)" class="text-danger border-0 inline-block bg-none" ref="{!! $td->id !!}" title="Delete"><i class="fas fa-trash"></i></button>

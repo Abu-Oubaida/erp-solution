@@ -490,7 +490,7 @@ Route::group(['middleware' => ['auth']],function (){
                         Route::post('final-update-fixed-asset-transfer','store')->name('fixed.asset.transfer.final.update');
                     });
                     Route::middleware(['permission:fixed_asset_transfer_entry, edit_fixed_asset_transfer'])->group(function (){
-                        Route::match(['get','put'],'edit-fixed-asset-transfer','edit')->name('edit.fixed.asset.transfer');
+                        Route::match(['get','put'],'edit-fixed-asset-transfer/{ftid}','edit')->name('edit.fixed.asset.transfer');
                     });
                     Route::middleware(['permission:fixed_asset_transfer_entry, delete_fixed_asset_transfer'])->group(function (){
                         Route::delete('delete-fixed-asset-transfer','deleteFixedAssetRunningTransfer')->name('fixed.asset.transfer.delete');

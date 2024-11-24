@@ -765,23 +765,39 @@ class FixedAssetTransferController extends Controller
         }
     }
 
-    public function editFixedAssetTransfer(Request $request,$fatid)
+    public function edit(Request $request,$fatid)
     {
         try {
             $permission = $this->permissions()->fixed_asset_distribution;
             $id = Crypt::decryptString($fatid);
             $item = $this->getFixedAssetGpAll($permission)->where('id',$id)->first();
-            $projects = $this->getUserProjectPermissions($this->user->id,$permission)->get();
-            $fixed_assets = $this->FixedAssets($permission)->where('company_id',$item->from_company_id)->get();
-            $spec = $this->fixedAssetSpecifications($id)->get();
+            $projects = $this->getUserProjectPermissions($this->user->id,$permission)->where('company_id',$item->from_company_id)->orWhere('company_id',$item->to_company_id)->get();
+            $fixed_assets = $this->getFixedAssets($permission)->where('status',1)->where('company_id',$item->from_company_id)->get();
+            $spec = $this->getFixedAssetSpecification($permission)->where('status',1)->where('company_id',$item->from_company_id)->get();
             $companies = $this->getCompany()->get();
             if ($request->isMethod('PUT'))
             {
                 return $this->updateFixedAssetOpening($request, $id);
             }
-            $view = view('back-end.asset.edit-fixed-asset-opening',compact('id','projects','fixed_assets','spec','item','companies'))->render();
-            return $view;
+            if ($item)
+            {
+                $view = view('back-end.asset.transfer.edit-fixed-asset-transfer',compact('id','projects','fixed_assets','spec','item','companies'))->render();
+                return $view;
+            }
+            return back()->with('error','Materials not found!');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
 
+    private function updateFixedAssetTransfer(Request $request,$id)
+    {
+        try {
+            $permission = $this->permissions()->fixed_asset_distribution;
+            $validatedData = $request->validate([
+
+            ]);
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
