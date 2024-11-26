@@ -82,6 +82,11 @@
                                         <a class="nav-link text-chl" href="{{route('fixed.asset.transfer')}}" title="Distribute Fixed Asset Via Gate Pass (GP) Reference"><div class="sb-nav-link-icon">GP</div> Gate Pass</a>
                                     @endif
                                 @endif
+                                @if(auth()->user()->hasPermission('edit_fixed_asset_transfer'))
+                                    @if(Route::currentRouteName() == 'edit.fixed.asset.transfer')
+                                        <a class="nav-link" href="{{route('edit.fixed.asset.transfer',['ftid'=>\Illuminate\Support\Facades\Request::route('ftid')])}}" title="Edit Fixed Asset Transfer"><div class="sb-nav-link-icon"><i class='fas fa-edit'></i></div>GP Edit</a>
+                                    @endif
+                                @endif
                                 @if(auth()->user()->hasPermission('fixed_asset_damage'))
                                     @if(Route::currentRouteName() == 'fixed.asset.add')
                                         <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>

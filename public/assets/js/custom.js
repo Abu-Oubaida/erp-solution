@@ -1236,6 +1236,40 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 });
             },
+            deleteFixedAssetTransferDocument:function (e)
+            {
+                if (confirm('Are you sure to delete this data?'))
+                {
+                    const id = $(e).attr('ref')
+                    if (id.length === 0)
+                    {
+                        return false
+                    }
+                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-transfer-document"
+                    $.ajax({
+                        url: url,
+                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        method: "DELETE",
+                        data:{'id':id},
+                        success:function (response)
+                        {
+                            if (response.status === 'success')
+                            {
+                                alert(response.message)
+                                window.location.reload()
+                            }
+                            if (response.status === 'error')
+                            {
+                                alert("Error:"+response.message)
+                                // Handle error
+                            }
+                            return false
+                        }
+                    })
+
+                }
+                return false
+            },
             priceTotal:function (e,inputID,actionID)
             {
                 const input = parseFloat($("#"+inputID).val())
@@ -1260,6 +1294,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 if (stock<qty)
                 {
                     $("#qty").val(stock)
+                    $("#qty-edit").val(stock)
                     qty = stock
                     alert("Quantity can't gather then Stock Balance")
                 }

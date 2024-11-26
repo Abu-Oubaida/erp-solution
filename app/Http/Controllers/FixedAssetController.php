@@ -13,6 +13,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,7 @@ class FixedAssetController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return Application|Redirector|RedirectResponse
      */
     public function index()
     {

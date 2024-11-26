@@ -121,6 +121,7 @@ return array(
     'App\\Models\\Fixed_asset_transfer_delete_history' => $baseDir . '/app/Models/Fixed_asset_transfer_delete_history.php',
     'App\\Models\\Fixed_asset_transfer_document' => $baseDir . '/app/Models/Fixed_asset_transfer_document.php',
     'App\\Models\\Fixed_asset_transfer_document_delete_history' => $baseDir . '/app/Models/Fixed_asset_transfer_document_delete_history.php',
+    'App\\Models\\Fixed_asset_transfer_edit_history' => $baseDir . '/app/Models/Fixed_asset_transfer_edit_history.php',
     'App\\Models\\Fixed_asset_transfer_with_spec' => $baseDir . '/app/Models/Fixed_asset_transfer_with_spec.php',
     'App\\Models\\Fixed_asset_transfer_with_spec_delete_history' => $baseDir . '/app/Models/Fixed_asset_transfer_with_spec_delete_history.php',
     'App\\Models\\Fixed_asset_with_ref_document_delete_history' => $baseDir . '/app/Models/Fixed_asset_with_ref_document_delete_history.php',

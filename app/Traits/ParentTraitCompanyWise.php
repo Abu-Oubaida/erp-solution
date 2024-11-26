@@ -192,7 +192,7 @@ trait ParentTraitCompanyWise
     }
     public function getFixedAssets($operation_permission_name)
     {
-        $object = Fixed_asset::with(['company','specifications','createdBy','updatedBy','withRefUses']);
+        $object = Fixed_asset::with(['company','specifications','createdBy','updatedBy','withRefUses','transfer']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
@@ -336,7 +336,10 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        return $object->whereIn('to_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name))->orWhereIn('from_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
+        return $object->where(function ($query) use ($operation_permission_name) {
+            $query->whereIn('to_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
+            $query->orWhereIn('from_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name));
+        });
     }
     public function getFixedAssetGpDataIn($operation_permission_name)
     {

@@ -22,6 +22,10 @@ class Fixed_asset extends Model
     {
         return $this->hasMany(Fixed_asset_opening_with_spec::class,'asset_id','id');
     }
+    public function transfer()
+    {
+        return $this->hasMany(Fixed_asset_transfer_with_spec::class,'asset_id','id');
+    }
     public function createdBy()
     {
         return $this->belongsTo(User::class,'created_by');

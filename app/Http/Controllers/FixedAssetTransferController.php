@@ -7,10 +7,12 @@ use App\Models\Fixed_asset_transfer;
 use App\Models\Fixed_asset_transfer_delete_history;
 use App\Models\Fixed_asset_transfer_document;
 use App\Models\Fixed_asset_transfer_document_delete_history;
+use App\Models\Fixed_asset_transfer_edit_history;
 use App\Models\Fixed_asset_transfer_with_spec;
 use App\Models\Fixed_asset_transfer_with_spec_delete_history;
 use App\Rules\GpUniqueRefCheck;
 use App\Traits\ParentTraitCompanyWise;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -89,7 +91,9 @@ class FixedAssetTransferController extends Controller
                     $to_project = $this->getBranch($permission_entry)->select(['id','branch_name'])->where('company_id',$to_company_id)->where('id',$to_branch_id)->first();
                     $fixed_asset_ids  = $this->getFixedAssetStockMaterials($permission_entry,$from_project->id,$from_company->id);//error
                     $fixed_assets = $this->getFixedAssets($permission_entry)->whereIn('id',$fixed_asset_ids)->get();
-                    $transferData = $this->getFixedAssetGpAll($permission_entry)->where('reference',$gp_reference)->first();
+
+                    $transferData = $this->getFixedAssetGpAll($permission_entry)->where('reference','1132423')->first();
+
                     if (!empty($transferData))
                     {
                         if ($transferData->from_company_id != $from_company_id || $transferData->to_company_id != $to_company_id || $transferData->from_project_id != $from_branch_id || $transferData->to_project_id != $to_branch_id)
@@ -143,8 +147,8 @@ class FixedAssetTransferController extends Controller
                         ]);
                     }
                 }
-                else{
-                    if ($this->user->hasPermission('fixed_asset_transfer_list'))//Report part
+                else{//Report part
+                    if ($this->user->hasPermission('fixed_asset_transfer_list'))
                     {
                         $Data = $this->getFixedAssetGpAll('fixed_asset_transfer_list');
                         if (!empty($from_company_id) && empty($from_branch_id) && empty($to_company_id) && empty($to_branch_id) && empty($gp_reference)) {
@@ -331,6 +335,7 @@ class FixedAssetTransferController extends Controller
             ]);
         }
     }
+
     public function deleteFixedAssetTransferSpec(Request $request)
     {
         try {
@@ -533,7 +538,7 @@ class FixedAssetTransferController extends Controller
             $f_a_t_b = Fixed_asset_transfer::where('id', $id)->first();
             foreach ($documents as $file)
             {
-                $fileName = "GP_".$f_a_t_b->references."_".$file->getClientOriginalName();
+                $fileName = "GP_".$f_a_t_b->id."_".$file->getClientOriginalName();
                 $file_location = $file->move($this->document_path,$fileName); // Adjust the storage path as needed
                 if (!$file_location)
                 {
@@ -768,20 +773,20 @@ class FixedAssetTransferController extends Controller
     public function edit(Request $request,$fatid)
     {
         try {
-            $permission = $this->permissions()->fixed_asset_distribution;
+            $permission = $this->permissions()->edit_fixed_asset_transfer;
             $id = Crypt::decryptString($fatid);
             $item = $this->getFixedAssetGpAll($permission)->where('id',$id)->first();
             $projects = $this->getUserProjectPermissions($this->user->id,$permission)->where('company_id',$item->from_company_id)->orWhere('company_id',$item->to_company_id)->get();
             $fixed_assets = $this->getFixedAssets($permission)->where('status',1)->where('company_id',$item->from_company_id)->get();
             $spec = $this->getFixedAssetSpecification($permission)->where('status',1)->where('company_id',$item->from_company_id)->get();
             $companies = $this->getCompany()->get();
-            if ($request->isMethod('PUT'))
+            if ($item && $request->isMethod('PUT'))
             {
-                return $this->updateFixedAssetOpening($request, $id);
+                return $this->updateFixedAssetTransfer($request, $item);
             }
             if ($item)
             {
-                $view = view('back-end.asset.transfer.edit-fixed-asset-transfer',compact('id','projects','fixed_assets','spec','item','companies'))->render();
+                $view = view('back-end.asset.transfer.edit.edit-fixed-asset-transfer',compact('id','projects','fixed_assets','spec','item','companies'))->render();
                 return $view;
             }
             return back()->with('error','Materials not found!');
@@ -791,16 +796,137 @@ class FixedAssetTransferController extends Controller
         }
     }
 
-    private function updateFixedAssetTransfer(Request $request,$id)
+    private function updateFixedAssetTransfer(Request $request,$item)
     {
         try {
-            $permission = $this->permissions()->fixed_asset_distribution;
-            $validatedData = $request->validate([
-
+            $permission = $this->permissions()->edit_fixed_asset_transfer;
+            $inputData = $request->validate([
+                'from_company_id' => ['required','string', 'exists:company_infos,id','exists:fixed_asset_transfers,from_company_id'],
+                'to_company_id' => ['required','string', 'exists:company_infos,id','exists:fixed_asset_transfers,to_company_id'],
+                'from_branch_id' => ['required','string', 'exists:branches,id','exists:fixed_asset_transfers,from_project_id'],
+                'to_branch_id' => ['required','string', 'exists:branches,id','exists:fixed_asset_transfers,to_project_id'],
+                'gp_reference' => ['required','string','exists:fixed_asset_transfers,reference'],
+                'gp_date' => ['sometimes','date', 'date_format:Y-m-d'],
+                'narration' => ['sometimes','nullable','string'],
+                'attachments' => ['sometimes','sometimes', 'array'],
+                'attachments.*' => ['nullable','file','mimes:jpg,jpeg,png,gif,pdf,doc,docx','max:512000'],
             ]);
+            extract($inputData);
+            if ($item)
+            {
+                $update = Fixed_asset_transfer::where('id',$item->id)->update([
+                    'date' => date('Y-m-d H:i:s' , strtotime($gp_date)),
+                    'reference' => $gp_reference,
+                    'from_company_id' => $from_company_id,
+                    'from_project_id' => $from_branch_id,
+                    'to_company_id' => $to_company_id,
+                    'to_project_id' => $to_branch_id,
+                    'narration' => $narration,
+                    'updated_by' => $this->user->id,
+                    'updated_at' => now(),
+                ]);
+                if ($update)
+                {
+                    if ($item->reference != $gp_reference)
+                    {
+                        Fixed_asset_transfer_with_spec::where('transfer_id',$item->id)->where('reference',$item->reference)->update([
+                            'reference' => $gp_reference,
+                        ]);
+                    }
+                    if ($request->hasFile('attachments'))
+                    {
+                        $res = $this->fixed_asset_transfer_documents($request->file('attachments'),$item->id,$permission);
+                        if (!$res)
+                        {
+                            return response()->json([
+                                'status' => 'success',
+                                'message'=>'Attachments upload failed! But Data update successfully.',
+                            ]);
+                        }
+                    }
+                    $this->updatedHistory($item,$gp_reference);
+                    return back()->with('success','Data updated successfully!');
+                }
+                return back()->with('error','Data update failed!');
+            }
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
+    }
+
+    protected function updatedHistory($itemData,$ref)
+    {
+        try {
+            if ($itemData)
+            {
+                return Fixed_asset_transfer_edit_history::create([
+                    'old_id' => $itemData->id,
+                    'status'=> $itemData->status,
+                    'date' => date('Y-m-d H:i:s' , strtotime($itemData->date)),
+                    'reference' => @$ref,
+                    'old_reference' => $itemData->reference,
+                    'from_company_id' => $itemData->from_company_id,
+                    'from_project_id' => $itemData->from_project_id,
+                    'to_company_id' => $itemData->to_company_id,
+                    'to_project_id' => $itemData->to_project_id,
+                    'narration' => $itemData->narration,
+                    'created_by' => $itemData->created_by,
+                    'updated_by' => $itemData->updated_by,
+                    'old_created_at' => $itemData->created_at,
+                    'old_updated_at' => $itemData->updated_at,
+                    'modified_by' => $this->user->id,
+                ]);
+            }
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function destroyDocument(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => ['string','required','exists:fixed_asset_opening_balance_documents,id'],
+            ]);
+            extract($request->post());
+            $document = Fixed_asset_transfer_document::where('id',$id)->first();
+            Fixed_asset_transfer_document_delete_history::create([
+                'old_id'=>$document->id,
+                'from_company_id'=>$document->from_company_id,
+                'to_company_id'=>$document->to_company_id,
+                'transfer_id'=>$document->transfer_id,
+                'document_name'=>$document->document_name,
+                'document_url'=>$document->document_url,
+                'created_by'=>$document->created_by,
+                'updated_by'=>$document->updated_by,
+                'deleted_by'=>$this->user->id,
+                'old_created_at'=>$document->created_at,
+                'old_updated_at'=>$document->updated_at,
+                'created_at'=>now(),
+            ]);
+            $document->delete();
+            return response()->json(['status'=>'success','message'=>'Data deleted successfully.']);
+        }catch (\Throwable $exception)
+        {
+            return response()->json(['status'=>'error','message'=>$exception->getMessage()],200);
+        }
+    }
+
+    public function fixedAssetTransferPrint($assetID)
+    {
+        $permission = $this->permissions()->fixed_asset_transfer;
+        $id = Crypt::decryptString($assetID);
+        $transferData = $this->getFixedAssetGpAll($permission)->where('id', $id)->first();
+//            dd($withRefData->branch);
+        if (!$transferData) {
+            abort(404); // or handle the not found case as needed
+        }
+        $view = view('back-end.asset.transfer.edit.fixed-asset-transfer-print',compact('transferData'))->render();
+        //required to pdf "C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+        $pdf = SnappyPdf::loadView('back-end.asset.transfer.edit.fixed-asset-transfer-print',compact('transferData'))->setPaper('a4','landscape');
+        return $view;
+//            return $pdf->download("salary_certificate_for_{$withRefData->refType->name}_{$withRefData->references}.pdf");
     }
 }

@@ -36,7 +36,10 @@
                 <td>{!! $fa->unit !!}</td>
                 <td>{{ $fa->rate }}</td>
                 <td>{{ $fa->depreciation }}</td>
-                <td><span class="badge bg-secondary">With Ref. ({{ count($fa->withRefUses) }})</span></td>
+                <td>
+                    <span class="badge bg-secondary">With Ref. ({{ count($fa->withRefUses) }})</span>
+                    <span class="badge bg-secondary">Transfer ({{ count($fa->transfer) }})</span>
+                </td>
                 <td>{{ $fa->remarks }}</td>
                 <td>{{ @$fa->createdBy->name }}</td>
                 <td>{!! date('d-M-y',strtotime(@$fa->created_at)) !!}</td>
