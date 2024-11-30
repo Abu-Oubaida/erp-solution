@@ -92,8 +92,7 @@ class FixedAssetTransferController extends Controller
                     $fixed_asset_ids  = $this->getFixedAssetStockMaterials($permission_entry,$from_project->id,$from_company->id);//error
                     $fixed_assets = $this->getFixedAssets($permission_entry)->whereIn('id',$fixed_asset_ids)->get();
 
-                    $transferData = $this->getFixedAssetGpAll($permission_entry)->where('reference','1132423')->first();
-
+                    $transferData = $this->getFixedAssetGpAll($permission_entry)->where('reference',$gp_reference)->first();
                     if (!empty($transferData))
                     {
                         if ($transferData->from_company_id != $from_company_id || $transferData->to_company_id != $to_company_id || $transferData->from_project_id != $from_branch_id || $transferData->to_project_id != $to_branch_id)

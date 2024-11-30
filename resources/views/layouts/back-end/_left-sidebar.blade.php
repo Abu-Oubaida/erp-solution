@@ -208,7 +208,7 @@
                 {{--#2.6.1  Permission Chck Sales Interface section Start--}}
                 @if(auth()->user()->hasPermission('fixed_asset_interface'))
                     <subgroup1>
-                        @if(Request::segment(1) == "fixed-asset" || Request::segment(1) == "fixed-asset-distribution")
+                        @if(Request::segment(1) == "fixed-asset" || Request::segment(1) == "fixed-asset-distribution" || Request::segment(1) == "fixed-asset-report")
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#AssetInterfaceLayouts"
                                aria-expanded="true" aria-controls="AssetInterfaceLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-solid fa-a"></i><i class="fas fa-solid fa-m"></i></div>

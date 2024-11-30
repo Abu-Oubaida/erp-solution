@@ -98,7 +98,7 @@
                         <div class="col">
                             <div class="mb-1">
                                 <label for="stock">Stock Balance<span class="text-danger">*</span></label>
-                                <input class="form-control bg-secondary text-white" id="stock" type="text" placeholder="Stock Balance" value="" required readonly/>
+                                <input class="form-control bg-secondary text-white" id="stock" type="text" ref="0" placeholder="Stock Balance" value="" required readonly/>
                             </div>
                         </div>
                         <div class="col">

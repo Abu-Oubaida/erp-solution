@@ -23,7 +23,7 @@
         </div>
         <div class="col-md-3">
             <label for="stock-edit">Stock Balance<span class="text-danger">*</span></label>
-            <input class="form-control" id="stock-edit" type="text" placeholder="Stock Balance" value="{!! @$stock !!}" required readonly disabled/>
+            <input class="form-control" id="stock-edit" type="text" placeholder="Stock Balance" ref="{!! $data->qty !!}" value="{!! @$stock !!}" required readonly disabled/>
         </div>
         <div class="col-md-3">
             <label for="qty-edit">Qty.<span class="text-danger">*</span></label>

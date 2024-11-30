@@ -1285,17 +1285,19 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             {
                 const output = $("#"+actionID)
                 let qty = parseFloat($("#"+qty_id).val())
+                const old_stock = parseFloat($("#"+stock_id).attr('ref'))
                 const stock = parseFloat($("#"+stock_id).val())
                 const rate = parseFloat($("#"+rate_id).val())
+                const total_stock = parseFloat(stock+old_stock)
                 if (qty.length === 0 || rate.length === 0)
                 {
                     output.val('')
                 }
-                if (stock<qty)
+                if (total_stock < qty)
                 {
-                    $("#qty").val(stock)
-                    $("#qty-edit").val(stock)
-                    qty = stock
+                    $("#qty").val(total_stock)
+                    $("#qty-edit").val(total_stock)
+                    qty = total_stock
                     alert("Quantity can't gather then Stock Balance")
                 }
                 output.val(parseFloat(Number(qty*rate)))
@@ -2155,7 +2157,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                             alert('Error: ' + response.message);
                             return false
                         } else if (response.status === 'success') {
-                            updateSelectBoxSingleOption(response.data,action_id,'id','branch_name')
+                            updateSelectBox(response.data,action_id,'id','branch_name')
                         }
                     }
                 })
@@ -2290,6 +2292,13 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 }
                 return false
             },
+            projectWiseMaterials:function (e,company)
+            {
+                this.selectAllOption(e)
+                let company_id = $('#'+ company).val()
+                let project_ids = $(e).val()
+                console.log(project_ids)
+            }
 
         }
         function checkFileExists(url, callback) {

@@ -7,6 +7,7 @@ use App\Models\Fixed_asset_delete_history;
 use App\Models\fixed_asset_specifications;
 use App\Models\User;
 use App\Traits\ParentTraitCompanyWise;
+use Database\Seeders\CompanyInfo;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -413,6 +414,19 @@ class FixedAssetController extends Controller
                 'status' => 'error',
                 'message' => $exception->getMessage()
             ]);
+        }
+    }
+
+    public function stockReport(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->fixed_asset_report;
+            $companies = $this->getCompany($permission)->get();
+            $view = view('back-end.asset.report.stock.index',compact('companies'))->render();
+            return $view;
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error', $exception->getMessage());
         }
     }
 }
