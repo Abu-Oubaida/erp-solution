@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\superadmin\ajaxRequestController;
 use App\Models\Fixed_asset;
 use App\Models\Fixed_asset_delete_history;
 use App\Models\fixed_asset_specifications;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
 use Throwable;
+use function PHPUnit\Framework\isFalse;
 
 class FixedAssetController extends Controller
 {
@@ -416,7 +418,41 @@ class FixedAssetController extends Controller
             ]);
         }
     }
-
+    public function projectsWiseFixedAssets(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->fixed_asset_interface;
+            if ($request->isMethod('POST')) {
+                $validData = $request->validate([
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                    'project_ids' => ['required', 'array'],
+                    'project_ids.*' => ['required', 'string',],
+                ]);
+                extract($validData);
+                if (in_array(0,$project_ids))
+                {
+                    $project_ids = $this->getUserProjectPermissions($this->user->id,$project_ids)->where('company_id',$company_id)->get()->unique()->pluck('id')->toArray();
+                }
+                $materials_id = $this->getFixedAssetStockMaterials($permission,$project_ids,$company_id);
+                $materials = $this->getFixedAssets($permission)->where('status',1)->whereIn('id',$materials_id)->get();
+                return response()->json([
+                    'status'    =>  'success',
+                    'data'      =>  ['data' => $materials],
+                    'message'   =>  'Request processed successfully.',
+                ]);
+            }
+            return response()->json([
+                'status'    =>  'error',
+                'message'=> "Request method not allowed!",
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
     public function stockReport(Request $request)
     {
         try {

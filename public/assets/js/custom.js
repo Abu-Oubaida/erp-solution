@@ -2228,8 +2228,10 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         // Set all other options as selected
                         selectize.setValue(allKeys);
                     }
+                    return true
                 } else {
                     console.error("Selectize is not initialized for the provided element.");
+                    return false
                 }
             },
             deleteCompanyModulePermissionAll:function (e)
@@ -2292,14 +2294,35 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 }
                 return false
             },
-            projectWiseMaterials:function (e,company)
+            projectWiseMaterials:function (e,company,output)
             {
-                this.selectAllOption(e)
-                let company_id = $('#'+ company).val()
-                let project_ids = $(e).val()
-                console.log(project_ids)
+                if(this.selectAllOption(e))
+                {
+                    let company_id = $('#'+ company).val()
+                    let project_ids = $(e).val()
+                    if (company_id.length <= 0 && project_ids.length <= 0)
+                    {
+                        return false
+                    }
+                    const url = window.location.origin + sourceDir + "/projects-wise-fixed-assets"
+                    $.ajax({
+                        url: url,
+                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        method: "POST",
+                        data: {'company_id': company_id,'project_ids': project_ids},
+                        success:function (response)
+                        {
+                            if (response.status === 'error')
+                            {
+                                alert('Error: ' + response.message)
+                            }
+                            else if (response.status === 'success') {
+                                updateSelectBox(response.data.data,output,'id','materials_name')
+                            }
+                        }
+                    })
+                }
             }
-
         }
         function checkFileExists(url, callback) {
             const xhr = new XMLHttpRequest();

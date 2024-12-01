@@ -445,6 +445,7 @@ Route::group(['middleware' => ['auth']],function (){
                 });
 
             });
+            Route::match(['get','post'],'projects-wise-fixed-assets','projectsWiseFixedAssets');
         });
         # 3.14.2 Fixed Asset Distribution
         Route::middleware(['permission:fixed_asset_distribution'])->prefix('fixed-asset-distribution')->group(function (){

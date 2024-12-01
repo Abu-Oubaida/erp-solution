@@ -29,15 +29,15 @@
                                 <button class="btn btn-sm btn-outline-primary float-end m-1 mb-0" type="button" id="ref-src-btn" onclick="return window.location.reload()">
                                     <i class="fa fa-refresh"></i> Refresh
                                 </button>
-                                <a href="{!! route('fixed.asset.transfer') !!}" class="btn btn-sm btn-outline-success float-end m-1 mb-0" type="button" id="ref-src-btn">
-                                    <i class="fa-solid fa-file-circle-plus"></i> New Entry
+                                <a href="{!! route('fixed.asset.stock.report') !!}" class="btn btn-sm btn-outline-success float-end m-1 mb-0" type="button" id="ref-src-btn">
+                                    <i class="fa-solid fa-file-circle-plus"></i> New
                                 </a>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col">
+                            <div class="col-md-2">
                                 <label for="company">Company<span class="text-danger">*</span></label>
                                 <select id="company" name="company" class="select-search cursor-pointer" onchange="return Obj.userWiseCompanyProjectPermissions(this,{!! Auth::user()->id !!},'projects')">
                                     <option value="">Pick option...</option>
@@ -48,15 +48,15 @@
                                     @endif
                                 </select>
                             </div>
-                            <div class="col">
+                            <div class="col-md-3">
                                 <label for="projects">Projects Name<span class="text-danger">*</span></label>
-                                <select id="projects" name="projects" class="select-search cursor-pointer" multiple onchange="Obj.projectWiseMaterials(this,'company')">
+                                <select id="projects" name="projects" class="select-search cursor-pointer" multiple onchange="Obj.projectWiseMaterials(this,'company','materials')">
                                     <option value="">Pick options...</option>
                                 </select>
                             </div>
-                            <div class="col">
+                            <div class="col-md-3">
                                 <label for="materials">Materials<span class="text-danger">*</span></label>
-                                <select id="materials" name="materials" class="select-search cursor-pointer">
+                                <select id="materials" name="materials" class="select-search cursor-pointer" multiple>
                                     <option value="">Pick options...</option>
                                 </select>
                             </div>

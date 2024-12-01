@@ -89,7 +89,7 @@ class FixedAssetTransferController extends Controller
                     $to_company = $this->getCompanyModulePermissionWise($permission_entry)->where('id',$to_company_id)->first();
                     $from_project = $this->getBranch($permission_entry)->select(['id','branch_name'])->where('company_id',$from_company_id)->where('id',$from_branch_id)->first();
                     $to_project = $this->getBranch($permission_entry)->select(['id','branch_name'])->where('company_id',$to_company_id)->where('id',$to_branch_id)->first();
-                    $fixed_asset_ids  = $this->getFixedAssetStockMaterials($permission_entry,$from_project->id,$from_company->id);//error
+                    $fixed_asset_ids  = $this->getFixedAssetStockMaterials($permission_entry,[$from_project->id],$from_company->id);//error
                     $fixed_assets = $this->getFixedAssets($permission_entry)->whereIn('id',$fixed_asset_ids)->get();
 
                     $transferData = $this->getFixedAssetGpAll($permission_entry)->where('reference',$gp_reference)->first();
@@ -228,7 +228,7 @@ class FixedAssetTransferController extends Controller
                     'remarks'=> ['sometimes','nullable','string'],
                 ]);
                 extract($data);
-                $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$specification,$materials_id,$from_project_id,$from_company_id);
+                $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$specification,[$materials_id],[$from_project_id],$from_company_id);
                 if ($stock<$qty)
                 {
                     return response()->json([
@@ -394,7 +394,7 @@ class FixedAssetTransferController extends Controller
                         'message' => 'Data not found.'
                     ]);
                 }
-                $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$data->spec_id,$data->asset_id,$data->fixed_asset_transfer->from_project_id,$data->fixed_asset_transfer->from_company_id);
+                $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$data->spec_id,[$data->asset_id],[$data->fixed_asset_transfer->from_project_id],$data->fixed_asset_transfer->from_company_id);
                 $view = view('back-end/asset/transfer/__edit_fixed_asset_gp_spec',compact('data','stock'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -599,7 +599,7 @@ class FixedAssetTransferController extends Controller
                     'materials_id'  =>  ['sometimes','string', 'required', 'exists:fixed_assets,id'],
                 ]);
                 extract($data);
-                $fixed_asset_specification_ids  = $this->getFixedAssetStockMaterialSpecifications($permission,$materials_id,$from_branch_id,$from_company_id);
+                $fixed_asset_specification_ids  = $this->getFixedAssetStockMaterialSpecifications($permission,[$materials_id],[$from_branch_id],$from_company_id);
                 $fixed_asset_specifications = $this->getFixedAssetSpecification($permission)->whereIn('id',$fixed_asset_specification_ids)->get();
                 return response()->json([
                     'status' => 'success',
@@ -630,8 +630,8 @@ class FixedAssetTransferController extends Controller
                     'spec_id'  =>  ['sometimes','string', 'required', 'exists:fixed_asset_specifications,id'],
                 ]);
                 extract($data);
-                $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$spec_id,$materials_id,$from_branch_id,$from_company_id);
-                $rate = $this->getFixedAssetSpecificationWiseRate($permission,$spec_id,$materials_id,$from_branch_id,$from_company_id);
+                $stock = $this->getFixedAssetSpecificationWiseStockBalance($permission,$spec_id,[$materials_id],[$from_branch_id],$from_company_id);
+                $rate = $this->getFixedAssetSpecificationWiseRate($permission,$spec_id,[$materials_id],[$from_branch_id],$from_company_id);
                 return response()->json([
                     'status' => 'success',
                     'data' => ['stock'=>$stock,'rate'=>$rate],
