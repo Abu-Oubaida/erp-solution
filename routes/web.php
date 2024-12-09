@@ -442,6 +442,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::middleware(['permission:fixed_asset_report'])->prefix('fixed-asset-report')->group(function (){
                 Route::middleware(['permission:fixed_asset_stock_report'])->group(function (){
                     Route::match(['get','post'],'stock-report','stockReport')->name('fixed.asset.stock.report');
+                    Route::match(['get','post'],'stock-report-search','stockReportSearch');
                 });
 
             });

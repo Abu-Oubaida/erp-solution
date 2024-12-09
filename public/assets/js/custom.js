@@ -2322,8 +2322,36 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         }
                     })
                 }
-            }
-        }
+            },
+            fixedAssetReportSearch:function (e){
+                let company_id = $("#company").val()
+                let projects = $("#projects").val()
+                let materials = $("#materials").val()
+                let from_date = $("#from_date").val()
+                let to_date = $("#to_date").val()
+                if (company_id.length <= 0)
+                {
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/fixed-asset-report/stock-report-search"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data: {'company_id':company_id,'project_ids':projects,'material_ids':materials,'from_date':from_date,'to_date':to_date},
+                    success:function (response)
+                    {
+                        if (response.status === 'error')
+                        {
+                            alert('Error: ' + response.message)
+                        }
+                        else if (response.status === 'success') {
+                            $("#fixed-asset-body").html(response.data.view)
+                        }
+                    }
+                })
+            },
+        },
         function checkFileExists(url, callback) {
             const xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {

@@ -23,7 +23,7 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h4 class="mb-0"><i class="fas fa-edit"></i> Fixed Asset Report</h4>
+                                <h4 class="mb-0"><i class="fas fa-file"></i> Fixed Asset Report</h4>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-outline-primary float-end m-1 mb-0" type="button" id="ref-src-btn" onclick="return window.location.reload()">
@@ -70,21 +70,24 @@
                             </div>
 
                             <div class="col mt-4">
-                                <button class="btn btn-chl-outline float-end" type="button" id="ref-src-btn" onclick="return Obj.gpEntrySearch(this,'fixed-asset-body')">
+                                <button class="btn btn-chl-outline float-end" type="button" id="ref-src-btn" onclick="return Obj.fixedAssetReportSearch(this,'fixed-asset-body')">
                                     <i class="fa fa-search"></i> search
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id="fixed-asset-body" class="mt-1">
-{{--                @if(isset($fixed_asset_with_ref_report_list))--}}
-{{--                    @include('back-end.asset._fixed_asset_opening_project_wise_list')--}}
-{{--                @endif--}}
-{{--                @if((isset($fixed_assets)) )--}}
-{{--                    @include('back-end.asset._fixed_asset_opening_body')--}}
-{{--                @endif--}}
+                <div class="card mt-1">
+{{--                    <div class="card-header">--}}
+{{--                        <h4 class="mb-0"><i class="fas fa-file"></i> Report List</h4>--}}
+{{--                    </div>--}}
+                    <div class="card-body">
+                        <div id="fixed-asset-body" class="mt-1">
+                            <h5 class="text-center text-danger">Nothing to show</h5>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
 

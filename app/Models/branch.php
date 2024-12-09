@@ -32,4 +32,11 @@ class branch extends Model
     {
         return $this->belongsTo(company_info::class,'company_id');
     }
+
+    public function fixedAssets()
+    {
+        $withRef = Fixed_asset_opening_with_spec::with(['fixed_asset_opening_balance'])->whereHas('fixed_asset_opening_balance',function ($query){
+            $query->where('branch_id',$this->id);
+        })->get();
+    }
 }

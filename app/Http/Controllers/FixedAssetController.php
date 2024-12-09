@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\superadmin\ajaxRequestController;
+use App\Models\company_info;
 use App\Models\Fixed_asset;
 use App\Models\Fixed_asset_delete_history;
+use App\Models\Fixed_asset_opening_with_spec;
 use App\Models\fixed_asset_specifications;
+use App\Models\Fixed_asset_transfer_with_spec;
 use App\Models\User;
 use App\Traits\ParentTraitCompanyWise;
 use Database\Seeders\CompanyInfo;
@@ -463,6 +466,131 @@ class FixedAssetController extends Controller
         }catch (\Throwable $exception)
         {
             return back()->with('error', $exception->getMessage());
+        }
+    }
+    public function stockReportSearch(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->fixed_asset_report;
+            $validData = $request->validate([
+                'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                'project_ids' => ['sometimes','nullable', 'array'],
+                'project_ids.*' => ['sometimes','nullable', 'string',],
+                'material_ids' => ['sometimes','nullable', 'array'],
+                'material_ids.*' => ['sometimes','nullable','exists:fixed_assets,id'],
+                'from_date' => ['sometimes','nullable','date','before_or_equal:to_date'],
+                'to_date' => ['sometimes','nullable','date','before_or_equal:from_date'],
+            ]);
+            extract($validData);
+            $with_ref_asset_id = Fixed_asset_opening_with_spec::with(['fixed_asset_opening_balance'])->whereHas('fixed_asset_opening_balance', function ($query) use ($company_id) {
+                $query->where('company_id',$company_id);
+            })->pluck('asset_id')->unique()->values()->all();
+            $transfer_asset_id = Fixed_asset_transfer_with_spec::with(['fixed_asset_transfer'])->whereHas('fixed_asset_transfer', function ($query) use ($company_id) {
+                $query->where('to_company_id',$company_id);
+                $query->orWhere('from_company_id',$company_id);
+            })->pluck('asset_id')->unique()->values()->all();
+            $asset_id = array_unique(array_merge($with_ref_asset_id,$transfer_asset_id));
+
+//            $fixed_assets = Fixed_asset::with(['withRefUses','withRefUses.fixed_asset_opening_balance','transfer','transfer.fixed_asset_transfer'])->whereIn('id',$asset_id)->whereHas('withRefUses.fixed_asset_opening_balance', function ($query) use ($company_id) {
+//                $query->where('company_id',$company_id);
+//            })->orWhereHas('transfer.fixed_asset_transfer', function ($query) use ($company_id) {
+//                $query->where('to_company_id',$company_id);
+//                $query->orWhere('from_company_id',$company_id);
+//            })->get();
+//            $fixed_assets->each(function ($fixed_asset) {
+//                $withRefUsesQty = $fixed_asset->withRefUses->sum('qty');
+//                $withRefUsesAvgRate = $fixed_asset->withRefUses->avg('rate');
+//                $withRefUsesTotalPrice = $withRefUsesQty * $withRefUsesAvgRate;
+//
+//                $transferQty = $fixed_asset->transfer->sum('qty');
+//                $transferAvgRate = $fixed_asset->transfer->avg('rate');
+//                $transferTotalPrice = $transferQty * $transferAvgRate;
+//
+//                // Add aggregated data to the fixed asset instance
+//                $fixed_asset->aggregated_data = [
+//                    'withRefUses' => [
+//                        'total_qty' => $withRefUsesQty,
+//                        'avg_rate' => $withRefUsesAvgRate,
+//                        'total_price' => $withRefUsesTotalPrice,
+//                    ],
+//                    'transfer' => [
+//                        'total_qty' => $transferQty,
+//                        'avg_rate' => $transferAvgRate,
+//                        'total_price' => $transferTotalPrice,
+//                    ],
+//                ];
+//            });
+            $company = $this->getCompany()->where('id',$company_id)->first();
+            $report = DB::table('fixed_assets')
+                ->leftJoin('fixed_asset_opening_with_specs as withRefSpc', 'withRefSpc.asset_id', '=', 'fixed_assets.id')
+                ->leftJoin('fixed_asset_opening_balances as withRef', 'withRef.id', '=', 'withRefSpc.opening_asset_id')
+                ->leftJoin('fixed_asset_transfer_with_specs as transferSpc', 'transferSpc.asset_id', '=', 'fixed_assets.id')
+                ->leftJoin('fixed_asset_transfers as transfer', 'transfer.id', '=', 'transferSpc.transfer_id')
+                ->whereIn('fixed_assets.id', $asset_id)
+                ->where(function ($query) use ($company_id) {
+                    $query->where('withRef.company_id', $company_id)
+                        ->orWhere(function ($query) use ($company_id) {
+                            $query->where('transfer.from_company_id', $company_id)
+                                ->orWhere('transfer.to_company_id', $company_id);
+                        });
+                })
+                ->select(
+                    'fixed_assets.id',
+                    'fixed_assets.materials_name',
+                    'fixed_assets.recourse_code',
+                    'fixed_assets.unit',
+//                    DB::raw('(COUNT(DISTINCT CASE WHEN withRef.company_id = ' . $company_id . ' THEN withRef.branch_id END)) AS opening_project_count'),
+                    DB::raw('(COUNT(DISTINCT CASE WHEN withRef.company_id = ' . $company_id . ' THEN withRef.id END)) AS opening_count'),
+//                    DB::raw('(COUNT(DISTINCT CASE WHEN transfer.to_company_id != ' . $company_id . ' THEN transfer.to_project_id END)) AS transfer_in_project_count'),
+                    DB::raw('(COUNT(DISTINCT CASE WHEN transfer.from_company_id != ' . $company_id . ' AND transfer.to_company_id = '.$company_id.' THEN transfer.to_company_id END)) AS transfer_in_company_count'),
+                    DB::raw('(COUNT(DISTINCT CASE WHEN transfer.to_company_id != ' . $company_id . ' AND transfer.from_company_id = '.$company_id.' THEN transfer.from_company_id END)) AS transfer_out_company_count'),
+                    DB::raw('(COUNT(DISTINCT CASE WHEN transfer.to_company_id = ' . $company_id . ' AND transfer.from_company_id = '.$company_id.' THEN transfer.id END)) AS in_company_transfer_count'),
+//                    DB::raw(
+//                        'COUNT(DISTINCT CASE WHEN transfer.from_company_id = ' . $company_id . ' THEN transfer.from_project_id END) AS transfer_out_project_count'
+//                    ),
+                    DB::raw('COALESCE(SUM(CASE WHEN withRef.company_id = ' . $company_id . ' THEN withRefSpc.qty END), 0) AS withRef_total_qty'),
+                    DB::raw('COALESCE(SUM(CASE WHEN withRef.company_id = ' . $company_id . ' THEN withRefSpc.qty * withRefSpc.rate END), 0) AS withRef_total_price'),
+                    DB::raw(
+                        'SUM(CASE WHEN transfer.from_company_id != ' . $company_id . ' AND transfer.to_company_id = '.$company_id.' THEN transferSpc.qty ELSE 0 END) AS transfer_in_qty'
+                    ),
+                    DB::raw(
+                        'SUM(CASE WHEN transfer.from_company_id != ' . $company_id . ' AND transfer.to_company_id = '.$company_id.' THEN (transferSpc.qty * transferSpc.rate) ELSE 0 END) AS transfer_in_total_price'
+                    ),
+                    DB::raw(
+                        'SUM(CASE WHEN transfer.to_company_id != ' . $company_id . ' AND transfer.from_company_id = '.$company_id.' THEN transferSpc.qty ELSE 0 END) AS transfer_out_qty'
+                    ),
+                    DB::raw(
+                        'SUM(CASE WHEN transfer.to_company_id != ' . $company_id . ' AND transfer.from_company_id = '.$company_id.' THEN (transferSpc.qty * transferSpc.rate) ELSE 0 END) AS transfer_out_total_price'
+                    ),
+                )
+                ->groupBy('fixed_assets.id', 'fixed_assets.materials_name', 'fixed_assets.recourse_code','fixed_assets.unit')
+                ->get();
+            $view = view('back-end.asset.report.stock.__list_table_1',compact('report','company'))->render();
+            return response()->json([
+               'status'    =>  'success',
+               'data'      =>  ['view' => $view, 'data' => $report],
+               'message'   =>  'Request processed successfully.',
+            ]);
+//            if ($fixed_assets->count() <= 0)
+//            {
+//                return response()->json([
+//                    'status' => 'error',
+//                    'message' => "No data found!",
+//                ]);
+//            }
+//            $view = view('back-end.asset.report.stock.__table_data',compact('fixed_assets'))->render();
+//            return response()->json([
+//                'status'    =>  'success',
+//                'data'      =>  ['view' => $view, 'data' => $fixed_assets],
+//                'message'   =>  'Request processed successfully.',
+//            ]);
+
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
         }
     }
 }

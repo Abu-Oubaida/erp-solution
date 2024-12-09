@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 
 class company_info extends Model
 {
@@ -33,5 +34,10 @@ class company_info extends Model
     public function fixedAssets()
     {
         return $this->hasMany(fixed_asset::class,'company_id');
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(branch::class,'company_id');
     }
 }
