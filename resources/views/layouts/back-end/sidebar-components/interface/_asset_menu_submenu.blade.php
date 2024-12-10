@@ -89,16 +89,16 @@
                                 @endif
                                 @if(auth()->user()->hasPermission('fixed_asset_damage'))
                                     @if(Route::currentRouteName() == 'fixed.asset.add')
-                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>
+                                        <a class="nav-link" href="#" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>
                                     @else
-                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>
+                                        <a class="nav-link text-chl" href="#" title="Damage Fixed Asset"><div class="sb-nav-link-icon">FA</div> Damage</a>
                                     @endif
                                 @endif
                                 @if(auth()->user()->hasPermission('issue_fixed_asset'))
                                     @if(Route::currentRouteName() == 'fixed.asset.add')
-                                        <a class="nav-link" href="{{route('fixed.asset.add')}}" title="Issue Fixed Asset"><div class="sb-nav-link-icon">FA</div> Issue</a>
+                                        <a class="nav-link" href="#" title="Issue Fixed Asset"><div class="sb-nav-link-icon">FA</div> Issue</a>
                                     @else
-                                        <a class="nav-link text-chl" href="{{route('fixed.asset.add')}}" title="Issue Fixed Asset"><div class="sb-nav-link-icon">FA</div> Issue</a>
+                                        <a class="nav-link text-chl" href="#" title="Issue Fixed Asset"><div class="sb-nav-link-icon">FA</div> Issue</a>
                                     @endif
                                 @endif
                                 @if(auth()->user()->hasPermission('issue_return_fixed_asset'))

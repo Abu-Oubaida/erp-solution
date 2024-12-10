@@ -66,7 +66,7 @@
                                             <th>Access Role:</th>
                                             <td>
                                                 @foreach ($user->roles as $role)
-                                                    {{ $roleNew = $role->display_name }}
+                                                    {{ $roleNew = @$role->display_name }}
                                                 @endforeach
                                                 <b>({!! $user->getCompany->company_name !!})</b>
                                             </td>
@@ -113,7 +113,7 @@
                                                         <option value="">--Select Option--</option>
                                                         @if(isset($roles) && count($roles))
                                                             @foreach($roles as $r)
-                                                                <option value="{{$r->id}}" @if($r->display_name == $roleNew) selected @endif>{!! $r->display_name !!} ({!! $r->company->company_name !!})</option>
+                                                                <option value="{{$r->id}}" @if($r->display_name == @$roleNew) selected @endif>{!! $r->display_name !!} ({!! $r->company->company_name !!})</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -212,7 +212,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        @if(strtolower($roleNew) == strtolower('systemsuperadmin'))
+                        @if(strtolower(@$roleNew) == strtolower('systemsuperadmin'))
                             <div class="col-md-12">
                                 <strong class="text-center text-info">System/Super Admin has all the permissions by default! </strong>
                             </div>
@@ -344,7 +344,7 @@
                                 </div>
                             </div>
                         @else
-                            @if(strtolower($roleNew) == strtolower('systemsuperadmin'))
+                            @if(strtolower(@$roleNew) == strtolower('systemsuperadmin'))
                                 <div class="row">
                                     <div class="col-md-12">
                                         <strong class="text-center text-info">System/Super Admin has all the permissions by default! </strong>

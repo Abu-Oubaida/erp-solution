@@ -37,11 +37,11 @@ class FixedAssetTransferController extends Controller
             $permission = $this->permissions()->fixed_asset_transfer_entry;
             $from_projects = null;
             $to_projects = null;
-            if ($request->get('from_p') && $request->get('from_c'))
+            if ($request->get('from_c'))
             {
                 $from_projects = $this->getBranch($permission)->where('company_id', $request->get('from_c'))->get();
             }
-            if ($request->get('to_p') && $request->get('to_c'))
+            if ($request->get('to_c'))
             {
                 $to_projects = $this->getBranch($permission)->where('company_id', $request->get('to_c'))->get();
             }
@@ -54,7 +54,7 @@ class FixedAssetTransferController extends Controller
 
     public function create(Request $request): JsonResponse
     {
-//        try {
+        try {
             if ($request->isMethod('POST')) {
                 $permission_entry = $this->permissions()->fixed_asset_transfer_entry;
                 $data = $request->validate([
@@ -86,6 +86,14 @@ class FixedAssetTransferController extends Controller
                 if (!empty($from_company_id) && !empty($from_branch_id) && !empty($to_company_id) && !empty($to_branch_id) && !empty($gp_reference))//Input Part
                 {
                     $from_company = $this->getCompanyModulePermissionWise($permission_entry)->where('id',$from_company_id)->first();
+//                    if (empty($from_company))
+//                    {
+//                        return response()->json([
+//                            'status' => 'error',
+//                            'data' => ['view'=>''],
+//                            'message' => "you don't have permission to access from company"
+//                        ]);
+//                    }
                     $to_company = $this->getCompanyModulePermissionWise($permission_entry)->where('id',$to_company_id)->first();
                     $from_project = $this->getBranch($permission_entry)->select(['id','branch_name'])->where('company_id',$from_company_id)->where('id',$from_branch_id)->first();
                     $to_project = $this->getBranch($permission_entry)->select(['id','branch_name'])->where('company_id',$to_company_id)->where('id',$to_branch_id)->first();
@@ -200,12 +208,12 @@ class FixedAssetTransferController extends Controller
                 'status'=>'error',
                 'message'=>'Request method not allowed.'
             ]);
-//        }catch (\Throwable $exception) {
-//            return response()->json([
-//                'status' => 'error',
-//                'message' => $exception->getMessage()
-//            ]);
-//        }
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
     }
     public function addToListFixedAssetGp(Request $request)
     {
@@ -775,7 +783,11 @@ class FixedAssetTransferController extends Controller
             $permission = $this->permissions()->edit_fixed_asset_transfer;
             $id = Crypt::decryptString($fatid);
             $item = $this->getFixedAssetGpAll($permission)->where('id',$id)->first();
-            $projects = $this->getUserProjectPermissions($this->user->id,$permission)->where('company_id',$item->from_company_id)->orWhere('company_id',$item->to_company_id)->get();
+            $projects = $this->getUserProjectPermissions($this->user->id,$permission)->where('company_id',$item->from_company_id)->get();
+            if (count($projects) <= 0)
+            {
+                return back()->with('error','You do not have permission for from company.');
+            }
             $fixed_assets = $this->getFixedAssets($permission)->where('status',1)->where('company_id',$item->from_company_id)->get();
             $spec = $this->getFixedAssetSpecification($permission)->where('status',1)->where('company_id',$item->from_company_id)->get();
             $companies = $this->getCompany()->get();

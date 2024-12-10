@@ -78,7 +78,7 @@
                                 <td>{!! $u->employee_id !!}</td>
                                 <td>{!! $u->name !!}</td>
                                 <td class="text-center text-capitalize">
-                                    <span class="badge bg-success" title="Mother Company">{!! isset($u->getCompany->company_name)?$u->getCompany->company_name:'N/A' !!} ({!! $u->roles->first()->display_name !!})</span>
+                                    <span class="badge bg-success" title="Mother Company">{!! isset($u->getCompany->company_name)?@$u->getCompany->company_name:'N/A' !!} ({!! @$u->roles->first()->display_name !!})</span>
                                     @foreach(@$u->companyPermissions as $cp)
                                         <span class="badge bg-info" title="Permission Company">{!! $cp->company->company_name !!} ({!! $cp->userRole->display_name !!})</span>
                                     @endforeach

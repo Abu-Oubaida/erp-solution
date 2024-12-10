@@ -689,13 +689,13 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                                         // $('#pdfPreviewModal').modal('show');
                                     } else {
                                         const btn = '<div class="row">\n' +
-                                            '                        <div class="col-md-12 text-center">\n' +
-                                            '                            <h1 class="text-center">Sorry! This file type is not supported for preview.</h1>\n' +
-                                            '                            <a class="btn btn-success text-center" href="' + pdfPreviewUrl + '" download>\n' +
-                                            '                                Click To Download\n' +
-                                            '                            </a>\n' +
-                                            '                        </div>\n' +
-                                            '                    </div>'
+                                        '                        <div class="col-md-12 text-center">\n' +
+                                        '                            <h1 class="text-center">Sorry! This file type is not supported for preview.</h1>\n' +
+                                        '                            <a class="btn btn-success text-center" href="' + pdfPreviewUrl + '" download>\n' +
+                                        '                                Click To Download\n' +
+                                        '                            </a>\n' +
+                                        '                        </div>\n' +
+                                        '                    </div>'
                                         // Provide a download link
                                         $('#'+actionID).html(btn);
                                         // window.location.href = pdfPreviewUrl;
@@ -1367,7 +1367,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     url:url,
                     method:'POST',
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'from_company_id':from_company_id,'to_company_id':to_company_id,'from_branch_id':from_project,'to_branch_id':to_project,'gp_date':gp_date,'gp_reference':reference},
+                    data:{'from_company_id':from_company_id,'to_company_id':to_company_id,'reference':reference,'from_branch_id':from_project,'to_branch_id':to_project,'gp_date':gp_date,'gp_reference':reference},
                     success:function(response)
                     {
                         if (response.status === 'success')
@@ -2352,16 +2352,16 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 })
             },
         },
-            function checkFileExists(url, callback) {
-                const xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        callback(xhr.status === 200);
-                    }
-                };
-                xhr.open('HEAD', url, true);
-                xhr.send();
-            }
+        function checkFileExists(url, callback) {
+            const xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    callback(xhr.status === 200);
+                }
+            };
+            xhr.open('HEAD', url, true);
+            xhr.send();
+        }
 
     })
     function setSelectBoxBlank (targetID){

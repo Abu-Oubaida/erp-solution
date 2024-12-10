@@ -111,7 +111,7 @@ class UserController extends Controller
                     $employee_id_hidden = $eid[0];
                     $employee_id = $eid[1];
                 }
-                $roles = $this->getRole()->where('id',$role)->first();
+                $roles = $this->getRole($permission)->where('id',$role)->first();
                 $user = $this->getUser($permission)->create([
                     'company' => $company,
                     'employee_id' => $employee_id,
@@ -437,7 +437,7 @@ class UserController extends Controller
                     DB::table('role_user')->where('user_id',$userId)->update(['role_id'=>$user_role]);
                 }
                 else{
-                    DB::table('role_user')->create([
+                    DB::table('role_user')->insert([
                         'role_id'=>$user_role,
                         'user_id'=>$userId,
                         'user_type'=>'App\Models\User'

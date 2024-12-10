@@ -479,7 +479,7 @@ class FixedAssetController extends Controller
                 'material_ids' => ['sometimes','nullable', 'array'],
                 'material_ids.*' => ['sometimes','nullable','exists:fixed_assets,id'],
                 'from_date' => ['sometimes','nullable','date','before_or_equal:to_date'],
-                'to_date' => ['sometimes','nullable','date','before_or_equal:from_date'],
+                'to_date' => ['sometimes','nullable','date','after_or_equal:from_date'],
             ]);
             extract($validData);
             $with_ref_asset_id = Fixed_asset_opening_with_spec::with(['fixed_asset_opening_balance'])->whereHas('fixed_asset_opening_balance', function ($query) use ($company_id) {
@@ -527,21 +527,14 @@ class FixedAssetController extends Controller
                 ->leftJoin('fixed_asset_transfer_with_specs as transferSpc', 'transferSpc.asset_id', '=', 'fixed_assets.id')
                 ->leftJoin('fixed_asset_transfers as transfer', 'transfer.id', '=', 'transferSpc.transfer_id')
                 ->whereIn('fixed_assets.id', $asset_id)
-                ->where(function ($query) use ($company_id) {
-                    $query->where('withRef.company_id', $company_id)
-                        ->orWhere(function ($query) use ($company_id) {
-                            $query->where('transfer.from_company_id', $company_id)
-                                ->orWhere('transfer.to_company_id', $company_id);
-                        });
-                })
                 ->select(
                     'fixed_assets.id',
                     'fixed_assets.materials_name',
                     'fixed_assets.recourse_code',
                     'fixed_assets.unit',
-//                    DB::raw('(COUNT(DISTINCT CASE WHEN withRef.company_id = ' . $company_id . ' THEN withRef.branch_id END)) AS opening_project_count'),
+                    DB::raw('(COUNT(DISTINCT CASE WHEN withRef.company_id = ' . $company_id . ' THEN withRef.branch_id END)) AS opening_project_count'),
                     DB::raw('(COUNT(DISTINCT CASE WHEN withRef.company_id = ' . $company_id . ' THEN withRef.id END)) AS opening_count'),
-//                    DB::raw('(COUNT(DISTINCT CASE WHEN transfer.to_company_id != ' . $company_id . ' THEN transfer.to_project_id END)) AS transfer_in_project_count'),
+                    DB::raw('(COUNT(DISTINCT CASE WHEN transfer.to_company_id = ' . $company_id . ' OR transfer.from_company_id ='.$company_id.' THEN transfer.to_project_id END)) AS transfer_project_count'),
                     DB::raw('(COUNT(DISTINCT CASE WHEN transfer.from_company_id != ' . $company_id . ' AND transfer.to_company_id = '.$company_id.' THEN transfer.to_company_id END)) AS transfer_in_company_count'),
                     DB::raw('(COUNT(DISTINCT CASE WHEN transfer.to_company_id != ' . $company_id . ' AND transfer.from_company_id = '.$company_id.' THEN transfer.from_company_id END)) AS transfer_out_company_count'),
                     DB::raw('(COUNT(DISTINCT CASE WHEN transfer.to_company_id = ' . $company_id . ' AND transfer.from_company_id = '.$company_id.' THEN transfer.id END)) AS in_company_transfer_count'),
@@ -563,8 +556,21 @@ class FixedAssetController extends Controller
                         'SUM(CASE WHEN transfer.to_company_id != ' . $company_id . ' AND transfer.from_company_id = '.$company_id.' THEN (transferSpc.qty * transferSpc.rate) ELSE 0 END) AS transfer_out_total_price'
                     ),
                 )
-                ->groupBy('fixed_assets.id', 'fixed_assets.materials_name', 'fixed_assets.recourse_code','fixed_assets.unit')
-                ->get();
+                ->where(function ($query) use ($company_id) {
+                    $query->where('withRef.company_id', $company_id)
+                        ->orWhere(function ($query) use ($company_id) {
+                            $query->where('transfer.from_company_id', $company_id)
+                                ->orWhere('transfer.to_company_id', $company_id);
+                        });
+                });
+            if (!empty($from_date) && !empty($to_date)) {
+                $report = $report->where(function ($query) use ($from_date, $to_date) {
+                    $query->whereBetween('transfer.date', [$from_date, $to_date]);
+                    $query->whereBetween('withRef.date', [$from_date, $to_date]);
+                });
+            }
+            $report = $report->groupBy('fixed_assets.id', 'fixed_assets.materials_name', 'fixed_assets.recourse_code','fixed_assets.unit')->get();
+
             $view = view('back-end.asset.report.stock.__list_table_1',compact('report','company'))->render();
             return response()->json([
                'status'    =>  'success',

@@ -25,14 +25,14 @@
                             <div class="col">
                                 <h4 class="mb-0"><i class="fas fa-file"></i> Fixed Asset Report</h4>
                             </div>
-                            <div class="col">
-                                <button class="btn btn-sm btn-outline-primary float-end m-1 mb-0" type="button" id="ref-src-btn" onclick="return window.location.reload()">
-                                    <i class="fa fa-refresh"></i> Refresh
-                                </button>
-                                <a href="{!! route('fixed.asset.stock.report') !!}" class="btn btn-sm btn-outline-success float-end m-1 mb-0" type="button" id="ref-src-btn">
-                                    <i class="fa-solid fa-file-circle-plus"></i> New
-                                </a>
-                            </div>
+{{--                            <div class="col">--}}
+{{--                                <button class="btn btn-sm btn-outline-primary float-end m-1 mb-0" type="button" id="ref-src-btn" onclick="return window.location.reload()">--}}
+{{--                                    <i class="fa fa-refresh"></i> Refresh--}}
+{{--                                </button>--}}
+{{--                                <a href="{!! route('fixed.asset.stock.report') !!}" class="btn btn-sm btn-outline-success float-end m-1 mb-0" type="button" id="ref-src-btn">--}}
+{{--                                    <i class="fa-solid fa-file-circle-plus"></i> New--}}
+{{--                                </a>--}}
+{{--                            </div>--}}
                         </div>
                     </div>
                     <div class="card-body">
@@ -49,23 +49,23 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label for="projects">Projects Name<span class="text-danger">*</span></label>
+                                <label for="projects">Projects Name</label>
                                 <select id="projects" name="projects" class="select-search cursor-pointer" multiple onchange="Obj.projectWiseMaterials(this,'company','materials')">
                                     <option value="">Pick options...</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label for="materials">Materials<span class="text-danger">*</span></label>
+                                <label for="materials">Materials</label>
                                 <select id="materials" name="materials" class="select-search cursor-pointer" multiple>
                                     <option value="">Pick options...</option>
                                 </select>
                             </div>
                             <div class="col">
-                                <label for="from_date">From<span class="text-danger">*</span></label>
+                                <label for="from_date">From</label>
                                 <input type="date" class="form-control" id="from_date">
                             </div>
                             <div class="col">
-                                <label for="to_date">To<span class="text-danger">*</span></label>
+                                <label for="to_date">To</label>
                                 <input type="date" class="form-control" id="to_date">
                             </div>
 
@@ -90,16 +90,28 @@
                 </div>
             </div>
         </div>
-
     </div>
-    <script>
-        @if(request()->get('from_c') || request()->get('to_c') || request()->get('to_p') || request()->get('from_p') || request()->get('ref'))
-        (function ($) {
-            $(document).ready(function () {
-                Obj.gpEntrySearch(this,'fixed-asset-body')
-            });
-        }(jQuery))
-        @endif
-    </script>
+    <div class="modal modal-xl fade" id="dataModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title fs-5" id="v_document_name"><i class="fas fa-file"></i> Data Model</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="fixed-asset-spec-edit">
+                    {{--                <div class="row" >--}}
+                    {{--                </div>--}}
+                    {{--                <div id="documentPreview"></div>--}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-chl" data-bs-dismiss="modal">Close</button>
+                    {{--                <button type="button" class="btn btn-primary">Understood</button>--}}
+                </div>
+                <div id='ajax_loader2' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+                    <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
