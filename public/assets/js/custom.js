@@ -2300,7 +2300,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 {
                     let company_id = $('#'+ company).val()
                     let project_ids = $(e).val()
-                    if (company_id.length <= 0 && project_ids.length <= 0)
+                    if (company_id.length <= 0 || project_ids.length <= 0)
                     {
                         return false
                     }

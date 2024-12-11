@@ -292,6 +292,26 @@ trait ParentTraitCompanyWise
         // $mrf or $mpr---------
         return $fixed_asset_ids;
     }
+    public function getFixedAssetAllProjectWise($operation_permission_name,$projects_ids,$company_id)
+    {
+        $fixed_asset_ids = [];
+        $withRef = $this->getProjectWiseWithReferenceMaterialsStock($operation_permission_name,$projects_ids,$company_id)->pluck('asset_id')->unique()->toArray();
+        $transfer = Fixed_asset_transfer_with_spec::with(['fixed_asset_transfer'])->whereHas('fixed_asset_transfer', function ($query) use ($company_id, $projects_ids) {
+            $query->where('status','>=',1);
+            $query->where(function ($query) use ($company_id, $projects_ids) {
+                $query->where('from_company_id', $company_id);
+                $query->whereIn('from_project_id', $projects_ids);
+            });
+            $query->orWhere(function ($query) use ($company_id, $projects_ids) {
+                $query->where('to_company_id', $company_id);
+                $query->whereIn('to_project_id', $projects_ids);
+            });
+        })->pluck('asset_id')->unique()->toArray();
+        $fixed_asset_ids = array_merge($withRef,$transfer);
+        // $issue_return--------
+        // $mrf or $mpr---------
+        return $fixed_asset_ids;
+    }
     public function getFixedAssetStockMaterialSpecifications($operation_permission_name,$materials_ids,$projects_ids,$company_id)
     {
         $fixed_asset_specification_id = [];

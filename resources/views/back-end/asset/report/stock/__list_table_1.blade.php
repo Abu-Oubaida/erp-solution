@@ -60,7 +60,7 @@
                 <td><a href="#">{!! $item->opening_count !!}</a></td>
                 <td>{!! $item->withRef_total_qty !!}</td>
                 <td>{!! $item->withRef_total_price !!}</td>
-                <td><a href="#">{!! $item->in_company_transfer_count !!}</a></td>
+                <td><a href="#">{!! $item->self_transfer_count !!}</a></td>
                 <td><a href="#">{!! $item->transfer_in_company_count !!}</a></td>
                 <td>{!! $item->transfer_in_qty !!}</td>
                 <td>{!! $item->transfer_in_total_price !!}</td>
