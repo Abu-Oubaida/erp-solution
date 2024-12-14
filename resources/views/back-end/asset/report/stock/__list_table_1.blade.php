@@ -2,19 +2,21 @@
     <thead>
     <tr>
         <th>SL.</th>
-        <th><i class="fas fa-search"></i></th>
+        <th>Company</th>
         <th title="Materials Name">Materials</th>
         <th title="Materials Code">Code</th>
         <th title="Unit">Unit</th>
-        <th title="Project count all transaction">Projects count</th>
-        <th title="Received balance using reference count">W.R.Count</th>
+        <th title="Project count all transaction">Project count</th>
+        <th title="Received balance using reference count">With Reference</th>
         <th title="Received balance using reference quantity total">W.R.Qty</th>
         <th title="Received balance using reference amount total">W.R.Amount</th>
         <th title="Transfer on self company count">GP Count</th>
-        <th title="Transfer in from other company count">T. In</th>
+        <th title="Transfer on self company quantity total">GP Qty</th>
+        <th title="Transfer on self company amount total">GP Amount</th>
+        <th title="Transfer in from other company count">T. In Company</th>
         <th title="Transfer in from other company quantity total">In Qty</th>
         <th title="Transfer in from other company amount total">In Amount</th>
-        <th title="Transfer out from this company count">T. Out</th>
+        <th title="Transfer out from this company count">T. Out Company</th>
         <th title="Transfer out from this company quantity total">Out Qty</th>
         <th title="Transfer out from this company amount total">Out Amount</th>
         <th>Total Qty</th>
@@ -29,14 +31,16 @@
         <th title="Materials Code">Code</th>
         <th title="Unit">Unit</th>
         <th title="Project count all transaction">Project count</th>
-        <th title="Received balance using reference count">W.R.Count</th>
+        <th title="Received balance using reference count">With Reference</th>
         <th title="Received balance using reference quantity total">W.R.Qty</th>
         <th title="Received balance using reference amount total">W.R.Amount</th>
         <th title="Transfer on self company count">GP Count</th>
-        <th title="Transfer in from other company count">T. In</th>
+        <th title="Transfer on self company quantity total">GP Qty</th>
+        <th title="Transfer on self company amount total">GP Amount</th>
+        <th title="Transfer in from other company count">T. In Company</th>
         <th title="Transfer in from other company quantity total">In Qty</th>
         <th title="Transfer in from other company amount total">In Amount</th>
-        <th title="Transfer out from this company count">T. Out</th>
+        <th title="Transfer out from this company count">T. Out Company</th>
         <th title="Transfer out from this company quantity total">Out Qty</th>
         <th title="Transfer out from this company amount total">Out Amount</th>
         <th>Total Qty</th>
@@ -61,14 +65,16 @@
                 <td>{!! $item->withRef_total_qty !!}</td>
                 <td>{!! $item->withRef_total_price !!}</td>
                 <td><a href="#">{!! $item->self_transfer_count !!}</a></td>
+                <td><a href="#">{!! $item->self_transfer_qty !!}</a></td>
+                <td><a href="#">{!! $item->self_transfer_amount !!}</a></td>
                 <td><a href="#">{!! $item->transfer_in_company_count !!}</a></td>
                 <td>{!! $item->transfer_in_qty !!}</td>
                 <td>{!! $item->transfer_in_total_price !!}</td>
                 <td><a href="#">{!! $item->transfer_out_company_count !!}</a></td>
                 <td>{!! $item->transfer_out_qty !!}</td>
                 <td>{!! $item->transfer_out_total_price !!}</td>
-                <td>{!! ($item->withRef_total_qty + $item->transfer_in_qty) !!}</td>
-                <td>{!! ($item->withRef_total_price + (($item->transfer_in_total_price-$item->transfer_out_total_price))) !!}</td>
+                <td>{!! (($item->withRef_total_qty + $item->transfer_in_qty + $item->transfer_in_qty)-$item->transfer_out_qty) !!}</td>
+                <td>{!! ($item->withRef_total_price + (($item->transfer_in_total_price - $item->transfer_out_total_price))) !!}</td>
             </tr>
         @endforeach
     @else
