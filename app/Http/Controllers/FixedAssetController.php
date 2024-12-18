@@ -514,13 +514,13 @@ class FixedAssetController extends Controller
                 $project_ids_string = implode(',', $project_ids);
                 $project_filter_withRef = 'withRef.branch_id IN (' . $project_ids_string . ')';
             }
-            $withRef_condition = "withRef.company_id = '" . $company_id . "' AND '" . $project_filter_withRef ."'";
+            $withRef_condition = "withRef.company_id = '$company_id' AND '" . $project_filter_withRef ."'";
 
             $transfer_in_from_other_condition = "(transfer.from_company_id != '$company_id ' AND (transfer.to_company_id = '$company_id' ".(!empty($project_ids)?" AND transfer.to_project_id IN ('$project_ids_string')":"")."))";
 
             $transfer_out_to_other_condition = "(transfer.from_company_id = '$company_id ' AND transfer.to_company_id !='$company_id' ".(!empty($project_ids)?" AND transfer.from_project_id IN ('$project_ids_string')":"").")";
 
-            $transfer_all_self_condition = "(transfer.to_company_id = '  $company_id  ' AND transfer.from_company_id ='$company_id' ".(!empty($project_ids)?" AND (transfer.to_project_id IN ('$project_ids_string')":"")." OR transfer.from_project_id IN ('$project_ids_string')) ";
+            $transfer_all_self_condition = "(transfer.to_company_id = '$company_id' AND transfer.from_company_id ='$company_id' ".(!empty($project_ids)?" AND (transfer.to_project_id IN ('$project_ids_string') OR transfer.from_project_id IN ('$project_ids_string')":"").") ";
 
 
 
@@ -530,37 +530,38 @@ class FixedAssetController extends Controller
                 ->leftJoin('fixed_asset_transfer_with_specs as transferSpc', 'transferSpc.asset_id', '=', 'fixed_assets.id')
                 ->leftJoin('fixed_asset_transfers as transfer', 'transfer.id', '=', 'transferSpc.transfer_id')
                 ->select(
-                    'fixed_assets.id',
-                    'fixed_assets.materials_name',
-                    'fixed_assets.recourse_code',
-                    'fixed_assets.unit',
-                    DB::raw('(COUNT(DISTINCT CASE WHEN '.$withRef_condition. ' THEN withRef.branch_id END)) AS opening_project_count'),
-                    DB::raw('(COUNT(DISTINCT CASE WHEN '.$withRef_condition. ' THEN withRef.id END)) AS opening_count'),
-                    DB::raw('COALESCE(SUM(CASE WHEN '.$withRef_condition. ' THEN withRefSpc.qty END), 0) AS withRef_total_qty'),
-                    DB::raw('COALESCE(SUM(CASE WHEN '.$withRef_condition. ' THEN withRefSpc.qty * withRefSpc.rate END), 0) AS withRef_total_price'),
-
-                    DB::raw('(COUNT(DISTINCT CASE WHEN (transfer.to_company_id = ' . $company_id.' '.(!empty($project_ids)?'AND transfer.to_project_id IN (' . $project_ids_string . ')':''). ') AND (transfer.from_company_id ='.$company_id.' '.(!empty($project_ids)?' AND transfer.from_project_id IN (' . $project_ids_string . ')':'').') THEN transfer.to_project_id END)) AS transfer_project_count'),//Transfer between self company
-
-                    //Transfer In From other company Start
-                    DB::raw('(COUNT(DISTINCT CASE WHEN '.$transfer_in_from_other_condition.' THEN transfer.to_company_id END)) AS transfer_in_company_count'),
-                    DB::raw(
-                        'SUM(CASE WHEN '.$transfer_in_from_other_condition.' THEN transferSpc.qty ELSE 0 END) AS transfer_in_qty'
-                    ),
-                    DB::raw(
-                        'SUM(CASE WHEN '.$transfer_in_from_other_condition.' THEN (transferSpc.qty * transferSpc.rate) ELSE 0 END) AS transfer_in_total_price'
-                    ),//Transfer In From other company End
-
-                    //Transfer out To other company Start
-                    DB::raw('(COUNT(DISTINCT CASE WHEN '.$transfer_out_to_other_condition.' THEN transfer.from_company_id END)) AS transfer_out_company_count'),
-                    DB::raw(
-                        'SUM(CASE WHEN '.$transfer_out_to_other_condition.' THEN transferSpc.qty ELSE 0 END) AS transfer_out_qty'
-                    ),
-                    DB::raw(
-                        'SUM(CASE WHEN '.$transfer_out_to_other_condition.' THEN (transferSpc.qty * transferSpc.rate) ELSE 0 END) AS transfer_out_total_price'
-                    ),//Transfer out To other company End
+//                    'fixed_assets.id',
+//                    'fixed_assets.materials_name',
+//                    'fixed_assets.recourse_code',
+//                    'fixed_assets.unit',
+//                    DB::raw('(COUNT(DISTINCT CASE WHEN '.$withRef_condition. ' THEN withRef.branch_id END)) AS opening_project_count'),
+//                    DB::raw('(COUNT(DISTINCT CASE WHEN '.$withRef_condition. ' THEN withRef.id END)) AS opening_count'),
+//                    DB::raw('COALESCE(SUM(CASE WHEN '.$withRef_condition. ' THEN withRefSpc.qty END), 0) AS withRef_total_qty'),
+//                    DB::raw('COALESCE(SUM(CASE WHEN '.$withRef_condition. ' THEN withRefSpc.qty * withRefSpc.rate END), 0) AS withRef_total_price'),
+//
+//                    DB::raw('(COUNT(DISTINCT CASE WHEN (transfer.to_company_id = ' . $company_id.' '.(!empty($project_ids)?'AND transfer.to_project_id IN (' . $project_ids_string . ')':''). ') AND (transfer.from_company_id ='.$company_id.' '.(!empty($project_ids)?' AND transfer.from_project_id IN (' . $project_ids_string . ')':'').') THEN transfer.to_project_id END)) AS transfer_project_count'),//Transfer between self company
+//
+//                    //Transfer In From other company Start
+//                    DB::raw('(COUNT(DISTINCT CASE WHEN '.$transfer_in_from_other_condition.' THEN transfer.to_company_id END)) AS transfer_in_company_count'),
+//                    DB::raw(
+//                        'SUM(CASE WHEN '.$transfer_in_from_other_condition.' THEN transferSpc.qty ELSE 0 END) AS transfer_in_qty'
+//                    ),
+//                    DB::raw(
+//                        'SUM(CASE WHEN '.$transfer_in_from_other_condition.' THEN (transferSpc.qty * transferSpc.rate) ELSE 0 END) AS transfer_in_total_price'
+//                    ),//Transfer In From other company End
+//
+//                    //Transfer out To other company Start
+//                    DB::raw('(COUNT(DISTINCT CASE WHEN '.$transfer_out_to_other_condition.' THEN transfer.from_company_id END)) AS transfer_out_company_count'),
+//                    DB::raw(
+//                        'SUM(CASE WHEN '.$transfer_out_to_other_condition.' THEN transferSpc.qty ELSE 0 END) AS transfer_out_qty'
+//                    ),
+//                    DB::raw(
+//                        'SUM(CASE WHEN '.$transfer_out_to_other_condition.' THEN (transferSpc.qty * transferSpc.rate) ELSE 0 END) AS transfer_out_total_price'
+//                    ),//Transfer out To other company End
 
                     //Between self transfer count
-                    DB::raw('COUNT(DISTINCT CASE WHEN '.$transfer_all_self_condition.' THEN transfer.id ELSE 0 END) AS self_transfer_count'),
+                    DB::raw('COALESCE(COUNT(
+                    DISTINCT CASE WHEN '.$transfer_all_self_condition.'THEN transfer.id END),0) AS self_transfer_count'),
                     DB::raw('COALESCE(SUM(CASE WHEN '.$transfer_all_self_condition.' THEN transferSpc.qty END),0) AS self_transfer_qty'),
                     DB::raw('COALESCE(SUM(CASE WHEN '.$transfer_all_self_condition.' THEN (transferSpc.qty * transferSpc.rate) END),0) AS self_transfer_amount'),
 //                    DB::raw(
@@ -599,6 +600,7 @@ class FixedAssetController extends Controller
                 });
             }
             $report = $report->groupBy('fixed_assets.id', 'fixed_assets.materials_name', 'fixed_assets.recourse_code','fixed_assets.unit')->get();
+            dd($report);
             $view = view('back-end.asset.report.stock.__list_table_1',compact('report','company'))->render();
             return response()->json([
                'status'    =>  'success',
