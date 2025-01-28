@@ -20,7 +20,7 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                        <h3 class="text-capitalize"><i class="fas fa-file-circle-plus"></i> {{str_replace('info','document',str_replace('.', ' ', \Route::currentRouteName()))}}</h3>
                     </div>
                     <div class="col">
                         <div class="float-end">
@@ -86,7 +86,7 @@
 
                         <div class="col-md-12">
                             <div class="form-floating mb-3 float-end">
-                                <input type="submit" value="Upload" class="btn btn-chl-outline" name="submit" >
+                                <button type="submit" value="" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Upload</button>
                             </div>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
-                    <h3 class="text-capitalize">Your Added/Updated Documents List</h3>
+                    <h3 class="text-capitalize"><i class="fas fa-file-pdf"></i> Your Added/Updated Documents List</h3>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
