@@ -2351,19 +2351,18 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
-        },
-            function checkFileExists(url, callback) {
-                const xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        callback(xhr.status === 200);
-                    }
-                };
-                xhr.open('HEAD', url, true);
-                xhr.send();
-            }
-
+        }
     })
+    function checkFileExists(url, callback) {
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                callback(xhr.status === 200);
+            }
+        };
+        xhr.open('HEAD', url, true);
+        xhr.send();
+    }
     function setSelectBoxBlank (targetID){
         const $select = $('#' + targetID);
         // Ensure Selectize is initialized

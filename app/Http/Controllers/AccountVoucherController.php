@@ -13,6 +13,7 @@ use App\Models\VoucherDocumentShareEmailLink;
 use App\Models\VoucherType;
 
 use App\Rules\AccountVoucherInfoStatusRule;
+use App\Traits\ParentTraitCompanyWise;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,19 +25,29 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class AccountVoucherController extends Controller
 {
+    use ParentTraitCompanyWise;
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->setUser();
+            return $next($request);
+        });
+    }
     //
     private $accounts_document_path = "file-manager/Account Document/";
 
     public function createVoucherType(Request $request)
     {
+        $permission = $this->permissions()->voucher_type_add;
         try {
             if ($request->isMethod('post'))
             {
                 return $this->storeVoucherType($request);
             }
             $voucherTypes = $this->voucherTypeList();
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
 //            dd($voucherTypes);
-            return view('back-end/account-voucher/type/add',compact('voucherTypes'));
+            return view('back-end/account-voucher/type/add',compact('voucherTypes','companies'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -49,6 +60,7 @@ class AccountVoucherController extends Controller
             'voucher_type_code'    =>  ['sometimes','nullable', 'numeric'],
             'status'               =>  ['required', 'numeric'],
             'remarks'              =>  ['sometimes','nullable', 'string'],
+            'company'               => ['required', 'integer', 'exists:company_infos,id'],
         ]);
         extract($request->post());
         try {
@@ -58,6 +70,7 @@ class AccountVoucherController extends Controller
             }
             $user = Auth::user();
             VoucherType::create([
+                'company_id'=> $company,
                 'status'    =>  $status,
                 'voucher_type_title'=>  $voucher_type_title,
                 'code'      =>  $voucher_type_code,
@@ -75,6 +88,7 @@ class AccountVoucherController extends Controller
     public function editVoucherType(Request $request, $voucherTypeID)
     {
         try {
+            $permission = $this->permissions()->edit_voucher_type;
             if ($request->isMethod('put'))
             {
                 return $this->updateVoucherType($request,$voucherTypeID);
@@ -82,7 +96,8 @@ class AccountVoucherController extends Controller
             $vtID = Crypt::decryptString($voucherTypeID);
             $voucherType = VoucherType::find($vtID);
             $voucherTypes = $this->voucherTypeList();
-            return view('back-end/account-voucher/type/edit',compact('voucherType','voucherTypes'));
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            return view('back-end/account-voucher/type/edit',compact('voucherType','voucherTypes','companies'));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -100,6 +115,7 @@ class AccountVoucherController extends Controller
             'voucher_type_code'    =>  ['sometimes','nullable', 'numeric'],
             'status'               =>  ['required', 'numeric'],
             'remarks'              =>  ['sometimes','nullable', 'string'],
+            'company'               => ['required', 'integer', 'exists:company_infos,id'],
         ]);
         extract($request->post());
         try {
@@ -114,6 +130,7 @@ class AccountVoucherController extends Controller
             }
             $user = Auth::user();
             VoucherType::where('id',$vtID)->update([
+                'company_id'=> $company,
                 'status'    =>  $status,
                 'voucher_type_title'=>  $voucher_type_title,
                 'code'      =>  $voucher_type_code,
@@ -151,6 +168,7 @@ class AccountVoucherController extends Controller
     public function create(Request $request)
     {
         try {
+            $permission = $this->permissions()->voucher_document_upload;
             if ($request->isMethod('post'))
             {
                 return $this->store($request);
@@ -159,7 +177,8 @@ class AccountVoucherController extends Controller
             $user = Auth::user();
             $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->get();
 //            dd($voucherInfos);
-            return view('back-end/account-voucher/add',compact("voucherTypes","voucherInfos"));
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            return view('back-end/account-voucher/add',compact("voucherTypes","voucherInfos","companies"));
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -169,6 +188,7 @@ class AccountVoucherController extends Controller
     private function store(Request $request)
     {
         $request->validate([
+            'company'               => ['required', 'integer', 'exists:company_infos,id'],
             'voucher_number'    =>  ['required','string','unique:account_voucher_infos,voucher_number'],
             'voucher_date'      =>  ['required','date'],
             'voucher_type'      =>  ['required','numeric','exists:voucher_types,id'],
@@ -182,6 +202,7 @@ class AccountVoucherController extends Controller
 //            dd(count($request->file('voucher_file')));
             $v_type = VoucherType::where('id',$voucher_type)->first();
             $firstInsert = DB::table('account_voucher_infos')->insertGetId([
+                'company_id'        =>  $company,
                 'voucher_type_id'   =>  $voucher_type,
                 'voucher_number'    =>  $voucher_number,
                 'voucher_date'      =>  $voucher_date,
@@ -206,6 +227,7 @@ class AccountVoucherController extends Controller
                     }
 
                     $secondInsert = DB::table('voucher_documents')->insert([
+                        'company_id'        =>  $company,
                         'voucher_info_id'   =>  $firstInsert,
                         'document'          =>  $fileName,
                         'filepath'          =>  $this->accounts_document_path,
@@ -239,6 +261,7 @@ class AccountVoucherController extends Controller
                 'id'    => ['required','string', new AccountVoucherInfoStatusRule()],
             ]);
             try {
+                $permission = $this->permissions()->add_voucher_document_individual;
                 extract($request->post());
                 $voucherInfo = Account_voucher::where('id',Crypt::decryptString($id))->first();
                 return view('back-end.account-voucher._create_voucher_document_individual_model',compact('voucherInfo'));
