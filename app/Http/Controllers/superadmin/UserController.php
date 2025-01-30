@@ -712,7 +712,7 @@ class UserController extends Controller
                 $branches = branch::where('company_id',$company_id)->where('status',1)->get();
                 $departments = department::where('company_id',$company_id)->where('status',1)->get();
                 $designations = Designation::where('company_id',$company_id)->where('status',1)->get();
-                $roles = Role::where('company_id',$company_id)->get();
+                $roles = Role::where('company_id',$company_id)->orWhere('name',['systemsuperadmin','systemadmin','superadmin'])->get();
                 return response()->json([
                     'status'    =>  'success',
                     'data'      => ['branches'=>$branches,'departments'=>$departments,'designations'=>$designations,'roles'=>$roles],

@@ -110,6 +110,7 @@ class AppPermissionSeeder extends Seeder
             ['id' => '101','parent_id' => '54','name' => 'delete_branch','is_parent' => NULL,'display_name' => 'Delete Branch','description' => 'Delete Branch','created_at' => '2023-11-19 04:26:57','updated_at' => '2023-11-19 04:26:57'],
             ['id' => '102','parent_id' => '27','name' => 'edit_department','is_parent' => NULL,'display_name' => 'Edit Department','description' => 'Edit Department','created_at' => date(now()),'updated_at' => null],
             ['id' => '103','parent_id' => '27','name' => 'delete_department','is_parent' => NULL,'display_name' => 'Delete Department','description' => 'Delete Department','created_at' => date(now()),'updated_at' => null],
+            ['id' => '103','parent_id' => '27','name' => 'company_directory_permission','is_parent' => NULL,'display_name' => 'Delete Department','description' => 'Delete Department','created_at' => date(now()),'updated_at' => null],
         ];
         DB::table($table)->insert($permissions);
     }
