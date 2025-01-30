@@ -17,7 +17,7 @@ class LaratrustSetupTables extends Migration
         Schema::create('roles', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->unsignedBigInteger('company_id')->nullable();
+            $table->unsignedBigInteger('company_id')->default(1)->nullable();
             $table->string('display_name')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
