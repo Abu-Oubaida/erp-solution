@@ -108,8 +108,8 @@
                         </div>
                         <div class="col-md-3">
                             <label for="employee_id">Employee ID <span class="text-danger">*</span></label>
-                            <input class="form-control" id="employee_id" name="employee_id" type="text" placeholder="System automatically assigned it" value="{{old('employee_id')}}" readonly/>
-                            <input type="hidden" name="employee_id_hidden" id="employee_id_hide" value="{!! old('employee_id_hidden') !!}">
+                            <input class="form-control" id="employee_id" name="employee_id" type="text" placeholder="System automatically assigned it" value="{{old('employee_id')}}"/>
+                            <input type="text" name="employee_id_hidden" id="employee_id_hide" value="{!! old('employee_id_hidden') !!}">
                         </div>
                         <div class="col-md-3">
                             <label for="designation">Designation <span class="text-danger">*</span></label>

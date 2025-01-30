@@ -164,7 +164,7 @@ class ajaxRequestController extends Controller
                     ]);
                 }
                 $companyWiseParentPermission = CompanyModulePermission::select('module_parent_id')->where('company_id',$cid)->distinct()->get();
-                $permissionParents = Permission::whereIn('id',$companyWiseParentPermission)->whereNot('parent_id',null)->get();
+                $permissionParents = Permission::whereIn('id',$companyWiseParentPermission)->where('parent_id',null)->get();
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Permission successfully changed',
@@ -272,6 +272,7 @@ class ajaxRequestController extends Controller
                 $share_id = $this->generateUniqueId();
                 $shareLink = route('voucher.document.view',['document'=>Crypt::encryptString($id),'share'=>$share_id]);
                 $insert1 = DB::table('voucher_document_share_email_links')->insertGetId([
+                    'company_id' => Auth::user()->company_id,
                     'share_id'  =>  $share_id,
                     'share_document_id' =>  $id,
                     'status'    =>  1,
@@ -291,6 +292,7 @@ class ajaxRequestController extends Controller
                     foreach ($tags as $email)
                     {
                         $insert2 = DB::table('voucher_document_share_email_lists')->insert([
+                            'company_id' => Auth::user()->company_id,
                             'share_id'  =>  $insert1,
                             'email'   =>  $email,
                         ]);
@@ -405,6 +407,7 @@ class ajaxRequestController extends Controller
                 $user = Auth::user();
                 $share_id = $this->generateUniqueId();
                 $link_data = VoucherDocumentShareLink::create([
+                    'company_id'=> $user->company,
                     'share_id'=>$share_id,
                     'share_type'=>$value,
                     'share_document_id'=>$id,

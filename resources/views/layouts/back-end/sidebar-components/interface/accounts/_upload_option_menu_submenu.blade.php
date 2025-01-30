@@ -1,6 +1,6 @@
-@if(auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document'))
+@if(auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document') || auth()->user()->hasPermission('voucher_document_edit'))
 
-    @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info')
+    @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info' || Route::currentRouteName() == 'edit.voucher.info')
         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="true" aria-controls="pagesUploadOption">
             <div class="sb-nav-link-icon"><i class="fas fa-upload" aria-hidden="true"></i></div>
             Upload Option
@@ -22,6 +22,11 @@
                         <a class="nav-link" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Voucher</a>
                     @else
                         <a class="nav-link text-chl" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Voucher</a>
+                    @endif
+                @endif
+                @if(auth()->user()->hasPermission('voucher_document_edit'))
+                    @if(Route::currentRouteName() == 'edit.voucher.info')
+                        <a class="nav-link" href="{{route("edit.voucher.info",['voucherDocumentID'=>\Illuminate\Support\Facades\Request::route('voucherDocumentID')])}}"><div class="sb-nav-link-icon" title="Edit Voucher Info"><i class="fas fa-edit"></i></div> Edit Voucher</a>
                     @endif
                 @endif
                 {{--                                    Upload Voucher Permission Check End--}}

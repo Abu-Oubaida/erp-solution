@@ -244,7 +244,14 @@ Route::group(['middleware' => ['auth']],function (){
 # 3.7.3 Add voucher document
         Route::middleware(['permission:add_voucher_document'])->group(function () {
             Route::match(['post','get'],'add-voucher','create')->name('add.voucher.info');
-        });//3.7.3 End
+        });
+        Route::middleware(['permission:voucher_document_edit'])->group(function () {
+            Route::match(['put','get'],'edit-voucher/{voucherDocumentID}','voucherDocumentEdit')->name('edit.voucher.info');
+        });
+        Route::middleware(['permission:voucher_document_delete'])->group(function () {
+            Route::delete('delete-voucher','delete')->name('delete.voucher.info');
+        });
+//3.7.3 End
 # 3.7.4 Add bill document
         Route::middleware(['permission:add_bill_document'])->group(function () {
             Route::match(['post','get'],'add-bill','createBill')->name('add.bill.info');

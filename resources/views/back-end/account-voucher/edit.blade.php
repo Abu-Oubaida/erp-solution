@@ -1,8 +1,6 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
-        <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
-        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
         <div class="row">
             <div class="col-md-10">
                 <ol class="breadcrumb mb-4">
@@ -10,93 +8,193 @@
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
+                        <a href="{{route('uploaded.voucher.list')}}" class="text-capitalize text-chl">Voucher Document List</a>
+                    </li>
+                    <li class="breadcrumb-item">
                         <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
                     </li>
                 </ol>
             </div>
             <div class="col-md-2">
-                <div class="float-end">
-                    <a class="btn btn-success btn-sm" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  User List</a>
-                </div>
+                <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
             </div>
         </div>
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="row">
-                    <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
-                </div>
-                <form action="{{ route('user.edit',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($user->id)]) }}" method="POST" enctype="multipart/form-data">
-                    @method('put')
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="name" name="name" type="text" placeholder="Enter full name" value="@if(old('name')){!! old('name') !!}@else{{$user->name}}@endif"/>
-                                <label for="name">Full name <span class="text-danger">*</span></label>
+        <div class="row">
+            <div class="col">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h3 class="text-capitalize"><i class="fas fa-edit"></i> {{str_replace('info','document',str_replace('.', ' ', \Route::currentRouteName()))}} Info</h3>
                             </div>
-                        </div>
-                        <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($user->id) !!}">
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="phone" name="phone" type="text" placeholder="Enter phone number" value="@if(old('phone')){!! old('phone') !!}@else{!!  str_replace('','',($user->phone))!!}@endif"/>
-                                <label for="phone">Phone number <span class="text-danger">*</span></label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <input class="form-control" id="email" name="email" type="email" placeholder="Enter email address" value="@if(old('email')) {!! old('email') !!} @else {{$user->email}}  @endif"/>
-                                <label for="email">Email address <span class="text-danger">*</span></label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <select class="form-control text-capitalize" id="branch" name="branch">
-                                    @if(isset($branches) || (count($branches) > 0))
-                                        <option value="0">--Select please--</option>
-                                        @foreach($branches as $b)
-                                            <option value="{{$b->id}}" @if((old('branch') == $b->id) || ($b->id == $user->branch_id)) selected @endif>{{$b->branch_name}}</option>
-                                        @endforeach
+                            <div class="col">
+                                <div class="float-end mt-1">
+                                    @if(auth()->user()->hasPermission('list_voucher_document'))
+                                        <a class="btn btn-success btn-sm" href="{{route("uploaded.voucher.list")}}"><i class="fas fa-list-check"></i> Uploaded List</a>
                                     @endif
-                                </select>
-                                <label for="branch">Branch Name</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <select class="form-control" id="to" name="dept">
-                                    <option value=""></option>
-                                    @if(isset($depts) || (count($depts) > 0))
-                                        <option value="0">--Select please--</option>
-                                        @foreach($depts as $d)
-                                            <option value="{{$d->id}}" @if((old('dept') == $d->id) || ($d->id == $user->dept_id)) selected @endif>{{$d->dept_name}}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <label for="priority">To Department <span class="text-danger">*</span></label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <select class="form-control" id="roll" name="roll">
-                                    <option value=""></option>
-                                    @if(isset($roles) || (count($roles) > 0))
-                                        <option value="0">--Select please--</option>
-                                        @foreach($roles as $r)
-                                            <option value="{{$r->id}}" @if((old('roll') == $r->id) || ($r->id == $user->role_id)) selected @endif>{{$r->display_name}}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <label for="roll">User Roll <span class="text-danger">*</span></label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12">
-                            <div class="form-floating mb-3 float-end">
-                                <input type="submit" value="Update User" class="btn btn-chl-outline" name="submit" >
+                                </div>
                             </div>
                         </div>
                     </div>
-                </form>
+                    <div class="card-body">
+                        <form action="{{ route('edit.voucher.info',["voucherDocumentID"=>\Illuminate\Support\Facades\Crypt::encryptString($voucherInfo->id)]) }}" method="post">
+                            @csrf
+                            @method('put')
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="company">Company Name <span class="text-danger">*</span></label>
+                                        <select class="text-capitalize select-search" id="company" name="company">
+                                            @if(isset($companies) || (count($companies) > 0))
+                                                @foreach($companies as $c)
+                                                    <option value="{{$c->id}}" @if($voucherInfo->company_id == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-2">
+                                        <input class="form-control" id="voucher_number" name="voucher_number" type="text" placeholder="Enter Voucher Number" value="{{$voucherInfo->voucher_number}}"/>
+                                        <label for="voucher_number">Voucher Number <span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-2">
+                                        <input class="form-control" id="voucher_date" name="voucher_date" type="date" placeholder="Enter Voucher Date" value="{{$voucherInfo->voucher_date}}"/>
+                                        <label for="voucher_date">Voucher Date <span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-2">
+                                        <select class="form-control" name="voucher_type" id="voucher_type">
+                                            <option value="">--Select Voucher Type--</option>
+                                            @foreach($voucherTypes as $type)
+                                                <option value="{!! $type->id !!}" @if ($voucherInfo->voucher_type_id == $type->id) selected @endif>{!! $type->voucher_type_title !!}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="voucher_type">Voucher Type<span class="text-danger">*</span></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10">{{$voucherInfo->remarks}}</textarea>
+                                        <label for="remarks">Remarks</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-3 float-end">
+                                        <button type="submit" value="" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Update</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h3 class="text-capitalize"><i class="fas fa-edit"></i> {{str_replace('info','document',str_replace('.', ' ', \Route::currentRouteName()))}} Document</h3>
+                            </div>
+                            <div class="col">
+                                @if(auth()->user()->hasPermission('add_voucher_document_individual'))
+                                    <a href="" class="text-end float-end badge bg-success text-decoration-none" onclick="return Obj.addVoucherDocumentIndividual(this)" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($voucherInfo->id) !!}"><i class="fas fa-plus"></i> Add New</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table id="datatablesSimple">
+                            <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Date</th>
+                                <th>Voucher Number</th>
+                                <th>Document</th>
+                                <th>Created By</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @if(isset($voucherInfo))
+                                @php $x = 1;@endphp
+                                @foreach($voucherInfo->VoucherDocument as $d)
+                                <tr>
+                                    <td>{!! $x++ !!}</td>
+                                    <td>{!! date('d-M-y', strtotime($d->created_at)) !!}</td>
+                                    <td>{!! $voucherInfo->voucher_number !!}</td>
+                                    <td>{!! $d->document !!}</td>
+                                    <td>{!! $d->createdBy->name !!}</td>
+                                    <td>
+                                        <a href="" title="Quick View" vtype="{!! $voucherInfo->VoucherType->voucher_type_title !!}" vno="{!! $voucherInfo->voucher_number !!}" path="{!! \Illuminate\Support\Facades\Crypt::encryptString(url($d->filepath.$d->document)) !!}" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','v_type','v_no')"> <i class="fa-solid fa-eye"></i></a>
+                                        &nbsp;
+                                        <a href="{!! route('view.voucher.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
+                                        &nbsp
+                                        @if(auth()->user()->hasPermission('share_voucher_document_individual'))
+                                            <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fas fa-share"></i></a>
+                                        @endif
+                                        &nbsp
+                                        @if(auth()->user()->hasPermission('delete_voucher_document_individual'))
+                                            <form action="{{route('delete.voucher.document.individual')}}" class="display-inline" method="post">
+                                                @method('delete')
+                                                @csrf
+                                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}">
+                                                <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete this?')" title="Delete"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="6" class="text-danger text-center">Not Found!</td>
+                                </tr>
+                            @endif
+                            </tbody>
+                        </table>
+                        @method('post')
+                        {{--</form>--}}
+                        <!-- Modal For Preview -->
+                        <div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="v_document_name"></h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <strong>Voucher No: <span id="v_no"></span></strong>
+                                            </div>
+                                            <div class="col-md-6 text-end">
+                                                <strong>Voucher Type: <span id="v_type"></span></strong>
+                                            </div>
+                                        </div>
+                                        <div id="documentPreview"></div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary">Understood</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal-2 For Share -->
+                        <div class="modal modal-xl fade" id="shareModel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="shareModelLabel" aria-hidden="true">
+                            <div class="modal-dialog" id="model_dialog">
+
+                            </div>
+                            <div id='ajax_loader2' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+                                <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

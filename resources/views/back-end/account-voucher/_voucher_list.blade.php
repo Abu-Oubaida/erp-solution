@@ -85,13 +85,17 @@
                 <td>{!! ($data->createdBY)? $data->createdBY->name:'-' !!}</td>
                 <td>{!! ($data->updatedBY)? $data->updatedBY->name:'-' !!}</td>
                 <td>
-                    {{--                                            <a href="{{route('edit.voucher.type',["voucherTypeID"=>\Illuminate\Support\Facades\Crypt::encryptString($vt->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>--}}
-                    {{--                                            <form action="{{route('delete.voucher.type')}}" class="display-inline" method="post">--}}
-                    {{--                                                @method('delete')--}}
-                    {{--                                                @csrf--}}
-                    {{--                                                <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($vt->id) !!}">--}}
-                    {{--                                                <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the voucher type?')"><i class="fas fa-trash"></i></button>--}}
-                    {{--                                            </form>--}}
+                    @if(auth()->user()->hasPermission('voucher_document_edit'))
+                    <a href="{{route('edit.voucher.info',["voucherDocumentID"=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
+                    @endif
+                    @if(auth()->user()->hasPermission('voucher_document_delete'))
+                    <form action="{{route('delete.voucher.info')}}" class="display-inline" method="post">
+                        @method('delete')
+                        @csrf
+                        <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($data->id) !!}">
+                        <button class="text-danger border-0 inline-block bg-none" onclick="return confirm('Are you sure delete the voucher type?')"><i class="fas fa-trash"></i></button>
+                    </form>
+                    @endif
                 </td>
             </tr>
         @endforeach

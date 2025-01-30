@@ -83,7 +83,7 @@ class UserController extends Controller
 //                'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users','email')->where(function ($query) use ($request) {
 //                    return $query->where('company',$request->post('company'));
 //                })],
-                'employee_id' => ['required', 'string', 'max:255','min:6',Rule::unique('users','employee_id')->where(function ($query) use ($request) {
+                'employee_id' => ['required', 'string', 'max:9','min:6',Rule::unique('users','employee_id')->where(function ($query) use ($request) {
                     return $query->where('company',$request->post('company'));
                 })],
                 'employee_id_hidden' => ['required', 'string', 'max:255',Rule::unique('users','employee_id_hidden')->where(function ($query) use ($request) {
@@ -111,6 +111,14 @@ class UserController extends Controller
                     $employee_id_hidden = $eid[0];
                     $employee_id = $eid[1];
                 }
+                if ($this->getEid($dept, $joining_date,$company)[1] != $employee_id)
+                {
+                    $employee_id_hidden = substr($employee_id,4);
+                    if (User::where('company',$company)->where('employee_id',$employee_id)->first())
+                    {
+                        return back()->with('error','Employee ID already exist');
+                    }
+                }
                 $roles = $this->getRole($permission)->where('id',$role)->first();
                 $user = $this->getUser($permission)->create([
                     'company' => $company,
@@ -126,7 +134,7 @@ class UserController extends Controller
                     'joining_date' => date('y-m-d',strtotime($joining_date)),
                     'password' => Hash::make($request->password),
                 ]);
-                $user->attachRole($roles->name);
+                $user->attachRole($roles->name,'App\Models\User');
                 event(new Registered($user));
                 return back()->with('success','Account create successfully');
             }
@@ -297,6 +305,55 @@ class UserController extends Controller
 
     }
 
+    public function UserEdit(Request $request,$id)
+    {
+        try {
+            $permission = $this->permissions()->edit_user;
+            if ($request->isMethod('put'))
+            {
+                $this->UserUpdate($request);
+            }
+            $userID = Crypt::decryptString($id);
+            $user = $this->getUser($this->permissions()->edit_user)->where('users.id',$userID)->first();
+            $userPermissions = PermissionUser::with(['permissionParent','company'])->where('user_id',$userID)->orderBy('permission_name','asc')->get();
+//            $deptLists = department::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
+            $deptLists = $this->getDepartment($permission)->where('company_id',$user->company)->where('status',1)->get();
+            $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID)->get();
+            $roles = Role::where('company_id',$user->company)->get();
+            $designations = $this->getDesignation($permission)->where('company_id',$user->company)->where('status',1)->get();
+            $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
+            $branches = $this->getBranch($permission)->where('company_id',$user->company)->where('status',1)->get();
+            return view('back-end.user.edit',compact('user','filPermission','roles','deptLists','userPermissions','designations','branches','userCompanies'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function UserUpdate(Request $request)
+    {
+        try {
+            $request->validate([
+                'name'  => ['required', 'string', 'max:255'],
+                'phone' => ['required', 'numeric', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
+                'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
+            ]);
+            extract($request->post());
+            $UserID = Crypt::decryptString($id);
+            $user = $this->getUser($this->permissions()->edit_user)->where('id',$UserID)->first();
+            $this->getUser($this->permissions()->delete_user)->where('id',$UserID)->update([
+                'name' => $name,
+                'phone' => $phone,
+                'email' => $email,
+
+            ]);
+            return back()->with('success','Data update successfully!');
+
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
     public function UserPerSubmit(Request $request)
     {
         try {
@@ -573,47 +630,6 @@ class UserController extends Controller
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
-        }
-    }
-
-    public function UserEdit(Request $request,$id)
-    {
-        try {
-            if ($request->isMethod('put'))
-            {
-                $this->UserUpdate($request);
-            }
-            $userID = Crypt::decryptString($id);
-            $user = $this->getUser($this->permissions()->edit_user)->where('users.id',$userID)->first();
-            return view('back-end.user.edit',compact('user'))->render();
-        }catch (\Throwable $exception)
-        {
-            return back()->with('error',$exception->getMessage());
-        }
-    }
-
-    public function UserUpdate(Request $request)
-    {
-        try {
-            $request->validate([
-                'name'  => ['required', 'string', 'max:255'],
-                'phone' => ['required', 'numeric', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
-                'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore(Crypt::decryptString($request->id))],
-            ]);
-            extract($request->post());
-            $UserID = Crypt::decryptString($id);
-            $user = $this->getUser($this->permissions()->edit_user)->where('id',$UserID)->first();
-            $this->getUser($this->permissions()->delete_user)->where('id',$UserID)->update([
-                'name' => $name,
-                'phone' => $phone,
-                'email' => $email,
-
-            ]);
-            return back()->with('success','Data update successfully!');
-
-        }catch (\Throwable $exception)
-        {
-            return back()->with('error',$exception->getMessage());
         }
     }
 

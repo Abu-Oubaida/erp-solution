@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AccountVoucherController extends Controller
@@ -297,6 +298,7 @@ class AccountVoucherController extends Controller
                         return redirect()->back()->with('error', 'Data uploaded error.');
                     }
                     DB::table('voucher_documents')->insert([
+                        'company_id'        =>  $voucherInfo->company_id,
                         'voucher_info_id'   =>  $voucherInfo->id,
                         'document'          =>  $fileName,
                         'filepath'          =>  $this->accounts_document_path,
@@ -336,6 +338,58 @@ class AccountVoucherController extends Controller
         }
     }
 
+    public function voucherDocumentEdit(Request $request, $vID)
+    {
+        try {
+            $permission = $this->permissions()->edit_voucher_type;
+            if ($request->isMethod('put'))
+            {
+                return $this->updateVoucherDocument($request,$vID);
+            }
+            $vID = Crypt::decryptString($vID);
+            $voucherTypes = VoucherType::where('status',1)->get();
+            $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->find($vID);
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            return view('back-end/account-voucher/edit',compact('voucherTypes','voucherInfo','companies'));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    private function updateVoucherDocument(Request $request, $vID)
+    {
+        try {
+            $permission = $this->permissions()->edit_voucher_type;
+            $vID = Crypt::decryptString($vID);
+            $request->validate([
+                'company'               => ['required', 'integer', 'exists:company_infos,id'],
+                'voucher_number'    =>  ['required','string','unique:account_voucher_infos,voucher_number,'.$vID, Rule::unique('account_voucher_infos')->ignore($vID)],
+                'voucher_date'      =>  ['required','date'],
+                'voucher_type'      =>  ['required','numeric','exists:voucher_types,id'],
+                'remarks'           =>  ['sometimes','nullable','string'],
+            ]);
+            extract($request->post());
+            $voucherInfo = Account_voucher::find($vID);
+            Account_voucher::where('id',$vID)->update([
+                'company_id'        =>  $company,
+                'voucher_type_id'   =>  $voucher_type,
+                'voucher_number'    =>  $voucher_number,
+                'voucher_date'      =>  $voucher_date,
+                'remarks'           =>  $remarks,
+            ]);
+            if ($voucherInfo->company_id != $company)
+            {
+                VoucherDocument::where('voucher_info_id',$vID)->update([
+                    'company_id'        =>  $company,
+                ]);
+            }
+            return back()->with('success','Data updated successfully on Voucher No:'.$voucherInfo->voucher_number);
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
     public function salaryCertificateInput(Request $request)
     {
         try {
