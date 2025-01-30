@@ -30,20 +30,6 @@ return [
             'users' => 'c,r,u,d',
             'profile' => 'r,u'
         ],
-        'it' => [
-            'users' => 'c,r,u,d',
-            'profile' => 'r,u'
-        ],
-        'hr' => [
-            'users' => 'c,r,u,d',
-            'profile' => 'r,u'
-        ],
-        'user' => [
-            'profile' => 'r,u',
-        ],
-        'role_name' => [
-            'module_1_name' => 'c,r,u,d',
-        ]
     ],
 
     'permissions_map' => [
