@@ -712,11 +712,26 @@ class UserController extends Controller
                 $branches = branch::where('company_id',$company_id)->where('status',1)->get();
                 $departments = department::where('company_id',$company_id)->where('status',1)->get();
                 $designations = Designation::where('company_id',$company_id)->where('status',1)->get();
-                $roles = Role::where('company_id', $company_id)
-                    ->orWhere(function ($query) use ($company_id) {
-                        $query->whereNull('company_id') // For system-wide roles
-                        ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin']);
-                    })->get();
+                if (Auth::user()->roles()->first()->name == 'systemsuperadmin')
+                {
+                    $roles = Role::where('company_id', $company_id)
+                        ->orWhere(function ($query) use ($company_id) {
+                            $query->whereNull('company_id') // For system-wide roles
+                            ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
+                        })->get();
+                }else if (Auth::user()->roles()->first()->name == 'superadmin'){
+                    $roles = Role::where('company_id', $company_id)
+                        ->orWhere(function ($query) use ($company_id) {
+                            $query->whereNull('company_id') // For system-wide roles
+                            ->whereIn('name', ['superadmin','admin','user']);
+                        })->get();
+                }else {
+                    $roles = Role::where('company_id', $company_id)
+                        ->orWhere(function ($query) use ($company_id) {
+                            $query->whereNull('company_id') // For system-wide roles
+                            ->whereIn('name', ['user']);
+                        })->get();
+                }
                 return response()->json([
                     'status'    =>  'success',
                     'data'      => ['branches'=>$branches,'departments'=>$departments,'designations'=>$designations,'roles'=>$roles],
