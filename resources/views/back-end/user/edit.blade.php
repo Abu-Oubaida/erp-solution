@@ -183,7 +183,7 @@
                                                     <option value="">--Select Option--</option>
                                                     @if(isset($roles) && count($roles))
                                                         @foreach($roles as $r)
-                                                            <option value="{{$r->id}}" @if(@$r->display_name == @$user->roles->first()->display_name) selected @endif>{!! $r->display_name !!} ({!! @$r->company->company_name !!})</option>
+                                                            <option value="{{$r->id}}" @if(@$r->display_name == @$user->roles->first()->display_name) selected @endif>{!! $r->display_name !!} ({!! ($r->company->company_name)?$r->company->company_name:'Global' !!})</option>
                                                         @endforeach
                                                     @endif
                                                 </select>
