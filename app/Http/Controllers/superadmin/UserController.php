@@ -319,7 +319,12 @@ class UserController extends Controller
 //            $deptLists = department::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
             $deptLists = $this->getDepartment($permission)->where('company_id',$user->company)->where('status',1)->get();
             $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID)->get();
-            $roles = Role::where('company_id',$user->company)->get();
+//            $roles = Role::where('company_id',)->get();
+            $roles = Role::where('company_id', $user->company)
+            ->orWhere(function ($query) {
+                $query->whereNull('company_id') // For system-wide roles
+                ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin']);
+            })->get();
             dd($roles);
             $designations = $this->getDesignation($permission)->where('company_id',$user->company)->where('status',1)->get();
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
