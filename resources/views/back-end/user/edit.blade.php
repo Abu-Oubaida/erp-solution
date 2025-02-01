@@ -24,7 +24,12 @@
                         <div class="card mb-4">
                             <div class="card-header">
                                 <div class="row">
-                                    <h6 class="text-capitalize"><i class="fas fa-user-edit"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h6>
+                                    <div class="col-md-8">
+                                        <h6 class="text-capitalize"><i class="fas fa-user-edit"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h6>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <a class="btn btn-primary btn-sm float-end me-0" href="{{route('user.single.view',['userID'=>\Illuminate\Support\Facades\Crypt::encryptString($user->id)])}}"><i class="fas fa-eye"></i> Single View</a>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -54,7 +59,7 @@
 
                                         <div class="col-md-12">
                                             <div class="form-floating mb-3 float-end">
-                                                <input type="submit" value="Update User" class="btn btn-chl-outline" name="submit" >
+                                                <button type="submit" value="Update User" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Update User</button>
                                             </div>
                                         </div>
                                     </div>
