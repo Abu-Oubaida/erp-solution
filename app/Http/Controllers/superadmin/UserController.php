@@ -320,6 +320,7 @@ class UserController extends Controller
             $deptLists = $this->getDepartment($permission)->where('company_id',$user->company)->where('status',1)->get();
             $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID)->get();
             $roles = Role::where('company_id',$user->company)->get();
+            dd($roles);
             $designations = $this->getDesignation($permission)->where('company_id',$user->company)->where('status',1)->get();
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
             $branches = $this->getBranch($permission)->where('company_id',$user->company)->where('status',1)->get();
