@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\superadmin;
 
+use App\Exports\PermissionInputDataPrototypeExport;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\PermissionUser;
@@ -9,6 +10,7 @@ use App\Models\User;
 use GuzzleHttp\Exception\TransferException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Maatwebsite\Excel\Facades\Excel;
 
 class prorammerController extends Controller
 {
@@ -92,5 +94,10 @@ class prorammerController extends Controller
         {
             return back()->with('error',$exception->getMessage())->withInput();
         }
+    }
+
+    public function exportPrototype(Request $request)
+    {
+        return Excel::download(new PermissionInputDataPrototypeExport(),'permission-input-data-prototype.xlsx');
     }
 }

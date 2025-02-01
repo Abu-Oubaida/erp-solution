@@ -117,7 +117,45 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         alert('Invalid input data! Please flowing the prototype of data format!')
                         return false
                     }
-                    if (!((jsonData[0][0] === 'Employee Name*' || jsonData[0][0] === 'Employee Name') && (jsonData[0][1] === 'Department') && (jsonData[0][2] === 'Department Code*') && (jsonData[0][2] === 'Department Code' || jsonData[0][3] === 'Designation*' ) && (jsonData[0][3] === 'Designation' || jsonData[0][4] === 'Branch' ) && (jsonData[0][5] === 'Joining Date*' || jsonData[0][5] === 'Joining Date' ) && (jsonData[0][6] === 'Phone') && (jsonData[0][7] === 'Email') && (jsonData[0][8] === 'Status') && (jsonData[0][9] === 'Blood Group')))
+                    if (!((jsonData[0][0] === 'Employee Name*' || jsonData[0][0] === 'Employee Name') && (jsonData[0][1] === 'Department') && (jsonData[0][2] === 'Department Code*'|| jsonData[0][2] === 'Department Code') && (jsonData[0][3] === 'Designation*'  || jsonData[0][3] === 'Designation') && (jsonData[0][4] === 'Branch' ) && (jsonData[0][5] === 'Joining Date*' || jsonData[0][5] === 'Joining Date' ) && (jsonData[0][6] === 'Phone') && (jsonData[0][7] === 'Email') && (jsonData[0][8] === 'Status') && (jsonData[0][9] === 'Blood Group')))
+                    {
+                        alert('Invalid input data! Please flowing the prototype of data format!')
+                        return false
+                    }
+                    for (let i = 0; i < jsonData.length; i++) {
+                        let zero = jsonData[0].length
+                        for (let j = 0; j < zero; j++) {
+                            if(typeof jsonData[i][j] === 'undefined')
+                            {
+                                jsonData[i][j] = null
+                            }
+                            else if (i !== 0 && j === 5)
+                            {
+                                jsonData[i][j] = ExcelDateToJSDate(jsonData[i][j])
+                            }
+                        }
+                    }
+                    employeeDatas.push(jsonData)
+                    showModal(employeeDatas,file.name);
+                };
+                reader.readAsBinaryString(file)
+            }
+        });
+        $('#permission_input_file').on('change',function (e){
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader()
+                reader.onload = function (e) {
+                    const data = e.target.result
+                    const workbook = XLSX.read(data, { type: "binary" })
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 })
+                    if(jsonData[0].length !== 5)
+                    {
+                        alert('Invalid input data! Please flowing the prototype of data format!')
+                        return false
+                    }
+                    if (!((jsonData[0][0] === 'Parent*' || jsonData[0][0] === 'Parent') && (jsonData[0][1] === 'Type*' || jsonData[0][1] === 'Type') && (jsonData[0][2] === 'Name*' || jsonData[0][2] === 'Name') && (jsonData[0][3] === 'Display Name*'  || (jsonData[0][3] === 'Display Name') && jsonData[0][4] === 'Details' )))
                     {
                         alert('Invalid input data! Please flowing the prototype of data format!')
                         return false
@@ -186,7 +224,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             }
         });
         // Function to display the modal
-        function showModal(data,fileName) {
+        function showModal_old(data,fileName) {
             const modal = document.getElementById("myModal");
             const modelTitle = document.getElementById("userDataModelLabel")
             const dataTable = document.getElementById("data-table");
@@ -228,6 +266,77 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 row.appendChild(cell)
                 table.appendChild(row)
                 t++
+            });
+
+            // Append the table to the modal
+            dataTable.appendChild(table)
+            modelTitle.innerText = fileName
+            $('#myModal').modal('show')
+        }
+        function showModal(data,fileName) {
+            const modal = document.getElementById("myModal");
+            const modelTitle = document.getElementById("userDataModelLabel")
+            const dataTable = document.getElementById("data-table");
+            while (dataTable.firstChild) {
+                dataTable.removeChild(dataTable.firstChild)
+            }
+
+            // Create a table from the data
+            const table = document.createElement("table")
+            table.className = "table"
+            let t=0
+            let action
+            let row_o = 1;
+
+            let col = 0
+            const row = document.createElement("tr")
+            cell = document.createElement("td")
+            while (col < data[0][0].length+2)
+            {
+                cell = document.createElement("td")
+                cell.textContent = col++
+                row.appendChild(cell)
+            }
+            table.appendChild(row)
+
+            data[0].forEach(rowData => {
+                const row = document.createElement("tr")
+                let cell
+                if(t===0)
+                {
+                    action = "Action"
+                    cell = document.createElement("th")
+                    cell.textContent = "SL"
+                    row.appendChild(cell)
+                    rowData.forEach(cellData => {
+                        cell = document.createElement("th")
+                        cell.textContent = cellData
+                        row.appendChild(cell)
+                    });
+                    cell = document.createElement("th")
+                    cell.innerHTML=action
+                    row.appendChild(cell)
+                    table.appendChild(row)
+                    t++
+                }
+                else
+                {
+                    action = '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,'+t+',`'+fileName+'`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>'
+                    cell = document.createElement("td")
+                    cell.textContent = row_o
+                    row_o++;
+                    row.appendChild(cell)
+                    rowData.forEach(cellData => {
+                        cell = document.createElement("td")
+                        cell.textContent = cellData
+                        row.appendChild(cell)
+                    });
+                    cell = document.createElement("td")
+                    cell.innerHTML=action
+                    row.appendChild(cell)
+                    table.appendChild(row)
+                    t++
+                }
             });
 
             // Append the table to the modal

@@ -95,6 +95,9 @@
                     @if(auth()->user()->hasPermission('voucher_document_edit'))
                     <a href="{{route('edit.voucher.info',["voucherDocumentID"=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
                     @endif
+                    @if(auth()->user()->hasPermission('share_voucher_document_individual'))
+                        <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fas fa-share"></i></a>
+                    @endif
                     @if(auth()->user()->hasPermission('voucher_document_delete'))
                     <form action="{{route('delete.voucher.info')}}" class="display-inline" method="post">
                         @method('delete')
