@@ -307,7 +307,7 @@ class UserController extends Controller
 
     public function UserEdit(Request $request,$id)
     {
-        try {
+//        try {
             $permission = $this->permissions()->edit_user;
             if ($request->isMethod('put'))
             {
@@ -325,10 +325,10 @@ class UserController extends Controller
             $branches = $this->getBranch($permission)->where('company_id',$user->company)->where('status',1)->get();
             $roleNew = $this->user->roles->first();
             return view('back-end.user.edit',compact('user','filPermission','roles','deptLists','userPermissions','designations','branches','userCompanies','roleNew'))->render();
-        }catch (\Throwable $exception)
-        {
-            return back()->with('error',$exception->getMessage());
-        }
+//        }catch (\Throwable $exception)
+//        {
+//            return back()->with('error',$exception->getMessage());
+//        }
     }
 
     public function UserUpdate(Request $request)
