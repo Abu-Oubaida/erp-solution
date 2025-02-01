@@ -325,7 +325,6 @@ class UserController extends Controller
                 $query->whereNull('company_id') // For system-wide roles
                 ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin']);
             })->get();
-            dd($roles);
             $designations = $this->getDesignation($permission)->where('company_id',$user->company)->where('status',1)->get();
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
             $branches = $this->getBranch($permission)->where('company_id',$user->company)->where('status',1)->get();
