@@ -20,7 +20,10 @@ class Account_voucher extends Model
     {
         return $this->hasMany(VoucherDocument::class,'voucher_info_id');
     }
-
+    public function company()
+    {
+        return $this->belongsTo(company_info::class,'company_id');
+    }
     public function createdBY()
     {
         return $this->belongsTo(User::class,'created_by');

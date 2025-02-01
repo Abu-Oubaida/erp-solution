@@ -1,22 +1,26 @@
 {{--<form action="{!! route('voucher.multiple.submit') !!}" method="post">--}}
 {{--<form>--}}
 {{--    @csrf--}}
+@if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
+    <div class="row" id="fixedDiv">
+        <div class="col-md-10">
+            <input type="checkbox" name="" id="select_all">
+            <label for="select_all">Select All</label>
+            <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete"> <i class="fas fa-trash"></i> Delete</button>
+            <button class="btn btn-outline-primary btn-sm"><i class="fa-regular fa-file-zipper"></i> Download Zip</button>
+        </div>
 
-<div class="row" id="fixedDiv">
-    <div class="col-md-10">
-        <input type="checkbox" name="" id="select_all">
-        <label for="select_all">Select All</label>
-        <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete"> <i class="fas fa-trash"></i> Delete</button>
-        <button class="btn btn-outline-primary btn-sm"><i class="fa-regular fa-file-zipper"></i> Download Zip</button>
     </div>
-
-</div>
+@endif
 <table id="permissionstable">
     <thead>
     <tr>
+    @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
         <th>Select</th>
+    @endif
         <th>SL</th>
         <th>Date</th>
+        <th>Company</th>
         <th>Voucher Number</th>
         <th>Voucher Type</th>
         <th>Remarks</th>
@@ -47,9 +51,12 @@
         @endphp
         @foreach($voucherInfos as $data)
             <tr>
+            @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
                 <th><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $data->id !!}" value="{!! $data->id !!}"></th>
+            @endif
                 <td>{!! $no++ !!}</td>
                 <td>{!! date('d-M-y', strtotime($data->voucher_date)) !!}</td>
+                <td>{!! $data->company->company_name !!}</td>
                 <td>{!! $data->voucher_number !!}</td>
                 <td>{!! $data->VoucherType->voucher_type_title !!}</td>
                 <td>{!! $data->remarks !!}</td>

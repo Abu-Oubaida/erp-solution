@@ -176,7 +176,7 @@ class AccountVoucherController extends Controller
             }
             $voucherTypes = VoucherType::where('status',1)->get();
             $user = Auth::user();
-            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->get();
+            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','company'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->get();
 //            dd($voucherInfos);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/account-voucher/add',compact("voucherTypes","voucherInfos","companies"));
@@ -664,6 +664,7 @@ class AccountVoucherController extends Controller
                 if ($v_d)
                 {
                     VoucherDocumentIndividualDeletedHistory::create([
+                        'company_id'        =>  $v_d->company_id,
                         'voucher_info_id'   =>  $v_d->voucher_info_id,
                         'document'          =>  $v_d->document,
                         'filepath'          =>  $v_d->filepath,
