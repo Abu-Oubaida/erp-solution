@@ -307,7 +307,7 @@ class UserController extends Controller
 
     public function UserEdit(Request $request,$id)
     {
-//        try {
+        try {
             $permission = $this->permissions()->edit_user;
             if ($request->isMethod('put'))
             {
@@ -316,24 +316,22 @@ class UserController extends Controller
             $userID = Crypt::decryptString($id);
             $user = $this->getUser($this->permissions()->edit_user)->where('users.id',$userID)->first();
             $userPermissions = PermissionUser::with(['permissionParent','company'])->where('user_id',$userID)->orderBy('permission_name','asc')->get();
-//            $deptLists = department::whereIn('company_id',$this->getUserCompanyPermissionArray($userID))->where('status',1)->get();
             $deptLists = $this->getDepartment($permission)->where('company_id',$user->company)->where('status',1)->get();
             $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID)->get();
-//            $roles = Role::where('company_id',)->get();
             $roles = Role::where('company_id', $user->company)
             ->orWhere(function ($query) {
                 $query->whereNull('company_id') // For system-wide roles
-                ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin']);
+                ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
             })->get();
             $designations = $this->getDesignation($permission)->where('company_id',$user->company)->where('status',1)->get();
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
             $branches = $this->getBranch($permission)->where('company_id',$user->company)->where('status',1)->get();
             $roleNew = $this->user->roles->first();
             return view('back-end.user.edit',compact('user','filPermission','roles','deptLists','userPermissions','designations','branches','userCompanies','roleNew'))->render();
-//        }catch (\Throwable $exception)
-//        {
-//            return back()->with('error',$exception->getMessage());
-//        }
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
     }
 
     public function UserUpdate(Request $request)
