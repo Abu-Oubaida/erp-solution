@@ -110,7 +110,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.location.reload()">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="return confirm('Are you sure?'), Obj.userExcelFileSubmit(this)">Save changes</button>
+                    <button type="button" class="btn btn-primary" onclick="return confirm('Are you sure?'), Obj.permissionExcelFileSubmit(this)">Save changes</button>
                 </div>
             </div>
         </div>

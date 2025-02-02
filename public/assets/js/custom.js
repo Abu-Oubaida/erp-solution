@@ -762,6 +762,44 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            permissionExcelFileSubmit:function (e) {
+                if (employeeDatas[0].length <= 1)
+                {
+                    alert('Empty data set please upload your excel file on the input field!')
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/system-operation/add-permission-excel";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    contentType: 'application/json',
+                    url: url,
+                    type: "POST",
+                    data: JSON.stringify({'input': employeeDatas[0]}),
+                    success:function (data)
+                    {
+                        if (data.error) {
+                            let alertMessage = data.message + '\nErrors:\n'
+                            if (data.errors)
+                            {
+                                for (let field in data.errors) {
+                                    if (data.errors.hasOwnProperty(field)) {
+                                        alertMessage += field + ': ' + data.errors[field].join(', ') + '\n'
+                                    }
+                                }
+                            }
+                            alert(alertMessage)
+                            return false
+                        }
+                        else {
+                            // Extract and display the Success Message
+                            let alertMessage = data.message
+                            alert(alertMessage)
+                            window.location.reload()
+                            return true
+                        }
+                    }
+                })
+            },
 
             findDocument: function (e,actionID,actionID2,actionID3){
                 let path = $(e).attr('path')

@@ -85,6 +85,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::controller(prorammerController::class)->group(function (){
                 Route::get('permission-input','create')->name('permission.input');
                 Route::get('permission-export-prototype','exportPrototype')->name('permission.export.prototype');
+                Route::post('add-permission-excel','permissionStoreBulk');
                 Route::post('permission-store','store')->name('permission.input.store');
                 Route::delete('permission-input-delete','delete')->name('permission.input.delete');
             });//3.2.1.1 End

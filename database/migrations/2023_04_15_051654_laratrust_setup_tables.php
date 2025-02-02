@@ -28,7 +28,7 @@ class LaratrustSetupTables extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->foreign('parent_id')->references('id')->on('permissions')->onDelete('cascade');
-            $table->string('name')->unique();
+            $table->string('name');
             $table->integer('is_parent')->default(null)->nullable()->comment('1=yes 0=no');
             $table->string('display_name')->nullable();
             $table->string('description')->nullable();

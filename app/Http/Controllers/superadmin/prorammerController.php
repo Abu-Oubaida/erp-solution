@@ -10,6 +10,7 @@ use App\Models\User;
 use GuzzleHttp\Exception\TransferException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class prorammerController extends Controller
@@ -73,6 +74,69 @@ class prorammerController extends Controller
         }
     }
 
+    public function permissionStoreBulk(Request $request)
+    {
+        try {
+            $input = $request->post()['input'];
+            unset($input[0]);
+            $rules= [
+                '*.0'  => ['string','required', 'max:255'],//permission_parent
+                '*.2'  => ['string','required', 'max:255','regex:/^[a-z0-9_]+$/'],//permission_name
+                '*.3'  => ['string','required', 'max:255'],//display_name
+                '*.4'  => ['string','sometimes','nullable', 'max:255'],//description
+            ];
+            $customMessages = [
+                'custom_separator' => 'Without underscore "_" all separator are invalid!'
+            ];
+            $validator = Validator::make($input, $rules, $customMessages);
+            if ($validator->fails()) {
+                // Return an error response in JSON format
+                $errors = $validator->errors();
+                $response = [
+                    'error' => true,
+                    'message' => 'Validation failed',
+                    'errors' => $errors,
+                ];
+            }
+            else {
+                $insert = 0;
+                $notInsert = 0;
+                foreach ($input as $key=>$data)
+                {
+                    $parent = Permission::where('name',$data[0])->first();
+                    if (!Permission::where('name',$data[2])->first())
+                    {
+                        Permission::create([
+                            'parent_id' =>  (@$parent->id ?? NULL),
+                            'is_parent'  =>  (isset($data[1]) && ($data[1] == 'Parent' || $data[1] == 'parent'))?1:NULL,
+                            'name'  =>  $data[2],
+                            'display_name'=>  $data[3],
+                            'description'=>  $data[4],
+                        ]);
+                        $insert++;
+                    }
+                    else
+                    {
+                        $notInsert++;
+                    }
+                }
+                $response = [
+                    'error' => false,
+                    'message' => "Inserted $insert data successfully. Not inserted $notInsert data.",
+                    'errors' => null,
+                ];
+            }
+            return response()->json($response, 200);
+        }catch (\Throwable $exception)
+        {
+            $response = [
+                'error' => true,
+                'code' => $exception->getCode(), // You can use any appropriate error code
+                'message' => $exception->getMessage(),
+            ];
+            return response()->json($response, 200);
+        }
+    }
     public function delete(Request $request)
     {
         try {
