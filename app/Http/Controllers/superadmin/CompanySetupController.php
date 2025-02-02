@@ -417,6 +417,7 @@ class CompanySetupController extends Controller
     public function userCompanyPermission(Request $request,$companyID)
     {
         try {
+            $permission = $this->permissions()->add_user_company_permission;
             $cID = Crypt::decryptString($companyID);
             if ($request->isMethod('post'))
             {
@@ -425,7 +426,7 @@ class CompanySetupController extends Controller
             $company = $this->getCompany()->where('id',$cID)->first();
             $selfUsersID = $company->users->pluck('id')->unique()->toArray();
             $companies = $this->getCompany()->whereNot('id',$company->id)->get();
-            $roles = $this->getRole()->where('company_id',$company->id)->get();
+            $roles = $this->getRole($permission)->where('company_id',$company->id)->get();
             return view('back-end.programmer.add-company-user-permission',compact('company','roles','companies'))->render();
         } catch (\Throwable $exception)
         {

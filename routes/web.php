@@ -133,7 +133,9 @@ Route::group(['middleware' => ['auth']],function (){
             });// 3.2.1.4 End
         });//3.2.1 End
         Route::controller(CompanySetupController::class)->group(function (){
-            Route::match(['post','get'],'user-company-permission/{companyID}','userCompanyPermission')->name('user.company.permission');
+            Route::middleware(['permission:add_user_company_permission'])->group(function (){
+                Route::match(['post','get'],'user-company-permission/{companyID}','userCompanyPermission')->name('user.company.permission');
+            });
             Route::middleware(['permission:delete_user_company_permission'])->group(function (){
                 Route::delete('user-company-permission-delete','userCompanyPermissionDelete')->name('delete.user.company.permission');
             });
