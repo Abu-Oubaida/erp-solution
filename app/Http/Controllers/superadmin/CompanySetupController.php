@@ -427,15 +427,8 @@ class CompanySetupController extends Controller
             $company = $this->getCompany()->where('id',$cID)->first();
             $selfUsersID = $company->users->pluck('id')->unique()->toArray();
             $companies = $this->getCompany()->whereNot('id',$company->id)->get();
-            if ($this->user->isSystemSuperAdmin())
+            if ($this->user->isSystemSuperAdmin() || $this->user->isSuperAdmin())
             {
-                $roles = $this->getRole($permission)->where('company_id',$company->id)
-                    ->orWhere(function ($query) {
-                        $query->whereNull('company_id') // For system-wide roles
-                        ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
-                    })->get();
-            }
-            else if ($this->user->isSuperAdmin()){
                 $roles = $this->getRole($permission)->where('company_id',$company->id)
                     ->orWhere(function ($query) {
                         $query->whereNull('company_id') // For system-wide roles
