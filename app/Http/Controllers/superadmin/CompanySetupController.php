@@ -8,6 +8,7 @@ use App\Models\company_type;
 use App\Models\CompanyModulePermission;
 use App\Models\CompanyModulePermissionDeleteHistory;
 use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
 use App\Traits\DeleteFileTrait;
@@ -426,7 +427,10 @@ class CompanySetupController extends Controller
             $company = $this->getCompany()->where('id',$cID)->first();
             $selfUsersID = $company->users->pluck('id')->unique()->toArray();
             $companies = $this->getCompany()->whereNot('id',$company->id)->get();
-            $roles = $this->getRole($permission)->where('company_id',$company->id)->get();
+            $roles = $this->getRole($permission)->where('company_id',$company->id)->orWhere(function ($query) {
+                $query->whereNull('company_id') // For system-wide roles
+                ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
+            })->get();
             return view('back-end.programmer.add-company-user-permission',compact('company','roles','companies'))->render();
         } catch (\Throwable $exception)
         {
