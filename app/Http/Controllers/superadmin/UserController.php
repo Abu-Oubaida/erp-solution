@@ -318,11 +318,28 @@ class UserController extends Controller
             $userPermissions = PermissionUser::with(['permissionParent','company'])->where('user_id',$userID)->orderBy('permission_name','asc')->get();
             $deptLists = $this->getDepartment($permission)->where('company_id',$user->company)->where('status',1)->get();
             $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID)->get();
-            $roles = Role::where('company_id', $user->company)
-            ->orWhere(function ($query) {
-                $query->whereNull('company_id') // For system-wide roles
-                ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
-            })->get();
+            if ($this->user->isSystemSuperAdmin())
+            {
+                $roles = Role::where('company_id', $user->company)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
+                    })->get();
+            }
+            else if ($this->user->isSuperAdmin()){
+                $roles = Role::where('company_id', $user->company)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['superadmin','admin','user']);
+                    })->get();
+            }
+            else{
+                $roles = Role::where('company_id', $user->company)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['user']);
+                    })->get();
+            }
             $designations = $this->getDesignation($permission)->where('company_id',$user->company)->where('status',1)->get();
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
             $branches = $this->getBranch($permission)->where('company_id',$user->company)->where('status',1)->get();

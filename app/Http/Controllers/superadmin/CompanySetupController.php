@@ -427,10 +427,28 @@ class CompanySetupController extends Controller
             $company = $this->getCompany()->where('id',$cID)->first();
             $selfUsersID = $company->users->pluck('id')->unique()->toArray();
             $companies = $this->getCompany()->whereNot('id',$company->id)->get();
-            $roles = $this->getRole($permission)->where('company_id',$company->id)->orWhere(function ($query) {
-                $query->whereNull('company_id') // For system-wide roles
-                ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
-            })->get();
+            if ($this->user->isSystemSuperAdmin())
+            {
+                $roles = $this->getRole($permission)->where('company_id',$company->id)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
+                    })->get();
+            }
+            else if ($this->user->isSuperAdmin()){
+                $roles = $this->getRole($permission)->where('company_id',$company->id)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['superadmin','admin','user']);
+                    })->get();
+            }
+            else{
+                $roles = $this->getRole($permission)->where('company_id',$company->id)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['user']);
+                    })->get();
+            }
             return view('back-end.programmer.add-company-user-permission',compact('company','roles','companies'))->render();
         } catch (\Throwable $exception)
         {
