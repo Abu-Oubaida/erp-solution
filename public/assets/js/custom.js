@@ -882,6 +882,28 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 })
                 return false
             },
+            voucherDocumentIndividual:function (e) {
+                let id = $(e).attr('ref')
+                let url = window.location.origin + sourceDir + "/fiend-voucher-document-info";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'id':id},
+                    success: function(data){
+                        if (data.error){
+                            alert(data.error.msg)
+                        }else{
+                            while(tags.length > 0) {
+                                tags.pop();
+                            }
+                            $('#model_dialog').html(data)
+                            $('#shareModel').modal('show')
+                        }
+                    }
+                })
+                return false
+            },
             addVoucherDocumentIndividual:function (e){
                 let id = $(e).attr('ref')
                 let url = window.location.origin + sourceDir + "/add-voucher-document-individual";

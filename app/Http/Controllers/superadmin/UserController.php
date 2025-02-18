@@ -613,6 +613,7 @@ class UserController extends Controller
                     'designation_id'   =>  $designation_id,
                 ]);
                 DesignationChangeHistory::create([
+                    'company_id'=>$oldData->company,
                     'transfer_user_id'=>$userId,
                     'new_designation_id'=>$designation_id,
                     'old_designation_id'=>$oldData->designation_id,

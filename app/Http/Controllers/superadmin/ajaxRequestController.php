@@ -216,7 +216,7 @@ class ajaxRequestController extends Controller
         }
     }
 
-    public function findVoucherDocumentInfo(Request $request)
+    public function fiendVoucherDocumentInfo(Request $request)
     {
         try {
             extract($request->post());

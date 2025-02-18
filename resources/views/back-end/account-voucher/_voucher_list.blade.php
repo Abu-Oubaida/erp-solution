@@ -56,7 +56,7 @@
             @endif
                 <td>{!! $no++ !!}</td>
                 <td>{!! date('d-M-y', strtotime($data->voucher_date)) !!}</td>
-                <td>{!! $data->company->company_name !!}</td>
+                <td>{!! $data->company->company_code !!}</td>
                 <td>{!! $data->voucher_number !!}</td>
                 <td>{!! $data->VoucherType->voucher_type_title !!}</td>
                 <td>{!! $data->remarks !!}</td>
@@ -96,7 +96,7 @@
                     <a href="{{route('edit.voucher.info',["voucherDocumentID"=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
                     @endif
                     @if(auth()->user()->hasPermission('share_voucher_document_individual'))
-                        <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fas fa-share"></i></a>
+                        <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($data->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fas fa-share"></i></a>
                     @endif
                     @if(auth()->user()->hasPermission('voucher_document_delete'))
                     <form action="{{route('delete.voucher.info')}}" class="display-inline" method="post">

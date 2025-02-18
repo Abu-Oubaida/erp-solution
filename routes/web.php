@@ -49,7 +49,7 @@ Route::controller(ajaxRequestController::class)->group(function (){
     Route::post('fiend-voucher-document','findVoucherDocument')->name('fien.voucher.document');
 # 2.3 Fiend voucher document info for sharing
     Route::middleware(['permission:share_voucher_document_individual'])->group(function (){
-        Route::post('fiend-voucher-document-info','findVoucherDocumentInfo')->name('fien.voucher.document.info');
+        Route::post('fiend-voucher-document-info','fiendVoucherDocumentInfo')->name('fiend.voucher.document.info');
         Route::post('voucher-share-type','voucherShareType')->name('voucher.share.type');
 
     });
