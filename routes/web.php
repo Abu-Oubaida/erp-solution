@@ -7,6 +7,7 @@ use App\Http\Controllers\BranchTypeController;
 use App\Http\Controllers\ComplainController;
 use App\Http\Controllers\ControlPanelController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentRequisitionInfoController;
 use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\FixedAssetController;
@@ -537,6 +538,15 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::middleware(['permission:delete_role'])->group(function (){
             Route::match(['delete'],'delete-role','destroy')->name('delete.role');
+        });
+    });
+
+    #3.16 Requisition Management
+    Route::middleware(['permission:requisition'])->prefix('requisition')->group(function (){
+        Route::controller(DocumentRequisitionInfoController::class)->group(function (){
+            Route::post('company-wise-user','companyWiseUser');
+            Route::match(['post','get'],'document-requisition-list','indexDocument')->name('document.requisition.list');
+            Route::match(['post','get'],'document-requisition-add','createDocument')->name('document.requisition.add');
         });
     });
 });//3.0 End

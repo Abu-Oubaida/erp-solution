@@ -2193,7 +2193,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
-            companyWiseUsers:function (e,action_id)
+            companyWiseUsers:function (e,action_id)//only able to control panel permission
             {
                 let id = $(e).val()
                 if (id.length === 0)
@@ -2222,7 +2222,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                                 selectize.clearOptions(); // Clear existing options
                                 response.data.forEach(function(item) {
                                     const companyName = item.get_company ? item.get_company.company_name : 'N/A'; // Fallback if get_company is null
-                                    const designationTitle = item.designation ? item.designation.title : 'N/A'; // Fallback if get_company is null
+                                    const designationTitle = item.designation ? item.designation.title : 'N/A'; // Fallback if get_designation is null
                                     const optionText = `${item.name} (ID: ${item.employee_id}) - (Designation: ${designationTitle}) - (Company: ${companyName})`;
 
                                     selectize.addOption({ value: item.id, text: optionText });
@@ -2236,7 +2236,51 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
-            companyWiseUsersCompanyPermission:function (e,action_id)
+            companyWiseUsersForReq:function (e,action_id)//only able to requisition
+            {
+                let id = $(e).val()
+                if (id.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/requisition/company-wise-user"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'company_id':id},
+                    success:function (response)
+                    {
+                        if (response.status === 'error') {
+                            alert('Error: ' + response.message);
+                            return false
+                        } else if (response.status === 'success') {
+                            // updateSelectBoxSingleOption(response.data, action_id, 'id', 'name');
+                            const $select = $("#"+action_id);
+                            // Ensure Selectize is initialized
+                            if ($select[0] && $select[0].selectize) {
+                                const selectize = $select[0].selectize;
+
+                                selectize.clear();
+                                selectize.clearOptions(); // Clear existing options
+                                response.data.forEach(function(item) {
+                                    const companyName = item.get_company ? item.get_company.company_name : 'N/A'; // Fallback if get_company is null
+                                    const designationTitle = item.designation ? item.designation.title : 'N/A'; // Fallback if get_designation is null
+                                    const departmentTitle = item.department ? item.department.dept_name : 'N/A'; // Fallback if get_department is null
+                                    const optionText = `${item.name} (${item.employee_id}, ${designationTitle},  ${departmentTitle}, ${companyName})`;
+
+                                    selectize.addOption({ value: item.id, text: optionText });
+                                });
+                                selectize.refreshOptions(true); // Refresh the options in the select box
+                                $('#user-project-permission-add-list').html('')
+                            } else {
+                                console.error("Selectize is not initialized for #" + action_id);
+                            }
+                        }
+                    }
+                })
+            },
+            companyWiseUsersCompanyPermission:function (e,action_id)// only able to system super admin permission
             {
                 let id = $(e).val()
                 if (id.length === 0)
@@ -2519,6 +2563,28 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         }
                     }
                 })
+            },
+            document_field_operation: function (e) {
+                let number_of_document = parseInt($("#d_count").val(), 10);
+                if (number_of_document > 0)
+                {
+                    $(e).removeClass('btn-outline-primary'); // Remove the 'btn-primary' class
+                    $(e).addClass('btn-outline-danger'); // Add the 'btn-danger' class
+                    $(e).html("<i class='fa-solid fa-clock-rotate-left'></i> Reset");
+                    $("#document_field").empty(); // Clear previous entries
+
+                    for (let i = 1; i <= number_of_document; i++) {
+                        $("#document_field").append(`
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="d_title_${i}">Document ${i} Title</label>
+                                <input class="form-control" name="d_title_${i}" id="d_title_${i}" type="text">
+                            </div>
+                        </div>
+                    `);
+                    }
+                }
+                return false
             },
         }
     })
