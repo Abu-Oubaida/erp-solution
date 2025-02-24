@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Document_requisition_attested_document_info;
 use App\Models\Document_requisition_info;
+use App\Models\Document_requisition_receiver_user;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DocumentRequisitionInfoController extends Controller
 {
@@ -72,13 +76,13 @@ class DocumentRequisitionInfoController extends Controller
     {
         //
     }
-    public function createDocument(Request $request)
+    public function createDocumentRequisition(Request $request)
     {
         try {
             $permission = $this->permissions()->add_document_requisition;
             if ($request->isMethod('post'))
             {
-                return $this->storeDocument($request);
+                return $this->storeDocumentRequisition($request);
             }else{
                 $companies = $this->getCompanyModulePermissionWise($permission)->get();
                 $depts = $this->getDepartment($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
@@ -99,9 +103,73 @@ class DocumentRequisitionInfoController extends Controller
     {
         //
     }
-    public function storeDocument(Request $request)
+    public function storeDocumentRequisition(Request $request)
     {
-        //
+        try {
+            if ($request->isMethod('post'))
+            {
+                $validatedData = $request->validate([
+                    'company' => ['required','string','exists:company_infos,id'],
+                    'users' => ['required','array',],
+                    'users.*' => ['required','string','exists:users,id'],
+                    'deadline' => ['required','date'],
+                    'd_count' => ['sometimes','nullable','integer','min:1'],
+                    'subject' => ['required','string'],
+                    'details' => ['sometimes','nullable','string'],
+                ]);
+                extract($validatedData);
+                $today_data_count = Document_requisition_info::whereDate('created_at', date('Y-m-d'))->count();
+                $reference = date("dmy") . '-' . ($today_data_count + 1);
+
+                while (Document_requisition_info::where('reference_number', $reference)->exists()) {
+                    $today_data_count++;
+                    $reference = date("dmy") . '-' . $today_data_count;
+                }
+//                DB::beginTransaction(); // Start Transaction
+                DB::transaction(function () use ($request, $reference, $company, $deadline, $d_count, $subject, $details, $users){
+                    $documentInfo = Document_requisition_info::create([
+                        'reference_number' => $reference,
+                        'status' => 1, // 1 = active
+                        'sander_company_id' => Auth::user()->company_id,
+                        'receiver_company_id' => $company,
+                        'deadline' => $deadline,
+                        'number_of_document' => $d_count ?? 0,
+                        'subject' => $subject,
+                        'description' => $details ?? null,
+                        'created_by' => $this->user->id,
+                    ]);
+
+                    if ($documentInfo) {
+                        if (!empty($d_count)) {
+                            for ($counter = 1; $counter <= $d_count; $counter++) {
+                                $variable = "d_title_" . $counter;
+                                $value = $request->post($variable);
+
+                                Document_requisition_attested_document_info::create([
+                                    'document_requisition_id' => $documentInfo->id,
+                                    'document_title' => $value,
+                                    'document_upload_status' => 0, // 0 = not uploaded yet
+                                    'created_by' => $this->user->id,
+                                ]);
+                            }
+                        }
+
+                        foreach ($users as $user) {
+                            Document_requisition_receiver_user::create([
+                                'document_requisition_id' => $documentInfo->id,
+                                'user_id' => $user,
+                                'reply_status' => 0,
+                                'created_by' => $this->user->id,
+                            ]);
+                        }
+                    }
+                });
+                return back()->with('success', 'Document requisition created successfully!');
+            }
+            return back()->with('error','Requested method not allowed!')->withInput();
+        }catch (\Throwable $exception){
+            return back()->with('error',$exception->getMessage())->withInput();
+        }
     }
 
     /**

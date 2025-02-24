@@ -543,10 +543,14 @@ Route::group(['middleware' => ['auth']],function (){
 
     #3.16 Requisition Management
     Route::middleware(['permission:requisition'])->prefix('requisition')->group(function (){
-        Route::controller(DocumentRequisitionInfoController::class)->group(function (){
+        Route::controller(DocumentRequisitionInfoController::class)->middleware(['permission:document_requisition'])->group(function (){
             Route::post('company-wise-user','companyWiseUser');
-            Route::match(['post','get'],'document-requisition-list','indexDocument')->name('document.requisition.list');
-            Route::match(['post','get'],'document-requisition-add','createDocument')->name('document.requisition.add');
+            Route::middleware(['permission:add_document_requisition'])->group(function (){
+                Route::match(['post','get'],'document-requisition-add','createDocumentRequisition')->name('document.requisition.add');
+            });
+            Route::middleware(['permission:list_document_requisition'])->group(function (){
+                Route::match(['post','get'],'document-requisition-list','indexDocument')->name('document.requisition.list');
+            });
         });
     });
 });//3.0 End

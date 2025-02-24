@@ -32,8 +32,9 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('add.department') }}" method="POST">
+                        <form action="{{ route('document.requisition.add') }}" method="POST">
                             @csrf
+                            @method('post')
                             <div class="row">
                                 <div class="col-md-2">
                                     <div class="mb-3">
@@ -49,8 +50,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-5 mb-1">
-                                    <label for="user">User Name<span class="text-danger">*</span></label>
-                                    <select id="user" name="user" class="select-search cursor-pointer" onchange="" multiple>
+                                    <label for="user">Users Name<span class="text-danger">*</span></label>
+                                    <select id="user" name="users[]" class="select-search cursor-pointer" onchange="" multiple>
                                         <option value="">Pick options...</option>
                                     </select>
                                 </div>
@@ -58,32 +59,49 @@
                                 <div class="col-md-2">
                                     <div class="mb-3">
                                         <label for="deadline">Deadline<span class="text-danger">*</span></label>
-                                        <input class="form-control" name="deadline" id="deadline" type="date" required>
+                                        <input class="form-control" name="deadline" id="deadline" type="date" value="{!! old("deadline") !!}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="mb-3">
                                         <label for="d_count">Number of Need Document</label>
-                                        <input class="form-control" name="d_count" id="d_count" type="number" required>
+                                        <input class="form-control" value="{!! old('d_count') !!}" name="d_count" id="d_count" type="number">
                                     </div>
                                 </div>
                                 <div class="col-md-1">
-                                    <button class="btn btn-outline-primary float-end mt-4" onclick="Obj.document_field_operation(this)">Next <i class="fa-solid fa-arrow-right"></i></button>
+                                    @if(old('d_count'))
+                                        <button class="btn btn-outline-danger float-end mt-4" onclick="Obj.document_field_operation(this)"><i class='fa-solid fa-clock-rotate-left'></i> Reset</button>
+                                    @else
+                                        <a class="btn btn-outline-primary float-end mt-4" onclick="Obj.document_field_operation(this)">Next <i class="fa-solid fa-arrow-right"></i></a>
+                                    @endif
                                 </div>
                             </div>
                             <div class="row" id="document_field">
+                                @if($d_count=old('d_count'))
+                                    @php($counter = 1)
+                                    @while($d_count >= $counter)
+                                        <div class="col">
+                                            <div class="mb-3">
+                                                <label for="d_title_{!! $counter !!}">Document {!! $counter !!} Title</label>
+                                                <input class="form-control" name="d_title_{!! $counter !!}" id="d_title_{!! $counter !!}" type="text" value="{!! old("d_title_".$counter) !!}">
+                                            </div>
+                                        </div>
+                                        @php($counter++)
+                                    @endwhile
+
+                                @endif
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <label for="subject">Subject<span class="text-danger">*</span></label>
-                                        <input class="form-control" name="subject" id="subject" type="number" required>
+                                        <input class="form-control" name="subject" id="subject" type="text" value="{!! old('subject') !!}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-floating mb-3">
-                                        <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10">{{old('remarks')}}</textarea>
-                                        <label for="remarks">Details</label>
+                                        <textarea class="form-control" name="details" id="details" cols="30" rows="10">{{old('details')}}</textarea>
+                                        <label for="details">Details</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
