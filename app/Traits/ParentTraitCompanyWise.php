@@ -9,6 +9,7 @@ use App\Models\company_info;
 use App\Models\CompanyModulePermission;
 use App\Models\department;
 use App\Models\Designation;
+use App\Models\Document_requisition_info;
 use App\Models\Fixed_asset;
 use App\Models\Fixed_asset_opening_balance;
 use App\Models\Fixed_asset_opening_with_spec;
@@ -381,5 +382,15 @@ trait ParentTraitCompanyWise
     public function getFixedAssetGpSpecificationAll($operation_permission_name)
     {
         return Fixed_asset_transfer_with_spec::with(['specification','asset','fixed_asset_transfer','createdBy','updatedBy']);
+    }
+
+    public function documentRequisition($operation_permission_name)
+    {
+        $object = Document_requisition_info::with(['receiverUser','sanderCompany','receiverCompany','sender','receivers','attachmentInfos']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $object;
+        }
+        return $object->whereIn('sander_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name))->whereIn('receiver_company_id',$this->getCompany());
     }
 }

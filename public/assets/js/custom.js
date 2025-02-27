@@ -2586,6 +2586,58 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 }
                 return false
             },
+            requisitionDocumentUsersInfo:function (e){
+                let data = $(e).attr('ref')
+                if (data.length <= 0)
+                {
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/requisition/req-document-receiver"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data: {'id':data},
+                    success:function (response)
+                    {
+                        if (response.status === 'error')
+                        {
+                            alert('Error: ' + response.message)
+                        }
+                        else if (response.status === 'success') {
+                            $("#heading").html("Receiver List")
+                            $('#documentPreview').html(response.view)
+                            $('#receiverList').modal('show')
+                        }
+                    }
+                })
+            },
+            requisitionDocumentNeed:function (e){
+                let data = $(e).attr('ref')
+                if (data.length <= 0)
+                {
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/requisition/requested-document"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data: {'id':data},
+                    success:function (response)
+                    {
+                        if (response.status === 'error')
+                        {
+                            alert('Error: ' + response.message)
+                        }
+                        else if (response.status === 'success') {
+                            $("#heading").html("Requested Document List")
+                            $('#documentPreview').html(response.view)
+                            $('#receiverList').modal('show')
+                        }
+                    }
+                })
+            },
         }
     })
     function checkFileExists(url, callback) {

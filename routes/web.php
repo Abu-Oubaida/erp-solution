@@ -545,6 +545,8 @@ Route::group(['middleware' => ['auth']],function (){
     Route::middleware(['permission:requisition'])->prefix('requisition')->group(function (){
         Route::controller(DocumentRequisitionInfoController::class)->middleware(['permission:document_requisition'])->group(function (){
             Route::post('company-wise-user','companyWiseUser');
+            Route::post('req-document-receiver','reqDocumentReceiver');//ajax request
+            Route::post('requested-document','requestedDocument');//ajax request
             Route::middleware(['permission:add_document_requisition'])->group(function (){
                 Route::match(['post','get'],'document-requisition-add','createDocumentRequisition')->name('document.requisition.add');
             });

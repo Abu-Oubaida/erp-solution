@@ -19,12 +19,12 @@ class Document_requisition_info extends Model
 
     public function sanderCompany()
     {
-        return $this->belongsTo(CompanyInfo::class, 'sander_company_id','id');
+        return $this->belongsTo(company_info::class, 'sander_company_id','id');
     }
 
     public function receiverCompany()
     {
-        return $this->belongsTo(CompanyInfo::class, 'receiver_company_id','id');
+        return $this->belongsTo(company_info::class, 'receiver_company_id','id');
     }
 
     public function sender()
@@ -34,6 +34,12 @@ class Document_requisition_info extends Model
 
     public function receivers()
     {
-        return $this->belongsToMany(User::class, 'document_requisition_receiver_users', 'document_requisition_id', 'user_id');
+        return $this->belongsToMany(User::class, 'document_requisition_receiver_user', 'document_requisition_id', 'user_id');
     }
+
+    public function attachmentInfos()
+    {
+        return $this->hasMany(Document_requisition_attested_document_info::class, 'document_requisition_id','id');
+    }
+
 }

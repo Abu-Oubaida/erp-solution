@@ -85,8 +85,9 @@ class DocumentRequisitionInfoController extends Controller
                 return $this->storeDocumentRequisition($request);
             }else{
                 $companies = $this->getCompanyModulePermissionWise($permission)->get();
+                $documents = $this->documentRequisition($permission)->where('created_by',Auth::id())->get();
                 $depts = $this->getDepartment($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
-                return view('back-end.requisition.add',compact('depts','companies'))->render();
+                return view('back-end.requisition.add',compact('depts','companies','documents'))->render();
             }
         }catch (\Exception $exception){
             return back()->with('error',$exception->getMessage());
@@ -215,5 +216,62 @@ class DocumentRequisitionInfoController extends Controller
     public function destroy(Document_requisition_info $document_requisition_info)
     {
         //
+    }
+
+    public function reqDocumentReceiver(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->requisition;
+            if ($request->isMethod('post'))
+            {
+                $validatedData = $request->validate([
+                    'id' => ['required','string','exists:document_requisition_infos,id'],
+                ]);
+                extract($validatedData);
+                $data = $this->documentRequisition($permission)->find($id)->receivers;
+                $view = view('back-end.requisition.__receiver-list-modal',compact('data'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'view' => $view,
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Request method not allowed!'
+            ]);
+        }catch (\Throwable $exception){
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+    public function requestedDocument(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->requisition;
+            if ($request->isMethod('post'))
+            {
+                $validatedData = $request->validate([
+                    'id' => ['required','string','exists:document_requisition_infos,id'],
+                ]);
+                extract($validatedData);
+                $data = $this->documentRequisition($permission)->find($id)->attachmentInfos;
+                $view = view('back-end.requisition.__requested-document-modal',compact('data'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'view' => $view,
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Request method not allowed!'
+            ]);
+        }catch (\Throwable $exception){
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 }
