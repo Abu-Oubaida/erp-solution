@@ -274,4 +274,29 @@ class DocumentRequisitionInfoController extends Controller
             ]);
         }
     }
+
+    public function documentRequisitionReceivedList()
+    {
+        try {
+            $permission = $this->permissions()->document_requisition_received_list;
+            $documents = $this->documentRequisition($permission)->whereHas('receiverUser',function ($query){
+                $query->where('user_id', $this->user->id);
+            })->get();
+            $view = view('back-end.requisition.list',compact('documents'))->render();
+            return $view;
+        }catch (\Throwable $exception){
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+    public function documentRequisitionSentList()
+    {
+        try {
+            $permission = $this->permissions()->document_requisition_sent_list;
+            $documents = $this->documentRequisition($permission)->where('created_by',Auth::id())->get();
+            $view = view('back-end.requisition.list',compact('documents'))->render();
+            return $view;
+        }catch (\Throwable $exception){
+            return back()->with('error',$exception->getMessage());
+        }
+    }
 }

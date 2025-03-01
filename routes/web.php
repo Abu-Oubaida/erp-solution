@@ -549,9 +549,20 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('requested-document','requestedDocument');//ajax request
             Route::middleware(['permission:add_document_requisition'])->group(function (){
                 Route::match(['post','get'],'document-requisition-add','createDocumentRequisition')->name('document.requisition.add');
+                Route::match(['get'],'document-requisition-view-self/{requisitionDocumentId}','viewDocumentRequisitionSelf')->name('document.requisition.view.self');
+                Route::match(['get','put'],'document-requisition-edit-self/{requisitionDocumentId}','editDocumentRequisitionSelf')->name('document.requisition.edit.self');
+                Route::match(['delete'],'document-requisition-delete-self/{requisitionDocumentId}','deleteDocumentRequisitionSelf')->name('document.requisition.delete.self');
             });
             Route::middleware(['permission:list_document_requisition'])->group(function (){
                 Route::match(['post','get'],'document-requisition-list','indexDocument')->name('document.requisition.list');
+            });
+            Route::middleware(['permission:document_requisition_list'])->prefix('document-report')->group(function (){
+                Route::middleware(['permission:document_requisition_received_list'])->group(function (){
+                    Route::match(['get'],'received-list','documentRequisitionReceivedList')->name("document.requisition.received.list");
+                });
+                Route::middleware(['permission:document_requisition_sent_list'])->group(function (){
+                    Route::match(['get'],'sent-list','documentRequisitionSentList')->name("document.requisition.sent.list");
+                });
             });
         });
     });
