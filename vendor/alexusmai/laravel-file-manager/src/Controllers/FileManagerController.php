@@ -11,6 +11,7 @@ use Alexusmai\LaravelFileManager\Events\Download;
 use Alexusmai\LaravelFileManager\Events\FileCreated;
 use Alexusmai\LaravelFileManager\Events\FileCreating;
 use Alexusmai\LaravelFileManager\Events\FilesUploaded;
+use Alexusmai\LaravelFileManager\Events\FilesUploadFailed;
 use Alexusmai\LaravelFileManager\Events\FilesUploading;
 use Alexusmai\LaravelFileManager\Events\FileUpdate;
 use Alexusmai\LaravelFileManager\Events\Paste;
@@ -20,14 +21,11 @@ use Alexusmai\LaravelFileManager\Events\Unzip as UnzipEvent;
 use Alexusmai\LaravelFileManager\Requests\RequestValidator;
 use Alexusmai\LaravelFileManager\FileManager;
 use Alexusmai\LaravelFileManager\Services\Zip;
-use App\Models\create_directory_history;
-use App\Models\Create_file_history;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use League\Flysystem\FilesystemException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -135,9 +133,14 @@ class FileManagerController extends Controller
             $request->file('files'),
             $request->input('overwrite')
         );
+        $status = $uploadResponse['result']['status'];
 
-        event(new FilesUploaded($request));
-//        dd($request->file('files')->getClientOriginalName());
+        if ($status === "success")
+            event(new FilesUploaded($request));
+        else
+            event(new FilesUploadFailed($request,$uploadResponse['result']['message']));
+
+
         return response()->json($uploadResponse);
     }
 
@@ -285,17 +288,7 @@ class FileManagerController extends Controller
         if ($createDirectoryResponse['result']['status'] === 'success') {
             event(new DirectoryCreated($request));
         }
-        if (is_array($createDirectoryResponse))
-        {
-            create_directory_history::create([
-                'status'    =>  $createDirectoryResponse['result']['status'],
-                'message'   =>  $createDirectoryResponse['result']['message'],
-                'disk_name' =>  $request->input('disk'),
-                'path'      =>  $request->input('path'),
-                'file_name' =>  $request->input('name'),
-                'created_by'=>  Auth::user()->id,
-            ]);
-        }
+
         return response()->json($createDirectoryResponse);
     }
 
@@ -319,18 +312,7 @@ class FileManagerController extends Controller
         if ($createFileResponse['result']['status'] === 'success') {
             event(new FileCreated($request));
         }
-        if (is_array($createFileResponse))
-        {
-            Create_file_history::create([
-                'status'    =>  $createFileResponse['result']['status'],
-                'message'   =>  $createFileResponse['result']['message'],
-                'disk_name' =>  $request->input('disk'),
-                'path'      =>  $request->input('path'),
-                'file_name' =>  $request->input('name'),
-                'content'   =>  '',
-                'created_by'=>  Auth::user()->id,
-            ]);
-        }
+
         return response()->json($createFileResponse);
     }
 

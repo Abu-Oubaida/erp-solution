@@ -32,7 +32,7 @@ class RolesController
     {
         return View::make('laratrust::panel.edit', [
             'model' => null,
-            'permissions' => $this->permissionModel::all(['id', 'name']),
+            'permissions' => $this->permissionModel::all(['id', 'display_name']),
             'type' => 'role',
         ]);
     }
@@ -49,7 +49,7 @@ class RolesController
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|unique:roles,name',
+            'name' => 'required|string|unique:' . config('laratrust.tables.roles', 'roles') . ',name',
             'display_name' => 'nullable|string',
             'description' => 'nullable|string',
         ]);

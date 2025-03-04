@@ -8,6 +8,7 @@ use App\Models\SalaryCertificateTransection;
 use App\Models\User;
 use App\Models\UserSalaryCertificateData;
 use App\Models\VoucherDocument;
+use App\Models\VoucherDocumentDeleteHistory;
 use App\Models\VoucherDocumentIndividualDeletedHistory;
 use App\Models\VoucherDocumentShareEmailLink;
 use App\Models\VoucherType;
@@ -663,27 +664,48 @@ class AccountVoucherController extends Controller
                 $v_d = VoucherDocument::where('id',$id)->first();
                 if ($v_d)
                 {
-                    VoucherDocumentIndividualDeletedHistory::create([
-                        'company_id'        =>  $v_d->company_id,
-                        'voucher_info_id'   =>  $v_d->voucher_info_id,
-                        'document'          =>  $v_d->document,
-                        'filepath'          =>  $v_d->filepath,
-                        'created_by'        =>  $v_d->created_by,
-                        'updated_by'        =>  $v_d->updated_by,
-                        'deleted_by'        =>  $user->id,
-                        'created_at'        =>  now(),
-                    ]);
-                    VoucherDocument::where('id',$id)->delete();
+                    $this->deleteVoucherDocumentIndividualWithHistory($v_d,Auth::id());
+//                    VoucherDocumentIndividualDeletedHistory::create([
+//                        'company_id'        =>  $v_d->company_id,
+//                        'voucher_info_id'   =>  $v_d->voucher_info_id,
+//                        'document'          =>  $v_d->document,
+//                        'filepath'          =>  $v_d->filepath,
+//                        'created_by'        =>  $v_d->created_by,
+//                        'updated_by'        =>  $v_d->updated_by,
+//                        'deleted_by'        =>  $user->id,
+//                        'created_at'        =>  now(),
+//                    ]);
+//                    VoucherDocument::where('id',$id)->delete();
                     return back()->with('success','Data delete successfully');
                 }
                 return back()->with('error','Data not found on database!');
             }
+            return back()->with('error','Requested data not valid!');
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
     }
 
+    private function deleteVoucherDocumentIndividualWithHistory($v_d,$deleted_by)
+    {
+        try {
+            VoucherDocumentIndividualDeletedHistory::create([
+                'company_id'        =>  $v_d->company_id,
+                'voucher_info_id'   =>  $v_d->voucher_info_id,
+                'document'          =>  $v_d->document,
+                'filepath'          =>  $v_d->filepath,
+                'created_by'        =>  $v_d->created_by,
+                'updated_by'        =>  $v_d->updated_by,
+                'deleted_by'        =>  $deleted_by,
+                'created_at'        =>  now(),
+            ]);
+            VoucherDocument::where('id',$v_d->id)->delete();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
     public function voucherMultipleSubmit(Request $request)
     {
         if ($request->isMethod('post'))
@@ -691,6 +713,68 @@ class AccountVoucherController extends Controller
             $submitButtonName = $request->input('submit_selected');
             $selectedCheckboxes = $request->input('selected', []);
             dd($selectedCheckboxes);
+        }
+    }
+
+    public function delete(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->voucher_document_delete;
+            if ($request->isMethod('delete'))
+            {
+                $request->validate([
+                    'id'  =>    ['required','string']
+                ]);
+                extract($request->post());
+                $user = Auth::user();
+                $id = Crypt::decryptString($id);
+                $v = Account_voucher::with(['VoucherDocument'])->where('id',$id)->first();
+                if(isset($v) && $this->deleteVoucherInfoWithHistory($v))
+                {
+                    return back()->with('success','Data delete successfully!');
+                }
+                return back()->with('error','Data not found on database!');
+            }
+            return back()->with('error','Requested data not valid!');
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    private function deleteVoucherInfoWithHistory($data)
+    {
+        try {
+            if (!$data)
+            {
+                return false;
+            }
+            if (isset($data->VoucherDocument) && count($data->VoucherDocument)>0)
+            {
+                foreach ($data->VoucherDocument as $v_d)
+                {
+                    $this->deleteVoucherDocumentIndividualWithHistory($v_d,Auth::id());
+                }
+            }
+            VoucherDocumentDeleteHistory::create([
+                'old_id' => $data->id,
+                'company_id'  => $data->company_id,
+                'voucher_type_id'  => $data->voucher_type_id,
+                'voucher_date'   => $data->voucher_date,
+                'voucher_number' => $data->voucher_number,
+                'file_count'  => $data->file_count,
+                'remarks'   => $data->remarks,
+                'old_created_by'    => $data->created_by,
+                'old_updated_by'     => $data->updated_by,
+                'old_created_at'     => $data->created_at,
+                'old_updated_at'      => $data->updated_at,
+                'created_by'   => Auth::id(),
+            ]);
+            $data->delete();
+            return true;
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
         }
     }
 }

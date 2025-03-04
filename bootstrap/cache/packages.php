@@ -8,26 +8,26 @@
   ),
   'barryvdh/laravel-dompdf' => 
   array (
+    'aliases' => 
+    array (
+      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+    ),
     'providers' => 
     array (
       0 => 'Barryvdh\\DomPDF\\ServiceProvider',
     ),
-    'aliases' => 
-    array (
-      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-    ),
   ),
   'barryvdh/laravel-snappy' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Barryvdh\\Snappy\\ServiceProvider',
-    ),
     'aliases' => 
     array (
       'PDF' => 'Barryvdh\\Snappy\\Facades\\SnappyPdf',
       'SnappyImage' => 'Barryvdh\\Snappy\\Facades\\SnappyImage',
+    ),
+    'providers' => 
+    array (
+      0 => 'Barryvdh\\Snappy\\ServiceProvider',
     ),
   ),
   'fruitcake/laravel-cors' => 
@@ -37,15 +37,15 @@
       0 => 'Fruitcake\\Cors\\CorsServiceProvider',
     ),
   ),
-  'intervention/image' => 
+  'intervention/image-laravel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Intervention\\Image\\ImageServiceProvider',
-    ),
     'aliases' => 
     array (
-      'Image' => 'Intervention\\Image\\Facades\\Image',
+      'Image' => 'Intervention\\Image\\Laravel\\Facades\\Image',
+    ),
+    'providers' => 
+    array (
+      0 => 'Intervention\\Image\\Laravel\\ServiceProvider',
     ),
   ),
   'laravel/breeze' => 
@@ -78,13 +78,13 @@
   ),
   'maatwebsite/excel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
-    ),
     'aliases' => 
     array (
       'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
+    ),
+    'providers' => 
+    array (
+      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
     ),
   ),
   'nesbot/carbon' => 
@@ -110,24 +110,24 @@
   ),
   'santigarcor/laratrust' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Laratrust\\LaratrustServiceProvider',
-    ),
     'aliases' => 
     array (
       'Laratrust' => 'Laratrust\\LaratrustFacade',
     ),
+    'providers' => 
+    array (
+      0 => 'Laratrust\\LaratrustServiceProvider',
+    ),
   ),
   'spatie/laravel-ignition' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
-    ),
     'aliases' => 
     array (
       'Flare' => 'Spatie\\LaravelIgnition\\Facades\\Flare',
+    ),
+    'providers' => 
+    array (
+      0 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
     ),
   ),
 );

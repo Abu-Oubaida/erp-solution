@@ -3,24 +3,17 @@
 namespace Alexusmai\LaravelFileManager;
 
 use Alexusmai\LaravelFileManager\Events\Deleted;
-use Alexusmai\LaravelFileManager\Events\Download;
 use Alexusmai\LaravelFileManager\Services\ConfigService\ConfigRepository;
 use Alexusmai\LaravelFileManager\Services\TransferService\TransferFactory;
 use Alexusmai\LaravelFileManager\Traits\CheckTrait;
 use Alexusmai\LaravelFileManager\Traits\ContentTrait;
 use Alexusmai\LaravelFileManager\Traits\PathTrait;
-use App\Models\Deleted_history;
-use App\Models\Download_history;
-use App\Models\file_uploading_history;
-use App\Models\Pest_history;
-use App\Models\Rename_history;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 use League\Flysystem\FilesystemException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -184,15 +177,6 @@ class FileManager
                         )
                     ) . '.' . $file->getClientOriginalExtension();
             }
-            file_uploading_history::create([
-                'status'    =>  'success',
-                'message'   =>  'uploaded',
-                'disk_name' =>  $disk,
-                'path'      =>  $path,
-                'file_name' =>  $name,
-                'overwrite' =>  $overwrite,
-                'created_by'=>  Auth::user()->id,
-            ]);
             // overwrite or save file
             Storage::disk($disk)->putFileAs(
                 $path,
@@ -234,12 +218,6 @@ class FileManager
             if (!Storage::disk($disk)->exists($item['path'])) {
                 continue;
             } else {
-                Deleted_history::create([
-                    'disk_name' =>  $disk,
-                    'path'      =>  $item['path'],
-                    'type'      =>  $item['type'],
-                    'created_by'=>  Auth::user()->id,
-                ]);
                 if ($item['type'] === 'dir') {
                     Storage::disk($disk)->deleteDirectory($item['path']);
                 } else {
@@ -271,7 +249,6 @@ class FileManager
      */
     public function paste($disk, $path, $clipboard): array
     {
-        $auth = Auth::user();
         // compare disk names
         if ($disk !== $clipboard['disk']) {
 
@@ -281,45 +258,8 @@ class FileManager
         }
 
         $transferService = TransferFactory::build($disk, $path, $clipboard);
-        $transferServiceArray = (array) $transferService;
-        $rs = $transferService->filesTransfer();
-        if (count($clipboard['directories']))
-        {
-            $i=0;
-            while (count($clipboard['directories']) > $i)
-            {
-                Pest_history::create([
-                    'status'=>$rs['result']['status'],
-                    'message'=>$rs['result']['message'],
-                    'type'=>$transferService->clipboard['type'],
-                    'disk_name'=>$disk,
-                    'to'=>$path,
-                    'from'=>$clipboard['directories'][$i],
-                    'document_type'=>'directories',
-                    'created_by'=>$auth->id,
-                ]);
-                $i++;
-            }
-        }
-        if (count($clipboard['files']))
-        {
-            $i=0;
-            while (count($clipboard['files']) > $i)
-            {
-                Pest_history::create([
-                    'status'=>$rs['result']['status'],
-                    'message'=>$rs['result']['message'],
-                    'type'=>$transferService->clipboard['type'],
-                    'disk_name'=>$disk,
-                    'to'=>$path,
-                    'from'=>$clipboard['files'][$i],
-                    'document_type'=>'files',
-                    'created_by'=>$auth->id,
-                ]);
-                $i++;
-            }
-        }
-        return $rs;
+
+        return $transferService->filesTransfer();
     }
 
     /**
@@ -334,14 +274,7 @@ class FileManager
     public function rename($disk, $newName, $oldName): array
     {
         Storage::disk($disk)->move($oldName, $newName);
-        Rename_history::create([
-            'status'=>'success',
-            'message'=>'renamed',
-            'disk_name'=>$disk,
-            'old_name'=>$oldName,
-            'new_name'=>$newName,
-            'created_by'=>Auth::user()->id,
-        ]);
+
         return [
             'result' => [
                 'status'  => 'success',
@@ -366,19 +299,8 @@ class FileManager
         } else {
             $filename = basename($path);
         }
-        try {
-            Download_history::create([
-                'disk_name' =>  $disk,
-                'path'      =>  $path,
-                'file_name' =>  $filename,
-                'created_by'=>  Auth::user()->id,
-            ]);
-            return Storage::disk($disk)->download($path, $filename);
-        }catch (\Throwable $exception)
-        {
-            return json($exception);
-        }
 
+        return Storage::disk($disk)->download($path, $filename);
     }
 
     /**
@@ -392,22 +314,14 @@ class FileManager
      */
     public function thumbnails($disk, $path): mixed
     {
-        if ($this->configRepository->getCache()) {
-            $thumbnail = Image::cache(function ($image) use ($disk, $path) {
-                $image->make(Storage::disk($disk)->get($path))->fit(80);
-            }, $this->configRepository->getCache());
-
-            // output
-            return response()->make(
-                $thumbnail,
-                200,
-                ['Content-Type' => Storage::disk($disk)->mimeType($path)]
-            );
-        }
-
-        $thumbnail = Image::make(Storage::disk($disk)->get($path))->fit(80);
-
-        return $thumbnail->response();
+        return response()->make(
+            Image::read(
+                Storage::disk($disk)->get($path))
+                ->coverDown(80, 80)
+                ->encode(),
+            200,
+            ['Content-Type' => Storage::disk($disk)->mimeType($path)]
+        );
     }
 
     /**
@@ -417,12 +331,15 @@ class FileManager
      * @param $path
      *
      * @return mixed
+     * @throws BindingResolutionException
      */
     public function preview($disk, $path): mixed
     {
-        $preview = Image::make(Storage::disk($disk)->get($path));
-
-        return $preview->response();
+        return response()->make(
+            Image::read(Storage::disk($disk)->get($path))->encode(),
+            200,
+            ['Content-Type' => Storage::disk($disk)->mimeType($path)]
+        );
     }
 
     /**
