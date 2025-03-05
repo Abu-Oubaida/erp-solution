@@ -221,7 +221,7 @@ class AccountVoucherController extends Controller
             if ($firstInsert && $request->hasFile('voucher_file')) {
                 foreach ($request->file('voucher_file') as $file) {
                     // Handle each file
-                    $fileName = $voucher_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His').$file->getClientOriginalName();
+                    $fileName = $voucher_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
                     $file_location = $file->move($this->accounts_document_path,$fileName); // Adjust the storage path as needed
                     if (!$file_location)
                     {
@@ -292,7 +292,7 @@ class AccountVoucherController extends Controller
                 $user = Auth::user();
                 $voucherInfo = Account_voucher::with(['VoucherType'])->where('id',Crypt::decryptString($id))->first();
                 foreach ($request->file('voucher_file') as $file) {
-                    $fileName = $voucherInfo->voucher_number."_".$voucherInfo->VoucherType->voucher_type_title."_".now()->format('Ymd_His').$file->getClientOriginalName();
+                    $fileName = $voucherInfo->voucher_number."_".$voucherInfo->VoucherType->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
                     $file_location = $file->move($this->accounts_document_path,$fileName); // Adjust the storage path as needed
                     if (!$file_location)
                     {
