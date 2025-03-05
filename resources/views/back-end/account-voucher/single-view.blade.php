@@ -7,8 +7,8 @@
                 <h1 class="modal-title fs-5 d-inline-block" id="v_document_name">{!! $document->document !!}</h1>
             </div>
             <div class="col-md-7">
-                <span><strong>Voucher Number</strong>:{!! $document->accountVoucherInfo->voucher_number !!}</span>
-                <span class="float-end"><strong>Voucher Type</strong>:{!! $document->accountVoucherInfo->VoucherType->voucher_type_title !!}</span>
+                <span><strong>Reference Number</strong>:{!! $document->accountVoucherInfo->voucher_number !!}</span>
+                <span class="float-end"><strong>Type</strong>:{!! $document->accountVoucherInfo->VoucherType->voucher_type_title !!}</span>
             </div>
             <div class="col-md-12">
                 <strong>Remarks:</strong> {!! $document->accountVoucherInfo->remarks !!}

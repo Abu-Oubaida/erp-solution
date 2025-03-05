@@ -8,7 +8,7 @@
             <form action="{!! route('store.voucher.document.individual') !!}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="col-md-12">
-                    <strong>Voucher No: {!! $voucherInfo->voucher_number !!}</strong>
+                    <strong>Reference No: {!! $voucherInfo->voucher_number !!}</strong>
                     <div class="form-floating mb-3">
                         <input type="file" class="form-control" name="voucher_file[]" multiple id="voucher_file" >
                         <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($voucherInfo->id) !!}">

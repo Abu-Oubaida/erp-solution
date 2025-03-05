@@ -21,8 +21,8 @@
         <th>SL</th>
         <th>Date</th>
         <th>Company</th>
-        <th>Voucher Number</th>
-        <th>Voucher Type</th>
+        <th>Reference Number</th>
+        <th>Type</th>
         <th>Remarks</th>
         <th>Document</th>
         <th>Created By</th>

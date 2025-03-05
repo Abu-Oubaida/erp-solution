@@ -50,24 +50,24 @@
                         <div class="col-md-2">
                             <div class="form-floating mb-2">
                                 <input class="form-control" id="voucher_number" name="voucher_number" type="text" placeholder="Enter Voucher Number" value="{{old('voucher_number')}}"/>
-                                <label for="voucher_number">Voucher Number <span class="text-danger">*</span></label>
+                                <label for="voucher_number">Reference Number <span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-floating mb-2">
                                 <input class="form-control" id="voucher_date" name="voucher_date" type="date" placeholder="Enter Voucher Date" value="{{old('voucher_date')}}"/>
-                                <label for="voucher_date">Voucher Date <span class="text-danger">*</span></label>
+                                <label for="voucher_date">Date <span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-floating mb-2">
                                 <select class="form-control" name="voucher_type" id="voucher_type">
-                                    <option value="">--Select Voucher Type--</option>
+                                    <option value="">--Select a Type--</option>
                                     @foreach($voucherTypes as $date)
                                         <option value="{!! $date->id !!}">{!! $date->voucher_type_title !!}</option>
                                     @endforeach
                                 </select>
-                                <label for="voucher_type">Voucher Type<span class="text-danger">*</span></label>
+                                <label for="voucher_type">Type<span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -96,7 +96,7 @@
         <div class="card mb-4">
             <div class="card-header">
                 <div class="row">
-                    <h3 class="text-capitalize"><i class="fas fa-file-pdf"></i> Your Added/Updated Documents List</h3>
+                    <h3 class="text-capitalize"><i class="fas fa-file-pdf"></i> Your Added Documents Latest 10 Records</h3>
                 </div>
             </div>
             <div class="card-body">

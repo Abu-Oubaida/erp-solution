@@ -56,24 +56,24 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mb-2">
                                         <input class="form-control" id="voucher_number" name="voucher_number" type="text" placeholder="Enter Voucher Number" value="{{$voucherInfo->voucher_number}}"/>
-                                        <label for="voucher_number">Voucher Number <span class="text-danger">*</span></label>
+                                        <label for="voucher_number">Reference Number <span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-2">
                                         <input class="form-control" id="voucher_date" name="voucher_date" type="date" placeholder="Enter Voucher Date" value="{{$voucherInfo->voucher_date}}"/>
-                                        <label for="voucher_date">Voucher Date <span class="text-danger">*</span></label>
+                                        <label for="voucher_date">Date <span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-2">
                                         <select class="form-control" name="voucher_type" id="voucher_type">
-                                            <option value="">--Select Voucher Type--</option>
+                                            <option value="">--Select a Type--</option>
                                             @foreach($voucherTypes as $type)
                                                 <option value="{!! $type->id !!}" @if ($voucherInfo->voucher_type_id == $type->id) selected @endif>{!! $type->voucher_type_title !!}</option>
                                             @endforeach
                                         </select>
-                                        <label for="voucher_type">Voucher Type<span class="text-danger">*</span></label>
+                                        <label for="voucher_type">Type<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
