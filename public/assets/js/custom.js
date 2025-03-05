@@ -2671,6 +2671,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 let ids = $(e).val()
                 if (ids.length === 0)
                 {
+                    setSelectBoxBlank(target_id)
                     return false
                 }
                 const url = window.location.origin + sourceDir + "/search-previous-document"
