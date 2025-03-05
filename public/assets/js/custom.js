@@ -2638,6 +2638,56 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            searchPreviousDocumentReference:function (e,target_id)
+            {
+                let value = $("#input").val()
+                if (value.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/search-previous-document-ref"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'value':value},
+                    success:function (response)
+                    {
+                        if (response.status === 'error')
+                        {
+                            alert('Error: ' + response.message)
+                        }
+                        else if (response.status === 'success') {
+                            updateSelectBoxSingleOption(response.data,target_id,'id','voucher_number')
+                        }
+                    }
+                })
+            },
+            searchPreviousDocuments:function (e,target_id)
+            {
+                let id = $(e).val()
+                if (id.length === 0)
+                {
+                    return false
+                }
+                const url = window.location.origin + sourceDir + "/search-previous-document"
+                $.ajax({
+                    url: url,
+                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    method: "POST",
+                    data:{'id':id},
+                    success:function (response)
+                    {
+                        if (response.status === 'error')
+                        {
+                            alert('Error: ' + response.message)
+                        }
+                        else if (response.status === 'success') {
+                            updateSelectBox(response.data,target_id,'id','document')
+                        }
+                    }
+                })
+            },
         }
     })
     function checkFileExists(url, callback) {

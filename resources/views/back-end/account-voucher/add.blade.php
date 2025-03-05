@@ -35,8 +35,8 @@
                 <form action="{{ route('add.voucher.info') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
-                        <div class="col-md-2">
-                            <div class="mb-3">
+                        <div class="col-md-2 mb-1">
+                            <div class="">
                                 <label for="company">Company Name <span class="text-danger">*</span></label>
                                 <select class="text-capitalize select-search" id="company" name="company">
                                     @if(isset($companies) || (count($companies) > 0))
@@ -47,20 +47,20 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-floating mb-2">
+                        <div class="col-md-2 mb-1">
+                            <div class="form-floating">
                                 <input class="form-control" id="voucher_number" name="voucher_number" type="text" placeholder="Enter Voucher Number" value="{{old('voucher_number')}}"/>
                                 <label for="voucher_number">Reference Number <span class="text-danger">*</span></label>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-floating mb-2">
+                        <div class="col-md-2 mb-1">
+                            <div class="form-floating">
                                 <input class="form-control" id="voucher_date" name="voucher_date" type="date" placeholder="Enter Voucher Date" value="{{old('voucher_date')}}"/>
                                 <label for="voucher_date">Date <span class="text-danger">*</span></label>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-floating mb-2">
+                        <div class="col-md-2 mb-1">
+                            <div class="form-floating">
                                 <select class="form-control" name="voucher_type" id="voucher_type">
                                     <option value="">--Select a Type--</option>
                                     @foreach($voucherTypes as $date)
@@ -70,22 +70,48 @@
                                 <label for="voucher_type">Type<span class="text-danger">*</span></label>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-floating mb-3">
+                        <div class="col-md-2 mb-1">
+                            <div class="form-floating">
                                 <input type="file" class="form-control" name="voucher_file[]" multiple id="voucher_file" >
-                                <label for="voucher_file">Voucher Document<span class="text-danger">*</span></label>
+                                <label for="voucher_file">Voucher Document</label>
                                 <small>jpeg,png,pdf/ Maximum size 500 MB</small>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-floating mb-3">
+                        <div class="col-md-2 mb-1">
+                            <div class="form-floating">
                                 <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10"></textarea>
                                 <label for="remarks">Remarks</label>
                             </div>
                         </div>
-
+                    </div>
+                    <div class="row">
                         <div class="col-md-12">
-                            <div class="form-floating mb-3 float-end">
+                            <small>Link previously uploaded file here</small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-1">
+                            <div class="input-group">
+                                <input type="text" id="input" class="form-control" placeholder="Reference number">
+                                <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'previous-reference')"><i class="fas fa-search"></i> Search</a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-1">
+                            <div class="">
+                                <select class="text-capitalize select-search" id="previous-reference" name="previous-reference" onchange="return Obj.searchPreviousDocuments(this,'previous-file')">
+                                    <option>--choose a option--</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-1">
+                            <div class="">
+                                <select class="text-capitalize select-search" id="previous-file" name="previous_files[]" multiple>
+                                    <option>--choose a file--</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-1">
+                            <div class="float-end">
                                 <button type="submit" value="" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Upload</button>
                             </div>
                         </div>

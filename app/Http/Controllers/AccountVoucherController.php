@@ -195,20 +195,21 @@ class AccountVoucherController extends Controller
             'voucher_date'      =>  ['required','date'],
             'voucher_type'      =>  ['required','numeric','exists:voucher_types,id'],
             'remarks'           =>  ['sometimes','nullable','string'],
-            'voucher_file.*'    =>  ['required','max:512000'],
+            'voucher_file.*'    =>  ['sometimes','nullable','max:512000'],
+            'previous_files'    =>  ['sometimes','nullable','array'],
+            'previous_files.*'  =>  ['sometimes','nullable','exists:voucher_documents,id'],
         ]);
         DB::beginTransaction();
         try {
             extract($request->post());
             $user = Auth::user();
-//            dd(count($request->file('voucher_file')));
             $v_type = VoucherType::where('id',$voucher_type)->first();
             $firstInsert = DB::table('account_voucher_infos')->insertGetId([
                 'company_id'        =>  $company,
                 'voucher_type_id'   =>  $voucher_type,
                 'voucher_number'    =>  $voucher_number,
                 'voucher_date'      =>  $voucher_date,
-                'file_count'        =>  count($request->file('voucher_file')),
+                'file_count'        =>  null,
                 'remarks'           =>  $remarks,
                 'created_by'        =>  $user->id,
                 'created_at'        =>  now(),
@@ -244,8 +245,31 @@ class AccountVoucherController extends Controller
                     }
                 }
             }
+            if ($firstInsert && !empty($previous_files)) {
+                $previous_documents = VoucherDocument::whereIn('id', $previous_files)->get();
+
+                $insertData = $previous_documents->map(function ($previous_document) use ($user,$firstInsert) {
+                    return [
+                        'company_id'      => $previous_document->company_id,
+                        'voucher_info_id' => $firstInsert,
+                        'document'        => $previous_document->document,
+                        'filepath'        => $previous_document->filepath,
+                        'created_by'      => $user->id,
+                        'created_at'      => now(),
+                    ];
+                })->toArray();
+
+                if (!empty($insertData)) {
+                    $thirdInsert = VoucherDocument::insert($insertData); // Bulk insert
+                }
+                if (!$thirdInsert) {
+                    // Rollback the transaction if the second insert for any item failed
+                    DB::rollBack();
+                    return redirect()->back()->with('error', 'Failed to execute the second insert.');
+                }
+            }
             DB::commit();
-            return redirect()->back()->with('success', 'Data inserts were successful.');
+            return redirect()->back()->with('success', 'Data save successful.');
 
         }catch (\Throwable $exception)
         {
@@ -775,6 +799,68 @@ class AccountVoucherController extends Controller
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function searchPreviousDocumentRef(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'value' => ['required','string'],
+                ]);
+                extract($request->post());
+                $data = Account_voucher::where(function ($query) use ($value) {
+                    $query->where('voucher_number', 'like', "%{$value}%")
+                        ->orWhere('remarks', 'like', "%{$value}%");
+                })->select(['id', 'voucher_number'])
+                ->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $data,
+                    'message' => 'Requested data found successfully!'
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message'=>'Requested method are not allowed!'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=> $exception->getMessage()
+            ]);
+        }
+    }
+    public function searchPreviousDocument(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'id' => ['required','string','exists:account_voucher_infos,id'],
+                ]);
+                extract($request->post());
+                $data = VoucherDocument::where('voucher_info_id',$id)->select(['id', 'document'])
+                ->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $data,
+                    'message' => 'Requested data found successfully!'
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message'=>'Requested method are not allowed!'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=> $exception->getMessage()
+            ]);
         }
     }
 }

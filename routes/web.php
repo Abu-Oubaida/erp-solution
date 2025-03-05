@@ -234,6 +234,8 @@ Route::group(['middleware' => ['auth']],function (){
 
 # 3.7 Accounts File Manager Controller
     Route::controller(AccountVoucherController::class)->group(function (){
+        Route::post('search-previous-document-ref','searchPreviousDocumentRef')->name('search.previous-document-ref');//for ajax
+        Route::post('search-previous-document','searchPreviousDocument')->name('search.previous-document');//for ajax
 # 3.7.1 Add voucher Type
         Route::middleware(['permission:add_voucher_type'])->group(function () {
             Route::match(['post','get'],'add-voucher-type','createVoucherType')->name('add.voucher.type');
