@@ -98,14 +98,14 @@
                         </div>
                         <div class="col-md-3 mb-1">
                             <div class="">
-                                <select class="text-capitalize select-search" id="previous-reference" name="previous-reference" onchange="return Obj.searchPreviousDocuments(this,'previous-file')">
+                                <select class="text-capitalize select-search" id="previous-reference" name="previous-reference" onchange="return Obj.searchPreviousDocuments(this,'previous-file')" multiple>
                                     <option>--choose a option--</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-4 mb-1">
                             <div class="">
-                                <select class="text-capitalize select-search" id="previous-file" name="previous_files[]" multiple>
+                                <select class="text-capitalize select-search" id="previous-file" name="previous_files[]" multiple onchange="return Obj.selectAllOption(this)">
                                     <option>--choose a file--</option>
                                 </select>
                             </div>

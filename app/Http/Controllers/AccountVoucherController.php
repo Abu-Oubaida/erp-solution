@@ -840,10 +840,22 @@ class AccountVoucherController extends Controller
             if ($request->isMethod('post'))
             {
                 $request->validate([
-                    'id' => ['required','string','exists:account_voucher_infos,id'],
+                    'ids' => ['required','array'],
+                    'ids.*' => ['string',function ($attribute, $value, $fail) {
+                        if ($value != 0) {
+                            // Apply the exists rule only when pid is not 0
+                            $exists = DB::table('account_voucher_infos')
+                                ->where('id', $value)
+                                ->exists();
+
+                            if (!$exists) {
+                                $fail('The selected pid is invalid.');
+                            }
+                        }
+                    }],
                 ]);
                 extract($request->post());
-                $data = VoucherDocument::where('voucher_info_id',$id)->select(['id', 'document'])
+                $data = VoucherDocument::whereIn('voucher_info_id',$ids)->select(['id', 'document'])
                 ->get();
                 return response()->json([
                     'status' => 'success',

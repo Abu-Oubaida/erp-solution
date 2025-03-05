@@ -2658,15 +2658,18 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                             alert('Error: ' + response.message)
                         }
                         else if (response.status === 'success') {
-                            updateSelectBoxSingleOption(response.data,target_id,'id','voucher_number')
+                            // updateSelectBoxSingleOption(response.data,target_id,'id','voucher_number')
+                            updateSelectBox(response.data,target_id,'id','voucher_number')
+                            Obj.selectAllOption(e)
+                            return true
                         }
                     }
                 })
             },
             searchPreviousDocuments:function (e,target_id)
             {
-                let id = $(e).val()
-                if (id.length === 0)
+                let ids = $(e).val()
+                if (ids.length === 0)
                 {
                     return false
                 }
@@ -2675,7 +2678,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     url: url,
                     headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
                     method: "POST",
-                    data:{'id':id},
+                    data:{'ids':ids},
                     success:function (response)
                     {
                         if (response.status === 'error')
@@ -2684,6 +2687,8 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         }
                         else if (response.status === 'success') {
                             updateSelectBox(response.data,target_id,'id','document')
+                            Obj.selectAllOption(e)
+                            return true
                         }
                     }
                 })
