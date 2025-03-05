@@ -185,7 +185,6 @@ return [
             ['disks' => 'file-manager', 'path' => 'user/*', 'access' => 2],
         ],
     ],
-
     /**
      * Enable slugification of filenames of uploaded files.
      *

@@ -68,7 +68,7 @@ class ACL
     {
         return Arr::where($this->rulesList(),
             function ($value) use ($disk) {
-                return $value['disk'] === $disk;
+                return $value['disks'] === $disk;
             });
     }
 
