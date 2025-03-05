@@ -96,12 +96,13 @@
                                 <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'previous-reference')"><i class="fas fa-search"></i> Search</a>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-1">
-                            <div class="">
-                                <select class="text-capitalize select-search" id="previous-reference" name="previous-reference" onchange="return Obj.searchPreviousDocuments(this,'previous-file')" multiple>
+                        <div class="col-sm-2 mb-1">
+                                <select class="text-capitalize select-search form-control" id="previous-reference" name="previous-reference" onchange="return Obj.selectAllOption(this)" multiple>
                                     <option>--choose a option--</option>
                                 </select>
-                            </div>
+                        </div>
+                        <div class="col-md-1 mb-1">
+                            <a class="btn btn-sm btn-outline-secondary" id="previous-reference-search" onclick="return Obj.searchPreviousDocuments('previous-reference','previous-file')"><i class="fas fa-search"></i> Search</a>
                         </div>
                         <div class="col-md-4 mb-1">
                             <div class="">

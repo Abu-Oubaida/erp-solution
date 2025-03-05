@@ -2666,9 +2666,9 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
-            searchPreviousDocuments:function (e,target_id)
+            searchPreviousDocuments:function (input_id,target_id)
             {
-                let ids = $(e).val()
+                let ids = $("#"+input_id).val()
                 if (ids.length === 0)
                 {
                     setSelectBoxBlank(target_id)
@@ -2688,7 +2688,6 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                         }
                         else if (response.status === 'success') {
                             updateSelectBox(response.data,target_id,'id','document')
-                            Obj.selectAllOption(e)
                             return true
                         }
                     }
