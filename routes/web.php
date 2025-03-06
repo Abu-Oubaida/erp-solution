@@ -254,6 +254,7 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::middleware(['permission:voucher_document_edit'])->group(function () {
             Route::match(['put','get'],'edit-voucher/{voucherDocumentID}','voucherDocumentEdit')->name('edit.voucher.info');
+            Route::put('linked-uploaded-document','linkedUploadedDocument')->name('linked-uploaded.document');
         });
         Route::middleware(['permission:voucher_document_delete'])->group(function () {
             Route::delete('delete-voucher','delete')->name('delete.voucher.info');

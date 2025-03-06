@@ -381,6 +381,49 @@ class AccountVoucherController extends Controller
             return back()->with('error',$exception->getMessage());
         }
     }
+    public function linkedUploadedDocument(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->edit_voucher_type;
+            if ($request->isMethod('put'))
+            {
+                $validated  = $request->validate([
+                   'company_id_link' => ['required','string', 'exists:company_infos,id'],
+                    'update_document_info_id' => ['required','string', 'exists:account_voucher_infos,id'],
+                    'previous_files'  => ['required','array'],
+                    'previous_files.*'  => ['required','string','exists:voucher_documents,id'],
+                ]);
+                extract($validated);
+                if (!empty($previous_files)) {
+                    $previous_documents = VoucherDocument::whereIn('id', $previous_files)->get();
+
+                    $insertData = $previous_documents->map(function ($previous_document) use ($update_document_info_id,$company_id_link) {
+                        return [
+                            'company_id'      => $company_id_link,
+                            'voucher_info_id' => $update_document_info_id,
+                            'document'        => $previous_document->document,
+                            'filepath'        => $previous_document->filepath,
+                            'created_by'      => Auth::user()->id,
+                            'created_at'      => now(),
+                        ];
+                    })->toArray();
+
+                    if (!empty($insertData)) {
+                        $thirdInsert = VoucherDocument::insert($insertData); // Bulk insert
+                        if (!$thirdInsert) {
+                            return back()->with('error', 'Failed to execute the second insert.');
+                        }
+                        return back()->with('success', 'Document updated successfully.');
+                    }
+                    return back()->with('error', 'Failed to execute the insert operation.');
+                }
+                return back()->with('error', 'Invalid data provided.');
+            }
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
 
     private function updateVoucherDocument(Request $request, $vID)
     {

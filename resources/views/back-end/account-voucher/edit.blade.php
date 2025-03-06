@@ -98,6 +98,55 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-md-8">
+                                <h3 class="text-capitalize"><i class="fas fa-link"></i> Link previously uploaded file here</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form action="{!! route('linked-uploaded.document') !!}" method="post">
+                            @csrf
+                            @method('put')
+                            <div class="row">
+                                <div class="col-md-6 mb-1">
+                                    <label for="input">Reference No. or Remarks</label>
+                                    <div class="input-group">
+                                        <input type="hidden" value="{!! @$voucherInfo->company_id  !!}" id="company_id_link" name="company_id_link">
+                                        <input type="hidden" value="{!! @$voucherInfo->id  !!}" id="update_document_info_id" name="update_document_info_id">
+                                        <input type="text" id="input" class="form-control" placeholder="Reference number or remarks">
+                                        <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'company_id_link','previous-reference')"><i class="fas fa-search"></i> Search</a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <label for="input">Select Reference No. or Remarks</label>
+                                    <select class="text-capitalize select-search form-control" id="previous-reference" name="previous-reference" onchange="return Obj.selectAllOption(this)" multiple>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <a class="btn btn-sm btn-outline-secondary mt-4" id="previous-reference-search" onclick="return Obj.searchPreviousDocuments('previous-reference','previous-file')"><i class="fas fa-search"></i> Search</a>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <div class="">
+                                        <label for="input">Select files here</label>
+                                        <select class="text-capitalize select-search" id="previous-file" name="previous_files[]" multiple onchange="return Obj.selectAllOption(this)">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mb-1">
+                                    <div class="float-end">
+                                        <button type="submit" value="submit" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Link Update</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-8">
                                 <h3 class="text-capitalize"><i class="fas fa-edit"></i> {{str_replace('info','document',str_replace('.', ' ', \Route::currentRouteName()))}} Document</h3>
                             </div>
                             <div class="col">

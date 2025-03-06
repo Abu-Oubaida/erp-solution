@@ -2638,10 +2638,10 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
-            searchPreviousDocumentReference:function (e,target_id)
+            searchPreviousDocumentReference:function (e,company_id,target_id)
             {
                 let value = $("#input").val()
-                let company = $("#company").val()
+                let company = $("#"+company_id).val()
                 if (value.length === 0 || company.length === 0)
                 {
                     return false

@@ -93,7 +93,7 @@
                         <div class="col-md-3 mb-1">
                             <div class="input-group">
                                 <input type="text" id="input" class="form-control" placeholder="Reference number">
-                                <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'previous-reference')"><i class="fas fa-search"></i> Search</a>
+                                <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'company','previous-reference')"><i class="fas fa-search"></i> Search</a>
                             </div>
                         </div>
                         <div class="col-sm-2 mb-1">
