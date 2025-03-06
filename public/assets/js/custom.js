@@ -2641,7 +2641,8 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             searchPreviousDocumentReference:function (e,target_id)
             {
                 let value = $("#input").val()
-                if (value.length === 0)
+                let company = $("#company").val()
+                if (value.length === 0 || company.length === 0)
                 {
                     return false
                 }
@@ -2650,7 +2651,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     url: url,
                     headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
                     method: "POST",
-                    data:{'value':value},
+                    data:{'value':value,'company':company},
                     success:function (response)
                     {
                         if (response.status === 'error')

@@ -809,9 +809,10 @@ class AccountVoucherController extends Controller
             {
                 $request->validate([
                     'value' => ['required','string'],
+                    'company' =>  ['required','string','exists:company_infos,id'],
                 ]);
                 extract($request->post());
-                $data = Account_voucher::where(function ($query) use ($value) {
+                $data = Account_voucher::where('company_id',$company)->where(function ($query) use ($value) {
                     $query->where('voucher_number', 'like', "%{$value}%")
                         ->orWhere('remarks', 'like', "%{$value}%");
                 })->select(['id', 'voucher_number'])
