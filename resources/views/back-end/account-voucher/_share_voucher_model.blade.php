@@ -1,6 +1,12 @@
 <div class="modal-content">
     <div class="modal-header">
-        <h1 class="modal-title fs-5" id="v_document_title">{!! $result->document !!}</h1>
+        <h1 class="modal-title fs-5 w-100" id="v_document_title">
+            <div class="row">
+                <div class="col"><strong>Reference No:</strong> {!! $result->voucher_number !!}</div>
+                <div class="col"><strong>Type:</strong> {!! @$result->VoucherType->voucher_type_title !!}</div>
+                <div class="col"><strong>Date:</strong> {!! $result->voucher_date !!}</div>
+            </div>
+        </h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body">
@@ -29,7 +35,7 @@
             </div>
             <div class="col-md-12">
                 <div class="form-floating mb-3 float-end">
-                    <button class="btn btn-success" id="submit-tags" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($result->id) !!}" onclick="return Obj.sendDocumentEmail(this)" type="button"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
+                    <button class="btn btn-success" id="submit-tags" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($result->id) !!}" onclick="return Obj.sendVoucherEmail(this)" type="button"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
                 </div>
             </div>
 

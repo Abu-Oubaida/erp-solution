@@ -154,6 +154,8 @@ return array(
     'App\\Models\\VoucherDocumentShareEmailList' => $baseDir . '/app/Models/VoucherDocumentShareEmailList.php',
     'App\\Models\\VoucherDocumentShareLink' => $baseDir . '/app/Models/VoucherDocumentShareLink.php',
     'App\\Models\\VoucherType' => $baseDir . '/app/Models/VoucherType.php',
+    'App\\Models\\Voucher_share_email_link' => $baseDir . '/app/Models/Voucher_share_email_link.php',
+    'App\\Models\\Voucher_share_email_list' => $baseDir . '/app/Models/Voucher_share_email_list.php',
     'App\\Models\\branch' => $baseDir . '/app/Models/branch.php',
     'App\\Models\\company_info' => $baseDir . '/app/Models/company_info.php',
     'App\\Models\\company_type' => $baseDir . '/app/Models/company_type.php',

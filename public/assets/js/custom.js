@@ -882,6 +882,28 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 })
                 return false
             },
+            voucherShare:function (e) {
+                let id = $(e).attr('ref')
+                let url = window.location.origin + sourceDir + "/share-voucher-fiend";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'id':id},
+                    success: function(data){
+                        if (data.error){
+                            alert(data.error.msg)
+                        }else{
+                            while(tags.length > 0) {
+                                tags.pop();
+                            }
+                            $('#model_dialog').html(data)
+                            $('#shareModel').modal('show')
+                        }
+                    }
+                })
+                return false
+            },
             voucherDocumentIndividual:function (e) {
                 let id = $(e).attr('ref')
                 let url = window.location.origin + sourceDir + "/fiend-voucher-document-info";
@@ -1000,6 +1022,40 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             sendDocumentEmail:function (e)
             {
                 const url = window.location.origin + sourceDir + "/share-voucher-document-email";
+                const refId = $(e).attr('ref');
+                const message = $('#message').val()
+                // const data = { tags: tags, refId: refId };
+                if (tags.length <= 0) {
+                    alert("Error! Empty Field");
+                    return false;
+                } else {
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        data: {tags: tags, refId: refId, message: message},
+                        success: function(data) {
+                            if (data.error){
+                                alert(data.error.msg)
+                                return false
+                            }else {
+                                data = JSON.parse(data)
+                                alert(data.results)
+                                if (data.results)
+                                    $('#shareModel').modal('hide')
+                                else
+                                    return false
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                }
+            },
+            sendVoucherEmail:function (e)
+            {
+                const url = window.location.origin + sourceDir + "/share-voucher-email";
                 const refId = $(e).attr('ref');
                 const message = $('#message').val()
                 // const data = { tags: tags, refId: refId };

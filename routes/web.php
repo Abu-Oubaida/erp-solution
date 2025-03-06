@@ -52,7 +52,9 @@ Route::controller(ajaxRequestController::class)->group(function (){
     Route::middleware(['permission:share_voucher_document_individual'])->group(function (){
         Route::post('fiend-voucher-document-info','fiendVoucherDocumentInfo')->name('fiend.voucher.document.info');
         Route::post('voucher-share-type','voucherShareType')->name('voucher.share.type');
-
+    });
+    Route::middleware(['permission:share_voucher'])->group(function (){
+        Route::post('share-voucher-fiend','shareVoucherFiend')->name('share.voucher.document.fiend');
     });
     # 2.4 For Auth user company check
     Route::post('company-check-set','companyCheckSet');
@@ -73,6 +75,10 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:share_voucher_document_individual'])->group(function (){
             Route::post('share-voucher-document-email','shareVoucherDocumentEmail')->name('share.voucher.document');
             Route::post('email-link-status-change','emailLinkStatusChange')->name('email.link.status.change');
+        });
+        Route::middleware(['permission:share_voucher_document'])->group(function (){
+            Route::post('share-voucher-email','shareVoucherEmail')->name('share.voucher.email');
+//            Route::post('email-link-status-change','emailLinkStatusChange')->name('email.link.status.change');
         });
         Route::post('company-wise-projects','companyWiseProjects');
         Route::post('user-wise-company-project-permissions','userWiseCompanyProjectPermissions');
@@ -573,6 +579,7 @@ Route::group(['middleware' => ['auth']],function (){
 # 4.0 Share Document View
 Route::controller(ShareDocumentViewController::class)->group(function (){
     Route::get('voucher-document-view','voucherDocumentView')->name('voucher.document.view');
+    Route::get('voucher-view','voucherView')->name('voucher.view');
 });
 Route::controller(AccountVoucherController::class)->group(function (){
     Route::middleware(['permission:add_voucher_document_individual'])->group(function (){

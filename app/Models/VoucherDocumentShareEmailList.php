@@ -12,6 +12,6 @@ class VoucherDocumentShareEmailList extends Model
 
     public function ShareLink()
     {
-        return $this->belongsTo(VoucherDocumentShareEmailLink::class,'id');
+        return $this->belongsTo(VoucherDocumentShareEmailLink::class,'share_id','id');
     }
 }

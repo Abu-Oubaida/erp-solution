@@ -830,6 +830,8 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\VoucherDocumentShareEmailList' => __DIR__ . '/../..' . '/app/Models/VoucherDocumentShareEmailList.php',
         'App\\Models\\VoucherDocumentShareLink' => __DIR__ . '/../..' . '/app/Models/VoucherDocumentShareLink.php',
         'App\\Models\\VoucherType' => __DIR__ . '/../..' . '/app/Models/VoucherType.php',
+        'App\\Models\\Voucher_share_email_link' => __DIR__ . '/../..' . '/app/Models/Voucher_share_email_link.php',
+        'App\\Models\\Voucher_share_email_list' => __DIR__ . '/../..' . '/app/Models/Voucher_share_email_list.php',
         'App\\Models\\branch' => __DIR__ . '/../..' . '/app/Models/branch.php',
         'App\\Models\\company_info' => __DIR__ . '/../..' . '/app/Models/company_info.php',
         'App\\Models\\company_type' => __DIR__ . '/../..' . '/app/Models/company_type.php',
