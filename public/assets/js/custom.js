@@ -7,6 +7,17 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
     sourceDir = ""
 }
 (function ($){
+    $(document).ready(function() {
+        // Show loading message when the document starts loading
+        $("#ajax_loader").show();
+        $("#ajax_loader2").show();
+    });
+
+// Hide loading message when the full page (including images) is loaded
+    $(window).on("load", function() {
+        $("#ajax_loader").hide();
+        $("#ajax_loader2").hide();
+    });
     $(document).ajaxStop(function(){
         $("#ajax_loader").hide();
         $("#ajax_loader2").hide();
