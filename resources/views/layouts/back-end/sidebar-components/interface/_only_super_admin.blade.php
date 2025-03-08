@@ -69,6 +69,9 @@
             @else
                 <a class="nav-link text-chl" href="{!! route('permission.input') !!}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Permission</a>
             @endif
+            @if(Route::currentRouteName() == 'permission.edit')
+                <a class="nav-link" href="{{route('permission.edit',['permissionID'=>\Illuminate\Support\Facades\Request::route('permissionID')])}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-edit"></i></div> Permission Edit</a>
+            @endif
             @if(Route::currentRouteName() == 'op.reference.type')
                 <a class="nav-link" href="{{route('op.reference.type')}}" title="Operation Reference Type"><div class="sb-nav-link-icon"><i class="fa-solid fa-icons"></i></div> Op. Ref. Type</a>
             @else

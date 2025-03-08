@@ -91,6 +91,8 @@ Route::group(['middleware' => ['auth']],function (){
             # 3.2.1.1 Only for programmer
             Route::controller(prorammerController::class)->group(function (){
                 Route::get('permission-input','create')->name('permission.input');
+                Route::match(['get','put'],'permission-edit/{permissionID}','edit')->name('permission.edit');
+                Route::post('permission-update','update')->name('permission.update');
                 Route::get('permission-export-prototype','exportPrototype')->name('permission.export.prototype');
                 Route::post('add-permission-excel','permissionStoreBulk');
                 Route::post('permission-store','store')->name('permission.input.store');

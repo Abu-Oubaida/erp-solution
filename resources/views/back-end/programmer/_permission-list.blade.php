@@ -43,6 +43,7 @@
                 <td><strong>{!! date('d-M-y',strtotime($data->created_at))   !!}</strong></td>
                 <td><strong>{!! date('d-M-y',strtotime($data->updated_at))   !!}</strong></td>
                 <td>
+                    <a href="{{route('permission.edit',["permissionID"=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)])}}" class="text-primary" title="Edit"><i class='fas fa-edit'></i></a>
                     <form action="{{route('permission.input.delete')}}" class="display-inline" method="post">
                         @method('delete')
                         @csrf
@@ -63,6 +64,7 @@
                     <td>{!! date('d-M-y',strtotime($child->created_at))   !!}</td>
                     <td>{!! date('d-M-y',strtotime($child->updated_at))   !!}</td>
                     <td>
+                        <a href="{{route('permission.edit',["permissionID"=>\Illuminate\Support\Facades\Crypt::encryptString($child->id)])}}" class="text-primary" title="Edit"><i class='fas fa-edit'></i></a>
                         <form action="{{route('permission.input.delete')}}" class="display-inline" method="post">
                             @method('delete')
                             @csrf

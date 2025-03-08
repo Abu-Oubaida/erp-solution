@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\TransferException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
 class prorammerController extends Controller
@@ -24,7 +25,6 @@ class prorammerController extends Controller
                 $this->store($request);
             }
             $permissions = Permission::with(['childPermission','parentName'])->where('parent_id',null)->orWhere('is_parent','!=',null)->orderBy('id','ASC')->get();
-//            dd($permissions);
             return view('back-end.programmer.permission-input',compact("permissions"));
         }catch (\Throwable $exception)
         {
@@ -135,6 +135,63 @@ class prorammerController extends Controller
                 'message' => $exception->getMessage(),
             ];
             return response()->json($response, 200);
+        }
+    }
+    public function edit(Request $request,$permissionID)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $this->update($request);
+            }
+            $permissionID = Crypt::decryptString($permissionID);
+            $permissions = Permission::with(['childPermission','parentName'])->where('parent_id',null)->orWhere('is_parent','!=',null)->orderBy('id','ASC')->get();
+            $permission = Permission::find($permissionID);
+            return view('back-end.programmer.permission-edit',compact("permissions","permission"));
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+    public function update(Request $request)
+    {
+        try {
+            $rules= [
+                'permission_id' => ['string','required', 'exists:permissions,id'],
+                'permission_name'  => ['string','required', 'max:255','regex:/^[a-z0-9_]+$/',Rule::unique('permissions', 'name')->ignore($request->permission_id, 'id')],
+                'permission_display_name'  => ['string','required', 'max:255',Rule::unique('permissions', 'display_name')->ignore($request->permission_id, 'id')],
+                'description'  => ['string','sometimes','nullable', 'max:255'],
+            ];
+            $customMessages = [
+                'custom_separator' => 'Without underscore "_" all separator are invalid!'
+            ];
+            $this->validate($request, $rules, $customMessages);
+            extract($request->post());
+            if (Permission::where('id',$permission_parent)->where('name','none')->first())
+            {
+                $permission_parent = null;
+            }
+            Permission::where('id',$permission_id)->update([
+                'parent_id' =>  $permission_parent,
+                'name'      =>  $permission_name,
+                'is_parent'  =>  $request->is_parent,
+                'display_name'=>  $permission_display_name,
+                'description'=>  $description,
+            ]);
+            $permissions = Permission::with(['childPermission','parentName'])->where('parent_id',null)->orWhere('is_parent','!=',null)->orderBy('id','ASC')->get();
+            $view   = view('back-end.programmer._permission-list',compact("permissions"))->render();
+            return response()->json([
+                'status' => 'success',
+                'data' => $view,
+                'parents' => $permissions,
+                'message' => 'Data updated successfully.',
+            ], 200);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ], 200);
         }
     }
     public function delete(Request $request)

@@ -415,6 +415,37 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     }
                 })
             },
+            permissionUpdate:function (e)
+            {
+                const permission_parent = $('#permission_parent').val()
+                const permission_name = $('#permission_name').val()
+                const permission_display_name = $('#permission_display_name').val()
+                const description = $('#description').val()
+                const permission_id = $('#permission_id').val()
+                if (permission_id.length === 0 || permission_parent.length === 0 || permission_display_name.length === 0 || permission_name.length === 0)
+                {
+                    return false
+                }
+                let url = window.location.origin + sourceDir + "/system-operation/permission-update";
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: url,
+                    type: "POST",
+                    data: {'permission_parent':permission_parent,'permission_name':permission_name,'permission_display_name':permission_display_name,'description':description, 'permission_id':permission_id},
+                    success: function(response){
+                        if (response.status === 'success')
+                        {
+                            alert(response.message)
+                            $('#permission-list').html(response.data)
+                        }
+                        if (response.status === 'error')
+                        {
+                            alert("Error:"+response.message)
+                            // Handle error
+                        }
+                    }
+                })
+            },
             authCompany: function (e){
                 const username = $("#email").val()
                 const password = $("#password").val()
