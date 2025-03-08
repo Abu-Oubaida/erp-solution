@@ -6,18 +6,29 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 }else{
     sourceDir = ""
 }
-(function ($){
-    $(document).ready(function() {
-        // Show loading message when the document starts loading
-        $("#ajax_loader").show();
-        $("#ajax_loader2").show();
-    });
+// Show loader immediately when the page starts loading
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("ajax_loader").style.display = "block";
+    document.getElementById("ajax_loader2").style.display = "block";
+});
 
-// Hide loading message when the full page (including images) is loaded
-    $(window).on("load", function() {
-        $("#ajax_loader").hide();
-        $("#ajax_loader2").hide();
-    });
+// Hide loader when the full page (including images, CSS, etc.) is fully loaded
+window.onload = function() {
+    document.getElementById("ajax_loader").style.display = "none";
+    document.getElementById("ajax_loader2").style.display = "none";
+};
+(function ($){
+//     $(document).ready(function() {
+//         // Show loading message when the document starts loading
+//         $("#ajax_loader").show();
+//         $("#ajax_loader2").show();
+//     });
+//
+// // Hide loading message when the full page (including images) is loaded
+//     $(window).on("load", function() {
+//         $("#ajax_loader").hide();
+//         $("#ajax_loader2").hide();
+//     });
     $(document).ajaxStop(function(){
         $("#ajax_loader").hide();
         $("#ajax_loader2").hide();
