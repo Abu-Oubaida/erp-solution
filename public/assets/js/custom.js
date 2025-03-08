@@ -7,14 +7,6 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
     sourceDir = ""
 }
 // Show loader immediately when the page starts loading
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("page_loader").style.display = "block";
-});
-
-// Hide loader when the full page (including images, CSS, etc.) is fully loaded
-window.onload = function() {
-    document.getElementById("page_loader").style.display = "none";
-};
 (function ($){
 //     $(document).ready(function() {
 //         // Show loading message when the document starts loading

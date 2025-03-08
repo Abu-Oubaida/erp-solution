@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("page_loader").style.display = "block";
+        });
+
+        // Hide loader when the full page (including images, CSS, etc.) is fully loaded
+        window.onload = function() {
+            document.getElementById("page_loader").style.display = "none";
+        };
+    </script>
     <title style="">{{ucwords(str_replace('.', ' ', \Route::currentRouteName()))}} | {{str_replace('-', '-', config('app.name'))}}</title>
     <link rel="icon" href="{{url("image/logo/default/icon/360.png")}}">
     <x-back-end._header-link/>
@@ -16,7 +26,7 @@
 <div id="page_loader" style="
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); color: white;
+    background: rgba(0,0,0,0.3); color: white;
     display: flex; justify-content: center; align-items: center;
     font-size: 24px; z-index: 9999;">
     Loading, please wait...
