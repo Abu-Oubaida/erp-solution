@@ -8,14 +8,12 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
 }
 // Show loader immediately when the page starts loading
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("ajax_loader").style.display = "block";
-    document.getElementById("ajax_loader2").style.display = "block";
+    document.getElementById("page_loader").style.display = "block";
 });
 
 // Hide loader when the full page (including images, CSS, etc.) is fully loaded
 window.onload = function() {
-    document.getElementById("ajax_loader").style.display = "none";
-    document.getElementById("ajax_loader2").style.display = "none";
+    document.getElementById("page_loader").style.display = "none";
 };
 (function ($){
 //     $(document).ready(function() {

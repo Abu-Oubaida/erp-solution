@@ -13,6 +13,14 @@
 </head>
 {{--<body class="sb-nav-fixed sb-sidenav-toggled">--}}
 <body class="sb-nav-fixed">
+<div id="page_loader" style="
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); color: white;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 24px; z-index: 9999;">
+    Loading, please wait...
+</div>
 <div id='ajax_loader' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
     <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
 </div>
