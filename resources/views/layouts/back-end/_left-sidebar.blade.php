@@ -63,11 +63,11 @@
             {{--#2.3    Accounts File Storage System Start--}}
             <group5>
                 {{--#2.3.1  Permission Chck Accounts File Storage System Start--}}
-                @if(auth()->user()->hasPermission('add_voucher_type') || auth()->user()->hasPermission('edit_voucher_type') || auth()->user()->hasPermission('delete_voucher_type') || auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document')|| auth()->user()->hasPermission('view_voucher_document') || auth()->user()->hasPermission('salary_certificate_input') || auth()->user()->hasPermission('salary_certificate_list') || auth()->user()->hasPermission('salary_certificate_view') || auth()->user()->hasPermission('voucher_document_edit'))
+                @if(auth()->user()->hasPermission('salary_certificate_input') || auth()->user()->hasPermission('salary_certificate_list') || auth()->user()->hasPermission('salary_certificate_view'))
                     {{--#2.3.1.1   Route/URL Chck and set navigation header Accounts File Storage Start--}}
                     <subgroup1>
-                        @if(Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'add.bill.info' || Route::currentRouteName() == 'add.fr.info'|| Route::currentRouteName() == 'view.voucher.document' || Route::currentRouteName() == 'input.salary.certificate' || Route::currentRouteName() == 'salary.certificate.list' || Route::currentRouteName() == 'salary.certificate.view' || Route::currentRouteName() == 'edit.voucher.info')
-                            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#accLayouts"
+                        @if(Route::currentRouteName() == 'input.salary.certificate' || Route::currentRouteName() == 'salary.certificate.list' || Route::currentRouteName() == 'salary.certificate.view')
+                            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#archiveLayouts"
                                aria-expanded="true" aria-controls="accLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-file-invoice-dollar"></i></div>
                                 Accounts
@@ -88,8 +88,6 @@
                                         <nav class="sb-sidenav-menu-nested nav ">
                                             {{--                    Only Accounts Document related menu and submenu--}}
                                             @include('layouts.back-end.sidebar-components.interface.accounts._add_menu_submenu')
-                                            {{--                    Only Document Upload related menu and submenu Here--}}
-                                            @include('layouts.back-end.sidebar-components.interface.accounts._upload_option_menu_submenu')
                                             {{--                    Only List of Documet related menu and submenu Here--}}
                                             @include('layouts.back-end.sidebar-components.interface.accounts._view_list_menu_submenu')
                                         </nav>
@@ -276,16 +274,73 @@
 {{--                    @endif--}}
                 @endif
             </group10>{{--#2.6    Mobile Sim section End--}}
+            <group5>
+                @if(auth()->user()->hasPermission('add_voucher_type') || auth()->user()->hasPermission('edit_voucher_type') || auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document') || auth()->user()->hasPermission('voucher_document_edit') || auth()->user()->hasPermission('list_voucher_document') || auth()->user()->hasPermission('view_voucher_document'))
 
-            {{--            <div class="sb-sidenav-menu-heading">Addons</div>--}}
-            {{--            <a class="nav-link text-chl" href="charts.html">--}}
-            {{--                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>--}}
-            {{--                Charts--}}
-            {{--            </a>--}}
-            {{--            <a class="nav-link text-chl" href="tables.html">--}}
-            {{--                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>--}}
-            {{--                Tables--}}
-            {{--            </a>--}}
+                    @if(Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'edit.voucher.info' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'view.voucher.document')
+                        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="true" aria-controls="pagesUploadOption">
+                            <div class="sb-nav-link-icon"><i class="fas fa-receipt" aria-hidden="true"></i></div>
+                            Data Archive
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse show" id="pagesUploadOption" aria-labelledby="headingOne" data-bs-parent="#pagesUploadOption">
+                    @else
+                        <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="false" aria-controls="pagesUploadOption">
+                            <div class="sb-nav-link-icon"><i class="fas fa-receipt" aria-hidden="true"></i></div>
+                            Data Archive
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="pagesUploadOption" aria-labelledby="headingOne" data-bs-parent="#pagesUploadOption">
+                    @endif
+                            <nav class="sb-sidenav-menu-nested nav">
+                                {{--            Upload Voucher Permission Check Start--}}
+                                @if(auth()->user()->hasPermission('add_voucher_type'))
+                                    @if(Route::currentRouteName() == 'add.voucher.type')
+                                        <a class="nav-link" href="{{route('add.voucher.type')}}">
+                                            <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Data Type
+                                        </a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('add.voucher.type')}}">
+                                            <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div>Data Type
+                                        </a>
+                                    @endif
+                                @endif
+                                {{--            Upload Voucher Permission Check End--}}
+                                @if(auth()->user()->hasPermission('edit_voucher_type'))
+                                    @if(Route::currentRouteName() == 'edit.voucher.type')
+                                        <a class="nav-link" href="{{route("edit.voucher.type",['voucherTypeID'=>\Illuminate\Support\Facades\Request::route('voucherTypeID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Data Type Edit</a>
+                                    @endif
+                                @endif
+                                {{--                                    Upload Voucher Permission Check Start--}}
+                                @if(auth()->user()->hasPermission('add_voucher_document'))
+                                    @if(Route::currentRouteName() == 'add.voucher.info')
+                                        <a class="nav-link" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-upload"></i></div> Data Upload</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-upload"></i></div> Data Upload</a>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->hasPermission('voucher_document_edit'))
+                                    @if(Route::currentRouteName() == 'edit.voucher.info')
+                                        <a class="nav-link" href="{{route("edit.voucher.info",['voucherDocumentID'=>\Illuminate\Support\Facades\Request::route('voucherDocumentID')])}}"><div class="sb-nav-link-icon" title="Edit Voucher Info"><i class="fas fa-edit"></i></div> Edit Document</a>
+                                    @endif
+                                @endif
+                                {{--                                    Upload Voucher Permission Check End--}}
+                                @if(auth()->user()->hasPermission('list_voucher_document'))
+                                    @if(Route::currentRouteName() == 'uploaded.voucher.list')
+                                        <a class="nav-link" href="{{route('uploaded.voucher.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div> Uploaded List</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('uploaded.voucher.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div> Uploaded List</a>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->hasPermission('view_voucher_document'))
+                                    @if(Route::currentRouteName() == 'view.voucher.document')
+                                        <a class="nav-link" href="{{route('view.voucher.document',['vID'=>\Illuminate\Support\Facades\Request::route('vID')])}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Document View</a>
+                                    @endif
+                                @endif
+                            </nav>
+                        </div>
+                    @endif {{--Upload Option End Here--}}
+            </group5>{{--#2.3    Accounts File Storage System End--}}
         </div>
     </div>
     <div class="sb-sidenav-footer text-chl">
