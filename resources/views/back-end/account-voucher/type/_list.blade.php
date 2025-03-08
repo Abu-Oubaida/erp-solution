@@ -2,7 +2,7 @@
     <div class="card mb-4">
         <div class="card-header">
             <div class="row">
-                <h3 class="text-capitalize"><i class="fas fa-list"></i> Voucher Type List</h3>
+                <h3 class="text-capitalize"><i class="fas fa-list"></i> Data Type List</h3>
             </div>
         </div>
         <div class="card-body">

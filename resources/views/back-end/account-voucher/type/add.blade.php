@@ -9,7 +9,7 @@
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
+                        <a style="text-decoration: none;" href="#" class="text-capitalize">Add data type</a>
                     </li>
                 </ol>
             </div>
@@ -22,7 +22,7 @@
                 <div class="card mb-4">
                     <div class="card-header">
                         <div class="row">
-                            <h3 class="text-capitalize"><i class="fas fa-plus"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                            <h3 class="text-capitalize"><i class="fas fa-plus"></i> Add new data type</h3>
                         </div>
                     </div>
                     <div class="card-body">

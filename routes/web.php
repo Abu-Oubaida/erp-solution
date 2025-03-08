@@ -244,11 +244,11 @@ Route::group(['middleware' => ['auth']],function (){
         Route::post('search-previous-document','searchPreviousDocument')->name('search.previous-document');//for ajax
 # 3.7.1 Add voucher Type
         Route::middleware(['permission:add_voucher_type'])->group(function () {
-            Route::match(['post','get'],'add-voucher-type','createVoucherType')->name('add.voucher.type');
+            Route::match(['post','get'],'add-data-type','createVoucherType')->name('add.voucher.type');
         });//3.7.1 End
 # 3.7.2 Edit voucher Type
         Route::middleware(['permission:edit_voucher_type'])->group(function (){
-            Route::match(['put','get'],'edit-voucher-type/{voucherTypeID}','editVoucherType')->name('edit.voucher.type');
+            Route::match(['put','get'],'edit-data-type/{voucherTypeID}','editVoucherType')->name('edit.voucher.type');
         });//3.7.2
 # 3.7.3 Delete voucher Type
         Route::middleware(['permission:delete_voucher_type'])->group(function (){
@@ -256,10 +256,10 @@ Route::group(['middleware' => ['auth']],function (){
         });//3.7.2 End
 # 3.7.3 Add voucher document
         Route::middleware(['permission:add_voucher_document'])->group(function () {
-            Route::match(['post','get'],'add-voucher','create')->name('add.voucher.info');
+            Route::match(['post','get'],'data-upload','create')->name('add.voucher.info');
         });
         Route::middleware(['permission:voucher_document_edit'])->group(function () {
-            Route::match(['put','get'],'edit-voucher/{voucherDocumentID}','voucherDocumentEdit')->name('edit.voucher.info');
+            Route::match(['put','get'],'edit-data/{voucherDocumentID}','voucherDocumentEdit')->name('edit.voucher.info');
             Route::put('linked-uploaded-document','linkedUploadedDocument')->name('linked-uploaded.document');
         });
         Route::middleware(['permission:voucher_document_delete'])->group(function () {

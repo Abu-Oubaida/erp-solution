@@ -8,7 +8,7 @@
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
+                        <a style="text-decoration: none;" href="#" class="text-capitalize">Edit data type</a>
                     </li>
                 </ol>
             </div>
@@ -21,7 +21,7 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row">
-                            <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                            <h3 class="text-capitalize">Edit data type</h3>
                         </div>
                         <form action="{!! route('edit.voucher.type',['voucherTypeID'=>\Illuminate\Support\Facades\Request::route('voucherTypeID')]) !!}" method="POST">
                             @csrf

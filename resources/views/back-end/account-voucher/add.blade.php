@@ -8,7 +8,7 @@
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
+                        <a style="text-decoration: none;" href="#" class="text-capitalize">Data upload</a>
                     </li>
                 </ol>
             </div>
@@ -20,7 +20,7 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="text-capitalize"><i class="fas fa-file-circle-plus"></i> {{str_replace('info','document',str_replace('.', ' ', \Route::currentRouteName()))}}</h3>
+                        <h3 class="text-capitalize"><i class="fas fa-file-circle-plus"></i> Upload documents here</h3>
                     </div>
                     <div class="col">
                         <div class="float-end">

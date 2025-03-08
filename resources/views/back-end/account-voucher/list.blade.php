@@ -20,12 +20,12 @@
             <div class="card-header text-capitalize">
                 <div class="row">
                     <div class="col">
-                        <h3><i class="fas fa-list"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                        <h3><i class="fas fa-list"></i> Uploaded data list</h3>
                     </div>
                     <div class="col">
                         <div class="float-end mt-1">
                             @if(auth()->user()->hasPermission('add_voucher_document'))
-                                <a class="btn btn-success btn-sm" href="{{route('add.voucher.info')}}"><i class="fas fa-upload" aria-hidden="true"></i> Upload Voucher</a>
+                                <a class="btn btn-success btn-sm" href="{{route('add.voucher.info')}}"><i class="fas fa-upload" aria-hidden="true"></i> New Upload</a>
                             @endif
                         </div>
                     </div>
