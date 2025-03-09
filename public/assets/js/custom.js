@@ -1064,7 +1064,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             },
             sendDocumentEmail:function (e)
             {
-                const url = window.location.origin + sourceDir + "/share-voucher-document-email";
+                const url = window.location.origin + sourceDir + "/share-archive-document-email";
                 const refId = $(e).attr('ref');
                 const message = $('#message').val()
                 // const data = { tags: tags, refId: refId };
@@ -1098,7 +1098,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             },
             sendVoucherEmail:function (e)
             {
-                const url = window.location.origin + sourceDir + "/share-voucher-email";
+                const url = window.location.origin + sourceDir + "/share-archive-email";
                 const refId = $(e).attr('ref');
                 const message = $('#message').val()
                 // const data = { tags: tags, refId: refId };

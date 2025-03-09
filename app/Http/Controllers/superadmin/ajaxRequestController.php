@@ -270,7 +270,7 @@ class ajaxRequestController extends Controller
 
         return $uniqueId;
     }
-    public function shareVoucherDocumentEmail(Request $request)
+    public function shareArchiveDocumentEmail(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'tags.*' => 'required|email',
@@ -359,7 +359,7 @@ class ajaxRequestController extends Controller
         }
     }
 
-    public function shareVoucherEmail(Request $request)
+    public function shareArchiveEmail(Request $request)
     {
 
         DB::beginTransaction();
