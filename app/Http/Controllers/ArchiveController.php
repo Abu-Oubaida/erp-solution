@@ -39,7 +39,7 @@ class ArchiveController extends Controller
             $voucherTypes = $this->archiveTypeList();
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
 //            dd($voucherTypes);
-            return view('back-end/account-voucher/type/add',compact('voucherTypes','companies'));
+            return view('back-end/account-voucher/type/add',compact('voucherTypes','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -48,15 +48,15 @@ class ArchiveController extends Controller
     private function storeArchiveType(Request $request):RedirectResponse
     {
         $request->validate([
-            'voucher_type_title'   =>  ['required', 'string', 'max:255'],
-            'voucher_type_code'    =>  ['sometimes','nullable', 'numeric'],
+            'data_type_title'   =>  ['required', 'string', 'max:255'],
+            'data_type_code'    =>  ['sometimes','nullable', 'numeric'],
             'status'               =>  ['required', 'numeric'],
             'remarks'              =>  ['sometimes','nullable', 'string'],
             'company'               => ['required', 'integer', 'exists:company_infos,id'],
         ]);
         extract($request->post());
         try {
-            if (VoucherType::where('voucher_type_title',$voucher_type_title)->orWhere('code',$voucher_type_code)->first())
+            if (VoucherType::where('voucher_type_title',$data_type_title)->orWhere('code',$data_type_code)->first())
             {
                 return back()->with('error','Duplicate data found!')->withInput();
             }
@@ -64,8 +64,8 @@ class ArchiveController extends Controller
             VoucherType::create([
                 'company_id'=> $company,
                 'status'    =>  $status,
-                'voucher_type_title'=>  $voucher_type_title,
-                'code'      =>  $voucher_type_code,
+                'voucher_type_title'=>  $data_type_title,
+                'code'      =>  $data_type_code,
                 'remarks'   =>  $remarks,
                 'created_by'=>  $user->id,
                 'updated_by'=>  $user->id,
@@ -89,7 +89,7 @@ class ArchiveController extends Controller
             $voucherType = VoucherType::find($vtID);
             $voucherTypes = $this->archiveTypeList();
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            return view('back-end/account-voucher/type/edit',compact('voucherType','voucherTypes','companies'));
+            return view('back-end/account-voucher/type/edit',compact('voucherType','voucherTypes','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -103,8 +103,8 @@ class ArchiveController extends Controller
     private function updateArchiveType(Request $request,$voucherTypeID)
     {
         $request->validate([
-            'voucher_type_title'   =>  ['required', 'string', 'max:255'],
-            'voucher_type_code'    =>  ['sometimes','nullable', 'numeric'],
+            'data_type_title'   =>  ['required', 'string', 'max:255'],
+            'data_type_code'    =>  ['sometimes','nullable', 'numeric'],
             'status'               =>  ['required', 'numeric'],
             'remarks'              =>  ['sometimes','nullable', 'string'],
             'company'               => ['required', 'integer', 'exists:company_infos,id'],
@@ -116,7 +116,7 @@ class ArchiveController extends Controller
             {
                 return back()->with('error','Data not found!')->withInput();
             }
-            if (VoucherType::where('id','!=',$vtID)->where('voucher_type_title',$voucher_type_title)->first() || VoucherType::where('id','!=',$vtID)->where('code',$voucher_type_code)->first())
+            if (VoucherType::where('id','!=',$vtID)->where('voucher_type_title',$data_type_title)->first() || VoucherType::where('id','!=',$vtID)->where('code',$data_type_code)->first())
             {
                 return back()->with('error','Duplicate data found!')->withInput();
             }
@@ -124,8 +124,8 @@ class ArchiveController extends Controller
             VoucherType::where('id',$vtID)->update([
                 'company_id'=> $company,
                 'status'    =>  $status,
-                'voucher_type_title'=>  $voucher_type_title,
-                'code'      =>  $voucher_type_code,
+                'voucher_type_title'=>  $data_type_title,
+                'code'      =>  $data_type_code,
                 'remarks'   =>  $remarks,
                 'updated_by'=>  $user->id,
             ]);
@@ -167,10 +167,10 @@ class ArchiveController extends Controller
             }
             $voucherTypes = VoucherType::where('status',1)->get();
             $user = Auth::user();
-            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','company'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->latest('created_at')->take(10)->get();
+            $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY','company'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->latest('created_at')->take(10)->get();
 //            dd($voucherInfos);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            return view('back-end/account-voucher/add',compact("voucherTypes","voucherInfos","companies"));
+            return view('back-end/account-voucher/add',compact("voucherTypes","voucherInfos","companies"))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -181,9 +181,11 @@ class ArchiveController extends Controller
     {
         $request->validate([
             'company'               => ['required', 'integer', 'exists:company_infos,id'],
-            'voucher_number'    =>  ['required','string','unique:account_voucher_infos,voucher_number'],
+            'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
+                return $query->where('company_id',$request->post('company'));
+            })],
             'voucher_date'      =>  ['required','date'],
-            'voucher_type'      =>  ['required','numeric','exists:voucher_types,id'],
+            'data_type'      =>  ['required','numeric','exists:voucher_types,id'],
             'remarks'           =>  ['sometimes','nullable','string'],
             'voucher_file.*'    =>  ['sometimes','nullable','max:512000'],
             'previous_files'    =>  ['sometimes','nullable','array'],
@@ -193,11 +195,11 @@ class ArchiveController extends Controller
         try {
             extract($request->post());
             $user = Auth::user();
-            $v_type = VoucherType::where('id',$voucher_type)->first();
+            $v_type = VoucherType::where('id',$data_type)->first();
             $firstInsert = DB::table('account_voucher_infos')->insertGetId([
                 'company_id'        =>  $company,
-                'voucher_type_id'   =>  $voucher_type,
-                'voucher_number'    =>  $voucher_number,
+                'voucher_type_id'   =>  $data_type,
+                'voucher_number'    =>  $reference_number,
                 'voucher_date'      =>  $voucher_date,
                 'file_count'        =>  null,
                 'remarks'           =>  $remarks,
@@ -212,7 +214,7 @@ class ArchiveController extends Controller
             if ($firstInsert && $request->hasFile('voucher_file')) {
                 foreach ($request->file('voucher_file') as $file) {
                     // Handle each file
-                    $fileName = $voucher_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
+                    $fileName = $reference_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
                     $file_location = $file->move($this->accounts_document_path,$fileName); // Adjust the storage path as needed
                     if (!$file_location)
                     {
@@ -280,7 +282,7 @@ class ArchiveController extends Controller
                 $permission = $this->permissions()->add_archive_document_individual;
                 extract($request->post());
                 $voucherInfo = Account_voucher::where('id',Crypt::decryptString($id))->first();
-                return view('back-end.account-voucher._create_voucher_document_individual_model',compact('voucherInfo'));
+                return view('back-end.account-voucher._create_voucher_document_individual_model',compact('voucherInfo'))->render();
             }catch (\Throwable $exception)
             {
                 echo json_encode(array(
@@ -306,7 +308,7 @@ class ArchiveController extends Controller
                 $user = Auth::user();
                 $voucherInfo = Account_voucher::with(['VoucherType'])->where('id',Crypt::decryptString($id))->first();
                 foreach ($request->file('voucher_file') as $file) {
-                    $fileName = $voucherInfo->voucher_number."_".$voucherInfo->VoucherType->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
+                    $fileName = $voucherInfo->reference_number."_".$voucherInfo->VoucherType->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
                     $file_location = $file->move($this->accounts_document_path,$fileName); // Adjust the storage path as needed
                     if (!$file_location)
                     {
@@ -330,11 +332,12 @@ class ArchiveController extends Controller
         return redirect()->back()->with('error', "request method {$request->method()} not supported")->withInput();
     }
 
-    public function voucherList()
+    public function archiveList()
     {
         try {
-            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->get();
-            return view('back-end/account-voucher/list',compact('voucherInfos'));
+            $permission = $this->permissions()->archive_data_list;
+            $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->get();
+            return view('back-end/account-voucher/list',compact('voucherInfos'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -346,7 +349,7 @@ class ArchiveController extends Controller
         try {
             $id = Crypt::decryptString($vID);
             $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-            return view('back-end/account-voucher/single-view',compact('document'));
+            return view('back-end/account-voucher/single-view',compact('document'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -365,7 +368,7 @@ class ArchiveController extends Controller
             $voucherTypes = VoucherType::where('status',1)->get();
             $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->find($vID);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            return view('back-end/account-voucher/edit',compact('voucherTypes','voucherInfo','companies'));
+            return view('back-end/account-voucher/edit',compact('voucherTypes','voucherInfo','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -422,17 +425,20 @@ class ArchiveController extends Controller
             $vID = Crypt::decryptString($vID);
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
-                'voucher_number'    =>  ['required','string','unique:account_voucher_infos,voucher_number,'.$vID, Rule::unique('account_voucher_infos')->ignore($vID)],
+//                'voucher_number'    =>  ['required','string','unique:account_voucher_infos,voucher_number,'.$vID, Rule::unique('account_voucher_infos')->ignore($vID)],
+                'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
+                    return $query->where('company_id',$request->post('company'));
+                })->ignore($vID)],
                 'voucher_date'      =>  ['required','date'],
-                'voucher_type'      =>  ['required','numeric','exists:voucher_types,id'],
+                'data_type'      =>  ['required','numeric','exists:voucher_types,id'],
                 'remarks'           =>  ['sometimes','nullable','string'],
             ]);
             extract($request->post());
             $voucherInfo = Account_voucher::find($vID);
             Account_voucher::where('id',$vID)->update([
                 'company_id'        =>  $company,
-                'voucher_type_id'   =>  $voucher_type,
-                'voucher_number'    =>  $voucher_number,
+                'voucher_type_id'   =>  $data_type,
+                'voucher_number'    =>  $reference_number,
                 'voucher_date'      =>  $voucher_date,
                 'remarks'           =>  $remarks,
             ]);

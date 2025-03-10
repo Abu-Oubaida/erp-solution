@@ -55,7 +55,7 @@ Route::controller(ajaxRequestController::class)->group(function (){
         Route::post('fiend-voucher-document-info','fiendVoucherDocumentInfo')->name('fiend.voucher.document.info');
         Route::post('voucher-share-type','voucherShareType')->name('voucher.share.type');
     });
-    Route::middleware(['permission:share_voucher'])->group(function (){
+    Route::middleware(['permission:share_archive_data'])->group(function (){
         Route::post('share-voucher-fiend','shareVoucherFiend')->name('share.voucher.document.fiend');
     });
     # 2.4 For Auth user company check
@@ -251,59 +251,55 @@ Route::group(['middleware' => ['auth']],function (){
 # 3.7.1 Add voucher Type
 //        Route::middleware(['permission:add_voucher_type'])->group(function () {
         Route::middleware(['permission:add_archive_data_type'])->group(function () {
-            Route::match(['post','get'],'add-archive-data-type','createArchiveType')->name('add.voucher.type');
+            Route::match(['post','get'],'add-archive-data-type','createArchiveType')->name('add.archive.type');
         });//3.7.1 End
 # 3.7.2 Edit voucher Type
 //        Route::middleware(['permission:edit_voucher_type'])->group(function (){
         Route::middleware(['permission:edit_archive_data_type'])->group(function (){
-            Route::match(['put','get'],'edit-archive-data-type/{voucherTypeID}','editArchiveType')->name('edit.voucher.type');
+            Route::match(['put','get'],'edit-archive-data-type/{archiveTypeID}','editArchiveType')->name('edit.archive.type');
         });//3.7.2
 # 3.7.3 Delete voucher Type
 //        Route::middleware(['permission:delete_voucher_type'])->group(function (){
         Route::middleware(['permission:archive_data_type_delete'])->group(function (){
-            Route::delete('delete-archive-type','deleteArchiveType')->name('delete.voucher.type');
+            Route::delete('delete-archive-type','deleteArchiveType')->name('delete.archive.type');
         });//3.7.2 End
 # 3.7.3 Add voucher document
 //        Route::middleware(['permission:add_voucher_document'])->group(function () {
         Route::middleware(['permission:archive_document_upload'])->group(function () {
-            Route::match(['post','get'],'archive-data-upload','create')->name('add.voucher.info');
+            Route::match(['post','get'],'archive-data-upload','create')->name('add.archive.info');
         });
 //        Route::middleware(['permission:voucher_document_edit'])->group(function () {
         Route::middleware(['permission:archive_document_edit'])->group(function () {
-            Route::match(['put','get'],'edit-archive-data/{voucherDocumentID}','voucherDocumentEdit')->name('edit.voucher.info');
-            Route::put('linked-uploaded-document','linkedUploadedDocument')->name('linked-uploaded.document');
+            Route::match(['put','get'],'edit-archive-data/{archiveDocumentID}','archiveDocumentEdit')->name('edit.archive.info');
+            Route::put('linked-uploaded-document','linkedUploadedDocument')->name('linked.uploaded.document');
         });
 //        Route::middleware(['permission:voucher_document_delete'])->group(function () {
         Route::middleware(['permission:archive_data_delete'])->group(function () {
-            Route::delete('delete-archive-data','delete')->name('delete.voucher.info');
+            Route::delete('delete-archive-data','delete')->name('delete.archive.info');
         });
 //3.7.3 End
 //        Route::middleware(['permission:list_voucher_document'])->group(function () {
         Route::middleware(['permission:archive_data_list'])->group(function () {
-            Route::get('archive-data-list','voucherList')->name('uploaded.voucher.list');
+            Route::get('archive-data-list','archiveList')->name('uploaded.archive.list');
         });//3.7.6
 # 3.7.5 List uploaded voucher document
 //        Route::middleware(['permission:view_voucher_document'])->group(function () {
         Route::middleware(['permission:archive_document_view'])->group(function () {
-            Route::get('archive-document-view/{vID}','voucherDocumentView')->name('view.voucher.document');
+            Route::get('archive-document-view/{vID}','archiveDocumentView')->name('view.archive.document');
         });//3.7.6
 //        Route::middleware(['permission:archive_document_upload_individual'])->group(function (){
         Route::middleware(['permission:add_archive_document_individual'])->group(function (){
             Route::post('add-archive-document-individual','createArchiveDocumentIndividual');
-            Route::post('store-archive-document-individual','storeArchiveDocumentIndividual')->name('store.voucher.document.individual');
+            Route::post('store-archive-document-individual','storeArchiveDocumentIndividual')->name('store.archive.document.individual');
         });
 //        Route::middleware(['permission:delete_voucher_document_individual'])->group(function (){
         Route::middleware(['permission:delete_archive_document_individual'])->group(function (){
-            Route::delete('delete-archive-document-individual','deleteVoucherDocumentIndividual')->name('delete.voucher.document.individual');
+            Route::delete('delete-archive-document-individual','deleteArchiveDocumentIndividual')->name('delete.archive.document.individual');
         });
 //        Route::middleware(['permission:multiple_voucher_operation'])->group(function (){
         Route::middleware(['permission:multiple_archive_operation'])->group(function (){
-            Route::post('archive-multiple-submit','voucherMultipleSubmit')->name('voucher.multiple.submit');
+            Route::post('archive-multiple-submit','archiveMultipleSubmit')->name('archive.multiple.submit');
 //            Route::delete('delete-voucher','deleteVoucherMultiple')->name('delete.voucher.multiple');
-        });
-        Route::middleware(['permission:archive_document_upload_individual'])->group(function (){
-            Route::post('add-archive-document-individual','createArchiveDocumentIndividual');
-            Route::post('store-archive-document-individual','storeArchiveDocumentIndividual')->name('store.voucher.document.individual');
         });
     });
 //    Account Controller

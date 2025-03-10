@@ -8,7 +8,7 @@
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a href="{{route('uploaded.voucher.list')}}" class="text-capitalize text-chl">Voucher Document List</a>
+                        <a href="{{route('uploaded.archive.list')}}" class="text-capitalize text-chl">Archive Document List</a>
                     </li>
                     <li class="breadcrumb-item">
                         <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
@@ -29,15 +29,15 @@
                             </div>
                             <div class="col">
                                 <div class="float-end mt-1">
-                                    @if(auth()->user()->hasPermission('list_voucher_document'))
-                                        <a class="btn btn-success btn-sm" href="{{route("uploaded.voucher.list")}}"><i class="fas fa-list-check"></i> Uploaded List</a>
+                                    @if(auth()->user()->hasPermission('archive_data_list'))
+                                        <a class="btn btn-success btn-sm" href="{{route("uploaded.archive.list")}}"><i class="fas fa-list-check"></i> Uploaded List</a>
                                     @endif
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('edit.voucher.info',["voucherDocumentID"=>\Illuminate\Support\Facades\Crypt::encryptString($voucherInfo->id)]) }}" method="post">
+                        <form action="{{ route('edit.archive.info',["archiveDocumentID"=>\Illuminate\Support\Facades\Crypt::encryptString($voucherInfo->id)]) }}" method="post">
                             @csrf
                             @method('put')
                             <div class="row">
@@ -55,8 +55,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-2">
-                                        <input class="form-control" id="voucher_number" name="voucher_number" type="text" placeholder="Enter Voucher Number" value="{{$voucherInfo->voucher_number}}"/>
-                                        <label for="voucher_number">Reference Number <span class="text-danger">*</span></label>
+                                        <input class="form-control" id="reference_number" name="reference_number" type="text" placeholder="Enter Voucher Number" value="{{$voucherInfo->voucher_number}}"/>
+                                        <label for="reference_number">Reference Number <span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -67,13 +67,13 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-2">
-                                        <select class="form-control" name="voucher_type" id="voucher_type">
+                                        <select class="form-control" name="data_type" id="data_type">
                                             <option value="">--Select a Type--</option>
                                             @foreach($voucherTypes as $type)
                                                 <option value="{!! $type->id !!}" @if ($voucherInfo->voucher_type_id == $type->id) selected @endif>{!! $type->voucher_type_title !!}</option>
                                             @endforeach
                                         </select>
-                                        <label for="voucher_type">Type<span class="text-danger">*</span></label>
+                                        <label for="data_type">Type<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -103,7 +103,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form action="{!! route('linked-uploaded.document') !!}" method="post">
+                        <form action="{!! route('linked.uploaded.document') !!}" method="post">
                             @csrf
                             @method('put')
                             <div class="row">
@@ -150,8 +150,8 @@
                                 <h3 class="text-capitalize"><i class="fas fa-edit"></i> {{str_replace('info','document',str_replace('.', ' ', \Route::currentRouteName()))}} Document</h3>
                             </div>
                             <div class="col">
-                                @if(auth()->user()->hasPermission('add_voucher_document_individual'))
-                                    <a href="" class="text-end float-end badge bg-success text-decoration-none" onclick="return Obj.addVoucherDocumentIndividual(this)" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($voucherInfo->id) !!}"><i class="fas fa-plus"></i> Add New</a>
+                                @if(auth()->user()->hasPermission('add_archive_document_individual'))
+                                    <a href="" class="text-end float-end badge bg-success text-decoration-none" onclick="return Obj.addArchiveDocumentIndividual(this)" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($voucherInfo->id) !!}"><i class="fas fa-plus"></i> Add New</a>
                                 @endif
                             </div>
                         </div>
@@ -181,14 +181,14 @@
                                     <td>
                                         <a href="" title="Quick View" vtype="{!! $voucherInfo->VoucherType->voucher_type_title !!}" vno="{!! $voucherInfo->voucher_number !!}" path="{!! \Illuminate\Support\Facades\Crypt::encryptString(url($d->filepath.$d->document)) !!}" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','v_type','v_no')"> <i class="fa-solid fa-eye"></i></a>
                                         &nbsp;
-                                        <a href="{!! route('view.voucher.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
+                                        <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
                                         &nbsp
-                                        @if(auth()->user()->hasPermission('share_voucher_document_individual'))
+                                        @if(auth()->user()->hasPermission('share_archive_data_individual'))
                                             <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fas fa-share"></i></a>
                                         @endif
                                         &nbsp
-                                        @if(auth()->user()->hasPermission('delete_voucher_document_individual'))
-                                            <form action="{{route('delete.voucher.document.individual')}}" class="display-inline" method="post">
+                                        @if(auth()->user()->hasPermission('delete_archive_document_individual'))
+                                            <form action="{{route('delete.archive.document.individual')}}" class="display-inline" method="post">
                                                 @method('delete')
                                                 @csrf
                                                 <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}">
@@ -218,17 +218,16 @@
                                     <div class="modal-body">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <strong>Voucher No: <span id="v_no"></span></strong>
+                                                <strong>Reference No: <span id="v_no"></span></strong>
                                             </div>
                                             <div class="col-md-6 text-end">
-                                                <strong>Voucher Type: <span id="v_type"></span></strong>
+                                                <strong>Data Type: <span id="v_type"></span></strong>
                                             </div>
                                         </div>
                                         <div id="documentPreview"></div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary">Understood</button>
                                     </div>
                                 </div>
                             </div>

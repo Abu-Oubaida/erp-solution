@@ -24,8 +24,8 @@
                     </div>
                     <div class="col">
                         <div class="float-end mt-1">
-                            @if(auth()->user()->hasPermission('add_voucher_document'))
-                                <a class="btn btn-success btn-sm" href="{{route('add.voucher.info')}}"><i class="fas fa-upload" aria-hidden="true"></i> New Upload</a>
+                            @if(auth()->user()->hasPermission('add_archive_document'))
+                                <a class="btn btn-success btn-sm" href="{{route('add.archive.info')}}"><i class="fas fa-upload" aria-hidden="true"></i> New Upload</a>
                             @endif
                         </div>
                     </div>

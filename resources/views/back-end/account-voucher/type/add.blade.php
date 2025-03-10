@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form action="{!! route('add.voucher.type') !!}" method="POST">
+                        <form action="{!! route('add.archive.type') !!}" method="POST">
                             @csrf
                             <div class="row">
                                 <div class="col-md-2">
@@ -43,14 +43,14 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-floating mb-">
-                                        <input class="form-control" id="voucher_type_title" name="voucher_type_title" type="text" placeholder="Enter Voucher Type Title" value="{!! old('voucher_type_title') !!}" required/>
-                                        <label for="voucher_type_title">Voucher Type Title<span class="text-danger">*</span></label>
+                                        <input class="form-control" id="data_type_title" name="data_type_title" type="text" placeholder="Enter Voucher Type Title" value="{!! old('data_type_title') !!}" required/>
+                                        <label for="data_type_title">Data Type Title<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="voucher_type_code" name="voucher_type_code" type="number" placeholder="Enter Voucher Type Code" value="{{old('voucher_type_code')}}" required/>
-                                        <label for="voucher_type_code">Voucher Type Code</label>
+                                        <input class="form-control" id="data_type_code" name="data_type_code" type="number" placeholder="Enter Voucher Type Code" value="{{old('data_type_code')}}" required/>
+                                        <label for="data_type_code">Data Type Code</label>
                                     </div>
                                 </div>
 

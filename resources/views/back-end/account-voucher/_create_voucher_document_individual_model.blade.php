@@ -5,7 +5,7 @@
     </div>
     <div class="modal-body">
         <div class="row">
-            <form action="{!! route('store.voucher.document.individual') !!}" method="post" enctype="multipart/form-data">
+            <form action="{!! route('store.archive.document.individual') !!}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="col-md-12">
                     <strong>Reference No: {!! $voucherInfo->voucher_number !!}</strong>

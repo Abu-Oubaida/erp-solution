@@ -46,7 +46,7 @@
             </div>
             <div class="col-md-2">
                 <div class="form-group mb-3">
-                    <select class="form-control" name="voucher_type" id="voucher_type" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($result->id) !!}" onchange="return Obj.voucherShareType(this)">
+                    <select class="form-control" name="voucher_type" id="voucher_type" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($result->id) !!}" onchange="return Obj.archiveShareType(this)">
                         <option value="0">--Select Option--</option>
                         <option value="1">Only view</option>
                         <option value="2">View/Download</option>
@@ -74,7 +74,7 @@
                     </thead>
                     @foreach($shareData as $e)
                         <tr>
-                            <td><a href="{!! $shareLink = route('voucher.document.view',['document'=>Crypt::encryptString($e->share_document_id),'share'=>$e->share_id]); !!}" target="_blank">{!! $e->share_id !!}</a></td>
+                            <td><a href="{!! $shareLink = route('archive.document.view',['document'=>Crypt::encryptString($e->share_document_id),'share'=>$e->share_id]); !!}" target="_blank">{!! $e->share_id !!}</a></td>
                             <td>
                                 @if(count($e->ShareEmails))
                                     @foreach($e->ShareEmails as $email)
@@ -99,61 +99,3 @@
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Understood</button>
     </div>
 </div>
-<script>
-    {{--const tagInput = document.getElementById('tag-input');--}}
-    {{--const tagsDiv = document.getElementById('tags');--}}
-    {{--const submitButton = document.getElementById('submit-tags');--}}
-
-    {{--const tags = [];--}}
-
-    {{--tagInput.addEventListener('keydown', function(event) {--}}
-    {{--    if (event.key === 'Enter' && tagInput.value.trim() !== '') {--}}
-    {{--        const tagValue = tagInput.value.trim();--}}
-    {{--        const tag = document.createElement('div');--}}
-    {{--        tag.classList.add('tag');--}}
-    {{--        tag.textContent = tagValue;--}}
-    {{--        tagsDiv.appendChild(tag);--}}
-    {{--        tagInput.value = '';--}}
-    {{--        tags.push(tagValue);--}}
-    {{--    }--}}
-    {{--});--}}
-
-    // tagsDiv.addEventListener('click', function(event) {
-    //     if (event.target.classList.contains('tag')) {
-    //         const tagValue = event.target.textContent;
-    //         const index = tags.indexOf(tagValue);
-    //         if (index !== -1) {
-    //             tags.splice(index, 1);
-    //         }
-    //         event.target.remove();
-    //     }
-    // });
-
-    {{--submitButton.addEventListener('click', function() {--}}
-    {{--    // Send the tags to the server via an AJAX request--}}
-    {{--    const url = window.location.origin + sourceDir + "/share-voucher-document-email";; // Replace with your server endpoint--}}
-    {{--    const refId = this.getAttribute('ref')--}}
-    {{--    const data = { tags: tags , refId: refId};--}}
-    {{--    if(data.tags.length <= 0)--}}
-    {{--    {--}}
-    {{--        alert("Error! Empty Field")--}}
-    {{--        return false--}}
-    {{--    }else {--}}
-    {{--        fetch(url, {--}}
-    {{--            method: 'POST',--}}
-    {{--            headers: {--}}
-    {{--                'Content-Type': 'application/json',--}}
-    {{--                'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token if needed--}}
-    {{--            },--}}
-    {{--            body: JSON.stringify(data)--}}
-    {{--        })--}}
-    {{--            .then(response => response.json())--}}
-    {{--            .then(data => {--}}
-    {{--                console.log('Tags submitted:', data);--}}
-    {{--                // Handle the response from the server if needed--}}
-    {{--            })--}}
-    {{--            .catch(error => console.error('Error:', error));--}}
-    {{--    }--}}
-    {{--});--}}
-
-</script>

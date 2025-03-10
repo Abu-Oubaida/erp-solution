@@ -23,7 +23,7 @@
                         <div class="row">
                             <h3 class="text-capitalize">Edit data type</h3>
                         </div>
-                        <form action="{!! route('edit.voucher.type',['voucherTypeID'=>\Illuminate\Support\Facades\Request::route('voucherTypeID')]) !!}" method="POST">
+                        <form action="{!! route('edit.archive.type',['archiveTypeID'=>\Illuminate\Support\Facades\Request::route('archiveTypeID')]) !!}" method="POST">
                             @csrf
                             {!! method_field('put') !!}
                             <div class="row">
@@ -41,14 +41,14 @@
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-floating mb-">
-                                        <input class="form-control" id="voucher_type_title" name="voucher_type_title" type="text" placeholder="Enter Voucher Type Title" value="{!!$voucherType->voucher_type_title !!}" required/>
-                                        <label for="voucher_type_title">Voucher Type Title<span class="text-danger">*</span></label>
+                                        <input class="form-control" id="data_type_title" name="data_type_title" type="text" placeholder="Enter Voucher Type Title" value="{!!$voucherType->voucher_type_title !!}" required/>
+                                        <label for="data_type_title">Voucher Type Title<span class="text-danger">*</span></label>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="voucher_type_code" name="voucher_type_code" type="number" placeholder="Enter Voucher Type Code" value="{!! $voucherType->code !!}" required/>
-                                        <label for="voucher_type_code">Voucher Type Code</label>
+                                        <input class="form-control" id="data_type_code" name="data_type_code" type="number" placeholder="Enter Voucher Type Code" value="{!! $voucherType->code !!}" required/>
+                                        <label for="data_type_code">Voucher Type Code</label>
                                     </div>
                                 </div>
 

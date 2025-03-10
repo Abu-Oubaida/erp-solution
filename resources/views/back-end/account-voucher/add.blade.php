@@ -24,15 +24,15 @@
                     </div>
                     <div class="col">
                         <div class="float-end">
-                            @if(auth()->user()->hasPermission('list_voucher_document'))
-                                <a class="btn btn-success btn-sm" href="{{route("uploaded.voucher.list")}}"><i class="fas fa-list-check"></i> Uploaded List</a>
+                            @if(auth()->user()->hasPermission('archive_data_list'))
+                                <a class="btn btn-success btn-sm" href="{{route("uploaded.archive.list")}}"><i class="fas fa-list-check"></i> Uploaded List</a>
                             @endif
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-body">
-                <form action="{{ route('add.voucher.info') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('add.archive.info') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <div class="col-md-2 mb-1">
@@ -49,8 +49,8 @@
                         </div>
                         <div class="col-md-2 mb-1">
                             <div class="form-floating">
-                                <input class="form-control" id="voucher_number" name="voucher_number" type="text" placeholder="Enter Voucher Number" value="{{old('voucher_number')}}"/>
-                                <label for="voucher_number">Reference Number <span class="text-danger">*</span></label>
+                                <input class="form-control" id="reference_number" name="reference_number" type="text" placeholder="Enter Voucher Number" value="{{old('reference_number')}}"/>
+                                <label for="reference_number">Reference Number <span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-2 mb-1">
@@ -61,19 +61,19 @@
                         </div>
                         <div class="col-md-2 mb-1">
                             <div class="form-floating">
-                                <select class="form-control" name="voucher_type" id="voucher_type">
+                                <select class="form-control" name="data_type" id="data_type">
                                     <option value="">--Select a Type--</option>
                                     @foreach($voucherTypes as $date)
                                         <option value="{!! $date->id !!}">{!! $date->voucher_type_title !!}</option>
                                     @endforeach
                                 </select>
-                                <label for="voucher_type">Type<span class="text-danger">*</span></label>
+                                <label for="data_type">Type<span class="text-danger">*</span></label>
                             </div>
                         </div>
                         <div class="col-md-2 mb-1">
                             <div class="form-floating">
                                 <input type="file" class="form-control" name="voucher_file[]" multiple id="voucher_file" >
-                                <label for="voucher_file">Voucher Document</label>
+                                <label for="voucher_file">Archive Document</label>
                                 <small>jpeg,png,pdf/ Maximum size 500 MB</small>
                             </div>
                         </div>

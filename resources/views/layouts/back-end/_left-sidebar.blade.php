@@ -275,9 +275,9 @@
                 @endif
             </group10>{{--#2.6    Mobile Sim section End--}}
             <group5>
-                @if(auth()->user()->hasPermission('add_voucher_type') || auth()->user()->hasPermission('edit_voucher_type') || auth()->user()->hasPermission('add_voucher_document') || auth()->user()->hasPermission('edit_voucher_document') || auth()->user()->hasPermission('add_fr_document') || auth()->user()->hasPermission('voucher_document_edit') || auth()->user()->hasPermission('list_voucher_document') || auth()->user()->hasPermission('view_voucher_document'))
+                @if(auth()->user()->hasPermission('data_archive'))
 
-                    @if(Route::currentRouteName() == 'add.voucher.type' || Route::currentRouteName() == 'edit.voucher.type' || Route::currentRouteName() == 'add.voucher.info' || Route::currentRouteName() == 'edit.voucher.info' || Route::currentRouteName() == 'uploaded.voucher.list' || Route::currentRouteName() == 'view.voucher.document')
+                    @if(Route::currentRouteName() == 'add.archive.type' || Route::currentRouteName() == 'edit.archive.type' || Route::currentRouteName() == 'add.archive.info' || Route::currentRouteName() == 'edit.archive.info' || Route::currentRouteName() == 'uploaded.archive.list' || Route::currentRouteName() == 'view.archive.document')
                         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="true" aria-controls="pagesUploadOption">
                             <div class="sb-nav-link-icon"><i class="fas fa-receipt" aria-hidden="true"></i></div>
                             Data Archive
@@ -294,47 +294,47 @@
                     @endif
                             <nav class="sb-sidenav-menu-nested nav">
                                 {{--            Upload Voucher Permission Check Start--}}
-                                @if(auth()->user()->hasPermission('add_voucher_type'))
-                                    @if(Route::currentRouteName() == 'add.voucher.type')
-                                        <a class="nav-link" href="{{route('add.voucher.type')}}">
+                                @if(auth()->user()->hasPermission('add_archive_data_type'))
+                                    @if(Route::currentRouteName() == 'add.archive.type')
+                                        <a class="nav-link" href="{{route('add.archive.type')}}">
                                             <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Data Type
                                         </a>
                                     @else
-                                        <a class="nav-link text-chl" href="{{route('add.voucher.type')}}">
+                                        <a class="nav-link text-chl" href="{{route('add.archive.type')}}">
                                             <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div>Data Type
                                         </a>
                                     @endif
                                 @endif
                                 {{--            Upload Voucher Permission Check End--}}
-                                @if(auth()->user()->hasPermission('edit_voucher_type'))
-                                    @if(Route::currentRouteName() == 'edit.voucher.type')
-                                        <a class="nav-link" href="{{route("edit.voucher.type",['voucherTypeID'=>\Illuminate\Support\Facades\Request::route('voucherTypeID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Data Type Edit</a>
+                                @if(auth()->user()->hasPermission('edit_archive_data_type'))
+                                    @if(Route::currentRouteName() == 'edit.archive.type')
+                                        <a class="nav-link" href="{{route("edit.archive.type",['archiveTypeID'=>\Illuminate\Support\Facades\Request::route('archiveTypeID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> Data Type Edit</a>
                                     @endif
                                 @endif
                                 {{--                                    Upload Voucher Permission Check Start--}}
-                                @if(auth()->user()->hasPermission('add_voucher_document'))
-                                    @if(Route::currentRouteName() == 'add.voucher.info')
-                                        <a class="nav-link" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-upload"></i></div> Data Upload</a>
+                                @if(auth()->user()->hasPermission('archive_document_upload'))
+                                    @if(Route::currentRouteName() == 'add.archive.info')
+                                        <a class="nav-link" href="{{route('add.archive.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-upload"></i></div> Data Upload</a>
                                     @else
-                                        <a class="nav-link text-chl" href="{{route('add.voucher.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-upload"></i></div> Data Upload</a>
+                                        <a class="nav-link text-chl" href="{{route('add.archive.info')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-upload"></i></div> Data Upload</a>
                                     @endif
                                 @endif
-                                @if(auth()->user()->hasPermission('voucher_document_edit'))
-                                    @if(Route::currentRouteName() == 'edit.voucher.info')
-                                        <a class="nav-link" href="{{route("edit.voucher.info",['voucherDocumentID'=>\Illuminate\Support\Facades\Request::route('voucherDocumentID')])}}"><div class="sb-nav-link-icon" title="Edit Voucher Info"><i class="fas fa-edit"></i></div> Edit Document</a>
+                                @if(auth()->user()->hasPermission('archive_document_edit'))
+                                    @if(Route::currentRouteName() == 'edit.archive.info')
+                                        <a class="nav-link" href="{{route("edit.archive.info",['archiveDocumentID'=>\Illuminate\Support\Facades\Request::route('archiveDocumentID')])}}"><div class="sb-nav-link-icon" title="Edit Archive Info"><i class="fas fa-edit"></i></div> Edit Document</a>
                                     @endif
                                 @endif
                                 {{--                                    Upload Voucher Permission Check End--}}
-                                @if(auth()->user()->hasPermission('list_voucher_document'))
-                                    @if(Route::currentRouteName() == 'uploaded.voucher.list')
-                                        <a class="nav-link" href="{{route('uploaded.voucher.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div> Uploaded List</a>
+                                @if(auth()->user()->hasPermission('archive_data_list'))
+                                    @if(Route::currentRouteName() == 'uploaded.archive.list')
+                                        <a class="nav-link" href="{{route('uploaded.archive.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div> Uploaded List</a>
                                     @else
-                                        <a class="nav-link text-chl" href="{{route('uploaded.voucher.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div> Uploaded List</a>
+                                        <a class="nav-link text-chl" href="{{route('uploaded.archive.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div> Uploaded List</a>
                                     @endif
                                 @endif
-                                @if(auth()->user()->hasPermission('view_voucher_document'))
-                                    @if(Route::currentRouteName() == 'view.voucher.document')
-                                        <a class="nav-link" href="{{route('view.voucher.document',['vID'=>\Illuminate\Support\Facades\Request::route('vID')])}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Document View</a>
+                                @if(auth()->user()->hasPermission('archive_document_view'))
+                                    @if(Route::currentRouteName() == 'view.archive.document')
+                                        <a class="nav-link" href="{{route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Request::route('vID')])}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Document View</a>
                                     @endif
                                 @endif
                             </nav>

@@ -925,7 +925,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 })
                 return false
             },
-            voucherShare:function (e) {
+            archiveShare:function (e) {
                 let id = $(e).attr('ref')
                 let url = window.location.origin + sourceDir + "/share-voucher-fiend";
                 $.ajax({
@@ -969,9 +969,9 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 })
                 return false
             },
-            addVoucherDocumentIndividual:function (e){
+            addArchiveDocumentIndividual:function (e){
                 let id = $(e).attr('ref')
-                let url = window.location.origin + sourceDir + "/add-voucher-document-individual";
+                let url = window.location.origin + sourceDir + "/add-archive-document-individual";
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,
@@ -1023,7 +1023,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 }
                 $(event).remove();
             },
-            voucherShareType:function (e)
+            archiveShareType:function (e)
             {
                 let value = $(e).val()
                 let refId = $(e).attr('ref');
@@ -1096,7 +1096,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                     });
                 }
             },
-            sendVoucherEmail:function (e)
+            sendArchiveEmail:function (e)
             {
                 const url = window.location.origin + sourceDir + "/share-archive-email";
                 const refId = $(e).attr('ref');
