@@ -186,7 +186,7 @@ class ajaxRequestController extends Controller
         }
     }
 
-    public function findVoucherDocument(Request $request)
+    public function findArchiveDocument(Request $request)
     {
         try {
             extract($request->post());
@@ -218,7 +218,7 @@ class ajaxRequestController extends Controller
         }
     }
 
-    public function fiendVoucherDocumentInfo(Request $request)
+    public function fiendArchiveDocumentInfo(Request $request)
     {
         try {
             extract($request->post());
@@ -226,7 +226,7 @@ class ajaxRequestController extends Controller
             $result = VoucherDocument::select(['id','document'])->find($id);
             $userEmails = User::all(['name','email']);
             $shareData =VoucherDocumentShareEmailLink::with('ShareEmails')->where('share_document_id',$id)->get();
-            return view('back-end/account-voucher/_share_document_model',compact('result','userEmails','shareData'));
+            return view('back-end/archive/_share_document_model',compact('result','userEmails','shareData'));
         }catch (\Throwable $exception)
         {
             echo json_encode(array(
@@ -237,7 +237,7 @@ class ajaxRequestController extends Controller
             ));
         }
     }
-    public function shareVoucherFiend(Request $request)
+    public function shareArchiveFiend(Request $request)
     {
         try {
             extract($request->post());
@@ -246,7 +246,7 @@ class ajaxRequestController extends Controller
             $result = Account_voucher::with(['VoucherType'])->select(['id','voucher_date','voucher_number','voucher_type_id'])->find($id);
             $userEmails = User::all(['name','email']);
             $shareData =Voucher_share_email_link::with('ShareEmails')->where('share_voucher_id',$id)->get();
-            return view('back-end/account-voucher/_share_voucher_model',compact('result','userEmails','shareData'));
+            return view('back-end/archive/_share_archive_model',compact('result','userEmails','shareData'));
         }catch (\Throwable $exception)
         {
             echo json_encode(array(
@@ -289,7 +289,7 @@ class ajaxRequestController extends Controller
             if ($document)
             {
                 $share_id = $this->generateUniqueId();
-                $shareLink = route('voucher.document.view',['document'=>Crypt::encryptString($id),'share'=>$share_id]);
+                $shareLink = route('archive.document.view',['document'=>Crypt::encryptString($id),'share'=>$share_id]);
                 $insert1 = DB::table('voucher_document_share_email_links')->insertGetId([
                     'company_id' => Auth::user()->company_id,
                     'share_id'  =>  $share_id,
@@ -496,7 +496,7 @@ class ajaxRequestController extends Controller
             ));
         }
     }
-    public function voucherShareType(Request $request)
+    public function archiveShareType(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'refId' => 'required','string',
@@ -523,7 +523,7 @@ class ajaxRequestController extends Controller
                     'shared_by'=>$user->id,
                 ]);
             }
-            $shareLink = route('voucher.document.view',['document'=>Crypt::encryptString($link_data->share_document_id),'share'=>$link_data->share_id]);
+            $shareLink = route('archive.document.view',['document'=>Crypt::encryptString($link_data->share_document_id),'share'=>$link_data->share_id]);
             return $shareLink;
         }catch (\Throwable $exception)
         {

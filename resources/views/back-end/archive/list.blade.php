@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="card-body">
-                @include('back-end.account-voucher._voucher_list')
+                @include('back-end.archive._archive_list')
             </div>
         </div>
     </div>

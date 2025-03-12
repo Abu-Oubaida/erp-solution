@@ -129,7 +129,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12">
-                        @include('back-end.account-voucher._voucher_list')
+                        @include('back-end.archive._archive_list')
                     </div>
                 </div>
             </div>

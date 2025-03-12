@@ -54,7 +54,7 @@ class User extends Authenticatable
 
     public function hasPermission($permission)
     {
-        return $this->isSystemSuperAdmin()|| $this->defaultPermissions($permission)->exists() || $this->permissions()->where('permission_name', $permission)->where('company_id',Auth::user()->getCompanyIdAttribute())->exists();
+        return $this->isSystemSuperAdmin() || $this->defaultPermissions($permission)->exists() || $this->permissions()->where('permission_name', $permission)->where('company_id',Auth::user()->getCompanyIdAttribute())->exists();
     }
     public function defaultPermissions($permission)
     {

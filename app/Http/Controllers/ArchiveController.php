@@ -39,7 +39,7 @@ class ArchiveController extends Controller
             $voucherTypes = $this->archiveTypeList();
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
 //            dd($voucherTypes);
-            return view('back-end/account-voucher/type/add',compact('voucherTypes','companies'))->render();
+            return view('back-end/archive/type/add',compact('voucherTypes','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -89,7 +89,7 @@ class ArchiveController extends Controller
             $voucherType = VoucherType::find($vtID);
             $voucherTypes = $this->archiveTypeList();
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            return view('back-end/account-voucher/type/edit',compact('voucherType','voucherTypes','companies'))->render();
+            return view('back-end/archive/type/edit',compact('voucherType','voucherTypes','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -151,7 +151,7 @@ class ArchiveController extends Controller
             }
             VoucherType::where('id',$vtID)->delete();
 
-            return redirect(route('add.voucher.type'))->with('success','Data delete successfully');
+            return redirect(route('add.archive.type'))->with('success','Data delete successfully');
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -170,7 +170,7 @@ class ArchiveController extends Controller
             $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY','company'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->latest('created_at')->take(10)->get();
 //            dd($voucherInfos);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            return view('back-end/account-voucher/add',compact("voucherTypes","voucherInfos","companies"))->render();
+            return view('back-end/archive/add',compact("voucherTypes","voucherInfos","companies"))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -282,7 +282,7 @@ class ArchiveController extends Controller
                 $permission = $this->permissions()->add_archive_document_individual;
                 extract($request->post());
                 $voucherInfo = Account_voucher::where('id',Crypt::decryptString($id))->first();
-                return view('back-end.account-voucher._create_voucher_document_individual_model',compact('voucherInfo'))->render();
+                return view('back-end.archive._create_archive_document_individual_model',compact('voucherInfo'))->render();
             }catch (\Throwable $exception)
             {
                 echo json_encode(array(
@@ -308,7 +308,7 @@ class ArchiveController extends Controller
                 $user = Auth::user();
                 $voucherInfo = Account_voucher::with(['VoucherType'])->where('id',Crypt::decryptString($id))->first();
                 foreach ($request->file('voucher_file') as $file) {
-                    $fileName = $voucherInfo->reference_number."_".$voucherInfo->VoucherType->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
+                    $fileName = $voucherInfo->voucher_number."_".$voucherInfo->VoucherType->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
                     $file_location = $file->move($this->accounts_document_path,$fileName); // Adjust the storage path as needed
                     if (!$file_location)
                     {
@@ -323,10 +323,10 @@ class ArchiveController extends Controller
                         'created_at'        =>  now(),
                     ]);
                 }
-                return redirect()->route('uploaded.voucher.list')->with('success','Data upload successfully on Voucher No:'.$voucherInfo->voucher_number);
+                return redirect()->route('uploaded.archive.list')->with('success','Data upload successfully on Voucher No:'.$voucherInfo->voucher_number);
             }catch (\Throwable $exception)
             {
-                return redirect()->route('uploaded.voucher.list')->with('error',$exception->getMessage());
+                return redirect()->route('uploaded.archive.list')->with('error',$exception->getMessage());
             }
         }
         return redirect()->back()->with('error', "request method {$request->method()} not supported")->withInput();
@@ -337,26 +337,26 @@ class ArchiveController extends Controller
         try {
             $permission = $this->permissions()->archive_data_list;
             $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->get();
-            return view('back-end/account-voucher/list',compact('voucherInfos'))->render();
+            return view('back-end/archive/list',compact('voucherInfos'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
     }
 
-    public function voucherDocumentView($vID)
+    public function archiveDocumentView($vID)
     {
         try {
             $id = Crypt::decryptString($vID);
             $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-            return view('back-end/account-voucher/single-view',compact('document'))->render();
+            return view('back-end/archive/single-view',compact('document'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
     }
 
-    public function voucherDocumentEdit(Request $request, $vID)
+    public function archiveDocumentEdit(Request $request, $vID)
     {
         try {
             $permission = $this->permissions()->edit_archive_data_type;
@@ -368,7 +368,7 @@ class ArchiveController extends Controller
             $voucherTypes = VoucherType::where('status',1)->get();
             $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->find($vID);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            return view('back-end/account-voucher/edit',compact('voucherTypes','voucherInfo','companies'))->render();
+            return view('back-end/archive/edit',compact('voucherTypes','voucherInfo','companies'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -454,7 +454,7 @@ class ArchiveController extends Controller
             return back()->with('error',$exception->getMessage());
         }
     }
-    public function deleteVoucherDocumentIndividual(Request $request)
+    public function deleteArchiveDocumentIndividual(Request $request)
     {
         try {
             if ($request->isMethod('delete'))
@@ -468,7 +468,7 @@ class ArchiveController extends Controller
                 $v_d = VoucherDocument::where('id',$id)->first();
                 if ($v_d)
                 {
-                    $this->deleteVoucherDocumentIndividualWithHistory($v_d,Auth::id());
+                    $this->deleteArchiveDocumentIndividualWithHistory($v_d,Auth::id());
 //                    VoucherDocumentIndividualDeletedHistory::create([
 //                        'company_id'        =>  $v_d->company_id,
 //                        'voucher_info_id'   =>  $v_d->voucher_info_id,
@@ -491,7 +491,7 @@ class ArchiveController extends Controller
         }
     }
 
-    private function deleteVoucherDocumentIndividualWithHistory($v_d,$deleted_by)
+    private function deleteArchiveDocumentIndividualWithHistory($v_d,$deleted_by)
     {
         try {
             VoucherDocumentIndividualDeletedHistory::create([
@@ -557,7 +557,7 @@ class ArchiveController extends Controller
             {
                 foreach ($data->VoucherDocument as $v_d)
                 {
-                    $this->deleteVoucherDocumentIndividualWithHistory($v_d,Auth::id());
+                    $this->deleteArchiveDocumentIndividualWithHistory($v_d,Auth::id());
                 }
             }
             VoucherDocumentDeleteHistory::create([

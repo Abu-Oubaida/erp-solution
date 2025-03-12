@@ -48,15 +48,15 @@ Route::controller(ajaxRequestController::class)->group(function (){
     Route::post('fiend-permission-child','findPermissionChild')->name('fien.permission.child');
     Route::post('company-change-module-permission','companyChangeModulePermission')->name('company.change.permission');
 # 2.2 Fiend voucher document for preview this document on pop-up modal
-    Route::post('fiend-voucher-document','findVoucherDocument')->name('fien.voucher.document');
+    Route::post('fiend-archive-document','findArchiveDocument')->name('fien.archive.document');
 # 2.3 Fiend voucher document info for sharing
 //    Route::middleware(['permission:share_voucher_document_individual'])->group(function (){
     Route::middleware(['permission:share_archive_data_individual'])->group(function (){
-        Route::post('fiend-voucher-document-info','fiendVoucherDocumentInfo')->name('fiend.voucher.document.info');
-        Route::post('voucher-share-type','voucherShareType')->name('voucher.share.type');
+        Route::post('fiend-archive-document-info','fiendArchiveDocumentInfo')->name('fiend.archive.document.info');
+        Route::post('archive-share-type','archiveShareType')->name('archive.share.type');
     });
     Route::middleware(['permission:share_archive_data'])->group(function (){
-        Route::post('share-voucher-fiend','shareVoucherFiend')->name('share.voucher.document.fiend');
+        Route::post('share-archive-fiend','shareArchiveFiend')->name('share.archive.document.fiend');
     });
     # 2.4 For Auth user company check
     Route::post('company-check-set','companyCheckSet');
@@ -589,7 +589,7 @@ Route::group(['middleware' => ['auth']],function (){
 });//3.0 End
 # 4.0 Share Document View
 Route::controller(ShareDocumentViewController::class)->group(function (){
-    Route::get('voucher-document-view','voucherDocumentView')->name('voucher.document.view');
-    Route::get('voucher-view','voucherView')->name('voucher.view');
+    Route::get('archive-document-view','archiveDocumentView')->name('archive.document.view');
+    Route::get('archive-view','archiveView')->name('archive.view');
 });
 require __DIR__.'/auth.php';

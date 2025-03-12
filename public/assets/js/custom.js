@@ -850,7 +850,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 let v_no = $(e).attr('vno')
                 if (path)
                 {
-                    let url = window.location.origin + sourceDir + "/fiend-voucher-document";
+                    let url = window.location.origin + sourceDir + "/fiend-archive-document";
                     $.ajax({
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         url: url,
@@ -905,7 +905,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             },
             fileSharingModal:function (e) {
                 let id = $(e).attr('ref')
-                let url = window.location.origin + sourceDir + "/fiend-voucher-document-info";
+                let url = window.location.origin + sourceDir + "/fiend-archive-document-info";
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,
@@ -927,7 +927,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             },
             archiveShare:function (e) {
                 let id = $(e).attr('ref')
-                let url = window.location.origin + sourceDir + "/share-voucher-fiend";
+                let url = window.location.origin + sourceDir + "/share-archive-fiend";
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,
@@ -949,7 +949,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
             },
             voucherDocumentIndividual:function (e) {
                 let id = $(e).attr('ref')
-                let url = window.location.origin + sourceDir + "/fiend-voucher-document-info";
+                let url = window.location.origin + sourceDir + "/fiend-archive-document-info";
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     url: url,
@@ -1029,7 +1029,7 @@ if(hostname === '127.0.0.1' ||  hostname === 'localhost')
                 let refId = $(e).attr('ref');
                 if (value.length > 0)
                 {
-                    let url = window.location.origin + sourceDir + "/voucher-share-type";
+                    let url = window.location.origin + sourceDir + "/archive-share-type";
                     $.ajax({
                         url: url,
                         method: 'POST',
