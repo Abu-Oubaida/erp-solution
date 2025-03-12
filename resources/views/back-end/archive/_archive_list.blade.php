@@ -26,6 +26,7 @@
         <th>Remarks</th>
         <th>Document</th>
         <th>Created By</th>
+        <th>Upload Date</th>
         <th>Updated By</th>
         <th>Action</th>
     </tr>
@@ -90,6 +91,7 @@
                 {{--                                        <td></td>--}}
                 {{--                                        <td></td>--}}
                 <td>{!! ($data->createdBY)? $data->createdBY->name:'-' !!}</td>
+                <td>{!! date('d-M-y', strtotime($data->created_at)) !!}</td>
                 <td>{!! ($data->updatedBY)? $data->updatedBY->name:'-' !!}</td>
                 <td>
                     @if(auth()->user()->hasPermission('archive_document_edit'))
