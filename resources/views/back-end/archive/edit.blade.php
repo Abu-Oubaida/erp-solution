@@ -111,7 +111,7 @@
                                     <label for="input">Reference No. or Remarks</label>
                                     <div class="input-group">
                                         <input type="hidden" value="{!! @$voucherInfo->company_id  !!}" id="company_id_link" name="company_id_link">
-                                        <input type="hidden" value="{!! @$voucherInfo->id  !!}" id="update_document_info_id" name="update_document_info_id">
+                                        <input type="hidden" value="{!! @$voucherInfo->id  !!}" id="update_document_info_id" name="update_archive_info_id">
                                         <input type="text" id="input" class="form-control" placeholder="Reference number or remarks">
                                         <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'company_id_link','previous-reference')"><i class="fas fa-search"></i> Search</a>
                                     </div>
@@ -171,7 +171,7 @@
                             <tbody>
                             @if(isset($voucherInfo))
                                 @php $x = 1;@endphp
-                                @foreach($voucherInfo->VoucherDocument as $d)
+                                @foreach($voucherInfo->voucherDocuments as $d)
                                 <tr>
                                     <td>{!! $x++ !!}</td>
                                     <td>{!! date('d-M-y', strtotime($d->created_at)) !!}</td>

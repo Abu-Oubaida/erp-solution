@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account_voucher;
+use App\Models\ArchiveInfoLinkDocument;
+use App\Models\ArchiveLinkDocumentDeleteHistory;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentDeleteHistory;
 use App\Models\VoucherDocumentIndividualDeletedHistory;
@@ -167,8 +169,7 @@ class ArchiveController extends Controller
             }
             $voucherTypes = VoucherType::where('status',1)->get();
             $user = Auth::user();
-            $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY','company'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->latest('created_at')->take(10)->get();
-//            dd($voucherInfos);
+            $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY','company','voucherDocuments'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->latest('created_at')->take(10)->get();
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/archive/add',compact("voucherTypes","voucherInfos","companies"))->render();
         }catch (\Throwable $exception)
@@ -196,6 +197,7 @@ class ArchiveController extends Controller
             extract($request->post());
             $user = Auth::user();
             $v_type = VoucherType::where('id',$data_type)->first();
+//            $firstInsert = archive infos
             $firstInsert = DB::table('account_voucher_infos')->insertGetId([
                 'company_id'        =>  $company,
                 'voucher_type_id'   =>  $data_type,
@@ -212,6 +214,7 @@ class ArchiveController extends Controller
                 return redirect()->back()->with('error', 'Failed to execute the first insert.');
             }
             if ($firstInsert && $request->hasFile('voucher_file')) {
+                $documentIds = array();
                 foreach ($request->file('voucher_file') as $file) {
                     // Handle each file
                     $fileName = $reference_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
@@ -220,8 +223,8 @@ class ArchiveController extends Controller
                     {
                         return redirect()->back()->with('error', 'Data uploaded error.');
                     }
-
-                    $secondInsert = DB::table('voucher_documents')->insert([
+//            $secondInsert = documents infos
+                    $secondInsert = DB::table('voucher_documents')->insertGetId([
                         'company_id'        =>  $company,
                         'voucher_info_id'   =>  $firstInsert,
                         'document'          =>  $fileName,
@@ -229,8 +232,18 @@ class ArchiveController extends Controller
                         'created_by'        =>  $user->id,
                         'created_at'        =>  now(),
                     ]);
-
+                    array_push($documentIds,$secondInsert);
                     if (!$secondInsert) {
+                        // Rollback the transaction if the second insert for any item failed
+                        DB::rollBack();
+                        return redirect()->back()->with('error', 'Failed to execute the second insert.');
+                    }
+                    $thirdInsert = ArchiveInfoLinkDocument::create([
+                        'company_id'        =>  $company,
+                        'voucher_info_id'   =>  $firstInsert,
+                        'document_id'        =>  $secondInsert,
+                    ]);
+                    if (!$thirdInsert) {
                         // Rollback the transaction if the second insert for any item failed
                         DB::rollBack();
                         return redirect()->back()->with('error', 'Failed to execute the second insert.');
@@ -238,21 +251,10 @@ class ArchiveController extends Controller
                 }
             }
             if ($firstInsert && !empty($previous_files)) {
-                $previous_documents = VoucherDocument::whereIn('id', $previous_files)->get();
-
-                $insertData = $previous_documents->map(function ($previous_document) use ($user,$firstInsert) {
-                    return [
-                        'company_id'      => $previous_document->company_id,
-                        'voucher_info_id' => $firstInsert,
-                        'document'        => $previous_document->document,
-                        'filepath'        => $previous_document->filepath,
-                        'created_by'      => $user->id,
-                        'created_at'      => now(),
-                    ];
-                })->toArray();
-
-                if (!empty($insertData)) {
-                    $thirdInsert = VoucherDocument::insert($insertData); // Bulk insert
+                $finalInsertData = $this->linkDocumentInfoArray($previous_files,$firstInsert,$documentIds,$company);
+                if (!empty($finalInsertData)) {
+//            $thirdInsert = archive infos and documents link
+                    $thirdInsert = ArchiveInfoLinkDocument::insert($finalInsertData); // Bulk insert
                 }
                 if (!$thirdInsert) {
                     // Rollback the transaction if the second insert for any item failed
@@ -334,14 +336,14 @@ class ArchiveController extends Controller
 
     public function archiveList()
     {
-        try {
+//        try {
             $permission = $this->permissions()->archive_data_list;
-            $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->get();
+            $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->get();
             return view('back-end/archive/list',compact('voucherInfos'))->render();
-        }catch (\Throwable $exception)
-        {
-            return back()->with('error',$exception->getMessage());
-        }
+//        }catch (\Throwable $exception)
+//        {
+//            return back()->with('error',$exception->getMessage());
+//        }
     }
 
     public function archiveDocumentView($vID)
@@ -366,7 +368,7 @@ class ArchiveController extends Controller
             }
             $vID = Crypt::decryptString($vID);
             $voucherTypes = VoucherType::where('status',1)->get();
-            $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY'])->find($vID);
+            $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->find($vID);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/archive/edit',compact('voucherTypes','voucherInfo','companies'))->render();
         }catch (\Throwable $exception)
@@ -381,43 +383,55 @@ class ArchiveController extends Controller
             if ($request->isMethod('put'))
             {
                 $validated  = $request->validate([
-                    'company_id_link' => ['required','string', 'exists:company_infos,id'],
-                    'update_document_info_id' => ['required','string', 'exists:account_voucher_infos,id'],
+                    'company_id_link' => ['required','string', 'exists:company_infos,id'],//hidden input
+                    'update_archive_info_id' => ['required','string', 'exists:account_voucher_infos,id'], //hidden input
                     'previous_files'  => ['required','array'],
                     'previous_files.*'  => ['required','string','exists:voucher_documents,id'],
                 ]);
                 extract($validated);
+                $thisArchiveDocumentIDs = VoucherDocument::where('voucher_info_id',$update_archive_info_id)->get(['id'])->pluck('id')->toArray();
                 if (!empty($previous_files)) {
-                    $previous_documents = VoucherDocument::whereIn('id', $previous_files)->get();
-
-                    $insertData = $previous_documents->map(function ($previous_document) use ($update_document_info_id,$company_id_link) {
-                        return [
-                            'company_id'      => $company_id_link,
-                            'voucher_info_id' => $update_document_info_id,
-                            'document'        => $previous_document->document,
-                            'filepath'        => $previous_document->filepath,
-                            'created_by'      => Auth::user()->id,
-                            'created_at'      => now(),
-                        ];
-                    })->toArray();
-
-                    if (!empty($insertData)) {
-                        $thirdInsert = VoucherDocument::insert($insertData); // Bulk insert
-                        if (!$thirdInsert) {
-                            return back()->with('error', 'Failed to execute the second insert.');
-                        }
-                        return back()->with('success', 'Document updated successfully.');
+                    $finalInsertData = $this->linkDocumentInfoArray($previous_files,$update_archive_info_id,$thisArchiveDocumentIDs,$company_id_link);
+                    if (!empty($finalInsertData)) {
+//            $thirdInsert = archive infos and documents link
+                        $thirdInsert = ArchiveInfoLinkDocument::insert($finalInsertData); // Bulk insert
                     }
-                    return back()->with('error', 'Failed to execute the insert operation.');
+                    if (!$thirdInsert) {
+                        // Rollback the transaction if the second insert for any item failed
+                        DB::rollBack();
+                        return redirect()->back()->with('error', 'Failed to execute the second insert.');
+                    }
                 }
-                return back()->with('error', 'Invalid data provided.');
+                return back()->with('success', 'Data uploaded successfully');
             }
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
     }
+    private function linkDocumentInfoArray($previous_files,$documentInfoId,$documentIds,$company_id): array
+    {
+        $previous_documents = VoucherDocument::whereIn('id', $previous_files)->get();
+        $childLinkData = $previous_documents->map(function ($previous_document) use ($documentInfoId) {
+            return [
+                'company_id'      => $previous_document->company_id,
+                'voucher_info_id' => $documentInfoId,
+                'document_id'        => $previous_document->id,
+                'created_at'        => now(),
+            ];
+        })->toArray();
 
+        $previous_document_single = $previous_documents->first();
+        $parentLinkData = collect($documentIds)->map(function ($documentId) use ($previous_document_single,$company_id) {
+            return [
+                'company_id'      => $company_id,
+                'voucher_info_id' => $previous_document_single->voucher_info_id,
+                'document_id'        => $documentId,
+                'created_at'        => now(),
+            ];
+        })->toArray();
+        return array_merge($childLinkData, $parentLinkData);
+    }
     private function updateVoucherDocument(Request $request, $vID)
     {
         try {
@@ -504,7 +518,17 @@ class ArchiveController extends Controller
                 'deleted_by'        =>  $deleted_by,
                 'created_at'        =>  now(),
             ]);
+            $old_link_data = ArchiveInfoLinkDocument::where('voucher_info_id',$v_d->voucher_info_id)->where('document_id',$v_d->id)->first();
+            ArchiveLinkDocumentDeleteHistory::create([
+                'old_id' => $old_link_data->id,
+                'voucher_info_id' =>  $old_link_data->voucher_info_id,
+                'company_id' =>   $old_link_data->company_id,
+                'document_id' =>   $old_link_data->voucher_info_id,
+                'old_created_at'  =>  $old_link_data->created_at,
+                'old_updated_at'   =>  $old_link_data->updated_at,
+            ]);
             VoucherDocument::where('id',$v_d->id)->delete();
+            $old_link_data->delete();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

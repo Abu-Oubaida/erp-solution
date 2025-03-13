@@ -20,6 +20,11 @@ class Account_voucher extends Model
     {
         return $this->hasMany(VoucherDocument::class,'voucher_info_id');
     }
+
+    public function voucherDocuments()
+    {
+        return $this->belongsToMany(VoucherDocument::class,'archive_info_link_documents','voucher_info_id','document_id');
+    }
     public function company()
     {
         return $this->belongsTo(company_info::class,'company_id');

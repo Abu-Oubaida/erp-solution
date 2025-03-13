@@ -14,14 +14,14 @@
 @endif
 <table id="permissionstable">
     <thead>
-    <tr>
+    <tr class="text-center">
     @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
         <th>Select</th>
     @endif
         <th>SL</th>
         <th>Date</th>
         <th>Company</th>
-        <th>Reference Number</th>
+        <th title="Reference Number">Ref. Number</th>
         <th>Type</th>
         <th>Remarks</th>
         <th>Document</th>
@@ -51,7 +51,7 @@
             $no= 1;
         @endphp
         @foreach($voucherInfos as $data)
-            <tr>
+            <tr class="text-center">
             @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
                 <th><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $data->id !!}" value="{!! $data->id !!}"></th>
             @endif
@@ -63,9 +63,9 @@
                 <td>{!! $data->remarks !!}</td>
                 <td>
                     @php $x = 1;@endphp
-                    @foreach($data->VoucherDocument as $d)
+                    @foreach($data->voucherDocuments as $d)
                         <div>
-                            <strong>{!! $x++ !!}.</strong> {!! $d->document !!} &nbsp; <a href="" title="Quick View" vtype="{!! $data->VoucherType->voucher_type_title !!}" vno="{!! $data->voucher_number !!}" path="{!! \Illuminate\Support\Facades\Crypt::encryptString(url($d->filepath.$d->document)) !!}" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','v_type','v_no')"> <i class="fa-solid fa-eye"></i></a>
+                            <strong>{!! $x++ !!}.</strong> {!! preg_replace('/(_\d{8}_\d{6}.*)/', '', pathinfo($d->document, PATHINFO_FILENAME)) . '.' . pathinfo($d->document, PATHINFO_EXTENSION) !!}  &nbsp; <a href="" title="Quick View" vtype="{!! $data->VoucherType->voucher_type_title !!}" vno="{!! $data->voucher_number !!}" path="{!! \Illuminate\Support\Facades\Crypt::encryptString(url($d->filepath.$d->document)) !!}" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','v_type','v_no')"> <i class="fa-solid fa-eye"></i></a>
                             &nbsp;
                             <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
                             &nbsp
