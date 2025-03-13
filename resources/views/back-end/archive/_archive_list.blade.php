@@ -61,7 +61,7 @@
                 <td>{!! $data->voucher_number !!}</td>
                 <td>{!! $data->VoucherType->voucher_type_title !!}</td>
                 <td>{!! $data->remarks !!}</td>
-                <td>
+                <td class="text-start text-left">
                     @php $x = 1;@endphp
                     @foreach($data->voucherDocuments as $d)
                         <div>
