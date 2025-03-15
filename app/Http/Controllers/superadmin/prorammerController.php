@@ -80,7 +80,7 @@ class prorammerController extends Controller
             $input = $request->post()['input'];
             unset($input[0]);
             $rules= [
-                '*.0'  => ['string','required', 'max:255'],//permission_parent
+                '*.0'  => ['string','required', 'max:255'],//permission_parent display name
                 '*.2'  => ['string','required', 'max:255','regex:/^[a-z0-9_]+$/'],//permission_name
                 '*.3'  => ['string','required', 'max:255'],//display_name
                 '*.4'  => ['string','sometimes','nullable', 'max:255'],//description
@@ -103,7 +103,7 @@ class prorammerController extends Controller
                 $notInsert = 0;
                 foreach ($input as $key=>$data)
                 {
-                    $parent = Permission::where('name',$data[0])->first();
+                    $parent = Permission::where('display_name',$data[0])->first();
                     if (!Permission::where('name',$data[2])->first())
                     {
                         Permission::create([
