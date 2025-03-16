@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fixed_asset_specification');
+        Schema::dropIfExists('fixed_asset_specifications');
     }
 };

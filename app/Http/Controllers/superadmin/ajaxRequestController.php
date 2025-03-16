@@ -41,10 +41,12 @@ class ajaxRequestController extends Controller
             ]);
             extract($request->post());
             $users = User::where('email',$username)->orWhere('phone',$username)->get();
+
             // Filter out users with correct password
             $matchingUsers = $users->filter(function ($user) use ($request) {
                 return Hash::check($request->password, $user->password);
             });
+        
             if ($matchingUsers->isEmpty()) {
                 return response()->json([
                     'status' => 'error',

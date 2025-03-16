@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('document_requisition_attested_documents');
+        Schema::dropIfExists('document_requisition_attested_document_infos');
     }
 };
