@@ -2449,7 +2449,7 @@ else{
                             alert('Error: ' + response.message);
                             return false
                         } else if (response.status === 'success') {
-
+                            updateSelectBoxSingleOption(response.data,action_id,'id','branch_name')
                         }
                     }
                 })
