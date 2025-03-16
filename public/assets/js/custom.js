@@ -8,7 +8,7 @@ if(hostname === 'localhost')
     sourceDir = ""
 }
 else{
-    sourceDir = "/chl/public"
+    sourceDir = ""
 }
 // Show loader immediately when the page starts loading
 (function ($){

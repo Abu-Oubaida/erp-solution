@@ -412,14 +412,18 @@ class ArchiveController extends Controller
     private function linkDocumentInfoArray($previous_files,$documentInfoId,$documentIds,$company_id): array
     {
         $previous_documents = VoucherDocument::whereIn('id', $previous_files)->get();
-        $childLinkData = $previous_documents->map(function ($previous_document) use ($documentInfoId) {
+        $existingLinks = ArchiveInfoLinkDocument::where('voucher_info_id', $documentInfoId)->whereIn('document_id', $previous_documents->pluck('id'))->whereIn('company_id', $previous_documents->pluck('company_id'))->get()->pluck('document_id')->toArray();
+
+        $childLinkData = $previous_documents->reject(function ($previous_document) use ($existingLinks) {
+            return in_array($previous_document->id, $existingLinks);
+        })->map(function ($previous_document) use ($documentInfoId) {
             return [
                 'company_id'      => $previous_document->company_id,
                 'voucher_info_id' => $documentInfoId,
-                'document_id'        => $previous_document->id,
-                'created_at'        => now(),
+                'document_id'     => $previous_document->id,
+                'created_at'      => now(),
             ];
-        })->toArray();
+        })->values()->toArray();
 
         $previous_document_single = $previous_documents->first();
         $parentLinkData = collect($documentIds)->map(function ($documentId) use ($previous_document_single,$company_id) {
