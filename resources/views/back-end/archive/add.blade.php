@@ -38,7 +38,8 @@
                         <div class="col-md-2 mb-1">
                             <div class="">
                                 <label for="company">Company Name <span class="text-danger">*</span></label>
-                                <select class="text-capitalize select-search" id="company" name="company">
+                                <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjects(this,'project')">
+                                    <option value="">Pick options...</option>
                                     @if(isset($companies) || (count($companies) > 0))
                                         @foreach($companies as $c)
                                             <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
@@ -46,6 +47,12 @@
                                     @endif
                                 </select>
                             </div>
+                        </div>
+                        <div class="col-md-2 mb-1">
+                            <label for="project">Enter Project Name</label>
+                            <select id="project" name="project" class="select-search cursor-pointer">
+                                <option value="">Pick options...</option>
+                            </select>
                         </div>
                         <div class="col-md-2 mb-1">
                             <div class="form-floating">
@@ -83,37 +90,40 @@
                                 <label for="remarks">Remarks</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <small>Link previously uploaded file here</small>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3 mb-1">
-                            <div class="input-group">
-                                <input type="text" id="input" class="form-control" placeholder="Reference number">
-                                <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'company','previous-reference')"><i class="fas fa-search"></i> Search</a>
+                        <div class="col-md-10 mb-1">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <small>Link previously uploaded file here</small>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-sm-2 mb-1">
-                                <select class="text-capitalize select-search form-control" id="previous-reference" name="previous-reference" onchange="return Obj.selectAllOption(this)" multiple>
-                                    <option>--choose a option--</option>
-                                </select>
-                        </div>
-                        <div class="col-md-1 mb-1">
-                            <a class="btn btn-sm btn-outline-secondary" id="previous-reference-search" onclick="return Obj.searchPreviousDocuments('previous-reference','previous-file')"><i class="fas fa-search"></i> Search</a>
-                        </div>
-                        <div class="col-md-4 mb-1">
-                            <div class="">
-                                <select class="text-capitalize select-search" id="previous-file" name="previous_files[]" multiple onchange="return Obj.selectAllOption(this)">
-                                    <option>--choose a file--</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-2 mb-1">
-                            <div class="float-end">
-                                <button type="submit" value="" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Upload</button>
+
+                            <div class="row">
+                                <div class="col-md-3 mb-1">
+                                    <div class="input-group">
+                                        <input type="text" id="input" class="form-control" placeholder="Reference number">
+                                        <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'company','previous-reference')"><i class="fas fa-search"></i> Search</a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-1">
+                                        <select class="text-capitalize select-search form-control" id="previous-reference" name="previous-reference" onchange="return Obj.selectAllOption(this)" multiple>
+                                            <option>--choose a option--</option>
+                                        </select>
+                                </div>
+                                <div class="col-md-1 mb-1">
+                                    <a class="btn btn-sm btn-outline-secondary" id="previous-reference-search" onclick="return Obj.searchPreviousDocuments('previous-reference','previous-file')"><i class="fas fa-search"></i> Search</a>
+                                </div>
+                                <div class="col-md-3 mb-1">
+                                    <div class="">
+                                        <select class="text-capitalize select-search" id="previous-file" name="previous_files[]" multiple onchange="return Obj.selectAllOption(this)">
+                                            <option>--choose a file--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-1">
+                                    <div class="float-end">
+                                        <button type="submit" value="" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Upload</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
