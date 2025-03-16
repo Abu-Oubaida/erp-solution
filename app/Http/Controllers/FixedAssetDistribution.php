@@ -884,6 +884,7 @@ class FixedAssetDistribution extends Controller
     public function companyProjects(Request $request)
     {
         try {
+            $permission = $this->permissions()->fixed_asset_interface;
             if ($request->isMethod('post'))
             {
                 $request->validate([
@@ -892,21 +893,7 @@ class FixedAssetDistribution extends Controller
                 ]);
                 extract($request->post());
                 $op_ref_type = Op_reference_type::where('company_id',$company_id)->where('status',1)->get();
-                if (Auth::user()->isSystemSuperAdmin())
-                {
-                    $projects = branch::with(['getUsers','company'])->where('company_id',$company_id)->where('status',1)->get();
-                }
-                else {
-                    $object = branch::with(['getUsers','company']);
-                    if (Auth::user()->companyWiseRoleName() == 'superadmin')
-                    {
-                        $projects = $object->where('company_id',$company_id)->where('status',1)->get();
-                    }
-                    else
-                    {
-                        $projects = $object->whereIn('id',userProjectPermission::where('user_id',$user_id)->get()->pluck('project_id')->unique()->toArray())->where('company_id',$company_id)->where('status',1)->get();
-                    }
-                }
+                $projects = $this->getUserProjectPermissions($user_id,$permission)->where('company_id',$company_id)->get();
                 return response()->json([
                     'status' => 'success',
                     'data' => ['project'=>$projects,'op_ref_type'=>$op_ref_type],
@@ -923,6 +910,24 @@ class FixedAssetDistribution extends Controller
                 'status' => 'error',
                 'message' => $exception->getMessage(),
             ]);
+        }
+    }
+    private function projects($company_id,$user_id)//optional
+    {
+        if (Auth::user()->isSystemSuperAdmin())
+        {
+            $projects = branch::with(['getUsers','company'])->where('company_id',$company_id)->where('status',1)->get();
+        }
+        else {
+            $object = branch::with(['getUsers','company']);
+            if (Auth::user()->companyWiseRoleName() == 'superadmin')
+            {
+                $projects = $object->where('company_id',$company_id)->where('status',1)->get();
+            }
+            else
+            {
+                $projects = $object->whereIn('id',userProjectPermission::where('user_id',$user_id)->get()->pluck('project_id')->unique()->toArray())->where('company_id',$company_id)->where('status',1)->get();
+            }
         }
     }
 }
