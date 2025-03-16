@@ -395,11 +395,14 @@ class ArchiveController extends Controller
                     if (!empty($finalInsertData)) {
 //            $thirdInsert = archive infos and documents link
                         $thirdInsert = ArchiveInfoLinkDocument::insert($finalInsertData); // Bulk insert
+                        if (!$thirdInsert) {
+                            // Rollback the transaction if the second insert for any item failed
+                            DB::rollBack();
+                            return redirect()->back()->with('error', 'Failed to execute the second insert.');
+                        }
                     }
-                    if (!$thirdInsert) {
-                        // Rollback the transaction if the second insert for any item failed
-                        DB::rollBack();
-                        return redirect()->back()->with('error', 'Failed to execute the second insert.');
+                    else{
+                        return back()->with('success', 'Data already updated.');
                     }
                 }
                 return back()->with('success', 'Data uploaded successfully');
@@ -426,14 +429,27 @@ class ArchiveController extends Controller
         })->values()->toArray();
 
         $previous_document_single = $previous_documents->first();
-        $parentLinkData = collect($documentIds)->map(function ($documentId) use ($previous_document_single,$company_id) {
-            return [
+        $existingLinks2 = ArchiveInfoLinkDocument::where('voucher_info_id', $previous_document_single->voucher_info_id)->whereIn('document_id', $documentIds)->where('company_id', $company_id)->get()->pluck('document_id')->toArray();
+
+//        $parentLinkData = collect($documentIds)->reject(function ($documentId) use ($existingLinks2){
+//            return in_array($documentId, $existingLinks2);
+//        })->map(function ($documentId) use ($previous_document_single,$company_id) {
+//            return [
+//                'company_id'      => $company_id,
+//                'voucher_info_id' => $previous_document_single->voucher_info_id,
+//                'document_id'        => $documentId,
+//                'created_at'        => now(),
+//            ];
+//        })->toArray();
+
+        $parentLinkData = collect($documentIds)
+            ->reject(fn($documentId) => in_array($documentId, $existingLinks2))
+            ->map(fn($documentId) => [
                 'company_id'      => $company_id,
                 'voucher_info_id' => $previous_document_single->voucher_info_id,
-                'document_id'        => $documentId,
-                'created_at'        => now(),
-            ];
-        })->toArray();
+                'document_id'     => $documentId,
+                'created_at'      => now(),
+            ])->values()->toArray();
         return array_merge($childLinkData, $parentLinkData);
     }
     private function updateVoucherDocument(Request $request, $vID)
