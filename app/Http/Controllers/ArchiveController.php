@@ -180,24 +180,21 @@ class ArchiveController extends Controller
 
     private function store(Request $request)
     {
-<<<<<<< Updated upstream
-=======
-        $request->validate([
-            'company'               => ['required', 'integer', 'exists:company_infos,id'],
-            'project'               => ['required', 'integer', 'exists:branches,id'],
-            'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
-                return $query->where('company_id',$request->post('company'));
-            })],
-            'voucher_date'      =>  ['required','date'],
-            'data_type'      =>  ['required','numeric','exists:voucher_types,id'],
-            'remarks'           =>  ['sometimes','nullable','string'],
-            'voucher_file.*'    =>  ['sometimes','nullable','max:512000'],
-            'previous_files'    =>  ['sometimes','nullable','array'],
-            'previous_files.*'  =>  ['sometimes','nullable','exists:voucher_documents,id'],
-        ]);
->>>>>>> Stashed changes
         DB::beginTransaction();
         try {
+            $request->validate([
+                'company'               => ['required', 'integer', 'exists:company_infos,id'],
+                'project'               => ['required', 'integer', 'exists:branches,id'],
+                'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
+                    return $query->where('company_id',$request->post('company'));
+                })],
+                'voucher_date'      =>  ['required','date'],
+                'data_type'      =>  ['required','numeric','exists:voucher_types,id'],
+                'remarks'           =>  ['sometimes','nullable','string'],
+                'voucher_file.*'    =>  ['sometimes','nullable','max:512000'],
+                'previous_files'    =>  ['sometimes','nullable','array'],
+                'previous_files.*'  =>  ['sometimes','nullable','exists:voucher_documents,id'],
+            ]);
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
                 'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
