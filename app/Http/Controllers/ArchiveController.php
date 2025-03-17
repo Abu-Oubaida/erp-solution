@@ -180,26 +180,11 @@ class ArchiveController extends Controller
 
     private function store(Request $request)
     {
-<<<<<<< Updated upstream
-=======
-        $request->validate([
-            'company'               => ['required', 'integer', 'exists:company_infos,id'],
-            'project'               => ['required', 'integer', 'exists:branches,id'],
-            'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
-                return $query->where('company_id',$request->post('company'));
-            })],
-            'voucher_date'      =>  ['required','date'],
-            'data_type'      =>  ['required','numeric','exists:voucher_types,id'],
-            'remarks'           =>  ['sometimes','nullable','string'],
-            'voucher_file.*'    =>  ['sometimes','nullable','max:512000'],
-            'previous_files'    =>  ['sometimes','nullable','array'],
-            'previous_files.*'  =>  ['sometimes','nullable','exists:voucher_documents,id'],
-        ]);
->>>>>>> Stashed changes
         DB::beginTransaction();
         try {
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
+                'project'               => ['required', 'integer', 'exists:branches,id'],
                 'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
                     return $query->where('company_id',$request->post('company'));
                 })],
@@ -234,7 +219,9 @@ class ArchiveController extends Controller
                 foreach ($request->file('voucher_file') as $file) {
                     // Handle each file
                     $fileName = $reference_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
+
                     $filePath = $this->accounts_document_path . '/' . $fileName;
+
                     if (!$file->move($this->accounts_document_path,$fileName))
                     {
                         throw new \Exception('Failed to upload file ['.$file->getClientOriginalName().']');
@@ -404,7 +391,7 @@ class ArchiveController extends Controller
     }
 
     public function archiveDocumentEdit(Request $request, $vID)
-    { 
+    {
         try {
             $permission = $this->permissions()->edit_archive_data_type;
             if ($request->isMethod('put'))
