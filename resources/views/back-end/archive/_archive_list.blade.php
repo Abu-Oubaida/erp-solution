@@ -21,6 +21,7 @@
         <th>SL</th>
         <th>Date</th>
         <th>Company</th>
+        <th>Project_id</th>
         <th title="Reference Number">Ref. Number</th>
         <th>Type</th>
         <th>Remarks</th>
@@ -58,6 +59,7 @@
                 <td>{!! $no++ !!}</td>
                 <td>{!! date('d-M-y', strtotime($data->voucher_date)) !!}</td>
                 <td>{!! $data->company->company_code !!}</td>
+                <td>{!! @$data->project->branch_name !!}</td>
                 <td>{!! $data->voucher_number !!}</td>
                 <td>{!! $data->VoucherType->voucher_type_title !!}</td>
                 <td>{!! $data->remarks !!}</td>

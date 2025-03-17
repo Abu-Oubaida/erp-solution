@@ -180,6 +180,22 @@ class ArchiveController extends Controller
 
     private function store(Request $request)
     {
+<<<<<<< Updated upstream
+=======
+        $request->validate([
+            'company'               => ['required', 'integer', 'exists:company_infos,id'],
+            'project'               => ['required', 'integer', 'exists:branches,id'],
+            'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
+                return $query->where('company_id',$request->post('company'));
+            })],
+            'voucher_date'      =>  ['required','date'],
+            'data_type'      =>  ['required','numeric','exists:voucher_types,id'],
+            'remarks'           =>  ['sometimes','nullable','string'],
+            'voucher_file.*'    =>  ['sometimes','nullable','max:512000'],
+            'previous_files'    =>  ['sometimes','nullable','array'],
+            'previous_files.*'  =>  ['sometimes','nullable','exists:voucher_documents,id'],
+        ]);
+>>>>>>> Stashed changes
         DB::beginTransaction();
         try {
             $request->validate([
@@ -205,6 +221,7 @@ class ArchiveController extends Controller
                 'voucher_date'      =>  $voucher_date,
                 'file_count'        =>  null,
                 'remarks'           =>  $remarks,
+                'project_id'           =>  $project,
                 'created_by'        =>  $user->id,
                 'created_at'        =>  now(),
             ]);
@@ -387,7 +404,7 @@ class ArchiveController extends Controller
     }
 
     public function archiveDocumentEdit(Request $request, $vID)
-    {
+    { 
         try {
             $permission = $this->permissions()->edit_archive_data_type;
             if ($request->isMethod('put'))
@@ -396,7 +413,7 @@ class ArchiveController extends Controller
             }
             $vID = Crypt::decryptString($vID);
             $voucherTypes = VoucherType::where('status',1)->get();
-            $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->find($vID);
+            $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments','company.projects'])->find($vID);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/archive/edit',compact('voucherTypes','voucherInfo','companies'))->render();
         }catch (\Throwable $exception)
@@ -487,6 +504,7 @@ class ArchiveController extends Controller
             $vID = Crypt::decryptString($vID);
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
+                'project'               =>  ['sometimes','nullable'],
 //                'voucher_number'    =>  ['required','string','unique:account_voucher_infos,voucher_number,'.$vID, Rule::unique('account_voucher_infos')->ignore($vID)],
                 'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
                     return $query->where('company_id',$request->post('company'));
@@ -503,6 +521,7 @@ class ArchiveController extends Controller
                 'voucher_number'    =>  $reference_number,
                 'voucher_date'      =>  $voucher_date,
                 'remarks'           =>  $remarks,
+                'project_id'           =>  $project
             ]);
             if ($voucherInfo->company_id != $company)
             {

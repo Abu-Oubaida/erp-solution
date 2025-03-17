@@ -9,7 +9,7 @@ class Account_voucher extends Model
 {
     protected $table = 'account_voucher_infos';
     use HasFactory;
-    protected $fillable = ['id','company_id', 'voucher_type_id', 'voucher_number', 'voucher_date', 'file_count','remarks', 'created_by', 'updated_by', 'created_at', 'updated_at'];
+    protected $fillable = ['id','company_id', 'voucher_type_id', 'voucher_number', 'voucher_date', 'file_count','remarks','project_id', 'created_by', 'updated_by', 'created_at', 'updated_at'];
 
     public function VoucherType()
     {
@@ -36,5 +36,8 @@ class Account_voucher extends Model
     public function updatedBY()
     {
         return $this->belongsTo(User::class,'updated_by');
+    }
+    public function project(){
+        return $this->belongsTo(Branch::class,'project_id','id');
     }
 }

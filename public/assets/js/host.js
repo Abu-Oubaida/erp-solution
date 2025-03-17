@@ -5,7 +5,7 @@ if (hostname === "localhost") {
 } else if (hostname === "127.0.0.1") {
     sourceDir = "";
 } else {
-    sourceDir = "";
+    sourceDir = "/chl/public";
 }
 
 export { sourceDir };
