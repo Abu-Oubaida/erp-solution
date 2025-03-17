@@ -1,10 +1,10 @@
 <?php
 
-namespace App\View\Components\back-end;
+namespace App\View\Components\back_end;
 
 use Illuminate\View\Component;
 
-class _footer-script extends Component
+class _footer_script extends Component
 {
     /**
      * Create a new component instance.
