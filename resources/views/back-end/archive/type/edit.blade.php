@@ -80,7 +80,7 @@
                     </div>
                 </div>
             </div>
-            @include("back-end.account-voucher.type._list")
+            @include("back-end.archive.type._list")
         </div>
 
     </div>

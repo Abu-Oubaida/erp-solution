@@ -15,3 +15,5 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+resources/views/components/back-end/_js_source_dir.blade.php
+/app/View/Components/back-end/_js_source_dir.php

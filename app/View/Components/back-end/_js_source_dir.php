@@ -4,7 +4,7 @@ namespace App\View\Components\back-end;
 
 use Illuminate\View\Component;
 
-class _footer-script extends Component
+class _js_source_dir extends Component
 {
     /**
      * Create a new component instance.
@@ -23,6 +23,6 @@ class _footer-script extends Component
      */
     public function render()
     {
-        return view('components.back-end._footer-script');
+        return view('components.back-end._js_source_dir');
     }
 }

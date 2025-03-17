@@ -44,7 +44,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="company">Company Name <span class="text-danger">*</span></label>
-                                        <select class="text-capitalize select-search" id="company" name="company">
+                                        <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjects(this,'project')">
                                             @if(isset($companies) || (count($companies) > 0))
                                                 @foreach($companies as $c)
                                                     <option value="{{$c->id}}" @if($voucherInfo->company_id == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
@@ -52,6 +52,17 @@
                                             @endif
                                         </select>
                                     </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="project">Enter Project Name</label>
+                                    <select id="project" name="project" class="select-search cursor-pointer">
+                                        <option value="">Pick options...</option>
+                                        @if ($projects = $voucherInfo->company->projects)
+                                            @foreach ( $projects as $project)
+                                            <option value="{{$project->id}}" @if($voucherInfo->project_id == $project->id) selected @endif>{!! $project->branch_name !!}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-2">
@@ -84,7 +95,7 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <div class="form-floating mt-3 float-end">
+                                    <div class="form-floating mt-3 float-start">
                                         <button type="submit" value="" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Update</button>
                                     </div>
                                 </div>

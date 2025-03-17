@@ -180,20 +180,21 @@ class ArchiveController extends Controller
 
     private function store(Request $request)
     {
-        $request->validate([
-            'company'               => ['required', 'integer', 'exists:company_infos,id'],
-            'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
-                return $query->where('company_id',$request->post('company'));
-            })],
-            'voucher_date'      =>  ['required','date'],
-            'data_type'      =>  ['required','numeric','exists:voucher_types,id'],
-            'remarks'           =>  ['sometimes','nullable','string'],
-            'voucher_file.*'    =>  ['sometimes','nullable','max:512000'],
-            'previous_files'    =>  ['sometimes','nullable','array'],
-            'previous_files.*'  =>  ['sometimes','nullable','exists:voucher_documents,id'],
-        ]);
         DB::beginTransaction();
         try {
+            $request->validate([
+                'company'               => ['required', 'integer', 'exists:company_infos,id'],
+                'project'               => ['required', 'integer', 'exists:branches,id'],
+                'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
+                    return $query->where('company_id',$request->post('company'));
+                })],
+                'voucher_date'      =>  ['required','date'],
+                'data_type'      =>  ['required','numeric','exists:voucher_types,id'],
+                'remarks'           =>  ['sometimes','nullable','string'],
+                'voucher_file.*'    =>  ['sometimes','nullable','max:512000'],
+                'previous_files'    =>  ['sometimes','nullable','array'],
+                'previous_files.*'  =>  ['sometimes','nullable','exists:voucher_documents,id'],
+            ]);
             extract($request->post());
             $user = Auth::user();
             $v_type = VoucherType::where('id',$data_type)->first();
@@ -205,24 +206,28 @@ class ArchiveController extends Controller
                 'voucher_date'      =>  $voucher_date,
                 'file_count'        =>  null,
                 'remarks'           =>  $remarks,
+                'project_id'           =>  $project,
                 'created_by'        =>  $user->id,
                 'created_at'        =>  now(),
             ]);
             if (!$firstInsert) {
-                // Rollback the transaction if the first insert failed
-                DB::rollBack();
-                return redirect()->back()->with('error', 'Failed to execute the first insert.');
+                throw new \Exception('Failed to insert data');
             }
             if ($firstInsert && $request->hasFile('voucher_file')) {
                 $documentIds = array();
+                $uploadedFiles = []; // Track successfully uploaded files
                 foreach ($request->file('voucher_file') as $file) {
                     // Handle each file
                     $fileName = $reference_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
-                    $file_location = $file->move($this->accounts_document_path,$fileName); // Adjust the storage path as needed
-                    if (!$file_location)
+
+                    $filePath = $this->accounts_document_path . '/' . $fileName;
+
+                    if (!$file->move($this->accounts_document_path,$fileName))
                     {
-                        return redirect()->back()->with('error', 'Data uploaded error.');
+                        throw new \Exception('Failed to upload file ['.$file->getClientOriginalName().']');
                     }
+                    $uploadedFiles[] = $filePath; // Track the uploaded file
+
 //            $secondInsert = documents infos
                     $secondInsert = DB::table('voucher_documents')->insertGetId([
                         'company_id'        =>  $company,
@@ -234,9 +239,7 @@ class ArchiveController extends Controller
                     ]);
                     array_push($documentIds,$secondInsert);
                     if (!$secondInsert) {
-                        // Rollback the transaction if the second insert for any item failed
-                        DB::rollBack();
-                        return redirect()->back()->with('error', 'Failed to execute the second insert.');
+                        throw new \Exception('Failed to insert documents ['.$file->getClientOriginalName().'] data!');
                     }
                     $thirdInsert = ArchiveInfoLinkDocument::create([
                         'company_id'        =>  $company,
@@ -244,9 +247,7 @@ class ArchiveController extends Controller
                         'document_id'        =>  $secondInsert,
                     ]);
                     if (!$thirdInsert) {
-                        // Rollback the transaction if the second insert for any item failed
-                        DB::rollBack();
-                        return redirect()->back()->with('error', 'Failed to execute the second insert.');
+                        throw new \Exception('Failed to update link between documents and info');
                     }
                 }
             }
@@ -257,17 +258,23 @@ class ArchiveController extends Controller
                     $thirdInsert = ArchiveInfoLinkDocument::insert($finalInsertData); // Bulk insert
                 }
                 if (!$thirdInsert) {
-                    // Rollback the transaction if the second insert for any item failed
-                    DB::rollBack();
-                    return redirect()->back()->with('error', 'Failed to execute the second insert.');
+                    throw new \Exception('Failed to update link between documents and info');
                 }
             }
             DB::commit();
-            return redirect()->back()->with('success', 'Data save successful.');
+            return back()->with('success', 'Data save successful.');
 
         }catch (\Throwable $exception)
         {
             DB::rollBack();
+
+            // Delete uploaded files if transaction fails
+            foreach ($uploadedFiles as $file) {
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+            }
+
             return redirect()->back()->with('error', 'An error occurred: ' . $exception->getMessage())->withInput();
         }
 
@@ -299,24 +306,28 @@ class ArchiveController extends Controller
     }
     public function storeArchiveDocumentIndividual(Request $request)
     {
-        if ($request->isMethod('post'))
-        {
-            $request->validate([
-                'id'    => ['required','string', new AccountVoucherInfoStatusRule()],
-                'voucher_file.*'    =>  ['required','max:512000'],
-            ]);
-            try {
+        DB::beginTransaction();
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'id'    => ['required','string', new AccountVoucherInfoStatusRule()],
+                    'voucher_file.*'    =>  ['required','max:512000'],
+                ]);
                 extract($request->post());
                 $user = Auth::user();
                 $voucherInfo = Account_voucher::with(['VoucherType'])->where('id',Crypt::decryptString($id))->first();
+                $uploadedFiles = []; // Track successfully uploaded files
+
                 foreach ($request->file('voucher_file') as $file) {
                     $fileName = $voucherInfo->voucher_number."_".$voucherInfo->VoucherType->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
-                    $file_location = $file->move($this->accounts_document_path,$fileName); // Adjust the storage path as needed
-                    if (!$file_location)
+                    $filePath = $this->accounts_document_path . '/' . $fileName;
+                    if (!$file->move($this->accounts_document_path,$fileName))
                     {
-                        return redirect()->back()->with('error', 'Data uploaded error.');
+                        throw new \Exception('Failed to upload file.['.$file->getClientOriginalName().']');
                     }
-                    DB::table('voucher_documents')->insert([
+                    $uploadedFiles[] = $filePath; // Track the uploaded file
+                    $insert = DB::table('voucher_documents')->insertGetId([
                         'company_id'        =>  $voucherInfo->company_id,
                         'voucher_info_id'   =>  $voucherInfo->id,
                         'document'          =>  $fileName,
@@ -324,14 +335,35 @@ class ArchiveController extends Controller
                         'created_by'        =>  $user->id,
                         'created_at'        =>  now(),
                     ]);
+                    if (!$insert) {
+                        throw new \Exception('Failed to execute the insert. ['.$file->getClientOriginalName().'] document');
+                    }
+
+                    $secondInsert = ArchiveInfoLinkDocument::create([
+                        'company_id'        =>  $voucherInfo->company_id,
+                        'voucher_info_id'   =>  $voucherInfo->id,
+                        'document_id'        =>  $insert,
+                    ]);
+                    if (!$secondInsert) {
+                        throw new \Exception('Failed to create link between ['.$voucherInfo->voucher_number.' And '.$file->getClientOriginalName().'] document');
+                    }
                 }
-                return redirect()->route('uploaded.archive.list')->with('success','Data upload successfully on Voucher No:'.$voucherInfo->voucher_number);
-            }catch (\Throwable $exception)
-            {
-                return redirect()->route('uploaded.archive.list')->with('error',$exception->getMessage());
+                DB::commit();
+                return back()->with('success','Data upload successfully on Voucher No:'.$voucherInfo->voucher_number);
             }
+            return back()->with('error', "request method {$request->method()} not supported")->withInput();
+        }catch (\Throwable $exception)
+        {
+            DB::rollBack();
+
+            // Delete uploaded files if transaction fails
+            foreach ($uploadedFiles as $file) {
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+            }
+            return back()->with('error',$exception->getMessage());
         }
-        return redirect()->back()->with('error', "request method {$request->method()} not supported")->withInput();
     }
 
     public function archiveList()
@@ -368,7 +400,7 @@ class ArchiveController extends Controller
             }
             $vID = Crypt::decryptString($vID);
             $voucherTypes = VoucherType::where('status',1)->get();
-            $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->find($vID);
+            $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments','company.projects'])->find($vID);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/archive/edit',compact('voucherTypes','voucherInfo','companies'))->render();
         }catch (\Throwable $exception)
@@ -459,6 +491,7 @@ class ArchiveController extends Controller
             $vID = Crypt::decryptString($vID);
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
+                'project'               =>  ['sometimes','nullable'],
 //                'voucher_number'    =>  ['required','string','unique:account_voucher_infos,voucher_number,'.$vID, Rule::unique('account_voucher_infos')->ignore($vID)],
                 'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
                     return $query->where('company_id',$request->post('company'));
@@ -475,6 +508,7 @@ class ArchiveController extends Controller
                 'voucher_number'    =>  $reference_number,
                 'voucher_date'      =>  $voucher_date,
                 'remarks'           =>  $remarks,
+                'project_id'           =>  $project
             ]);
             if ($voucherInfo->company_id != $company)
             {

@@ -1,15 +1,4 @@
 let Obj = {};
-let hostname = window.location.hostname;
-if(hostname === 'localhost')
-{
-    sourceDir = "/chl/public"
-}else if (hostname === '127.0.0.1')
-{
-    sourceDir = ""
-}
-else{
-    sourceDir = ""
-}
 // Show loader immediately when the page starts loading
 (function ($){
 //     $(document).ready(function() {

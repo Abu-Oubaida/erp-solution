@@ -9,6 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>{{(\Route::currentRouteName() == 'root')?'Home Page':ucwords(str_replace('.', ' ', \Route::currentRouteName()))}} | {{str_replace('-', '-', config('app.name'))}}</title>
     <link rel="icon" href="{{url("image/logo/default/icon/360.png")}}">
+    <x-back-end._js_source_dir/>
     <x-auth._header_link/>
     <style>
         button:disabled {

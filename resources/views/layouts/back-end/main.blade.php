@@ -16,6 +16,7 @@
             document.getElementById("page_loader").style.display = "none";
         };
     </script>
+    <x-back-end._js_source_dir/>
     <title style="">{{ucwords(str_replace('.', ' ', \Route::currentRouteName()))}} | {{str_replace('-', '-', config('app.name'))}}</title>
     <link rel="icon" href="{{url("image/logo/default/icon/360.png")}}">
     <x-back-end._header-link/>
