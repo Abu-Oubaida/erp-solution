@@ -7,6 +7,7 @@ use App\Models\ArchiveInfoLinkDocument;
 use App\Models\ArchiveLinkDocumentDeleteHistory;
 use App\Models\branch;
 use App\Models\User;
+use App\Models\Voucher_type_permission_user_delete_history;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentDeleteHistory;
 use App\Models\VoucherDocumentIndividualDeletedHistory;
@@ -22,6 +23,7 @@ use Illuminate\Validation\Rule;
 use App\Models\department;
 use App\Models\Voucher_type_permission_user;
 use Log;
+
 
 
 class ArchiveController extends Controller
@@ -158,7 +160,95 @@ class ArchiveController extends Controller
 
     private function archiveTypeList($permission)
     {
-        return VoucherType::withCount('voucherWithUsers')->with(['createdBY','updatedBY','company'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->get();
+        return VoucherType::withCount('voucherWithUsers')->with(['voucherWithUsers','createdBY','updatedBY','company'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->get();
+    }
+    public function archiveDataListPermissionWithUsers(Request $request){
+        try{
+            if ($request->isMethod('post')){
+                $voucherId = $request->id;
+                $usersWithPermission = VoucherType::with([
+                    'voucherWithUsers' => function ($query) use ($voucherId) {
+                        $query->select(
+                            'users.id', 
+                            'users.dept_id',
+                            'users.designation_id',
+                            'users.company',
+                            'users.name',
+                            'users.employee_id'
+                        )->where('voucher_type_permission_user.voucher_type_id', $voucherId);
+                    },
+                    'voucherWithUsers.department' => function ($query) {
+                        $query->select('departments.id', 'departments.dept_name'); 
+                    },
+                    'voucherWithUsers.designation' => function ($query) {
+                        $query->select('designations.id', 'designations.title'); 
+                    },
+                    'voucherWithUsers.getCompany' => function ($query) {
+                        $query->select('company_infos.id', 'company_infos.company_name'); 
+                    }
+                ])->select(['voucher_types.id','voucher_types.voucher_type_title'])->find($voucherId);
+                $view = view('back-end.archive.type.__receiver-list-modal',compact('usersWithPermission'))->render();
+                return response()->json(['data' => $view,'status' => 'success','message'=>'Request process successful']);
+            }
+           
+            return response()->json([
+                    'status' => 'error',
+                    'message' => 'Request method not allowed!'
+                ]);
+        }catch (\Throwable $exception){
+            return response()->json([
+                    'status' => 'error',
+                    'message' => $exception->getMessage(),
+             ]);
+        }
+    }
+    public function deleteTypePermissionFromUser(Request $request){
+      try{
+        $user_id = Crypt::decryptString($request->user_id);
+        $data_type_id = Crypt::decryptString($request->data_type_id);
+        $request->validate([
+            'user_id'=>['required','string'],
+            'data_type_id'=>['required','string']
+        ]);
+        $deleteData = Voucher_type_permission_user::where('user_id',$user_id)->where('voucher_type_id',$data_type_id)->first();
+        if($deleteData){
+           $delete_history = Voucher_type_permission_user_delete_history::create([
+            'old_id'=>$deleteData->id,
+            'voucher_type_id'=>$deleteData->voucher_type_id,
+            'user_id'=>$deleteData->user_id,
+            'old_created_at'=>$deleteData->created_at,
+            'old_updated_at'=>$deleteData->updated_at,
+            'old_created_by'=>$deleteData->created_by,
+            'old_updated_by'=>$deleteData->updated_by,
+            'created_by'=>Auth::user()->id,
+            'updated_by'=>null,
+            'created_at'=>now()
+           ]);
+           if($delete_history){
+            $deleteData->delete();
+            return response()->json([
+                'status'=> 'success',
+                'message'=> 'Data deleted successfully!',
+            ]);
+           }
+           return response()->json([
+            'status'=> 'error',
+            'message'=> 'Delete operation failed, please try again!',
+        ]);
+        }
+        return response()->json([
+            'status'=> 'error',
+            'message'=> 'Data not found!',
+        ]);
+
+        
+      }catch (\Exception $exception){
+        return response()->json([
+            'status'=> 'error',
+            'message'=> $exception->getMessage(),
+        ]);
+      }
+      
     }
     private function updateArchiveType(Request $request,$voucherTypeID)
     {
