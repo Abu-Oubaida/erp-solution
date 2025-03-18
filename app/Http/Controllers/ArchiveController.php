@@ -169,9 +169,9 @@ class ArchiveController extends Controller
             }
             $voucherTypes = VoucherType::where('status',1)->get();
             $user = Auth::user();
-            $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY','company','voucherDocuments'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->latest('created_at')->take(10)->get();
+//            $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY','company','voucherDocuments'])->where('created_by',$user->id)->orWhere('updated_by',$user->id)->latest('created_at')->take(10)->get();
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            return view('back-end/archive/add',compact("voucherTypes","voucherInfos","companies"))->render();
+            return view('back-end/archive/add',compact("voucherTypes","companies"))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -184,7 +184,7 @@ class ArchiveController extends Controller
         try {
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
-                'project'               => ['required', 'integer', 'exists:branches,id'],
+                'project'               => ['sometimes','nullable', 'integer', 'exists:branches,id'],
                 'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
                     return $query->where('company_id',$request->post('company'));
                 })],

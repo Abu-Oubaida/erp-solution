@@ -130,20 +130,20 @@
                 </form>
             </div>
         </div>
-        <div class="card mb-4">
-            <div class="card-header">
-                <div class="row">
-                    <h3 class="text-capitalize"><i class="fas fa-file-pdf"></i> Your Added Documents Latest 10 Records</h3>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        @include('back-end.archive._archive_list')
-                    </div>
-                </div>
-            </div>
-        </div>
+{{--        <div class="card mb-4">--}}
+{{--            <div class="card-header">--}}
+{{--                <div class="row">--}}
+{{--                    <h3 class="text-capitalize"><i class="fas fa-file-pdf"></i> Your Added Documents Latest 10 Records</h3>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--            <div class="card-body">--}}
+{{--                <div class="row">--}}
+{{--                    <div class="col-md-12">--}}
+{{--                        @include('back-end.archive._archive_list')--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
     </div>
 @stop
 
