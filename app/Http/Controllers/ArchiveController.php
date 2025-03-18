@@ -181,6 +181,7 @@ class ArchiveController extends Controller
     private function store(Request $request)
     {
         DB::beginTransaction();
+        $uploadedFiles = []; // Track successfully uploaded files
         try {
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
@@ -215,7 +216,6 @@ class ArchiveController extends Controller
             }
             if ($firstInsert && $request->hasFile('voucher_file')) {
                 $documentIds = array();
-                $uploadedFiles = []; // Track successfully uploaded files
                 foreach ($request->file('voucher_file') as $file) {
                     // Handle each file
                     $fileName = $reference_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
