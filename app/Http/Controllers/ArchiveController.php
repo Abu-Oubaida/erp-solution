@@ -44,10 +44,10 @@ class ArchiveController extends Controller
                 return $this->storeArchiveType($request);
             }
             $voucherTypes = $this->archiveTypeList();
-            $voucherWithUsers = Voucher_type_permission_user::with('user')->get();
+            //$voucherWithUsers = Voucher_type_permission_user::with('user')->get();
           // dd($voucherWithUsers);
         //    Log::info('$voucherWithUsers');
-        Log::info(json_encode($voucherWithUsers, JSON_PRETTY_PRINT));
+        Log::info(json_encode($voucherTypes, JSON_PRETTY_PRINT));
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/archive/type/add',compact('voucherTypes','companies'))->render();
         }catch (\Throwable $exception)
@@ -121,7 +121,7 @@ class ArchiveController extends Controller
 
     private function archiveTypeList()
     {
-        return VoucherType::with(['createdBY','updatedBY'])->get();
+        return VoucherType::withCount('voucherWithUsers')->with(['createdBY','updatedBY'])->get();
     }
     private function updateArchiveType(Request $request,$voucherTypeID)
     {

@@ -69,7 +69,21 @@
                                         <label for="remarks">Remarks</label>
                                     </div>
                                 </div>
-
+                                <div class="col-md-5 mb-1">
+                                    <label for="department">Enter Department Name</label>
+                                    <select id="company_wise_departments" multiple name="department" class="select-search cursor-pointer" onchange="return Obj.selectAllOption(this)">
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-1 d-flex float-start align-items-center">
+                                    <a class="btn btn-sm btn-outline-secondary mt-3" id="search-icon" onclick="return Obj.searchCompanyDepartmentUsers('company','company_wise_departments','company_departments_users')"><i class="fas fa-search"></i> Find Users</a>
+                                </div>
+                                <div class="col-md-5 mb-1">
+                                    <label for="department">User List</label>
+                                    <select id="company_departments_users" name="company_departments_users[]" class="select-search cursor-pointer" onchange="return Obj.selectAllOption(this)" multiple>
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
                                 <div class="col-md-2">
                                     <div class="form-floating mb-3 float-end">
                                         <input onclick="return confirm('Are you sure!')" type="submit" value="Update" class="btn btn-chl-outline" name="submit" >

@@ -43,7 +43,7 @@
                                 <tr>
                                     <td>{!! $no++ !!}</td>
                                     <td>{!! $vt->voucher_type_title !!}</td>
-                                    <td>10</td>
+                                    <td>{!! $vt->voucher_with_users_count !!}</td>
                                     <td>@if($vt->status ==1) Active @else Inactive @endif</td>
                                     <td>{!! $vt->code !!}</td>
                                     <td>{!! $vt->remarks !!}</td>
