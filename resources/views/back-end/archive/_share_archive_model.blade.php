@@ -80,7 +80,7 @@
                     </thead>
                     @foreach($shareData as $e)
                         <tr>
-                            <td><a href="{!! $shareLink = route('archive.document.view',['document'=>Crypt::encryptString($e->share_document_id),'share'=>$e->share_id]); !!}" target="_blank">{!! $e->share_id !!}</a></td>
+                            <td><a href="{!! $shareLink = route('archive.view',['archive'=>Crypt::encryptString($e->share_voucher_id),'share'=>$e->share_id]); !!}" target="_blank">{!! $e->share_id !!}</a></td>
                             <td>
                                 @if(count($e->ShareEmails))
                                     @foreach($e->ShareEmails as $email)
