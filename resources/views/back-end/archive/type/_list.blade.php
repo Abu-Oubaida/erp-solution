@@ -13,6 +13,7 @@
                         <tr>
                             <th>No</th>
                             <th>Voucher type title</th>
+                            <th>Permission User</th>
                             <th>Status</th>
                             <th>Code</th>
                             <th>Remarks</th>
@@ -42,6 +43,7 @@
                                 <tr>
                                     <td>{!! $no++ !!}</td>
                                     <td>{!! $vt->voucher_type_title !!}</td>
+                                    <td>10</td>
                                     <td>@if($vt->status ==1) Active @else Inactive @endif</td>
                                     <td>{!! $vt->code !!}</td>
                                     <td>{!! $vt->remarks !!}</td>

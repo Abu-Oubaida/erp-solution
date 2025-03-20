@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Account_voucher;
 use App\Models\ArchiveInfoLinkDocument;
 use App\Models\ArchiveLinkDocumentDeleteHistory;
+use App\Models\User;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentDeleteHistory;
 use App\Models\VoucherDocumentIndividualDeletedHistory;
@@ -17,6 +18,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Models\department;
+use App\Models\Voucher_type_permission_user;
+use Log;
+
 
 class ArchiveController extends Controller
 {
@@ -39,8 +44,11 @@ class ArchiveController extends Controller
                 return $this->storeArchiveType($request);
             }
             $voucherTypes = $this->archiveTypeList();
+            $voucherWithUsers = Voucher_type_permission_user::with('user')->get();
+          // dd($voucherWithUsers);
+        //    Log::info('$voucherWithUsers');
+        Log::info(json_encode($voucherWithUsers, JSON_PRETTY_PRINT));
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-//            dd($voucherTypes);
             return view('back-end/archive/type/add',compact('voucherTypes','companies'))->render();
         }catch (\Throwable $exception)
         {
@@ -49,12 +57,14 @@ class ArchiveController extends Controller
     }
     private function storeArchiveType(Request $request):RedirectResponse
     {
+        DB::beginTransaction();
         $request->validate([
             'data_type_title'   =>  ['required', 'string', 'max:255'],
             'data_type_code'    =>  ['sometimes','nullable', 'numeric'],
             'status'               =>  ['required', 'numeric'],
             'remarks'              =>  ['sometimes','nullable', 'string'],
-            'company'               => ['required', 'integer', 'exists:company_infos,id'],
+            'company'               => ['sometimes', 'integer', 'exists:company_infos,id'],
+            'company_departments_users'=> ['sometimes','array','exists:users,id']
         ]);
         extract($request->post());
         try {
@@ -63,7 +73,7 @@ class ArchiveController extends Controller
                 return back()->with('error','Duplicate data found!')->withInput();
             }
             $user = Auth::user();
-            VoucherType::create([
+            $voucherType = VoucherType::create([
                 'company_id'=> $company,
                 'status'    =>  $status,
                 'voucher_type_title'=>  $data_type_title,
@@ -72,9 +82,20 @@ class ArchiveController extends Controller
                 'created_by'=>  $user->id,
                 'updated_by'=>  $user->id,
             ]);
+            foreach($company_departments_users as $department_user_id){
+                DB::table('voucher_type_permission_user')->insert([
+                    'voucher_type_id'=>$voucherType->id,
+                    'user_id'=>$department_user_id,
+                    'company_id'=>$company,
+                    'created_by'=>$user->id,
+                    'updated_by'=>null
+                ]);
+            }
+            DB::commit();
             return back()->with('success','Data insert successfully');
         }catch (\Throwable $exception)
-        {
+        {   
+            DB::rollBack();
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
@@ -733,5 +754,44 @@ class ArchiveController extends Controller
                 'message'=> $exception->getMessage()
             ]);
         }
+    }
+    public function searchCompanyDepartmentUsers(Request $request){
+        try {
+            $permission = $this->permissions()->add_archive_data_type;
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'ids'=> ['required','array'],
+                    'ids.*'=> ['string','numeric','exists:departments,id'],
+                    'company_id'=> ['string','numeric','exists:company_infos,id']
+                    ]);
+                extract($request->post());
+
+                $users = $this->getUser($permission)->where('company',$company_id)->whereIn('dept_id',$ids)->get(['id','name']);
+
+                return response()->json([
+                    'status'=> 'success',
+                    'data'=>$users,
+                    'message' => 'Request process successfully!',
+                ]);
+            }
+            return response()->json([
+                'status'=> 'error',
+                'message'=> 'Requested method are not allowed!'
+                ]);
+
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status'=> 'error',
+                'message'=> $exception->getMessage()
+                ]);
+        }
+
+        
+        // $departments = department::with(['get_users' => function($query) {
+        //     $query->whereColumn('company_id', 'company'); // Compare company_id with company directly
+        // }])
+        // ->get();
     }
 }

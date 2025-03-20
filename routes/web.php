@@ -86,6 +86,7 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::post('company-wise-projects','companyWiseProjects');
         Route::post('user-wise-company-project-permissions','userWiseCompanyProjectPermissions');
+        Route::post('company-wise-departments','companyWiseDepartments');
     });//3.2 End
 
 # 3.2 System Admin Controller
@@ -301,6 +302,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('archive-multiple-submit','archiveMultipleSubmit')->name('archive.multiple.submit');
 //            Route::delete('delete-voucher','deleteVoucherMultiple')->name('delete.voucher.multiple');
         });
+        Route::post('search-company-department-users','searchCompanyDepartmentUsers')->name('search.company-department-users');
     });
 //    Account Controller
     Route::controller(AccountVoucherController::class)->group(function (){

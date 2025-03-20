@@ -29,9 +29,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use function Symfony\Component\String\s;
+use App\Traits\ParentTraitCompanyWise;
+use Log;
 
 class ajaxRequestController extends Controller
 {
+    use ParentTraitCompanyWise;
     public function companyCheckSet(Request $request)
     {
         try {
@@ -559,6 +562,22 @@ class ajaxRequestController extends Controller
             ]);
         }catch (\Throwable $exception)
         {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+    public function companyWiseDepartments(Request $request){
+        try {
+            $deparments = company_info::with(['departments'])->find($request->company_id)->departments->where('status',1);
+            return response()->json([
+                'status' => 'success',
+                'data' => $deparments,
+                'company_id'=>$request->company_id,
+                'message' => 'Request processed successfully!'
+            ]);
+        }catch (\Throwable $exception){
             return response()->json([
                 'status' => 'error',
                 'message' => $exception->getMessage(),

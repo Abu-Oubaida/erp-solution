@@ -24,6 +24,7 @@ use App\Models\User;
 use App\Models\UserCompanyPermission;
 use App\Models\userProjectPermission;
 use Illuminate\Database\Eloquent\Builder;
+use Log;
 
 trait ParentTraitCompanyWise
 {
@@ -79,7 +80,7 @@ trait ParentTraitCompanyWise
     }
     public function getDepartment($operation_permission_name)
     {
-        $object = department::with(['createdBy','updatedBy','getUsers','company']);
+         $object = department::with(['createdBy','updatedBy','getUsers','company']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
@@ -393,4 +394,10 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('sander_company_id',$this->getCompanyModulePermissionWiseArray($operation_permission_name))->whereIn('receiver_company_id',$this->getCompany());
     }
+    // public function companyDepartmentWithUsers($ids,$request,$company_id){
+    //     return department::with(['getUsers'primaryCompany => function ($query) use ($ids, $company_id) {
+    //         $query->whereIn('dept_id', $ids) // Filtering users by department IDs
+    //               ->where('company', $company_id); // Filtering users by company ID
+    //     }])->get();
+    // }
 }
