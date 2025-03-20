@@ -283,6 +283,12 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:archive_data_list'])->group(function () {
             Route::get('archive-data-list','archiveList')->name('uploaded.archive.list');
         });//3.7.6
+
+        Route::middleware(['permission:archive_data_list_quick'])->group(function () {
+            Route::get('archive-data-list-quick','archiveListQuick')->name('uploaded.archive.list.quick');
+        });//3.7.6
+
+
 # 3.7.5 List uploaded voucher document
 //        Route::middleware(['permission:view_voucher_document'])->group(function () {
         Route::middleware(['permission:archive_document_view'])->group(function () {
@@ -303,6 +309,8 @@ Route::group(['middleware' => ['auth']],function (){
 //            Route::delete('delete-voucher','deleteVoucherMultiple')->name('delete.voucher.multiple');
         });
         Route::post('search-company-department-users','searchCompanyDepartmentUsers')->name('search.company-department-users');
+
+        Route::post('company-wise-projects-archive','companyWiseProjects');
     });
 //    Account Controller
     Route::controller(AccountVoucherController::class)->group(function (){

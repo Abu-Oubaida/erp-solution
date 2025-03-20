@@ -3008,6 +3008,45 @@ let Obj = {};
                     },
                 });
             },
+            companyWiseProjectsArchive: function (e, action_id,action_id_2) {
+                let id = $(e).val();
+                if (id.length === 0) {
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-wise-projects-archive";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { company_id: id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            updateSelectBoxSingleOption(
+                                response.data.projects,
+                                action_id,
+                                "id",
+                                "branch_name"
+                            );
+                            updateSelectBoxSingleOption(
+                                response.data.types,
+                                action_id_2,
+                                "id",
+                                "voucher_type_title"
+                            );
+                        }
+                    },
+                });
+            },
             companyWiseDepartments: function (e, action_id) {
                 let id = $(e).val();
                 // console.log(val);

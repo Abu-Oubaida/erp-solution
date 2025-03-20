@@ -277,7 +277,7 @@
             <group5>
                 @if(auth()->user()->hasPermission('data_archive'))
 
-                    @if(Route::currentRouteName() == 'add.archive.type' || Route::currentRouteName() == 'edit.archive.type' || Route::currentRouteName() == 'add.archive.info' || Route::currentRouteName() == 'edit.archive.info' || Route::currentRouteName() == 'uploaded.archive.list' || Route::currentRouteName() == 'view.archive.document')
+                    @if(Route::currentRouteName() == 'add.archive.type' || Route::currentRouteName() == 'edit.archive.type' || Route::currentRouteName() == 'add.archive.info' || Route::currentRouteName() == 'edit.archive.info' || Route::currentRouteName() == 'uploaded.archive.list' || Route::currentRouteName() == 'view.archive.document' || Route::currentRouteName() == 'uploaded.archive.list.quick')
                         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="true" aria-controls="pagesUploadOption">
                             <div class="sb-nav-link-icon"><i class="fas fa-receipt" aria-hidden="true"></i></div>
                             Data Archive
@@ -330,6 +330,13 @@
                                         <a class="nav-link" href="{{route('uploaded.archive.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div> Uploaded List</a>
                                     @else
                                         <a class="nav-link text-chl" href="{{route('uploaded.archive.list')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div> Uploaded List</a>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->hasPermission('archive_data_list_quick'))
+                                    @if(Route::currentRouteName() == 'uploaded.archive.list.quick')
+                                        <a class="nav-link" href="{{route('uploaded.archive.list.quick')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-truck-fast"></i></div> Quick List</a>
+                                    @else
+                                        <a class="nav-link text-chl" href="{{route('uploaded.archive.list.quick')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-truck-fast"></i></div> Quick List</a>
                                     @endif
                                 @endif
                                 @if(auth()->user()->hasPermission('archive_document_view'))

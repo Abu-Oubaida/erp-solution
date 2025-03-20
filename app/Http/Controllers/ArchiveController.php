@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Account_voucher;
 use App\Models\ArchiveInfoLinkDocument;
 use App\Models\ArchiveLinkDocumentDeleteHistory;
+use App\Models\branch;
 use App\Models\User;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentDeleteHistory;
@@ -387,14 +388,56 @@ class ArchiveController extends Controller
 
     public function archiveList()
     {
-//        try {
+        try {
             $permission = $this->permissions()->archive_data_list;
             $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->get();
             return view('back-end/archive/list',compact('voucherInfos'))->render();
-//        }catch (\Throwable $exception)
-//        {
-//            return back()->with('error',$exception->getMessage());
-//        }
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function archiveListQuick()
+    {
+        try {
+            $permission = $this->permissions()->archive_data_list_quick;
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            return view('back-end/archive/quick-list',compact('companies'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    public function companyWiseProjects(Request $request)
+    {
+        try {
+            if ($request->isMethod('post'))
+            {
+                $request->validate([
+                    'company_id' => ['required','string','exists:company_infos,id'],
+                ]);
+                extract($request->post());
+                $projects = branch::where('company_id',$company_id)->where('status',1)->get();
+                $types = VoucherType::where('company_id',$company_id)->where('status',1)->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['projects' => $projects,'types' => $types],
+                    'message' => 'Request processed successfully!'
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message'=> 'Request method not allowed!'
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 
     public function archiveDocumentView($vID)
