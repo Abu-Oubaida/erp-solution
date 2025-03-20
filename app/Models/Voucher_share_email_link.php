@@ -10,7 +10,7 @@ class Voucher_share_email_link extends Model
     use HasFactory;
     protected $fillable = ['company_id','share_id','share_voucher_id','status','shared_by'];
 
-    public function shareVoucher()
+    public function shareArchive()
     {
         return $this->belongsTo(Account_voucher::class , 'share_voucher_id','id');
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\superadmin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ShareArchive;
 use App\Mail\ShareVoucherDocument;
 use App\Models\Account_voucher;
 use App\Models\branch;
@@ -49,7 +50,7 @@ class ajaxRequestController extends Controller
             $matchingUsers = $users->filter(function ($user) use ($request) {
                 return Hash::check($request->password, $user->password);
             });
-        
+
             if ($matchingUsers->isEmpty()) {
                 return response()->json([
                     'status' => 'error',
@@ -334,7 +335,7 @@ class ajaxRequestController extends Controller
                     DB::commit();
                 }
                 if ($tags && (is_array($tags) || is_object($tags))) {
-                    Mail::to($tags)->send(new ShareVoucherDocument($shareLink, $message));
+                    Mail::to($tags)->send(new ShareVoucherDocument($shareLink, null));
                     // Email sent successfully
                 } else {
                     // Handle the case where $tags is null or not iterable
@@ -383,7 +384,7 @@ class ajaxRequestController extends Controller
             if ($document)
             {
                 $share_id = $this->generateUniqueId();
-                $shareLink = route('voucher.view',['document'=>Crypt::encryptString($id),'share'=>$share_id]);
+                $shareLink = route('archive.view',['archive'=>Crypt::encryptString($id),'share'=>$share_id]);
                 $insert1 = DB::table('voucher_share_email_links')->insertGetId([
                     'company_id' => Auth::user()->company_id,
                     'share_id'  =>  $share_id,
@@ -393,13 +394,7 @@ class ajaxRequestController extends Controller
                 ]);
                 if (!$insert1) {
                     // Rollback the transaction if the second insert for any item failed
-                    DB::rollBack();
-                    echo json_encode(array(
-                        'error' => array(
-                            'msg' => 'Failed to execute the insert.',
-                            'code' => '126',
-                        )
-                    ));
+                    throw  new \Exception('Failed to execute the insert.');
                 }
                 else{
                     $insertData = collect($tags)->map(function ($email) use ($insert1) {
@@ -412,38 +407,26 @@ class ajaxRequestController extends Controller
                     $insert2 = DB::table('voucher_share_email_lists')->insert($insertData);
                     if (!$insert2) {
                         // Rollback the transaction if the second insert for any item failed
-                        DB::rollBack();
-                        echo json_encode(array(
-                            'error' => array(
-                                'msg' => 'Failed to execute the insert.',
-                                'code' => '126',
-                            )
-                        ));
+                        throw  new \Exception('Failed to execute the insert.');
                     }
                     DB::commit();
                 }
                 if ($tags && (is_array($tags) || is_object($tags))) {
-                    Mail::to($tags)->send(new ShareVoucherDocument($shareLink, $message));
+                    Mail::to($tags)->send(new ShareArchive($shareLink, null));
                     // Email sent successfully
                 } else {
-                    // Handle the case where $tags is null or not iterable
-                    // For example, you can log an error or return a response indicating an issue with the recipient list.
-                    return response()->json(['error' => 'Invalid recipient list'], 400);
+                    throw  new \Exception('Invalid recipient list');
                 }
                 echo json_encode(array(
                     'results' => 'Document sent to email successfully!'
                 ));
             }
             else {
-                echo json_encode(array(
-                    'error' => array(
-                        'msg' => 'Document Not Found!',
-                        'code' => '404',
-                    )
-                ));
+                throw  new \Exception('Document Not Found!');
             }
         }catch (\Throwable $exception)
         {
+            DB::rollBack();
             echo json_encode(array(
                 'error' => array(
                     'msg' => $exception->getMessage(),

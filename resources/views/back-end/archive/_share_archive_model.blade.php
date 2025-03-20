@@ -46,27 +46,27 @@
                     <hr>
                 </div>
             </div>
-            <div class="col-md-12">
-                <br>
-                <span><i class="fa-solid fa-earth-americas"></i> Anyone on the internet of this system with the link can view</span>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group mb-3">
-                    <select class="form-control" name="voucher_type" id="voucher_type" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($result->id) !!}" onchange="return Obj.archiveShareType(this)">
-                        <option value="0">--Select Option--</option>
-                        <option value="1">Only view</option>
-                        <option value="2">View/Download</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="form-group mb-3">
-                    <input type="text" class="form-control" readonly id="sharedLink">
-                </div>
-            </div>
-            <div class="col-md-2 text-end">
-                <button class="btn btn-success" onclick="return Obj.copyDocumentShareLink(this)" type="button"><i class="fa-regular fa-copy"></i> Copy link</button>
-            </div>
+{{--            <div class="col-md-12">--}}
+{{--                <br>--}}
+{{--                <span><i class="fa-solid fa-earth-americas"></i> Anyone on the internet of this system with the link can view</span>--}}
+{{--            </div>--}}
+{{--            <div class="col-md-2">--}}
+{{--                <div class="form-group mb-3">--}}
+{{--                    <select class="form-control" name="voucher_type" id="voucher_type" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($result->id) !!}" onchange="return Obj.archiveShareType(this)">--}}
+{{--                        <option value="0">--Select Option--</option>--}}
+{{--                        <option value="1">Only view</option>--}}
+{{--                        <option value="2">View/Download</option>--}}
+{{--                    </select>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--            <div class="col-md-8">--}}
+{{--                <div class="form-group mb-3">--}}
+{{--                    <input type="text" class="form-control" readonly id="sharedLink">--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--            <div class="col-md-2 text-end">--}}
+{{--                <button class="btn btn-success" onclick="return Obj.copyDocumentShareLink(this)" type="button"><i class="fa-regular fa-copy"></i> Copy link</button>--}}
+{{--            </div>--}}
             <div class="col-md-12">
                 <span><i class="fa-regular fa-envelope"></i> This document share via email list</span>
                 <table class="table table-bordered">

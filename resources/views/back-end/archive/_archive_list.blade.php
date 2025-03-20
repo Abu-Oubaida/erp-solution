@@ -21,7 +21,7 @@
         <th>SL</th>
         <th>Date</th>
         <th>Company</th>
-        <th>Project_id</th>
+        <th>Project</th>
         <th title="Reference Number">Ref. Number</th>
         <th>Type</th>
         <th>Remarks</th>
@@ -71,7 +71,7 @@
                             &nbsp;
                             <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
                             &nbsp
-                            @if(auth()->user()->hasPermission('share_archive_document_individual'))
+                            @if(auth()->user()->hasPermission('share_archive_data_individual'))
                             <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fas fa-share"></i></a>
                             @endif
                             &nbsp
