@@ -27,6 +27,10 @@
                             @csrf
                             {!! method_field('put') !!}
                             <div class="row">
+                                <div class="col-md-6">
+
+                                </div>
+                                
                                 <div class="col-md-2">
                                     <div class="mb-3">
                                         <label for="company">Company Name <span class="text-danger">*</span></label>

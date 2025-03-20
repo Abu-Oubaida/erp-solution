@@ -44,10 +44,6 @@ class ArchiveController extends Controller
                 return $this->storeArchiveType($request);
             }
             $voucherTypes = $this->archiveTypeList();
-            //$voucherWithUsers = Voucher_type_permission_user::with('user')->get();
-          // dd($voucherWithUsers);
-        //    Log::info('$voucherWithUsers');
-        Log::info(json_encode($voucherTypes, JSON_PRETTY_PRINT));
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/archive/type/add',compact('voucherTypes','companies'))->render();
         }catch (\Throwable $exception)
@@ -82,21 +78,23 @@ class ArchiveController extends Controller
                 'created_by'=>  $user->id,
                 'updated_by'=>  $user->id,
             ]);
-            foreach($company_departments_users as $department_user_id){
-                DB::table('voucher_type_permission_user')->insert([
-                    'voucher_type_id'=>$voucherType->id,
-                    'user_id'=>$department_user_id,
-                    'company_id'=>$company,
-                    'created_by'=>$user->id,
-                    'updated_by'=>null
-                ]);
+            if(!empty($company_departments_users ?? null) && is_array($company_departments_users)){
+                foreach($company_departments_users as $department_user_id){
+                    DB::table('voucher_type_permission_user')->insert([
+                        'voucher_type_id'=>$voucherType->id,
+                        'user_id'=>$department_user_id,
+                        'company_id'=>$company,
+                        'created_by'=>$user->id,
+                        'updated_by'=>null
+                    ]);
+                }
             }
             DB::commit();
             return back()->with('success','Data insert successfully');
         }catch (\Throwable $exception)
         {   
             DB::rollBack();
-            return back()->with('error',$exception->getMessage())->withInput();
+            return back()->with('error',$exception->getMessage().$exception->getLine())->withInput();
         }
     }
 
