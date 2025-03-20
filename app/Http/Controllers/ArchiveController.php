@@ -92,7 +92,7 @@ class ArchiveController extends Controller
             DB::commit();
             return back()->with('success','Data insert successfully');
         }catch (\Throwable $exception)
-        {   
+        {
             DB::rollBack();
             return back()->with('error',$exception->getMessage().$exception->getLine())->withInput();
         }
@@ -171,8 +171,8 @@ class ArchiveController extends Controller
                 return back()->with('error','A relationship exists between other tables. Data delete not possible');
             }
             VoucherType::where('id',$vtID)->delete();
-
-            return redirect(route('add.archive.type'))->with('success','Data delete successfully');
+            Voucher_type_permission_user::where('voucher_type_id',$vtID)->delete();
+            return back()->with('success','Data delete successfully');
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage())->withInput();
@@ -786,7 +786,7 @@ class ArchiveController extends Controller
                 ]);
         }
 
-        
+
         // $departments = department::with(['get_users' => function($query) {
         //     $query->whereColumn('company_id', 'company'); // Compare company_id with company directly
         // }])
