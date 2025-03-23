@@ -578,7 +578,17 @@ class ArchiveController extends Controller
                 ]);
                 extract($request->post());
                 $projects = branch::where('company_id',$company_id)->where('status',1)->get();
-                $types = VoucherType::where('company_id',$company_id)->where('status',1)->get();
+                $userWiseVoucherTypePermissionId = null;
+                if ($this->user->isSystemSuperAdmin() || $user->companyWiseRoleName() == 'superadmin')
+                {
+                    $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('company_id',$company_id)->get()->pluck('voucher_type_id')->toArray();
+                }
+                else
+                {
+                    $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('company_id',$company_id)->where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
+                }
+
+                $types = VoucherType::where('company_id',$company_id)->where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
                 return response()->json([
                     'status' => 'success',
                     'data' => ['projects' => $projects,'types' => $types],
