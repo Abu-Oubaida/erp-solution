@@ -6,12 +6,12 @@
     'debug' => true,
     'url' => 'http://localhost',
     'asset_url' => NULL,
-    'file_manager_url' => 'E:\\LocalServer\\htdocs\\chl\\public\\file-manager',
+    'file_manager_url' => 'D:\\LocalServer\\htdocs\\chl\\public\\file-manager',
     'timezone' => 'Asia/Dhaka',
     'locale' => 'en',
     'fallback_locale' => 'en',
     'faker_locale' => 'en_US',
-    'key' => 'base64:jLxhM8FU/REoaamP8k6lzbvQSWa+L6ek0GRcd0i/9FQ=',
+    'key' => 'base64:WjtoHLbHKp/KuADRvjjtiHBJ7I3sOxwAwTHZlKuk0VE=',
     'cipher' => 'AES-256-CBC',
     'providers' => 
     array (
@@ -195,7 +195,7 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => 'E:\\LocalServer\\htdocs\\chl\\storage\\framework/cache/data',
+        'path' => 'D:\\LocalServer\\htdocs\\chl\\storage\\framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -278,7 +278,7 @@
       array (
         'driver' => 'sqlite',
         'url' => NULL,
-        'database' => 'credence_erp_solution_test',
+        'database' => 'erp-solution',
         'prefix' => '',
         'foreign_key_constraints' => true,
       ),
@@ -288,7 +288,7 @@
         'url' => NULL,
         'host' => 'localhost',
         'port' => '3306',
-        'database' => 'credence_erp_solution_test',
+        'database' => 'erp-solution',
         'username' => 'root',
         'password' => '',
         'unix_socket' => '',
@@ -308,7 +308,7 @@
         'url' => NULL,
         'host' => 'localhost',
         'port' => '3306',
-        'database' => 'credence_erp_solution_test',
+        'database' => 'erp-solution',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
@@ -323,7 +323,7 @@
         'url' => NULL,
         'host' => 'localhost',
         'port' => '3306',
-        'database' => 'credence_erp_solution_test',
+        'database' => 'erp-solution',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
@@ -365,10 +365,10 @@
     'convert_entities' => true,
     'options' => 
     array (
-      'font_dir' => 'E:\\LocalServer\\htdocs\\chl\\storage\\fonts',
-      'font_cache' => 'E:\\LocalServer\\htdocs\\chl\\storage\\fonts',
-      'temp_dir' => 'C:\\WINDOWS\\TEMP',
-      'chroot' => 'E:\\LocalServer\\htdocs\\chl',
+      'font_dir' => 'D:\\LocalServer\\htdocs\\chl\\storage\\fonts',
+      'font_cache' => 'D:\\LocalServer\\htdocs\\chl\\storage\\fonts',
+      'temp_dir' => 'C:\\Windows\\TEMP',
+      'chroot' => 'D:\\LocalServer\\htdocs\\chl',
       'allowed_protocols' => 
       array (
         'file://' => 
@@ -554,13 +554,13 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => 'E:\\LocalServer\\htdocs\\chl\\storage\\app',
+        'root' => 'D:\\LocalServer\\htdocs\\chl\\storage\\app',
         'throw' => false,
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => 'E:\\LocalServer\\htdocs\\chl\\storage\\app/public/',
+        'root' => 'D:\\LocalServer\\htdocs\\chl\\storage\\app/public/',
         'url' => 'http://localhost/storage/',
         'visibility' => 'public',
         'throw' => false,
@@ -580,7 +580,7 @@
       'file-manager' => 
       array (
         'driver' => 'local',
-        'root' => 'E:\\LocalServer\\htdocs\\chl\\public\\file-manager',
+        'root' => 'D:\\LocalServer\\htdocs\\chl\\public\\file-manager',
         'url' => 'http://localhost/public/',
         'visibility' => 'public',
         'throw' => false,
@@ -588,7 +588,7 @@
     ),
     'links' => 
     array (
-      'E:\\LocalServer\\htdocs\\chl\\public\\storage' => 'E:\\LocalServer\\htdocs\\chl\\storage\\app/public',
+      'D:\\LocalServer\\htdocs\\chl\\public\\storage' => 'D:\\LocalServer\\htdocs\\chl\\storage\\app/public',
     ),
   ),
   'hashing' => 
@@ -754,13 +754,13 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => 'E:\\LocalServer\\htdocs\\chl\\storage\\logs/laravel.log',
+        'path' => 'D:\\LocalServer\\htdocs\\chl\\storage\\logs/laravel.log',
         'level' => 'debug',
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => 'E:\\LocalServer\\htdocs\\chl\\storage\\logs/laravel.log',
+        'path' => 'D:\\LocalServer\\htdocs\\chl\\storage\\logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
       ),
@@ -812,7 +812,7 @@
       ),
       'emergency' => 
       array (
-        'path' => 'E:\\LocalServer\\htdocs\\chl\\storage\\logs/laravel.log',
+        'path' => 'D:\\LocalServer\\htdocs\\chl\\storage\\logs/laravel.log',
       ),
     ),
   ),
@@ -826,9 +826,9 @@
         'transport' => 'smtp',
         'host' => 'credencegroupbd.com',
         'port' => '465',
-        'encryption' => 'ssl',
-        'username' => 'no-reply@credencegroupbd.com',
-        'password' => 'AI8UTpwB6Uep',
+        'encryption' => NULL,
+        'username' => 'saiful250321016@credencegroupbd.com',
+        'password' => 'saiful250321016',
         'timeout' => NULL,
       ),
       'ses' => 
@@ -869,15 +869,15 @@
     ),
     'from' => 
     array (
-      'address' => 'no-reply@credencegroupbd.com',
-      'name' => 'CHL-360',
+      'address' => NULL,
+      'name' => 'ERP-360˚',
     ),
     'markdown' => 
     array (
       'theme' => 'default',
       'paths' => 
       array (
-        0 => 'E:\\LocalServer\\htdocs\\chl\\resources\\views/vendor/mail',
+        0 => 'D:\\LocalServer\\htdocs\\chl\\resources\\views/vendor/mail',
       ),
     ),
   ),
@@ -982,7 +982,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => 'E:\\LocalServer\\htdocs\\chl\\storage\\framework/sessions',
+    'files' => 'D:\\LocalServer\\htdocs\\chl\\storage\\framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -1029,9 +1029,9 @@
   array (
     'paths' => 
     array (
-      0 => 'E:\\LocalServer\\htdocs\\chl\\resources\\views',
+      0 => 'D:\\LocalServer\\htdocs\\chl\\resources\\views',
     ),
-    'compiled' => 'E:\\LocalServer\\htdocs\\chl\\storage\\framework\\views',
+    'compiled' => 'D:\\LocalServer\\htdocs\\chl\\storage\\framework\\views',
   ),
   'image' => 
   array (
@@ -1157,7 +1157,7 @@
     ),
     'temporary_files' => 
     array (
-      'local_path' => 'E:\\LocalServer\\htdocs\\chl\\storage\\framework/cache/laravel-excel',
+      'local_path' => 'D:\\LocalServer\\htdocs\\chl\\storage\\framework/cache/laravel-excel',
       'local_permissions' => 
       array (
       ),
@@ -1239,7 +1239,7 @@
     array (
     ),
     'enable_runnable_solutions' => NULL,
-    'remote_sites_path' => 'E:\\LocalServer\\htdocs\\chl',
+    'remote_sites_path' => 'D:\\LocalServer\\htdocs\\chl',
     'local_sites_path' => '',
     'housekeeping_endpoint_prefix' => '_ignition',
     'settings_file_path' => '',

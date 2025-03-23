@@ -1,3 +1,4 @@
+
 <div class="col-md-12">
     <div class="card mb-4">
         <div class="card-header">
@@ -14,6 +15,7 @@
                             <th>No</th>
                             <th>Voucher type title</th>
                             <th>Permission User</th>
+                            <th>Company Name</th>
                             <th>Status</th>
                             <th>Code</th>
                             <th>Remarks</th>
@@ -44,6 +46,13 @@
                                     <td>{!! $no++ !!}</td>
                                     <td>{!! $vt->voucher_type_title !!}</td>
                                     <td>{!! $vt->voucher_with_users_count !!}</td>
+                                    <td>
+                                        @if(isset($vt->company_id) && isset($vt->company->id))
+                                            @if($vt->company_id == $vt->company->id)
+                                                <p>{!! $vt->company->company_name !!}</p>
+                                            @endif
+                                        @endif
+                                    </td>
                                     <td>@if($vt->status ==1) Active @else Inactive @endif</td>
                                     <td>{!! $vt->code !!}</td>
                                     <td>{!! $vt->remarks !!}</td>

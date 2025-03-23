@@ -91,15 +91,15 @@
                     <div class="card-body">
                         <form action="{!! route('edit.archive.type',['archiveTypeID'=>\Illuminate\Support\Facades\Request::route('archiveTypeID')]) !!}" method="POST">
                             @csrf
-                            {!! method_field('put') !!}
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <label for="company2">Company Name <span class="text-danger">*</span></label>
                                         <select class="text-capitalize select-search" id="company2" name="company" onchange="return Obj.companyWiseDepartments(this,'company_wise_departments')">
+                                            <option value="">--Please select a option--</option>
                                             @if(isset($companies) || (count($companies) > 0))
                                                 @foreach($companies as $c)
-                                                    <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                                    <option value="{{$c->id}}">{{$c->company_name}} ({!! $c->company_code !!})</option>
                                                 @endforeach
                                             @endif
                                         </select>

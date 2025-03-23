@@ -27,4 +27,8 @@ class VoucherType extends Model
     public function voucherWithUsers(){
         return $this->hasMany(Voucher_type_permission_user::class,'voucher_type_id');
     }
+    public function company()
+    {
+        return $this->belongsTo(company_info::class,'company_id');
+    }
 }

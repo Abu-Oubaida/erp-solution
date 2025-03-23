@@ -17,3 +17,4 @@ yarn-error.log
 /.vscode
 resources/views/components/back-end/_js_source_dir.blade.php
 /app/View/Components/back-end/_js_source_dir.php
+storage/logs/laravel.log

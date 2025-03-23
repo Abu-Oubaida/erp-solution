@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form action="{!! route('add.archive.type') !!}" method="POST">
+                      <form action="{!! route('add.archive.type') !!}" method="POST">
                             @csrf
                             <div class="row">
                                 <div class="col-md-2">
@@ -100,7 +100,6 @@
                     </div>
                 </div>
             </div>
-            @include("back-end.archive.type._list")
         </div>
 
     </div>

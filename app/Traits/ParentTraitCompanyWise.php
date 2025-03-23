@@ -135,7 +135,7 @@ trait ParentTraitCompanyWise
         }
         return $object->whereIn('id',$this->getUserCompanyPermissionsArray())->whereIn('id',$companyPermissionIDs);
     }
-
+    // gives company id's to user whom have permission
     public function getCompanyModulePermissionWiseArray($operation_permission_name)
     {
         return $this->getCompanyModulePermissionWise($operation_permission_name)->pluck('id')->unique()->toArray();
