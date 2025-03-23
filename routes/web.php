@@ -258,6 +258,10 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get'],'archive-data-type-list','listArchiveDataType')->name('archive.data.type.list');
         });//3.7.1 End
 # 3.7.2 Edit voucher Type
+
+       // Route::middleware(['permission:delete_archive_data_type_user_permission'])->group(function () {
+            Route::match(['post'],'delete_data_type_permission_from_user','deleteTypePermissionFromUser')->name('delete.data.type.permission.from.user');
+       // });
 //        Route::middleware(['permission:edit_voucher_type'])->group(function (){
         Route::middleware(['permission:edit_archive_data_type'])->group(function (){
             Route::match(['put','get','post'],'edit-archive-data-type/{archiveTypeID}','editArchiveType')->name('edit.archive.type');
@@ -285,6 +289,7 @@ Route::group(['middleware' => ['auth']],function (){
 //        Route::middleware(['permission:list_voucher_document'])->group(function () {
         Route::middleware(['permission:archive_data_list'])->group(function () {
             Route::get('archive-data-list','archiveList')->name('uploaded.archive.list');
+            Route::post('archive-data-list-permission-users','archiveDataListPermissionWithUsers')->name('archive-data-list.permission.users');
         });//3.7.6
 
         Route::middleware(['permission:archive_data_list_quick'])->group(function () {

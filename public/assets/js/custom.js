@@ -3008,7 +3008,12 @@ let Obj = {};
                     },
                 });
             },
-            companyWiseProjectsAndDataTypeArchive: function (e, action_id_projects, action_id_types,multiply = null) {
+            companyWiseProjectsAndDataTypeArchive: function (
+                e,
+                action_id_projects,
+                action_id_types,
+                multiply = null
+            ) {
                 let id = $(e).val();
                 if (id.length === 0) {
                     return false;
@@ -3031,8 +3036,7 @@ let Obj = {};
                             alert("Error: " + response.message);
                             return false;
                         } else if (response.status === "success") {
-                            if (multiply)
-                            {
+                            if (multiply) {
                                 updateSelectBox(
                                     response.data.projects,
                                     action_id_projects,
@@ -3045,8 +3049,7 @@ let Obj = {};
                                     "id",
                                     "voucher_type_title"
                                 );
-                            }
-                            else {
+                            } else {
                                 updateSelectBoxSingleOption(
                                     response.data.projects,
                                     action_id_projects,
@@ -3064,19 +3067,24 @@ let Obj = {};
                     },
                 });
             },
-            archiveDataQuickSearch:function (e) {
-                let company = $("#company").val()
-                let projects = $("#projects").val()//array
-                let data_types = $("#data_types").val()//array
-                let from_date = $("#from_date").val()
-                let to_date = $("#to_date").val()
-                let reference = $("#reference").val()
-                if (company.length <= 0 && projects.length <= 0 && data_types <= 0 && from_date <= 0 && to_date <= 0 && reference <= 0)
-                {
-                    return false
+            archiveDataQuickSearch: function (e) {
+                let company = $("#company").val();
+                let projects = $("#projects").val(); //array
+                let data_types = $("#data_types").val(); //array
+                let from_date = $("#from_date").val();
+                let to_date = $("#to_date").val();
+                let reference = $("#reference").val();
+                if (
+                    company.length <= 0 &&
+                    projects.length <= 0 &&
+                    data_types <= 0 &&
+                    from_date <= 0 &&
+                    to_date <= 0 &&
+                    reference <= 0
+                ) {
+                    return false;
                 }
-                if (confirm('Are you sure!'))
-                {
+                if (confirm("Are you sure!")) {
                     const url =
                         window.location.origin +
                         sourceDir +
@@ -3089,19 +3097,26 @@ let Obj = {};
                             ),
                         },
                         method: "POST",
-                        data: { company_id: company, projects: projects, data_types: data_types, to_date: to_date, from_date: from_date, reference: reference },
+                        data: {
+                            company_id: company,
+                            projects: projects,
+                            data_types: data_types,
+                            to_date: to_date,
+                            from_date: from_date,
+                            reference: reference,
+                        },
                         success: function (response) {
                             if (response.status === "error") {
                                 alert("Error: " + response.message);
-                                return false
+                                return false;
                             } else if (response.status === "success") {
                                 // alert(response.message)
-                                $("#quick-list").html(response.data)
+                                $("#quick-list").html(response.data);
                             }
                         },
                     });
                 }
-                return false
+                return false;
             },
             companyWiseDepartments: function (e, action_id) {
                 let id = $(e).val();
@@ -3479,6 +3494,71 @@ let Obj = {};
                             $("#documentPreview").html(response.view);
                             $("#receiverList").modal("show");
                         }
+                    },
+                });
+            },
+            dataTypePermissionUsersInfo: function (e) {
+                let data = $(e).attr("ref");
+                if (data.length <= 0) {
+                    return false;
+                }
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/archive-data-list-permission-users";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { id: data },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            console.log(response);
+                        } else if (response.status === "success") {
+                            $("#heading").html("Receiver List");
+                            $("#documentPreview").html(response.data);
+                            // console.log('ok');
+                            console.log(response);
+                            $("#receiverList").modal("show");
+                        }
+                    },
+                });
+            },
+            deleteTypePermissionFromUser: function (element) {
+                if (!confirm("Are you sure you want to delete this item?")) {
+                    return false;
+                }
+
+                let userId = $(element).data("user-id");
+                let dataTypeId = $(element).data("data-type-id");
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/delete_data_type_permission_from_user";
+                //console.log(userId, dataTypeId);
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    type: "POST",
+                    data: {
+                        user_id: userId,
+                        data_type_id: dataTypeId,
+                    },
+                    success: function (response) {
+                        alert("Deleted successfully");
+                        //location.reload();
+                    },
+                    error: function (xhr) {
+                        // alert("Failed to delete");
                     },
                 });
             },

@@ -45,7 +45,7 @@
                                 <tr>
                                     <td>{!! $no++ !!}</td>
                                     <td>{!! $vt->voucher_type_title !!}</td>
-                                    <td>{!! $vt->voucher_with_users_count !!}</td>
+                                    <td> <a href="#" onclick="return Obj.dataTypePermissionUsersInfo(this)" ref="{!! @$vt->id !!}">{!! $vt->voucher_with_users_count !!}</a></td>
                                     <td>
                                         @if(isset($vt->company_id) && isset($vt->company->id))
                                             @if($vt->company_id == $vt->company->id)
@@ -80,6 +80,14 @@
                         @endif
                         </tbody>
                     </table>
+                    <!-- Modal For User List with Permission -->
+                    <div class="modal modal-xl fade" id="receiverList" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="receiverListLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content" id="documentPreview">
+                                
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

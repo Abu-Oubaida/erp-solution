@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('voucher_type_permission_user', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('voucher_type_id');
-            $table->foreign('voucher_type_id')->references('id')->on('voucher_types')->cascadeOnUpdate()->restrictOnDelete();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('company_id');
             $table->timestamps();
