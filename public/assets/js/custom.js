@@ -3008,7 +3008,7 @@ let Obj = {};
                     },
                 });
             },
-            companyWiseProjectsArchive: function (e, action_id,action_id_2) {
+            companyWiseProjectsAndDataTypeArchive: function (e, action_id_projects, action_id_types,multiply = null) {
                 let id = $(e).val();
                 if (id.length === 0) {
                     return false;
@@ -3031,21 +3031,77 @@ let Obj = {};
                             alert("Error: " + response.message);
                             return false;
                         } else if (response.status === "success") {
-                            updateSelectBoxSingleOption(
-                                response.data.projects,
-                                action_id,
-                                "id",
-                                "branch_name"
-                            );
-                            updateSelectBoxSingleOption(
-                                response.data.types,
-                                action_id_2,
-                                "id",
-                                "voucher_type_title"
-                            );
+                            if (multiply)
+                            {
+                                updateSelectBox(
+                                    response.data.projects,
+                                    action_id_projects,
+                                    "id",
+                                    "branch_name"
+                                );
+                                updateSelectBox(
+                                    response.data.types,
+                                    action_id_types,
+                                    "id",
+                                    "voucher_type_title"
+                                );
+                            }
+                            else {
+                                updateSelectBoxSingleOption(
+                                    response.data.projects,
+                                    action_id_projects,
+                                    "id",
+                                    "branch_name"
+                                );
+                                updateSelectBoxSingleOption(
+                                    response.data.types,
+                                    action_id_types,
+                                    "id",
+                                    "voucher_type_title"
+                                );
+                            }
                         }
                     },
                 });
+            },
+            archiveDataQuickSearch:function (e) {
+                let company = $("#company").val()
+                let projects = $("#projects").val()//array
+                let data_types = $("#data_types").val()//array
+                let from_date = $("#from_date").val()
+                let to_date = $("#to_date").val()
+                let reference = $("#reference").val()
+                if (company.length <= 0 && projects.length <= 0 && data_types <= 0 && from_date <= 0 && to_date <= 0 && reference <= 0)
+                {
+                    return false
+                }
+                if (confirm('Are you sure!'))
+                {
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/archive-data-list-quick";
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "POST",
+                        data: { company_id: company, projects: projects, data_types: data_types, to_date: to_date, from_date: from_date, reference: reference },
+                        success: function (response) {
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                                return false
+                            } else if (response.status === "success") {
+                                // alert(response.message)
+                                $("#quick-list").html(response.data)
+                            }
+                        },
+                    });
+                }
+                return false
             },
             companyWiseDepartments: function (e, action_id) {
                 let id = $(e).val();

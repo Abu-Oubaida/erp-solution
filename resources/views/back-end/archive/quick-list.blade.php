@@ -19,10 +19,10 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col">
                         <div class="mb-3">
                             <label for="company">Company Name <span class="text-danger">*</span></label>
-                            <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseDepartments(this,'company_wise_departments')">
+                            <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjectsAndDataTypeArchive(this,'projects','data_types',true)">
                                 <option value="">--select option--</option>
                                 @if(isset($companies) || (count($companies) > 0))
                                     @foreach($companies as $c)
@@ -32,18 +32,49 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-2 mb-1">
+                    <div class="col mb-1">
                         <div class="">
-                            <label for="data_type">Type<span class="text-danger">*</span></label>
-                            <select class="form-control text-capitalize select-search" name="data_type" id="data_type">
-                                <option value="">--Select a Type--</option>
-{{--                                @foreach($voucherTypes as $date)--}}
-{{--                                    <option value="{!! $date->id !!}">{!! $date->voucher_type_title !!}</option>--}}
-{{--                                @endforeach--}}
+                            <label for="projects">Projects<span class="text-danger">*</span></label>
+                            <select class="form-control text-capitalize select-search" name="projects" id="projects" multiple>
+                                <option value="">--Select options--</option>
                             </select>
                         </div>
                     </div>
+                    <div class="col mb-1">
+                        <div class="">
+                            <label for="data_types">Data Types<span class="text-danger">*</span></label>
+                            <select class="form-control text-capitalize select-search" name="data_type" id="data_types" multiple>
+                                <option value="">--Select options--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col mb-1">
+                        <div class="">
+                            <label for="from_date">From Date<span class="text-danger">*</span></label>
+                            <input class="form-control" type="date" name="from_date" id="from_date">
+                        </div>
+                    </div>
+                    <div class="col mb-1">
+                        <div class="">
+                            <label for="to_date">To Date<span class="text-danger">*</span></label>
+                            <input class="form-control" type="date" name="to_date" id="to_date">
+                        </div>
+                    </div>
+                    <div class="col mb-1">
+                        <div class="">
+                            <label for="reference">Reference</label>
+                            <input class="form-control" type="text" name="reference" id="reference">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <button class="float-end btn btn-chl-outline mt-4" onclick="return Obj.archiveDataQuickSearch(this)"><i class="fas fa-search"></i> Search</button>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body" id="quick-list">
             </div>
         </div>
     </div>

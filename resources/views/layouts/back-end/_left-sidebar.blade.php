@@ -276,7 +276,7 @@
             </group10>{{--#2.6    Mobile Sim section End--}}
             <group5>
                 @if(auth()->user()->hasPermission('data_archive'))
-                    @if(Route::currentRouteName() == 'add.archive.type' || Route::currentRouteName() == 'archive.data.type.list' || Route::currentRouteName() == 'edit.archive.type' || Route::currentRouteName() == 'add.archive.info' || Route::currentRouteName() == 'edit.archive.info' || Route::currentRouteName() == 'uploaded.archive.list' || Route::currentRouteName() == 'view.archive.document')
+                    @if(Route::currentRouteName() == 'add.archive.type' || Route::currentRouteName() == 'archive.data.type.list' || Route::currentRouteName() == 'edit.archive.type' || Route::currentRouteName() == 'add.archive.info' || Route::currentRouteName() == 'edit.archive.info' || Route::currentRouteName() == 'uploaded.archive.list' || Route::currentRouteName() == 'view.archive.document' || Route::currentRouteName() == 'uploaded.archive.list.quick')
 
                         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption" aria-expanded="true" aria-controls="pagesUploadOption">
                             <div class="sb-nav-link-icon"><i class="fas fa-receipt" aria-hidden="true"></i></div>

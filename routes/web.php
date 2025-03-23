@@ -288,7 +288,7 @@ Route::group(['middleware' => ['auth']],function (){
         });//3.7.6
 
         Route::middleware(['permission:archive_data_list_quick'])->group(function () {
-            Route::get('archive-data-list-quick','archiveListQuick')->name('uploaded.archive.list.quick');
+            Route::match(['get','post'],'archive-data-list-quick','archiveListQuick')->name('uploaded.archive.list.quick');
         });//3.7.6
 
 

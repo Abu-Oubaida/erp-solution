@@ -38,7 +38,7 @@
                         <div class="col-md-2 mb-1">
                             <div class="">
                                 <label for="company">Company Name <span class="text-danger">*</span></label>
-                                <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjectsArchive(this,'project','data_types')">
+                                <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjectsAndDataTypeArchive(this,'project','data_types',null)">
                                     <option value="">Pick options...</option>
                                     @if(isset($companies) || (count($companies) > 0))
                                         @foreach($companies as $c)
