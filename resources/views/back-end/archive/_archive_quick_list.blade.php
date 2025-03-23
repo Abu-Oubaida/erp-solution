@@ -1,6 +1,94 @@
-{{--<form action="{!! route('voucher.multiple.submit') !!}" method="post">--}}
-{{--<form>--}}
-{{--    @csrf--}}
+<script>
+    (function ($) {
+        $("#select_all").change(function () {
+            $(".check-box").prop("checked", this.checked);
+        });
+        $(document).ready(function () {
+
+            if (!$.fn.DataTable.isDataTable('#DataTable2')) {
+                $('#DataTable2').DataTable({
+                    dom: 'lBfrtip', // 'l' includes the "length changing" input
+                    lengthMenu: [[5, 10, 15, 25, 50, 100, -1], [5, 10, 15, 25, 50, 100, "ALL"]],
+                    pageLength: 15,
+                    buttons: [
+                        {
+                            extend: 'pdfHtml5',
+                            text: '<i class="fas fa-file-pdf"></i> PDF',
+                            orientation: 'landscape', // Landscape orientation
+                            pageSize: 'A4', // A4 page size
+                            title: 'My Table Export', // Optional: Custom title
+                            exportOptions: {
+                                columns: ':visible', // Export only visible columns
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        // Extract the header text from the <th> element, ignoring the input field
+                                        return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            extend: 'copy',
+                            text: '<i class="fas fa-copy"></i> Copy',
+                        },
+                        {
+                            extend: 'csv',
+                            text: '<i class="fas fa-file-csv"></i> CSV',
+                            exportOptions: {
+                                columns: ':visible',
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            extend: 'excel',
+                            text: '<i class="fas fa-file-excel"></i> Excel',
+                            exportOptions: {
+                                columns: ':visible',
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            extend: 'print',
+                            text: '<i class="fas fa-print"></i> Print',
+                            exportOptions: {
+                                columns: ':visible',
+                                format: {
+                                    header: function (data, columnIdx) {
+                                        return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    initComplete: function () {
+                        // Add search inputs to header
+                        $('#DataTable2 thead th').each(function () {
+                            var title = $(this).text(); // Use the text content of the header cells
+                            $(this).html('<input type="text" class="form-control" placeholder="' + title + '..." />');
+                        });
+
+                        // Apply the search
+                        var table = this.api(); // Use the DataTables API instance
+                        table.columns().eq(0).each(function (colIdx) {
+                            $('input', table.column(colIdx).header()).on('keyup change', function () {
+                                table.column(colIdx).search(this.value).draw();
+                            });
+                        });
+                    }
+                });
+            }
+
+        })
+    }(jQuery))
+</script>
 @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
     <div class="row" id="fixedDiv">
         <div class="col-md-10">
@@ -12,7 +100,7 @@
 
     </div>
 @endif
-<table id="permissionstable">
+<table class="table table-sm" @if(isset($voucherInfos) && count($voucherInfos)) id="DataTable2" @endif>
     <thead>
     <tr class="text-center">
     @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
@@ -97,7 +185,7 @@
                 <td>{!! ($data->updatedBY)? $data->updatedBY->name:'-' !!}</td>
                 <td>
                     @if(auth()->user()->hasPermission('archive_document_edit'))
-                    <a href="{{route('edit.archive.info',["archiveDocumentID"=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
+                    <a href="{{route('edit.archive.info',["archiveDocumentID"=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)])}}" class="text-success" title="Edit" target="_blank"><i class='fas fa-edit'></i></a>
                     @endif
                     @if(auth()->user()->hasPermission('share_archive_data'))
                         <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($data->id) !!}" onclick="return Obj.archiveShare(this)" title="Share Archive"><i class="fas fa-share"></i></a>
@@ -115,7 +203,11 @@
         @endforeach
     @else
         <tr>
-            <td colspan="9" class="text-danger text-center">Not Found!</td>
+        @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
+            <td colspan="13" class="text-danger text-center">Not Found!</td>
+        @else
+            <td colspan="12" class="text-danger text-center">Not Found!</td>
+        @endif
         </tr>
     @endif
     </tbody>

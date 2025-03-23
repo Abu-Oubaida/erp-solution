@@ -40,4 +40,9 @@ class company_info extends Model
     {
         return $this->hasMany(branch::class,'company_id');
     }
+
+    public function departments()
+    {
+        return $this->hasMany(department::class,'company_id');
+    }
 }

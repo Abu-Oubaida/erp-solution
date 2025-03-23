@@ -86,6 +86,7 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::post('company-wise-projects','companyWiseProjects');
         Route::post('user-wise-company-project-permissions','userWiseCompanyProjectPermissions');
+        Route::post('company-wise-departments','companyWiseDepartments');
     });//3.2 End
 
 # 3.2 System Admin Controller
@@ -253,10 +254,13 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:add_archive_data_type'])->group(function () {
             Route::match(['post','get'],'add-archive-data-type','createArchiveType')->name('add.archive.type');
         });//3.7.1 End
+        Route::middleware(['permission:archive_data_type_list'])->group(function () {
+            Route::match(['get'],'archive-data-type-list','listArchiveDataType')->name('archive.data.type.list');
+        });//3.7.1 End
 # 3.7.2 Edit voucher Type
 //        Route::middleware(['permission:edit_voucher_type'])->group(function (){
         Route::middleware(['permission:edit_archive_data_type'])->group(function (){
-            Route::match(['put','get'],'edit-archive-data-type/{archiveTypeID}','editArchiveType')->name('edit.archive.type');
+            Route::match(['put','get','post'],'edit-archive-data-type/{archiveTypeID}','editArchiveType')->name('edit.archive.type');
         });//3.7.2
 # 3.7.3 Delete voucher Type
 //        Route::middleware(['permission:delete_voucher_type'])->group(function (){
@@ -282,6 +286,12 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:archive_data_list'])->group(function () {
             Route::get('archive-data-list','archiveList')->name('uploaded.archive.list');
         });//3.7.6
+
+        Route::middleware(['permission:archive_data_list_quick'])->group(function () {
+            Route::match(['get','post'],'archive-data-list-quick','archiveListQuick')->name('uploaded.archive.list.quick');
+        });//3.7.6
+
+
 # 3.7.5 List uploaded voucher document
 //        Route::middleware(['permission:view_voucher_document'])->group(function () {
         Route::middleware(['permission:archive_document_view'])->group(function () {
@@ -301,6 +311,9 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('archive-multiple-submit','archiveMultipleSubmit')->name('archive.multiple.submit');
 //            Route::delete('delete-voucher','deleteVoucherMultiple')->name('delete.voucher.multiple');
         });
+        Route::post('search-company-department-users','searchCompanyDepartmentUsers')->name('search.company-department-users');
+
+        Route::post('company-wise-projects-archive','companyWiseProjects');
     });
 //    Account Controller
     Route::controller(AccountVoucherController::class)->group(function (){
@@ -590,6 +603,7 @@ Route::group(['middleware' => ['auth']],function (){
 # 4.0 Share Document View
 Route::controller(ShareDocumentViewController::class)->group(function (){
     Route::get('archive-document-view','archiveDocumentView')->name('archive.document.view');
+    Route::get('/secure-document/{id}', 'viewDocument')->name('document.view');
     Route::get('archive-view','archiveView')->name('archive.view');
 });
 require __DIR__.'/auth.php';

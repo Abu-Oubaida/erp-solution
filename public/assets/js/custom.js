@@ -1,208 +1,281 @@
 let Obj = {};
 // Show loader immediately when the page starts loading
-(function ($){
-//     $(document).ready(function() {
-//         // Show loading message when the document starts loading
-//         $("#ajax_loader").show();
-//         $("#ajax_loader2").show();
-//     });
-//
-// // Hide loading message when the full page (including images) is loaded
-//     $(window).on("load", function() {
-//         $("#ajax_loader").hide();
-//         $("#ajax_loader2").hide();
-//     });
-    $(document).ajaxStop(function(){
+(function ($) {
+    //     $(document).ready(function() {
+    //         // Show loading message when the document starts loading
+    //         $("#ajax_loader").show();
+    //         $("#ajax_loader2").show();
+    //     });
+    //
+    // // Hide loading message when the full page (including images) is loaded
+    //     $(window).on("load", function() {
+    //         $("#ajax_loader").hide();
+    //         $("#ajax_loader2").hide();
+    //     });
+    $(document).ajaxStop(function () {
         $("#ajax_loader").hide();
         $("#ajax_loader2").hide();
     });
-    $(document).ajaxStart(function (){
+    $(document).ajaxStart(function () {
         $("#ajax_loader").show();
         $("#ajax_loader2").show();
     });
-    $(document).ready(function(){
+    $(document).ready(function () {
         const tags = [];
         const employeeDatas = [];
         const materialsTempList = [];
-        $('.select-search').selectize({
+        $(".select-search").selectize({
             create: false,
-            sortField: 'text'
+            sortField: "text",
         });
-        $('.select-search-with-create').selectize({
+        $(".select-search-with-create").selectize({
             create: true,
-            sortField: 'text'
+            sortField: "text",
         });
-        $('#perAdd').click(function (){
-            let company = $("#company_id").val()
-            let per = $("#per").val()
-            let dir = $("#dir").val()
-            let ref = $("#per").attr('ref')
+        $("#perAdd").click(function () {
+            let company = $("#company_id").val();
+            let per = $("#per").val();
+            let dir = $("#dir").val();
+            let ref = $("#per").attr("ref");
             // alert(window.location.origin + sourceDir + "/user-per-add")
             // return false
-            if (per.length > 0 && dir.length > 0 && company.length > 0 && ref.length > 0)
-            {
-                let url = window.location.origin + sourceDir + "/system-operation/user-per-add";
+            if (
+                per.length > 0 &&
+                dir.length > 0 &&
+                company.length > 0 &&
+                ref.length > 0
+            ) {
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/user-per-add";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'per': per, 'dir': dir,'ref':ref, 'company':company},
+                    data: { per: per, dir: dir, ref: ref, company: company },
                     success: function (data) {
                         try {
-                            data = JSON.parse(data)
-                            alert(data.error.msg)
+                            data = JSON.parse(data);
+                            alert(data.error.msg);
                         } catch (e) {
-                            $("#f-p-list").html(data)
-                            alert('Data added successfully!')
+                            $("#f-p-list").html(data);
+                            alert("Data added successfully!");
                         }
-                    }
-                })
+                    },
+                });
             }
-        })
-        $('#file_upload').on('change',function (e){
+        });
+        $("#file_upload").on("change", function (e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader()
+                const reader = new FileReader();
                 reader.onload = function (e) {
-                    const data = e.target.result
-                    const workbook = XLSX.read(data, { type: "binary" })
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 })
-                    if(jsonData[0].length !== 13)
-                    {
-                        alert('Invalid input data! Please flowing the prototype of data format!')
-                        return false
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: "binary" });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
+                        header: 1,
+                    });
+                    if (jsonData[0].length !== 13) {
+                        alert(
+                            "Invalid input data! Please flowing the prototype of data format!"
+                        );
+                        return false;
                     }
-                    if (!((jsonData[0][0] === 'Employee ID*' || jsonData[0][0] === 'Employee ID') && (jsonData[0][1] === 'Name') && (jsonData[0][2] === 'Department') && (jsonData[0][3] === 'Financial Year From*' || jsonData[0][3] === 'Financial Year From' ) && (jsonData[0][4] === 'Financial Year To*' || jsonData[0][4] === 'Financial Year To' ) && (jsonData[0][5] === 'Basic*' || jsonData[0][5] === 'Basic' ) && (jsonData[0][6] === 'House Rent*' || jsonData[0][6] === 'House Rent' ) && (jsonData[0][7] === 'Conveyance*' || jsonData[0][7] === 'Conveyance' ) && (jsonData[0][8] === 'Medical Allowance*' || jsonData[0][8] === 'Medical Allowance' ) && (jsonData[0][9] === 'Total' ) && (jsonData[0][10] === 'Festival Bonus*' || jsonData[0][10] === 'Festival Bonus' ) && (jsonData[0][11] === 'Others' ) && (jsonData[0][12] === 'Remarks' ) ))
-                    {
-                        alert('Invalid input data! Please flowing the prototype of data format!')
-                        return false
+                    if (
+                        !(
+                            (jsonData[0][0] === "Employee ID*" ||
+                                jsonData[0][0] === "Employee ID") &&
+                            jsonData[0][1] === "Name" &&
+                            jsonData[0][2] === "Department" &&
+                            (jsonData[0][3] === "Financial Year From*" ||
+                                jsonData[0][3] === "Financial Year From") &&
+                            (jsonData[0][4] === "Financial Year To*" ||
+                                jsonData[0][4] === "Financial Year To") &&
+                            (jsonData[0][5] === "Basic*" ||
+                                jsonData[0][5] === "Basic") &&
+                            (jsonData[0][6] === "House Rent*" ||
+                                jsonData[0][6] === "House Rent") &&
+                            (jsonData[0][7] === "Conveyance*" ||
+                                jsonData[0][7] === "Conveyance") &&
+                            (jsonData[0][8] === "Medical Allowance*" ||
+                                jsonData[0][8] === "Medical Allowance") &&
+                            jsonData[0][9] === "Total" &&
+                            (jsonData[0][10] === "Festival Bonus*" ||
+                                jsonData[0][10] === "Festival Bonus") &&
+                            jsonData[0][11] === "Others" &&
+                            jsonData[0][12] === "Remarks"
+                        )
+                    ) {
+                        alert(
+                            "Invalid input data! Please flowing the prototype of data format!"
+                        );
+                        return false;
                     }
                     for (let i = 0; i < jsonData.length; i++) {
                         for (let j = 0; j < jsonData[i].length; j++) {
-                            if(typeof jsonData[i][j] === 'undefined')
-                            {
-                                jsonData[i][j] = 0
+                            if (typeof jsonData[i][j] === "undefined") {
+                                jsonData[i][j] = 0;
                             }
-                            if (i > 0)
-                            {
-                                if (typeof jsonData[0][9] !== 'undefined' && jsonData[0][9] !== null)
-                                {
-                                    let total = parseInt(jsonData[i][9])
-                                    jsonData[i][5] = ((total * 60)/100)
-                                    jsonData[i][6] = ((total * 30)/100)
-                                    jsonData[i][7] = ((total * 5)/100)
-                                    jsonData[i][8] = ((total * 5)/100)
+                            if (i > 0) {
+                                if (
+                                    typeof jsonData[0][9] !== "undefined" &&
+                                    jsonData[0][9] !== null
+                                ) {
+                                    let total = parseInt(jsonData[i][9]);
+                                    jsonData[i][5] = (total * 60) / 100;
+                                    jsonData[i][6] = (total * 30) / 100;
+                                    jsonData[i][7] = (total * 5) / 100;
+                                    jsonData[i][8] = (total * 5) / 100;
                                 }
-                                if ( j === 3 || j === 4)
-                                {
-                                    jsonData[i][j] = ExcelDateToJSFinancialDate(jsonData[i][j])
+                                if (j === 3 || j === 4) {
+                                    jsonData[i][j] = ExcelDateToJSFinancialDate(
+                                        jsonData[i][j]
+                                    );
                                 }
                             }
                         }
                     }
-                    employeeDatas.push(jsonData)
-                    showModal(employeeDatas,file.name);
+                    employeeDatas.push(jsonData);
+                    showModal(employeeDatas, file.name);
                 };
-                reader.readAsBinaryString(file)
+                reader.readAsBinaryString(file);
             }
         });
 
-        $('#employee_file_upload').on('change',function (e){
+        $("#employee_file_upload").on("change", function (e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader()
+                const reader = new FileReader();
                 reader.onload = function (e) {
-                    const data = e.target.result
-                    const workbook = XLSX.read(data, { type: "binary" })
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 })
-                    if(jsonData[0].length !== 10)
-                    {
-                        alert('Invalid input data! Please flowing the prototype of data format!')
-                        return false
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: "binary" });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
+                        header: 1,
+                    });
+                    if (jsonData[0].length !== 10) {
+                        alert(
+                            "Invalid input data! Please flowing the prototype of data format!"
+                        );
+                        return false;
                     }
-                    if (!((jsonData[0][0] === 'Employee Name*' || jsonData[0][0] === 'Employee Name') && (jsonData[0][1] === 'Department') && (jsonData[0][2] === 'Department Code*'|| jsonData[0][2] === 'Department Code') && (jsonData[0][3] === 'Designation*'  || jsonData[0][3] === 'Designation') && (jsonData[0][4] === 'Branch' ) && (jsonData[0][5] === 'Joining Date*' || jsonData[0][5] === 'Joining Date' ) && (jsonData[0][6] === 'Phone') && (jsonData[0][7] === 'Email') && (jsonData[0][8] === 'Status') && (jsonData[0][9] === 'Blood Group')))
-                    {
-                        alert('Invalid input data! Please flowing the prototype of data format!')
-                        return false
+                    if (
+                        !(
+                            (jsonData[0][0] === "Employee Name*" ||
+                                jsonData[0][0] === "Employee Name") &&
+                            jsonData[0][1] === "Department" &&
+                            (jsonData[0][2] === "Department Code*" ||
+                                jsonData[0][2] === "Department Code") &&
+                            (jsonData[0][3] === "Designation*" ||
+                                jsonData[0][3] === "Designation") &&
+                            jsonData[0][4] === "Branch" &&
+                            (jsonData[0][5] === "Joining Date*" ||
+                                jsonData[0][5] === "Joining Date") &&
+                            jsonData[0][6] === "Phone" &&
+                            jsonData[0][7] === "Email" &&
+                            jsonData[0][8] === "Status" &&
+                            jsonData[0][9] === "Blood Group"
+                        )
+                    ) {
+                        alert(
+                            "Invalid input data! Please flowing the prototype of data format!"
+                        );
+                        return false;
                     }
                     for (let i = 0; i < jsonData.length; i++) {
-                        let zero = jsonData[0].length
+                        let zero = jsonData[0].length;
                         for (let j = 0; j < zero; j++) {
-                            if(typeof jsonData[i][j] === 'undefined')
-                            {
-                                jsonData[i][j] = null
-                            }
-                            else if (i !== 0 && j === 5)
-                            {
-                                jsonData[i][j] = ExcelDateToJSDate(jsonData[i][j])
+                            if (typeof jsonData[i][j] === "undefined") {
+                                jsonData[i][j] = null;
+                            } else if (i !== 0 && j === 5) {
+                                jsonData[i][j] = ExcelDateToJSDate(
+                                    jsonData[i][j]
+                                );
                             }
                         }
                     }
-                    employeeDatas.push(jsonData)
-                    showModal(employeeDatas,file.name);
+                    employeeDatas.push(jsonData);
+                    showModal(employeeDatas, file.name);
                 };
-                reader.readAsBinaryString(file)
+                reader.readAsBinaryString(file);
             }
         });
-        $('#permission_input_file').on('change',function (e){
+        $("#permission_input_file").on("change", function (e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader()
+                const reader = new FileReader();
                 reader.onload = function (e) {
-                    const data = e.target.result
-                    const workbook = XLSX.read(data, { type: "binary" })
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 })
-                    if(jsonData[0].length !== 5)
-                    {
-                        alert('Invalid input data! Please flowing the prototype of data format!')
-                        return false
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: "binary" });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
+                        header: 1,
+                    });
+                    if (jsonData[0].length !== 5) {
+                        alert(
+                            "Invalid input data! Please flowing the prototype of data format!"
+                        );
+                        return false;
                     }
-                    if (!((jsonData[0][0] === 'Parent*' || jsonData[0][0] === 'Parent') && (jsonData[0][1] === 'Type*' || jsonData[0][1] === 'Type') && (jsonData[0][2] === 'Name*' || jsonData[0][2] === 'Name') && (jsonData[0][3] === 'Display Name*'  || (jsonData[0][3] === 'Display Name') && jsonData[0][4] === 'Details' )))
-                    {
-                        alert('Invalid input data! Please flowing the prototype of data format!')
-                        return false
+                    if (
+                        !(
+                            (jsonData[0][0] === "Parent*" ||
+                                jsonData[0][0] === "Parent") &&
+                            (jsonData[0][1] === "Type*" ||
+                                jsonData[0][1] === "Type") &&
+                            (jsonData[0][2] === "Name*" ||
+                                jsonData[0][2] === "Name") &&
+                            (jsonData[0][3] === "Display Name*" ||
+                                (jsonData[0][3] === "Display Name" &&
+                                    jsonData[0][4] === "Details"))
+                        )
+                    ) {
+                        alert(
+                            "Invalid input data! Please flowing the prototype of data format!"
+                        );
+                        return false;
                     }
                     for (let i = 0; i < jsonData.length; i++) {
-                        let zero = jsonData[0].length
+                        let zero = jsonData[0].length;
                         for (let j = 0; j < zero; j++) {
-                            if(typeof jsonData[i][j] === 'undefined')
-                            {
-                                jsonData[i][j] = null
-                            }
-                            else if (i !== 0 && j === 5)
-                            {
-                                jsonData[i][j] = ExcelDateToJSDate(jsonData[i][j])
+                            if (typeof jsonData[i][j] === "undefined") {
+                                jsonData[i][j] = null;
+                            } else if (i !== 0 && j === 5) {
+                                jsonData[i][j] = ExcelDateToJSDate(
+                                    jsonData[i][j]
+                                );
                             }
                         }
                     }
-                    employeeDatas.push(jsonData)
-                    showModal(employeeDatas,file.name);
+                    employeeDatas.push(jsonData);
+                    showModal(employeeDatas, file.name);
                 };
-                reader.readAsBinaryString(file)
+                reader.readAsBinaryString(file);
             }
         });
-        let fixedDiv = $('#fixedDiv');
-        if (typeof (fixedDiv.offset()) !== 'undefined')
-        {
+        let fixedDiv = $("#fixedDiv");
+        if (typeof fixedDiv.offset() !== "undefined") {
             let initialOffset = fixedDiv.offset().top;
 
-            $(window).scroll(function() {
+            $(window).scroll(function () {
                 var scrollPos = $(window).scrollTop();
 
                 if (scrollPos > initialOffset) {
-                    fixedDiv.addClass('fixed');
+                    fixedDiv.addClass("fixed");
                 } else {
-                    fixedDiv.removeClass('fixed');
+                    fixedDiv.removeClass("fixed");
                 }
             });
         }
 
-        $('#selected-delete').click(function (){
-            if (confirm("Are you sure?"))
-            {
+        $("#selected-delete").click(function () {
+            if (confirm("Are you sure?")) {
                 // Create an array to store the checked values
                 let checkedValues = [];
 
@@ -213,802 +286,999 @@ let Obj = {};
                 });
 
                 // Display the result (you can modify this part based on your needs)
-                alert('Checked values: ' + checkedValues.join(', '));
+                alert("Checked values: " + checkedValues.join(", "));
             }
-        })
+        });
 
         // Select All checkbox
-        $('#select_all').change(function() {
-            $('.check-box').prop('checked', this.checked);
+        $("#select_all").change(function () {
+            $(".check-box").prop("checked", this.checked);
         });
 
         // Individual checkboxes
-        $('.check-box').change(function() {
+        $(".check-box").change(function () {
             if (!this.checked) {
-                $('#select_all').prop('checked', false);
+                $("#select_all").prop("checked", false);
             }
         });
         // Function to display the modal
-        function showModal_old(data,fileName) {
+        function showModal_old(data, fileName) {
             const modal = document.getElementById("myModal");
-            const modelTitle = document.getElementById("userDataModelLabel")
+            const modelTitle = document.getElementById("userDataModelLabel");
             const dataTable = document.getElementById("data-table");
             while (dataTable.firstChild) {
-                dataTable.removeChild(dataTable.firstChild)
+                dataTable.removeChild(dataTable.firstChild);
             }
 
             // Create a table from the data
-            const table = document.createElement("table")
-            table.className = "table"
-            let t=0
-            let action
+            const table = document.createElement("table");
+            table.className = "table";
+            let t = 0;
+            let action;
             let row_o = 1;
-            data[0].forEach(rowData => {
-                const row = document.createElement("tr")
-                let cell
-                if(t===0)
-                {
-                    action = "Action"
-                    cell = document.createElement("td")
-                    cell.textContent = "SL"
-                    row.appendChild(cell)
-                }
-                else
-                {
-                    action = '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,'+t+',`'+fileName+'`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>'
-                    cell = document.createElement("td")
-                    cell.textContent = row_o
+            data[0].forEach((rowData) => {
+                const row = document.createElement("tr");
+                let cell;
+                if (t === 0) {
+                    action = "Action";
+                    cell = document.createElement("td");
+                    cell.textContent = "SL";
+                    row.appendChild(cell);
+                } else {
+                    action =
+                        '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,' +
+                        t +
+                        ",`" +
+                        fileName +
+                        '`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>';
+                    cell = document.createElement("td");
+                    cell.textContent = row_o;
                     row_o++;
-                    row.appendChild(cell)
+                    row.appendChild(cell);
                 }
-                rowData.forEach(cellData => {
-                    cell = document.createElement("td")
-                    cell.textContent = cellData
-                    row.appendChild(cell)
+                rowData.forEach((cellData) => {
+                    cell = document.createElement("td");
+                    cell.textContent = cellData;
+                    row.appendChild(cell);
                 });
-                cell = document.createElement("td")
-                cell.innerHTML=action
-                row.appendChild(cell)
-                table.appendChild(row)
-                t++
+                cell = document.createElement("td");
+                cell.innerHTML = action;
+                row.appendChild(cell);
+                table.appendChild(row);
+                t++;
             });
 
             // Append the table to the modal
-            dataTable.appendChild(table)
-            modelTitle.innerText = fileName
-            $('#myModal').modal('show')
+            dataTable.appendChild(table);
+            modelTitle.innerText = fileName;
+            $("#myModal").modal("show");
         }
-        function showModal(data,fileName) {
+        function showModal(data, fileName) {
             const modal = document.getElementById("myModal");
-            const modelTitle = document.getElementById("userDataModelLabel")
+            const modelTitle = document.getElementById("userDataModelLabel");
             const dataTable = document.getElementById("data-table");
             while (dataTable.firstChild) {
-                dataTable.removeChild(dataTable.firstChild)
+                dataTable.removeChild(dataTable.firstChild);
             }
 
             // Create a table from the data
-            const table = document.createElement("table")
-            table.className = "table"
-            let t=0
-            let action
+            const table = document.createElement("table");
+            table.className = "table";
+            let t = 0;
+            let action;
             let row_o = 1;
 
-            let col = 0
-            const row = document.createElement("tr")
-            cell = document.createElement("td")
-            while (col < data[0][0].length+2)
-            {
-                cell = document.createElement("td")
-                cell.textContent = col++
-                row.appendChild(cell)
+            let col = 0;
+            const row = document.createElement("tr");
+            cell = document.createElement("td");
+            while (col < data[0][0].length + 2) {
+                cell = document.createElement("td");
+                cell.textContent = col++;
+                row.appendChild(cell);
             }
-            table.appendChild(row)
+            table.appendChild(row);
 
-            data[0].forEach(rowData => {
-                const row = document.createElement("tr")
-                let cell
-                if(t===0)
-                {
-                    action = "Action"
-                    cell = document.createElement("th")
-                    cell.textContent = "SL"
-                    row.appendChild(cell)
-                    rowData.forEach(cellData => {
-                        cell = document.createElement("th")
-                        cell.textContent = cellData
-                        row.appendChild(cell)
+            data[0].forEach((rowData) => {
+                const row = document.createElement("tr");
+                let cell;
+                if (t === 0) {
+                    action = "Action";
+                    cell = document.createElement("th");
+                    cell.textContent = "SL";
+                    row.appendChild(cell);
+                    rowData.forEach((cellData) => {
+                        cell = document.createElement("th");
+                        cell.textContent = cellData;
+                        row.appendChild(cell);
                     });
-                    cell = document.createElement("th")
-                    cell.innerHTML=action
-                    row.appendChild(cell)
-                    table.appendChild(row)
-                    t++
-                }
-                else
-                {
-                    action = '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,'+t+',`'+fileName+'`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>'
-                    cell = document.createElement("td")
-                    cell.textContent = row_o
+                    cell = document.createElement("th");
+                    cell.innerHTML = action;
+                    row.appendChild(cell);
+                    table.appendChild(row);
+                    t++;
+                } else {
+                    action =
+                        '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,' +
+                        t +
+                        ",`" +
+                        fileName +
+                        '`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>';
+                    cell = document.createElement("td");
+                    cell.textContent = row_o;
                     row_o++;
-                    row.appendChild(cell)
-                    rowData.forEach(cellData => {
-                        cell = document.createElement("td")
-                        cell.textContent = cellData
-                        row.appendChild(cell)
+                    row.appendChild(cell);
+                    rowData.forEach((cellData) => {
+                        cell = document.createElement("td");
+                        cell.textContent = cellData;
+                        row.appendChild(cell);
                     });
-                    cell = document.createElement("td")
-                    cell.innerHTML=action
-                    row.appendChild(cell)
-                    table.appendChild(row)
-                    t++
+                    cell = document.createElement("td");
+                    cell.innerHTML = action;
+                    row.appendChild(cell);
+                    table.appendChild(row);
+                    t++;
                 }
             });
 
             // Append the table to the modal
-            dataTable.appendChild(table)
-            modelTitle.innerText = fileName
-            $('#myModal').modal('show')
+            dataTable.appendChild(table);
+            modelTitle.innerText = fileName;
+            $("#myModal").modal("show");
         }
         function ExcelDateToJSDate(serial) {
-            const dateToString = d => `${('00' + d.getDate()).slice(-2)}-${('00' + (d.getMonth() + 1)).slice(-2)}-${d.getFullYear()}`
-            return dateToString(new Date(Math.round((serial - 25569)*86400*1000)));
+            const dateToString = (d) =>
+                `${("00" + d.getDate()).slice(-2)}-${(
+                    "00" +
+                    (d.getMonth() + 1)
+                ).slice(-2)}-${d.getFullYear()}`;
+            return dateToString(
+                new Date(Math.round((serial - 25569) * 86400 * 1000))
+            );
         }
         function ExcelDateToJSFinancialDate(serial) {
-            if (typeof serial !== 'number')
-            {
-                return serial
+            if (typeof serial !== "number") {
+                return serial;
             }
-            const dateToString = d => {
+            const dateToString = (d) => {
                 const months = [
-                    "January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
                 ];
                 const monthsShort = [
-                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
                 ];
 
                 const monthName = monthsShort[d.getMonth()];
                 return `${monthName}-${d.getFullYear()}`;
             };
 
-            return dateToString(new Date(Math.round((serial - 25569) * 86400 * 1000)));
+            return dateToString(
+                new Date(Math.round((serial - 25569) * 86400 * 1000))
+            );
         }
         Obj = {
-            permissionInput:function (e)
-            {
-                let is_parent = null
-                const permission_parent = $('#permission_parent').val()
-                const permission_name = $('#permission_name').val()
-                const permission_display_name = $('#permission_display_name').val()
-                const description = $('#description').val()
-                if($('#is_parent').is(':checked')) is_parent = 1
-                if (permission_parent.length === 0 || permission_display_name.length === 0 || permission_name.length === 0)
-                {
-                    return false
+            permissionInput: function (e) {
+                let is_parent = null;
+                const permission_parent = $("#permission_parent").val();
+                const permission_name = $("#permission_name").val();
+                const permission_display_name = $(
+                    "#permission_display_name"
+                ).val();
+                const description = $("#description").val();
+                if ($("#is_parent").is(":checked")) is_parent = 1;
+                if (
+                    permission_parent.length === 0 ||
+                    permission_display_name.length === 0 ||
+                    permission_name.length === 0
+                ) {
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/system-operation/permission-store";
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/permission-store";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'permission_parent':permission_parent,'permission_name':permission_name,'permission_display_name':permission_display_name,'is_parent':is_parent,'description':description},
-                    success: function(response){
-                        if (response.status === 'success')
-                        {
-                            alert(response.message)
-                            $('#permission-list').html(response.data)
-                            if (is_parent)window.location.reload()
-                        }
-                        if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
-                            // Handle error
-                        }
-                    }
-                })
-            },
-            permissionUpdate:function (e)
-            {
-                const permission_parent = $('#permission_parent').val()
-                const permission_name = $('#permission_name').val()
-                const permission_display_name = $('#permission_display_name').val()
-                const description = $('#description').val()
-                const permission_id = $('#permission_id').val()
-                if (permission_id.length === 0 || permission_parent.length === 0 || permission_display_name.length === 0 || permission_name.length === 0)
-                {
-                    return false
-                }
-                let url = window.location.origin + sourceDir + "/system-operation/permission-update";
-                $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    url: url,
-                    type: "POST",
-                    data: {'permission_parent':permission_parent,'permission_name':permission_name,'permission_display_name':permission_display_name,'description':description, 'permission_id':permission_id},
-                    success: function(response){
-                        if (response.status === 'success')
-                        {
-                            alert(response.message)
-                            $('#permission-list').html(response.data)
-                        }
-                        if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
-                            // Handle error
-                        }
-                    }
-                })
-            },
-            authCompany: function (e){
-                const username = $("#email").val()
-                const password = $("#password").val()
-                if (username.length === 0 || password.length === 0)
-                {
-                    $("#companySelect").html("<option></option>");
-                    $("#login").attr('disabled','disabled')
-                    $("#login").hide()
-                    return false
-                }
-                const url = window.location.origin + sourceDir + "/company-check-set"
-                $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    url: url,
-                    type: "POST",
-                    data: {'username':username,'password':password},
+                    data: {
+                        permission_parent: permission_parent,
+                        permission_name: permission_name,
+                        permission_display_name: permission_display_name,
+                        is_parent: is_parent,
+                        description: description,
+                    },
                     success: function (response) {
-                        if (response.status === 'error')
-                        {
+                        if (response.status === "success") {
+                            alert(response.message);
+                            $("#permission-list").html(response.data);
+                            if (is_parent) window.location.reload();
+                        }
+                        if (response.status === "error") {
+                            alert("Error:" + response.message);
+                            // Handle error
+                        }
+                    },
+                });
+            },
+            permissionUpdate: function (e) {
+                const permission_parent = $("#permission_parent").val();
+                const permission_name = $("#permission_name").val();
+                const permission_display_name = $(
+                    "#permission_display_name"
+                ).val();
+                const description = $("#description").val();
+                const permission_id = $("#permission_id").val();
+                if (
+                    permission_id.length === 0 ||
+                    permission_parent.length === 0 ||
+                    permission_display_name.length === 0 ||
+                    permission_name.length === 0
+                ) {
+                    return false;
+                }
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/permission-update";
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    url: url,
+                    type: "POST",
+                    data: {
+                        permission_parent: permission_parent,
+                        permission_name: permission_name,
+                        permission_display_name: permission_display_name,
+                        description: description,
+                        permission_id: permission_id,
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            alert(response.message);
+                            $("#permission-list").html(response.data);
+                        }
+                        if (response.status === "error") {
+                            alert("Error:" + response.message);
+                            // Handle error
+                        }
+                    },
+                });
+            },
+            authCompany: function (e) {
+                const username = $("#email").val();
+                const password = $("#password").val();
+                if (username.length === 0 || password.length === 0) {
+                    $("#companySelect").html("<option></option>");
+                    $("#login").attr("disabled", "disabled");
+                    $("#login").hide();
+                    return false;
+                }
+                const url =
+                    window.location.origin + sourceDir + "/company-check-set";
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    url: url,
+                    type: "POST",
+                    data: { username: username, password: password },
+                    success: function (response) {
+                        if (response.status === "error") {
                             // alert('Error:'+response.message)
                             $("#companySelect").html("<option></option>");
-                            $("#login").attr('disabled','disabled')
-                            $("#login").hide()
-                        }
-                        else {
+                            $("#login").attr("disabled", "disabled");
+                            $("#login").hide();
+                        } else {
                             // Display the list of companies
                             let companies = response.companies;
-                            let companySelect = $('#companySelect');
+                            let companySelect = $("#companySelect");
                             companySelect.empty();
                             $.each(companies, function (index, company) {
-                                companySelect.append(new Option(company.company_name, company.id));
+                                companySelect.append(
+                                    new Option(company.company_name, company.id)
+                                );
                             });
-                            $("#login").removeAttr('disabled')
-                            $("#login").show()
-
+                            $("#login").removeAttr("disabled");
+                            $("#login").show();
                         }
                     },
                     error: function (error) {
                         // alert(error.responseJSON.message);
                         $("#companySelect").html("<option></option>");
-                        $("#login").attr('disabled','disabled')
-                        $("#login").hide()
-                    }
-                })
+                        $("#login").attr("disabled", "disabled");
+                        $("#login").hide();
+                    },
+                });
             },
-            changeUserCompany:function (e){
-                let company = $(e).val()
-                if (company.length === 0)
-                {
-                    return false
+            changeUserCompany: function (e) {
+                let company = $(e).val();
+                if (company.length === 0) {
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/change-user-company";
+                let url =
+                    window.location.origin + sourceDir + "/change-user-company";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'company_id':company},
+                    data: { company_id: company },
                     success: function (response) {
-                        if (response.status === 'error')
-                        {
-                            return alert(response.message)
+                        if (response.status === "error") {
+                            return alert(response.message);
                         }
-                        if (response.status === 'success')
-                        {
-                            updateSelectBoxSingleOption(response.data.departments,'dept_menu','id','dept_name')
-                            updateSelectBoxSingleOption(response.data.branches,'branch_menu','id','branch_name')
-                            updateSelectBoxSingleOption(response.data.designations,'designation_menu','id','title')
-                            updateSelectBoxSingleOption(response.data.roles,'role_menu','id','display_name')
-                            $("#employee_id").val('')
-                            $("#employee_id_hide").val('')
+                        if (response.status === "success") {
+                            updateSelectBoxSingleOption(
+                                response.data.departments,
+                                "dept_menu",
+                                "id",
+                                "dept_name"
+                            );
+                            updateSelectBoxSingleOption(
+                                response.data.branches,
+                                "branch_menu",
+                                "id",
+                                "branch_name"
+                            );
+                            updateSelectBoxSingleOption(
+                                response.data.designations,
+                                "designation_menu",
+                                "id",
+                                "title"
+                            );
+                            updateSelectBoxSingleOption(
+                                response.data.roles,
+                                "role_menu",
+                                "id",
+                                "display_name"
+                            );
+                            $("#employee_id").val("");
+                            $("#employee_id_hide").val("");
                         }
                     },
-                    error: function (error)
-                    {
-                        return alert(error.responseJSON.message)
-                    }
-                })
+                    error: function (error) {
+                        return alert(error.responseJSON.message);
+                    },
+                });
             },
-            changeBranchCompany:function (e){
-                let company = $(e).val()
-                if (company.length === 0)
-                {
-                    return false
+            changeBranchCompany: function (e) {
+                let company = $(e).val();
+                if (company.length === 0) {
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/change-branch-company";
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/change-branch-company";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'company_id':company},
+                    data: { company_id: company },
                     success: function (response) {
-                        if (response.status === 'error')
-                        {
-                            return alert(response.message)
+                        if (response.status === "error") {
+                            return alert(response.message);
                         }
-                        if (response.status === 'success')
-                        {
+                        if (response.status === "success") {
                             // console.log(response.data.branchTypes)
-                            updateSelectBoxSingleOption(response.data.branchTypes,'branch_type','id','title')
+                            updateSelectBoxSingleOption(
+                                response.data.branchTypes,
+                                "branch_type",
+                                "id",
+                                "title"
+                            );
                         }
                     },
-                    error: function (error)
-                    {
-                        return alert(error.responseJSON.message)
-                    }
-                })
+                    error: function (error) {
+                        return alert(error.responseJSON.message);
+                    },
+                });
             },
-            makeEmployeeID:function (dept_menu,companyID,joining_date){
-                let company_id = $("#"+companyID).val()
-                let department_id = $("#"+dept_menu).val()
-                let joining = $("#"+joining_date).val()
-                if (company_id.length === 0)
-                {
-                    alert("Empty Company ID")
-                    return false
+            makeEmployeeID: function (dept_menu, companyID, joining_date) {
+                let company_id = $("#" + companyID).val();
+                let department_id = $("#" + dept_menu).val();
+                let joining = $("#" + joining_date).val();
+                if (company_id.length === 0) {
+                    alert("Empty Company ID");
+                    return false;
                 }
-                if (department_id.length === 0)
-                {
-                    alert("Empty Department ID")
-                    return false
+                if (department_id.length === 0) {
+                    alert("Empty Department ID");
+                    return false;
                 }
-                if (joining.length === 0)
-                {
-                    alert("Empty Joining Date")
-                    return false
+                if (joining.length === 0) {
+                    alert("Empty Joining Date");
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/get-employee-id";
+                let url =
+                    window.location.origin + sourceDir + "/get-employee-id";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'department_id':department_id,'company_id':company_id,'joining_date':joining},
+                    data: {
+                        department_id: department_id,
+                        company_id: company_id,
+                        joining_date: joining,
+                    },
                     success: function (response) {
-                        if (response.status === 'error')
-                        {
-                            return alert(response.message)
+                        if (response.status === "error") {
+                            return alert(response.message);
                         }
-                        if (response.status === 'success')
-                        {
-                            console.log(response)
-                            $("#employee_id").val(response.data[1])
-                            $("#employee_id_hide").val(response.data[0])
+                        if (response.status === "success") {
+                            console.log(response);
+                            $("#employee_id").val(response.data[1]);
+                            $("#employee_id_hide").val(response.data[0]);
                         }
                     },
-                    error: function (error)
-                    {
-                        return alert(error.responseJSON.message)
-                    }
-
-                })
+                    error: function (error) {
+                        return alert(error.responseJSON.message);
+                    },
+                });
             },
-            companyChangeModulePermission: function (e){
-                let cid = $(e).val()
-                let uid = $('#user_id').val()
-                if (cid.length === 0 || uid.length === 0)
-                {
-                    return false
+            companyChangeModulePermission: function (e) {
+                let cid = $(e).val();
+                let uid = $("#user_id").val();
+                if (cid.length === 0 || uid.length === 0) {
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/company-change-module-permission";
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-change-module-permission";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'cid':cid,'uid':uid},
+                    data: { cid: cid, uid: uid },
                     success: function (responses) {
-                        if (responses.status === 'error') {
-                            alert("Error: " +responses.message)
-                            setSelectBoxBlank('parentPermission')
-                            setSelectBoxBlank('childPermission')
+                        if (responses.status === "error") {
+                            alert("Error: " + responses.message);
+                            setSelectBoxBlank("parentPermission");
+                            setSelectBoxBlank("childPermission");
                         } else {
                             let parents = responses.data;
-                            updateSelectBox(parents,'parentPermission','id','display_name')
-                            setSelectBoxBlank('childPermission')
+                            updateSelectBox(
+                                parents,
+                                "parentPermission",
+                                "id",
+                                "display_name"
+                            );
+                            setSelectBoxBlank("childPermission");
                         }
-                    }
-                })
+                    },
+                });
             },
-            fiendPermissionChild : function (e,actionID) {
-                let ids = $(e).val()
-                let company = $("#company").val()
-                if (ids.length !== 0 && company.length !== 0)
-                {
-                    let url = window.location.origin + sourceDir + "/fiend-permission-child";
+            fiendPermissionChild: function (e, actionID) {
+                let ids = $(e).val();
+                let company = $("#company").val();
+                if (ids.length !== 0 && company.length !== 0) {
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        "/fiend-permission-child";
                     $.ajax({
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
                         url: url,
                         type: "POST",
-                        data: {'pids':ids,'company_id':company},
+                        data: { pids: ids, company_id: company },
                         success: function (response) {
-                            if (response.status === 'error')
-                            {
-                                alert("Error: "+ response.message)
-                                return false
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                                return false;
                             }
-                            if (response.status === 'success')
-                            {
+                            if (response.status === "success") {
                                 let permissions = response.data;
-                                updateSelectBox(permissions,actionID,'id','display_name')
-                                Obj.selectAllOption(e)
-                                return true
+                                updateSelectBox(
+                                    permissions,
+                                    actionID,
+                                    "id",
+                                    "display_name"
+                                );
+                                Obj.selectAllOption(e);
+                                return true;
                             }
-
-                        }
-                    })
+                        },
+                    });
                 }
             },
-            removeElementOfEmployeeData:function (e,index,file){
-                employeeDatas[0].splice(index, 1)
-                showModal(employeeDatas,file)
+            removeElementOfEmployeeData: function (e, index, file) {
+                employeeDatas[0].splice(index, 1);
+                showModal(employeeDatas, file);
             },
-            employeeDataSubmit:function (e) {
-                if (employeeDatas[0].length <= 1)
-                {
-                    alert('Empty data set please upload your excel file on the input field!')
-                    return false
+            employeeDataSubmit: function (e) {
+                if (employeeDatas[0].length <= 1) {
+                    alert(
+                        "Empty data set please upload your excel file on the input field!"
+                    );
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/salary-certificate-input-excel";
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/salary-certificate-input-excel";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
-                    contentType: 'application/json',
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    contentType: "application/json",
                     url: url,
                     type: "POST",
-                    data: JSON.stringify({'input': employeeDatas[0]}),
-                    success:function (data)
-                    {
+                    data: JSON.stringify({ input: employeeDatas[0] }),
+                    success: function (data) {
                         if (data.error) {
-                            let alertMessage = data.message + '\nErrors:\n'
-                            if (data.errors)
-                            {
+                            let alertMessage = data.message + "\nErrors:\n";
+                            if (data.errors) {
                                 for (let field in data.errors) {
                                     if (data.errors.hasOwnProperty(field)) {
-                                        alertMessage += field + ': ' + data.errors[field].join(', ') + '\n'
+                                        alertMessage +=
+                                            field +
+                                            ": " +
+                                            data.errors[field].join(", ") +
+                                            "\n";
                                     }
                                 }
                             }
-                            alert(alertMessage)
-                            return false
+                            alert(alertMessage);
+                            return false;
                         } else {
                             // Handle success
-                            let alertMessage = ''
-                            if (data.errorMessage)
-                            {
+                            let alertMessage = "";
+                            if (data.errorMessage) {
                                 // Extract and display the Error Message
-                                alertMessage += "Error! This Data Are Added not Possible:\n"
+                                alertMessage +=
+                                    "Error! This Data Are Added not Possible:\n";
                                 for (let key in data.errorMessage) {
-                                    let employee = data.errorMessage[key]
-                                    alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`
+                                    let employee = data.errorMessage[key];
+                                    alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`;
                                 }
                             }
-                            if (data.successMessage)
-                            {
+                            if (data.successMessage) {
                                 // Extract and display the Success Message
-                                alertMessage += "This Data Are Added Successfully:\n"
+                                alertMessage +=
+                                    "This Data Are Added Successfully:\n";
                                 for (let key in data.successMessage) {
-                                    let employee = data.successMessage[key]
-                                    alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`
+                                    let employee = data.successMessage[key];
+                                    alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`;
                                 }
                             }
-                            if (data.alreadyHasMessage)
-                            {
+                            if (data.alreadyHasMessage) {
                                 // Extract and display the alreadyHasMessage
-                                alertMessage += "This Data are Already Exists in DB:\n"
+                                alertMessage +=
+                                    "This Data are Already Exists in DB:\n";
                                 for (let key in data.alreadyHasMessage) {
-                                    let employee = data.alreadyHasMessage[key]
-                                    alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`
+                                    let employee = data.alreadyHasMessage[key];
+                                    alertMessage += `Employee ID: ${employee["Employee ID"]}, Name: ${employee.Name}, Department: ${employee.Department}\n`;
                                 }
                             }
-                            alert(alertMessage)
-                            window.location.reload()
-                            return true
+                            alert(alertMessage);
+                            window.location.reload();
+                            return true;
                         }
-                    }
-                })
+                    },
+                });
             },
-            salaryDistribute:function (e){
-                let total = $('#total').val()
-                if (total.length)
-                {
-                    total = parseInt(total)
-                    let basic = ((total*60) / 100)
-                    let house_rent = ((total*30) / 100)
-                    let conveyance = ((total*5) / 100)
-                    let ma = ((total*5) / 100)
-                    $('#basic').val(basic).attr('readonly','readonly')
-                    $('#house_rent').val(house_rent).attr('readonly','readonly')
-                    $('#conveyance').val(conveyance).attr('readonly','readonly')
-                    $('#medical').val(ma).attr('readonly','readonly')
-                }
-                else {
-                    $('#basic').val('').removeAttr('readonly')
-                    $('#house_rent').val('').removeAttr('readonly')
-                    $('#conveyance').val('').removeAttr('readonly')
-                    $('#medical').val('').removeAttr('readonly')
+            salaryDistribute: function (e) {
+                let total = $("#total").val();
+                if (total.length) {
+                    total = parseInt(total);
+                    let basic = (total * 60) / 100;
+                    let house_rent = (total * 30) / 100;
+                    let conveyance = (total * 5) / 100;
+                    let ma = (total * 5) / 100;
+                    $("#basic").val(basic).attr("readonly", "readonly");
+                    $("#house_rent")
+                        .val(house_rent)
+                        .attr("readonly", "readonly");
+                    $("#conveyance")
+                        .val(conveyance)
+                        .attr("readonly", "readonly");
+                    $("#medical").val(ma).attr("readonly", "readonly");
+                } else {
+                    $("#basic").val("").removeAttr("readonly");
+                    $("#house_rent").val("").removeAttr("readonly");
+                    $("#conveyance").val("").removeAttr("readonly");
+                    $("#medical").val("").removeAttr("readonly");
                 }
             },
-            userExcelFileSubmit:function (e) {
-                if (employeeDatas[0].length <= 1)
-                {
-                    alert('Empty data set please upload your excel file on the input field!')
-                    return false
+            userExcelFileSubmit: function (e) {
+                if (employeeDatas[0].length <= 1) {
+                    alert(
+                        "Empty data set please upload your excel file on the input field!"
+                    );
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/add-user-excel";
+                let url =
+                    window.location.origin + sourceDir + "/add-user-excel";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
-                    contentType: 'application/json',
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    contentType: "application/json",
                     url: url,
                     type: "POST",
-                    data: JSON.stringify({'input': employeeDatas[0]}),
-                    success:function (data)
-                    {
+                    data: JSON.stringify({ input: employeeDatas[0] }),
+                    success: function (data) {
                         if (data.error) {
-                            let alertMessage = data.message + '\nErrors:\n'
-                            if (data.errors)
-                            {
+                            let alertMessage = data.message + "\nErrors:\n";
+                            if (data.errors) {
                                 for (let field in data.errors) {
                                     if (data.errors.hasOwnProperty(field)) {
-                                        alertMessage += field + ': ' + data.errors[field].join(', ') + '\n'
+                                        alertMessage +=
+                                            field +
+                                            ": " +
+                                            data.errors[field].join(", ") +
+                                            "\n";
                                     }
                                 }
                             }
-                            alert(alertMessage)
-                            return false
+                            alert(alertMessage);
+                            return false;
                         } else {
                             // Handle success
-                            let alertMessage = ''
-                            if (data.errorMessage)
-                            {
+                            let alertMessage = "";
+                            if (data.errorMessage) {
                                 // Extract and display the Error Message
-                                alertMessage += "Error! This Data Are Added not Possible:\n"
+                                alertMessage +=
+                                    "Error! This Data Are Added not Possible:\n";
                                 for (let key in data.errorMessage) {
-                                    let employee = data.errorMessage[key]
-                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`
+                                    let employee = data.errorMessage[key];
+                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
                                 }
                             }
-                            if (data.successMessage)
-                            {
+                            if (data.successMessage) {
                                 // Extract and display the Success Message
-                                alertMessage += "This Data Are Added Successfully:\n"
+                                alertMessage +=
+                                    "This Data Are Added Successfully:\n";
                                 for (let key in data.successMessage) {
-                                    let employee = data.successMessage[key]
-                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`
+                                    let employee = data.successMessage[key];
+                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
                                 }
                             }
-                            if (data.alreadyHasMessage)
-                            {
+                            if (data.alreadyHasMessage) {
                                 // Extract and display the alreadyHasMessage
-                                alertMessage += "This Data are Already Exists in DB:\n"
+                                alertMessage +=
+                                    "This Data are Already Exists in DB:\n";
                                 for (let key in data.alreadyHasMessage) {
-                                    let employee = data.alreadyHasMessage[key]
-                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`
+                                    let employee = data.alreadyHasMessage[key];
+                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
                                 }
                             }
-                            alert(alertMessage)
-                            window.location.reload()
-                            return true
+                            alert(alertMessage);
+                            window.location.reload();
+                            return true;
                         }
-                    }
-                })
+                    },
+                });
             },
-            permissionExcelFileSubmit:function (e) {
-                if (employeeDatas[0].length <= 1)
-                {
-                    alert('Empty data set please upload your excel file on the input field!')
-                    return false
+            permissionExcelFileSubmit: function (e) {
+                if (employeeDatas[0].length <= 1) {
+                    alert(
+                        "Empty data set please upload your excel file on the input field!"
+                    );
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/system-operation/add-permission-excel";
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/add-permission-excel";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
-                    contentType: 'application/json',
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    contentType: "application/json",
                     url: url,
                     type: "POST",
-                    data: JSON.stringify({'input': employeeDatas[0]}),
-                    success:function (data)
-                    {
+                    data: JSON.stringify({ input: employeeDatas[0] }),
+                    success: function (data) {
                         if (data.error) {
-                            let alertMessage = data.message + '\nErrors:\n'
-                            if (data.errors)
-                            {
+                            let alertMessage = data.message + "\nErrors:\n";
+                            if (data.errors) {
                                 for (let field in data.errors) {
                                     if (data.errors.hasOwnProperty(field)) {
-                                        alertMessage += field + ': ' + data.errors[field].join(', ') + '\n'
+                                        alertMessage +=
+                                            field +
+                                            ": " +
+                                            data.errors[field].join(", ") +
+                                            "\n";
                                     }
                                 }
                             }
-                            alert(alertMessage)
-                            return false
-                        }
-                        else {
+                            alert(alertMessage);
+                            return false;
+                        } else {
                             // Extract and display the Success Message
-                            let alertMessage = data.message
-                            alert(alertMessage)
-                            window.location.reload()
-                            return true
+                            let alertMessage = data.message;
+                            alert(alertMessage);
+                            window.location.reload();
+                            return true;
                         }
-                    }
-                })
+                    },
+                });
             },
 
-            findDocument: function (e,actionID,actionID2,actionID3){
-                let path = $(e).attr('path')
-                let v_type = $(e).attr('vtype')
-                let v_no = $(e).attr('vno')
-                if (path)
-                {
-                    let url = window.location.origin + sourceDir + "/fiend-archive-document";
+            findDocument: function (e, actionID, actionID2, actionID3) {
+                let path = $(e).attr("path");
+                let v_type = $(e).attr("vtype");
+                let v_no = $(e).attr("vno");
+                if (path) {
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        "/fiend-archive-document";
                     $.ajax({
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
                         url: url,
                         type: "POST",
-                        data: {'path':path},
-                        success: function(pdfPreviewUrl){
+                        data: { path: path },
+                        success: function (pdfPreviewUrl) {
                             // Check if the file exists
-                            checkFileExists(pdfPreviewUrl, function(exists) {
+                            checkFileExists(pdfPreviewUrl, function (exists) {
                                 if (exists) {
-                                    const fileExtension = pdfPreviewUrl.split('.').pop().toLowerCase();
-                                    const fileName = pdfPreviewUrl.split('/').pop();
-                                    $('#v_document_name').html(fileName)
-                                    $('#'+actionID2).html(v_type);
-                                    $('#'+actionID3).html(v_no);
-                                    if (['jpg', 'jpeg', 'png', 'gif','pdf','PDF'].includes(fileExtension)) {
+                                    const fileExtension = pdfPreviewUrl
+                                        .split(".")
+                                        .pop()
+                                        .toLowerCase();
+                                    const fileName = pdfPreviewUrl
+                                        .split("/")
+                                        .pop();
+                                    $("#v_document_name").html(fileName);
+                                    $("#" + actionID2).html(v_type);
+                                    $("#" + actionID3).html(v_no);
+                                    if (
+                                        [
+                                            "jpg",
+                                            "jpeg",
+                                            "png",
+                                            "gif",
+                                            "pdf",
+                                            "PDF",
+                                        ].includes(fileExtension)
+                                    ) {
                                         // Preview PDF in iframe
-                                        const embedTag = '<embed src="'+pdfPreviewUrl+'#toolbar=0" style="width:100%; height:700px;" />'
-                                        $('#'+actionID).html(embedTag);
-                                    } else if (['mp4', 'webm', 'ogg'].includes(fileExtension)) {
+                                        const embedTag =
+                                            '<embed src="' +
+                                            pdfPreviewUrl +
+                                            '#toolbar=0" style="width:100%; height:700px;" />';
+                                        $("#" + actionID).html(embedTag);
+                                    } else if (
+                                        ["mp4", "webm", "ogg"].includes(
+                                            fileExtension
+                                        )
+                                    ) {
                                         // Play video
                                         // Modify this to fit your video display logic
                                         const videoTag = `<video controls style="width: 100%"><source src="${pdfPreviewUrl}" type="video/mp4">Your browser does not support the video tag.</video>`;
-                                        $('#'+actionID).html(videoTag);
+                                        $("#" + actionID).html(videoTag);
                                         // $('#'+actionID).replaceWith(videoTag);
                                         // $('#staticBackdrop').modal('show');
                                         // $('#pdfPreviewModal').modal('show');
                                     } else {
-                                        const btn = '<div class="row">\n' +
+                                        const btn =
+                                            '<div class="row">\n' +
                                             '                        <div class="col-md-12 text-center">\n' +
                                             '                            <h1 class="text-center">Sorry! This file type is not supported for preview.</h1>\n' +
-                                            '                            <a class="btn btn-success text-center" href="' + pdfPreviewUrl + '" download>\n' +
-                                            '                                Click To Download\n' +
-                                            '                            </a>\n' +
-                                            '                        </div>\n' +
-                                            '                    </div>'
+                                            '                            <a class="btn btn-success text-center" href="' +
+                                            pdfPreviewUrl +
+                                            '" download>\n' +
+                                            "                                Click To Download\n" +
+                                            "                            </a>\n" +
+                                            "                        </div>\n" +
+                                            "                    </div>";
                                         // Provide a download link
-                                        $('#'+actionID).html(btn);
+                                        $("#" + actionID).html(btn);
                                         // window.location.href = pdfPreviewUrl;
                                     }
-                                    $('#staticBackdrop').modal('show');
+                                    $("#staticBackdrop").modal("show");
                                 } else {
-                                    const error = '<div class="text-center text-danger">URL Not Found!</div>'
-                                    $('#'+actionID).html(error);
-                                    $('#staticBackdrop').modal('show');
+                                    const error =
+                                        '<div class="text-center text-danger">URL Not Found!</div>';
+                                    $("#" + actionID).html(error);
+                                    $("#staticBackdrop").modal("show");
                                 }
                             });
-                            return true
-                        }
-                    })
+                            return true;
+                        },
+                    });
                 }
-                return false
+                return false;
             },
-            fileSharingModal:function (e) {
-                let id = $(e).attr('ref')
-                let url = window.location.origin + sourceDir + "/fiend-archive-document-info";
+            fileSharingModal: function (e) {
+                let id = $(e).attr("ref");
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fiend-archive-document-info";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'id':id},
-                    success: function(data){
-                        if (data.error){
-                            alert(data.error.msg)
-                        }else{
-                            while(tags.length > 0) {
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.error) {
+                            alert(data.error.msg);
+                        } else {
+                            while (tags.length > 0) {
                                 tags.pop();
                             }
-                            $('#model_dialog').html(data)
-                            $('#shareModel').modal('show')
+                            $("#model_dialog").html(data);
+                            $("#shareModel").modal("show");
                         }
-                    }
-                })
-                return false
+                    },
+                });
+                return false;
             },
-            archiveShare:function (e) {
-                let id = $(e).attr('ref')
-                let url = window.location.origin + sourceDir + "/share-archive-fiend";
+            archiveShare: function (e) {
+                let id = $(e).attr("ref");
+                let url =
+                    window.location.origin + sourceDir + "/share-archive-fiend";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'id':id},
-                    success: function(data){
-                        if (data.error){
-                            alert(data.error.msg)
-                        }else{
-                            while(tags.length > 0) {
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.error) {
+                            alert(data.error.msg);
+                        } else {
+                            while (tags.length > 0) {
                                 tags.pop();
                             }
-                            $('#model_dialog').html(data)
-                            $('#shareModel').modal('show')
+                            $("#model_dialog").html(data);
+                            $("#shareModel").modal("show");
                         }
-                    }
-                })
-                return false
+                    },
+                });
+                return false;
             },
-            voucherDocumentIndividual:function (e) {
-                let id = $(e).attr('ref')
-                let url = window.location.origin + sourceDir + "/fiend-archive-document-info";
+            voucherDocumentIndividual: function (e) {
+                let id = $(e).attr("ref");
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fiend-archive-document-info";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'id':id},
-                    success: function(data){
-                        if (data.error){
-                            alert(data.error.msg)
-                        }else{
-                            while(tags.length > 0) {
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.error) {
+                            alert(data.error.msg);
+                        } else {
+                            while (tags.length > 0) {
                                 tags.pop();
                             }
-                            $('#model_dialog').html(data)
-                            $('#shareModel').modal('show')
+                            $("#model_dialog").html(data);
+                            $("#shareModel").modal("show");
                         }
-                    }
-                })
-                return false
+                    },
+                });
+                return false;
             },
-            addArchiveDocumentIndividual:function (e){
-                let id = $(e).attr('ref')
-                let url = window.location.origin + sourceDir + "/add-archive-document-individual";
+            addArchiveDocumentIndividual: function (e) {
+                let id = $(e).attr("ref");
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/add-archive-document-individual";
                 $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     url: url,
                     type: "POST",
-                    data: {'id':id},
-                    success: function(data){
-                        if (data.error){
-                            alert(data.error.msg)
-                        }else{
-                            $('#model_dialog').html(data)
-                            $('#shareModel').modal('show')
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.error) {
+                            alert(data.error.msg);
+                        } else {
+                            $("#model_dialog").html(data);
+                            $("#shareModel").modal("show");
                         }
-                    }
-                })
-                return false
+                    },
+                });
+                return false;
             },
-            closeSharingModel:function (e) {
-                while(tags.length > 0) {
+            closeSharingModel: function (e) {
+                while (tags.length > 0) {
                     tags.pop();
                 }
-
             },
-            tagInput:function (event)
-            {
-                const value = $(event).val()
+            tagInput: function (event) {
+                const value = $(event).val();
                 const regex = /\s|,/;
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-                if (regex.test(value))
-                {
-                    const leanedData = value.replace(/[\s,]/g, '');
-                    if (emailRegex.test(leanedData))
-                    {
+                if (regex.test(value)) {
+                    const leanedData = value.replace(/[\s,]/g, "");
+                    if (emailRegex.test(leanedData)) {
                         const tagValue = leanedData.trim();
-                        const tag = $('<div>').addClass('tag').attr('onclick','return Obj.removeTag(this)').text(tagValue+' 🗙');
-                        $('#tags').append(tag);
-                        $('#tag-input').val('');
+                        const tag = $("<div>")
+                            .addClass("tag")
+                            .attr("onclick", "return Obj.removeTag(this)")
+                            .text(tagValue + " 🗙");
+                        $("#tags").append(tag);
+                        $("#tag-input").val("");
                         tags.push(tagValue);
                     }
                 }
             },
-            removeTag:function (event)
-            {
-
+            removeTag: function (event) {
                 const tagValue = $(event).text();
                 const index = tags.indexOf(tagValue);
                 if (index !== -1) {
@@ -1016,50 +1286,55 @@ let Obj = {};
                 }
                 $(event).remove();
             },
-            archiveShareType:function (e)
-            {
-                let value = $(e).val()
-                let refId = $(e).attr('ref');
-                if (value.length > 0)
-                {
-                    let url = window.location.origin + sourceDir + "/archive-share-type";
+            archiveShareType: function (e) {
+                let value = $(e).val();
+                let refId = $(e).attr("ref");
+                if (value.length > 0) {
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        "/archive-share-type";
                     $.ajax({
                         url: url,
-                        method: 'POST',
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        data: {value: value, refId: refId},
-                        success: function(data) {
-                            $('#sharedLink').val(data)
-                        }
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        data: { value: value, refId: refId },
+                        success: function (data) {
+                            $("#sharedLink").val(data);
+                        },
                     });
                 }
-
             },
-            copyDocumentShareLink:function (e)
-            {
-                let sharedLink = $("#sharedLink")
-                if (sharedLink.val().length <= 0)
-                {
-                    return false
-                }
-                else {
-                    sharedLink.select()
+            copyDocumentShareLink: function (e) {
+                let sharedLink = $("#sharedLink");
+                if (sharedLink.val().length <= 0) {
+                    return false;
+                } else {
+                    sharedLink.select();
                     try {
                         // Execute the copy command
-                        document.execCommand('copy');
-                        $(e).html('<i class="fa-solid fa-clipboard"></i> Copied!')
+                        document.execCommand("copy");
+                        $(e).html(
+                            '<i class="fa-solid fa-clipboard"></i> Copied!'
+                        );
                         // $(e).remove('class','btn-success')
-                        $(e).addClass('btn-info')
+                        $(e).addClass("btn-info");
                     } catch (err) {
-                        alert('Unable to copy link:'+err);
+                        alert("Unable to copy link:" + err);
                     }
                 }
             },
-            sendDocumentEmail:function (e)
-            {
-                const url = window.location.origin + sourceDir + "/share-archive-document-email";
-                const refId = $(e).attr('ref');
-                const message = $('#message').val()
+            sendDocumentEmail: function (e) {
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/share-archive-document-email";
+                const refId = $(e).attr("ref");
+                const message = $("#message").val();
                 // const data = { tags: tags, refId: refId };
                 if (tags.length <= 0) {
                     alert("Error! Empty Field");
@@ -1067,33 +1342,36 @@ let Obj = {};
                 } else {
                     $.ajax({
                         url: url,
-                        method: 'POST',
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        data: {tags: tags, refId: refId, message: message},
-                        success: function(data) {
-                            if (data.error){
-                                alert(data.error.msg)
-                                return false
-                            }else {
-                                data = JSON.parse(data)
-                                alert(data.results)
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        data: { tags: tags, refId: refId, message: message },
+                        success: function (data) {
+                            if (data.error) {
+                                alert(data.error.msg);
+                                return false;
+                            } else {
+                                data = JSON.parse(data);
+                                alert(data.results);
                                 if (data.results)
-                                    $('#shareModel').modal('hide')
-                                else
-                                    return false
+                                    $("#shareModel").modal("hide");
+                                else return false;
                             }
                         },
-                        error: function(error) {
-                            console.error('Error:', error);
-                        }
+                        error: function (error) {
+                            console.error("Error:", error);
+                        },
                     });
                 }
             },
-            sendArchiveEmail:function (e)
-            {
-                const url = window.location.origin + sourceDir + "/share-archive-email";
-                const refId = $(e).attr('ref');
-                const message = $('#message').val()
+            sendArchiveEmail: function (e) {
+                const url =
+                    window.location.origin + sourceDir + "/share-archive-email";
+                const refId = $(e).attr("ref");
+                const message = $("#message").val();
                 // const data = { tags: tags, refId: refId };
                 if (tags.length <= 0) {
                     alert("Error! Empty Field");
@@ -1101,369 +1379,468 @@ let Obj = {};
                 } else {
                     $.ajax({
                         url: url,
-                        method: 'POST',
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        data: {tags: tags, refId: refId, message: message},
-                        success: function(data) {
-                            if (data.error){
-                                alert(data.error.msg)
-                                return false
-                            }else {
-                                data = JSON.parse(data)
-                                alert(data.results)
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        data: { tags: tags, refId: refId, message: message },
+                        success: function (data) {
+                            if (data.error) {
+                                alert(data.error.msg);
+                                return false;
+                            } else {
+                                data = JSON.parse(data);
+                                alert(data.results);
                                 if (data.results)
-                                    $('#shareModel').modal('hide')
-                                else
-                                    return false
+                                    $("#shareModel").modal("hide");
+                                else return false;
                             }
                         },
-                        error: function(error) {
-                            console.error('Error:', error);
-                        }
+                        error: function (error) {
+                            console.error("Error:", error);
+                        },
                     });
                 }
             },
-            emailLinkStatusChange:function (e) {
-                const ref = $(e).attr('ref')
-                const status = $(e).attr('status')
-                const url = window.location.origin + sourceDir + "/email-link-status-change";
+            emailLinkStatusChange: function (e) {
+                const ref = $(e).attr("ref");
+                const status = $(e).attr("status");
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/email-link-status-change";
                 $.ajax({
                     url: url,
-                    method: 'POST',
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data: {ref: ref, status: status},
-                    success: function(data) {
-                        if (data.error){
-                            alert(data.error.msg)
-                        }else {
-                            data = JSON.parse(data)
-                            alert(data.results)
-                            $('#shareModel').modal('hide')
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: { ref: ref, status: status },
+                    success: function (data) {
+                        if (data.error) {
+                            alert(data.error.msg);
+                        } else {
+                            data = JSON.parse(data);
+                            alert(data.results);
+                            $("#shareModel").modal("hide");
                         }
                     },
-                    error: function(error) {
-                        console.error('Error:', error);
-                    }
+                    error: function (error) {
+                        console.error("Error:", error);
+                    },
                 });
             },
-            getFixedAssetSpecification:function (e){
-                const value = $(e).val()
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/get-fixed-asset-spec";
-                $.ajax({
-                    url:url,
-                    method:'POST',
-                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{id:value},
-                    success: function (response){
-                        if (response.status === 'success')
-                        {
-                            fixedAsset = response.data[0].fixed_asset
-                            updateSelectBoxSingleOption(response.data,'specification','id','specification')
-                            $("#rate").val(fixedAsset.rate)
-                            $("#unite").val(fixedAsset.unit)
-                            $("#qty").val(1)
-                            $("#total").val(fixedAsset.rate)
-                        }else if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
-                        }
-                    },
-                    error: function (xhr)
-                    {
-                        // Handle general AJAX errors
-                        console.log('AJAX Error:', xhr.statusText);
-                    },
-                })
-            },
-            fixedAssetOpeningAddList:function (e){
-                const opdate = $('#date').val()
-                const company_id = $('#company_id_hide').val()
-                const reference = $('#ref_hide').val()
-                const r_type = $('#r_type_id_hide').val()
-                const project_id = $('#project_id_hide').val()
-                const materials_id = $('#materials_id').val()
-                const specification = $('#specification').val()
-                const rate = $('#rate').val()
-                const qty = $('#qty').val()
-                const purpose = $('#purpose').val()
-                const remarks = $('#remarks').val()
-                if (opdate.length === 0 || company_id.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || r_type.length === 0)
-                {
-                    alert('All field are required')
-                    return false
-                }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/add-fixed-asset-opening";
-                $.ajax({
-                    url:url,
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    method: "POST",
-                    data: {'opening_date':opdate,'company_id':company_id,'reference':reference,'r_type':r_type,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
-                    success(response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            // $('#opening-materials-list').html(response.data)
-                            $('#load-view').html(response.data)
-                        }
-                        else if (response.status === 'warning')
-                        {
-                            alert("Warning: "+response.message)
-                            console.log('Error:', response)
-                        }
-                        else if (response.status === 'error')
-                        {
-                            alert("Error: "+response.message)
-                            // Handle error
-                            console.log('Error:', response)
-                        }
-                    },
-                    error(xhr)
-                    {
-                        // Handle general AJAX errors
-                        console.log('AJAX Error:', xhr.statusText);
-                    }
-                })
-            },
-            fixedAssetOpeningEditList:function (e){
-                const opdate = $('#date').val()
-                const company_id = $('#company_id_hide').val()
-                const reference = $('#ref_hide').val()
-                const r_type = $('#r_type_id_hide').val()
-                const project_id = $('#project_id_hide').val()
-                const materials_id = $('#materials_id').val()
-                const specification = $('#specification').val()
-                const rate = $('#rate').val()
-                const qty = $('#qty').val()
-                const purpose = $('#purpose').val()
-                const remarks = $('#remarks').val()
-                if (opdate.length === 0 || company_id.length === 0 || reference.length === 0 || project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || r_type.length === 0)
-                {
-                    alert('All field are required')
-                    return false
-                }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/edit-fixed-asset-opening";
-                $.ajax({
-                    url:url,
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    method: "POST",
-                    data: {'opening_date':opdate,'company_id':company_id,'reference':reference,'r_type':r_type,'project_id':project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
-                    success(response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            // $('#opening-materials-list').html(response.data)
-                            $('#opening-materials-list').html(response.data)
-                        }
-                        else if (response.status === 'warning')
-                        {
-                            alert("Warning: "+response.message)
-                            console.log('Error:', response)
-                        }
-                        else if (response.status === 'error')
-                        {
-                            alert("Error: "+response.message)
-                            // Handle error
-                            console.log('Error:', response)
-                        }
-                    },
-                    error(xhr)
-                    {
-                        // Handle general AJAX errors
-                        console.log('AJAX Error:', xhr.statusText);
-                    }
-                })
-            },
-            fixedAssetGpAddList:function (e){
-                const gp_date = $('#gp_date_hidden').val()
-                const from_company_id = $('#from_company_id_hide').val()
-                const to_company_id = $('#to_company_id_hide').val()
-                const gp_reference = $('#gp_ref_hide').val()
-                const from_project_id = $('#from_project_id_hide').val()
-                const to_project_id = $('#to_project_id_hide').val()
-                const materials_id = $('#materials_id').val()
-                const specification = $('#specification').val()
-                const rate = $('#rate').val()
-                const qty = $('#qty').val()
-                const stock = $('#stock').val()
-                const purpose = $('#purpose').val()
-                const remarks = $('#remarks').val()
-                if (gp_date.length === 0 || from_company_id.length === 0 || to_company_id.length === 0 || gp_reference.length === 0 || from_project_id.length === 0 || to_project_id.length === 0 || materials_id.length === 0 || specification.length === 0 || rate.length === 0 || qty.length === 0 || stock.length === 0)
-                {
-                    alert('All field are required')
-                    return false
-                }
-                if (parseFloat(qty) === 0)
-                {
-                    qty.val(0)
-                    return false
-                }
-                if (parseFloat(stock) <= 0)
-                {
-                    qty.val(0)
-                    alert("Not within the stock quantity.")
-                    return false
-                }
-                if (parseFloat(stock) < parseFloat(qty))
-                {
-                    alert("Quantity can't gather then Stock Blanch")
-                    return false
-                }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/add-to-list-fixed-asset-gp";
-                $.ajax({
-                    url:url,
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    method: "POST",
-                    data: {'gp_date':gp_date,'from_company_id':from_company_id ,'to_company_id':to_company_id,'reference':gp_reference,'from_project_id':from_project_id,'to_project_id':to_project_id,'materials_id':materials_id,'specification':specification,'rate':rate,'qty':qty,'stock':stock,'purpose':purpose,'remarks':remarks},
-                    success(response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            // $('#opening-materials-list').html(response.data)
-                            $('#materials-list').html(response.data.view)
-                        }
-                        else if (response.status === 'warning')
-                        {
-                            alert("Warning: "+response.message)
-                            console.log('Error:', response)
-                        }
-                        else if (response.status === 'error')
-                        {
-                            alert("Error: "+response.message)
-                            // Handle error
-                            console.log('Error:', response)
-                        }
-                    },
-                    error(xhr)
-                    {
-                        // Handle general AJAX errors
-                        console.log('AJAX Error:', xhr.statusText);
-                    }
-                })
-            },
-            fixedAssetTransferSpecEdit:function (e){
-                const id = $(e).attr('ref')
-                if (id.length === 0)
-                    return false
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/edit-fixed-asset-transfer-spec"
+            getFixedAssetSpecification: function (e) {
+                const value = $(e).val();
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/get-fixed-asset-spec";
                 $.ajax({
                     url: url,
-                    method:'POST',
-                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'id':id},
-                    success:function (response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            const view = response.data.view
-                            $('#fixed-asset-spec-edit').html(view)
-                            $('#editModal').modal('show')
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: { id: value },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            fixedAsset = response.data[0].fixed_asset;
+                            updateSelectBoxSingleOption(
+                                response.data,
+                                "specification",
+                                "id",
+                                "specification"
+                            );
+                            $("#rate").val(fixedAsset.rate);
+                            $("#unite").val(fixedAsset.unit);
+                            $("#qty").val(1);
+                            $("#total").val(fixedAsset.rate);
+                        } else if (response.status === "error") {
+                            alert("Error:" + response.message);
                         }
-                        else if (response.status === 'warning')
-                        {
-                            alert("Warning: "+response.message)
-                            console.log('Error:', response)
-                        }
-                        else if (response.status === 'error')
-                        {
-                            alert("Error: "+response.message)
-                            // Handle error
-                            console.log('Error:', response)
-                        }
-                    }
-
-                })
+                    },
+                    error: function (xhr) {
+                        // Handle general AJAX errors
+                        console.log("AJAX Error:", xhr.statusText);
+                    },
+                });
             },
-            fixedAssetTransferSpecUpdate:function (e){
-                const gp_date = $('#edit-date').val()
-                const id = $('#edit-id').val()
-                const rate = $('#rate-edit').val()
-                const qty = $('#qty-edit').val()
-                const purpose = $('#edit-purpose').val()
-                const remarks = $('#edit-remarks').val()
-                if (id.length === 0 || gp_date.length === 0 || rate.length === 0 || qty.length === 0 )
-                    return false
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/update-fixed-asset-transfer-spec"
+            fixedAssetOpeningAddList: function (e) {
+                const opdate = $("#date").val();
+                const company_id = $("#company_id_hide").val();
+                const reference = $("#ref_hide").val();
+                const r_type = $("#r_type_id_hide").val();
+                const project_id = $("#project_id_hide").val();
+                const materials_id = $("#materials_id").val();
+                const specification = $("#specification").val();
+                const rate = $("#rate").val();
+                const qty = $("#qty").val();
+                const purpose = $("#purpose").val();
+                const remarks = $("#remarks").val();
+                if (
+                    opdate.length === 0 ||
+                    company_id.length === 0 ||
+                    reference.length === 0 ||
+                    project_id.length === 0 ||
+                    materials_id.length === 0 ||
+                    specification.length === 0 ||
+                    rate.length === 0 ||
+                    qty.length === 0 ||
+                    r_type.length === 0
+                ) {
+                    alert("All field are required");
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/add-fixed-asset-opening";
                 $.ajax({
                     url: url,
-                    method:'PUT',
-                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'id':id,'gp_date':gp_date,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
-                    success:function (response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            const view = response.data.view
-                            alert(response.message)
-                            $('#editModal').modal('hide')
-                            $('#materials-list').html(view)
-                        }
-                        else if (response.status === 'warning')
-                        {
-                            alert("Warning: "+response.message)
-                            console.log('Error:', response)
-                        }
-                        else if (response.status === 'error')
-                        {
-                            alert("Error: "+response.message)
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: {
+                        opening_date: opdate,
+                        company_id: company_id,
+                        reference: reference,
+                        r_type: r_type,
+                        project_id: project_id,
+                        materials_id: materials_id,
+                        specification: specification,
+                        rate: rate,
+                        qty: qty,
+                        purpose: purpose,
+                        remarks: remarks,
+                    },
+                    success(response) {
+                        if (response.status === "success") {
+                            // $('#opening-materials-list').html(response.data)
+                            $("#load-view").html(response.data);
+                        } else if (response.status === "warning") {
+                            alert("Warning: " + response.message);
+                            console.log("Error:", response);
+                        } else if (response.status === "error") {
+                            alert("Error: " + response.message);
                             // Handle error
-                            console.log('Error:', response)
+                            console.log("Error:", response);
                         }
-                    }
-
-                })
+                    },
+                    error(xhr) {
+                        // Handle general AJAX errors
+                        console.log("AJAX Error:", xhr.statusText);
+                    },
+                });
             },
-            deleteFixedAssetTransferSpec:function (e)
-            {
-                if (confirm('Are you sure delete this data?'))
-                {
-                    const id = $(e).attr('ref')
-                    if (id.length === 0)
-                        return false
-                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-transfer-spec"
+            fixedAssetOpeningEditList: function (e) {
+                const opdate = $("#date").val();
+                const company_id = $("#company_id_hide").val();
+                const reference = $("#ref_hide").val();
+                const r_type = $("#r_type_id_hide").val();
+                const project_id = $("#project_id_hide").val();
+                const materials_id = $("#materials_id").val();
+                const specification = $("#specification").val();
+                const rate = $("#rate").val();
+                const qty = $("#qty").val();
+                const purpose = $("#purpose").val();
+                const remarks = $("#remarks").val();
+                if (
+                    opdate.length === 0 ||
+                    company_id.length === 0 ||
+                    reference.length === 0 ||
+                    project_id.length === 0 ||
+                    materials_id.length === 0 ||
+                    specification.length === 0 ||
+                    rate.length === 0 ||
+                    qty.length === 0 ||
+                    r_type.length === 0
+                ) {
+                    alert("All field are required");
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/edit-fixed-asset-opening";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: {
+                        opening_date: opdate,
+                        company_id: company_id,
+                        reference: reference,
+                        r_type: r_type,
+                        project_id: project_id,
+                        materials_id: materials_id,
+                        specification: specification,
+                        rate: rate,
+                        qty: qty,
+                        purpose: purpose,
+                        remarks: remarks,
+                    },
+                    success(response) {
+                        if (response.status === "success") {
+                            // $('#opening-materials-list').html(response.data)
+                            $("#opening-materials-list").html(response.data);
+                        } else if (response.status === "warning") {
+                            alert("Warning: " + response.message);
+                            console.log("Error:", response);
+                        } else if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            // Handle error
+                            console.log("Error:", response);
+                        }
+                    },
+                    error(xhr) {
+                        // Handle general AJAX errors
+                        console.log("AJAX Error:", xhr.statusText);
+                    },
+                });
+            },
+            fixedAssetGpAddList: function (e) {
+                const gp_date = $("#gp_date_hidden").val();
+                const from_company_id = $("#from_company_id_hide").val();
+                const to_company_id = $("#to_company_id_hide").val();
+                const gp_reference = $("#gp_ref_hide").val();
+                const from_project_id = $("#from_project_id_hide").val();
+                const to_project_id = $("#to_project_id_hide").val();
+                const materials_id = $("#materials_id").val();
+                const specification = $("#specification").val();
+                const rate = $("#rate").val();
+                const qty = $("#qty").val();
+                const stock = $("#stock").val();
+                const purpose = $("#purpose").val();
+                const remarks = $("#remarks").val();
+                if (
+                    gp_date.length === 0 ||
+                    from_company_id.length === 0 ||
+                    to_company_id.length === 0 ||
+                    gp_reference.length === 0 ||
+                    from_project_id.length === 0 ||
+                    to_project_id.length === 0 ||
+                    materials_id.length === 0 ||
+                    specification.length === 0 ||
+                    rate.length === 0 ||
+                    qty.length === 0 ||
+                    stock.length === 0
+                ) {
+                    alert("All field are required");
+                    return false;
+                }
+                if (parseFloat(qty) === 0) {
+                    qty.val(0);
+                    return false;
+                }
+                if (parseFloat(stock) <= 0) {
+                    qty.val(0);
+                    alert("Not within the stock quantity.");
+                    return false;
+                }
+                if (parseFloat(stock) < parseFloat(qty)) {
+                    alert("Quantity can't gather then Stock Blanch");
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/add-to-list-fixed-asset-gp";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: {
+                        gp_date: gp_date,
+                        from_company_id: from_company_id,
+                        to_company_id: to_company_id,
+                        reference: gp_reference,
+                        from_project_id: from_project_id,
+                        to_project_id: to_project_id,
+                        materials_id: materials_id,
+                        specification: specification,
+                        rate: rate,
+                        qty: qty,
+                        stock: stock,
+                        purpose: purpose,
+                        remarks: remarks,
+                    },
+                    success(response) {
+                        if (response.status === "success") {
+                            // $('#opening-materials-list').html(response.data)
+                            $("#materials-list").html(response.data.view);
+                        } else if (response.status === "warning") {
+                            alert("Warning: " + response.message);
+                            console.log("Error:", response);
+                        } else if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            // Handle error
+                            console.log("Error:", response);
+                        }
+                    },
+                    error(xhr) {
+                        // Handle general AJAX errors
+                        console.log("AJAX Error:", xhr.statusText);
+                    },
+                });
+            },
+            fixedAssetTransferSpecEdit: function (e) {
+                const id = $(e).attr("ref");
+                if (id.length === 0) return false;
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/edit-fixed-asset-transfer-spec";
+                $.ajax({
+                    url: url,
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            const view = response.data.view;
+                            $("#fixed-asset-spec-edit").html(view);
+                            $("#editModal").modal("show");
+                        } else if (response.status === "warning") {
+                            alert("Warning: " + response.message);
+                            console.log("Error:", response);
+                        } else if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            // Handle error
+                            console.log("Error:", response);
+                        }
+                    },
+                });
+            },
+            fixedAssetTransferSpecUpdate: function (e) {
+                const gp_date = $("#edit-date").val();
+                const id = $("#edit-id").val();
+                const rate = $("#rate-edit").val();
+                const qty = $("#qty-edit").val();
+                const purpose = $("#edit-purpose").val();
+                const remarks = $("#edit-remarks").val();
+                if (
+                    id.length === 0 ||
+                    gp_date.length === 0 ||
+                    rate.length === 0 ||
+                    qty.length === 0
+                )
+                    return false;
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/update-fixed-asset-transfer-spec";
+                $.ajax({
+                    url: url,
+                    method: "PUT",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: {
+                        id: id,
+                        gp_date: gp_date,
+                        rate: rate,
+                        qty: qty,
+                        purpose: purpose,
+                        remarks: remarks,
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            const view = response.data.view;
+                            alert(response.message);
+                            $("#editModal").modal("hide");
+                            $("#materials-list").html(view);
+                        } else if (response.status === "warning") {
+                            alert("Warning: " + response.message);
+                            console.log("Error:", response);
+                        } else if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            // Handle error
+                            console.log("Error:", response);
+                        }
+                    },
+                });
+            },
+            deleteFixedAssetTransferSpec: function (e) {
+                if (confirm("Are you sure delete this data?")) {
+                    const id = $(e).attr("ref");
+                    if (id.length === 0) return false;
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/fixed-asset-distribution/delete-fixed-asset-transfer-spec";
                     $.ajax({
                         url: url,
-                        method:'DELETE',
-                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        data:{'id':id},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                const view = response.data.view
-                                $('#materials-list').html(view)
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                const view = response.data.view;
+                                $("#materials-list").html(view);
                             }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
                                 // Handle error
                             }
-                            return false
-                        }
-
-                    })
+                            return false;
+                        },
+                    });
                 }
             },
-            gpFinalUpdate:function (e)
-            {
+            gpFinalUpdate: function (e) {
                 // Validate required fields
-                if ($('#gp_ref_hide').val().length === 0) {
-                    alert('Reference is required!');
+                if ($("#gp_ref_hide").val().length === 0) {
+                    alert("Reference is required!");
                     return false;
                 }
 
                 // Build FormData object
                 const formData = new FormData();
-                formData.append('gp_date', $('#gp_date_hidden').val());
-                formData.append('from_company', $('#from_company_id_hide').val());
-                formData.append('to_company', $('#to_company_id_hide').val());
-                formData.append('from_project', $('#from_project_id_hide').val());
-                formData.append('to_project', $('#to_project_id_hide').val());
-                formData.append('reference', $('#gp_ref_hide').val());
-                formData.append('narration', $('#narration').val());
+                formData.append("gp_date", $("#gp_date_hidden").val());
+                formData.append(
+                    "from_company",
+                    $("#from_company_id_hide").val()
+                );
+                formData.append("to_company", $("#to_company_id_hide").val());
+                formData.append(
+                    "from_project",
+                    $("#from_project_id_hide").val()
+                );
+                formData.append("to_project", $("#to_project_id_hide").val());
+                formData.append("reference", $("#gp_ref_hide").val());
+                formData.append("narration", $("#narration").val());
 
                 // Append multiple files (if any)
-                const files = $('#attachments')[0].files;
+                const files = $("#attachments")[0].files;
                 if (files.length > 0) {
                     for (let i = 0; i < files.length; i++) {
                         formData.append(`attachments[${i}]`, files[i]);
@@ -1472,749 +1849,854 @@ let Obj = {};
 
                 // Prepare URL
                 const url =
-                    window.location.origin + sourceDir + "/fixed-asset-distribution/final-update-fixed-asset-transfer";
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/final-update-fixed-asset-transfer";
 
                 // AJAX request
                 $.ajax({
                     url: url,
-                    method: 'post', // Change to POST for better compatibility
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    method: "post", // Change to POST for better compatibility
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function (response) {
-                        if (response.status === 'success') {
+                        if (response.status === "success") {
                             alert(response.message);
                             window.location.reload();
-                        } else if (response.status === 'error') {
+                        } else if (response.status === "error") {
                             alert("Error: " + response.message);
                             // Additional error handling
                         }
                     },
                     error: function (xhr, status, error) {
                         console.error("AJAX Error:", status, error);
-                        alert('An error occurred. Please try again.');
-                    }
+                        alert("An error occurred. Please try again.");
+                    },
                 });
             },
-            deleteFixedAssetTransferDocument:function (e)
-            {
-                if (confirm('Are you sure to delete this data?'))
-                {
-                    const id = $(e).attr('ref')
-                    if (id.length === 0)
-                    {
-                        return false
+            deleteFixedAssetTransferDocument: function (e) {
+                if (confirm("Are you sure to delete this data?")) {
+                    const id = $(e).attr("ref");
+                    if (id.length === 0) {
+                        return false;
                     }
-                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-transfer-document"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/fixed-asset-distribution/delete-fixed-asset-transfer-document";
                     $.ajax({
                         url: url,
-                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
                         method: "DELETE",
-                        data:{'id':id},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                window.location.reload()
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                window.location.reload();
                             }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
                                 // Handle error
                             }
-                            return false
-                        }
-                    })
-
+                            return false;
+                        },
+                    });
                 }
-                return false
+                return false;
             },
-            priceTotal:function (e,inputID,actionID)
-            {
-                const input = parseFloat($("#"+inputID).val())
-                const output = $("#"+actionID)
-                const self = parseFloat($(e).val())
-                if (input.length === 0 || self.length === 0)
-                {
-                    output.val('')
+            priceTotal: function (e, inputID, actionID) {
+                const input = parseFloat($("#" + inputID).val());
+                const output = $("#" + actionID);
+                const self = parseFloat($(e).val());
+                if (input.length === 0 || self.length === 0) {
+                    output.val("");
                 }
-                output.val(parseFloat(Number(input*self)))
+                output.val(parseFloat(Number(input * self)));
             },
-            priceTotalForTransfer:function (e,actionID,qty_id,stock_id,rate_id)
-            {
-                const output = $("#"+actionID)
-                let qty = parseFloat($("#"+qty_id).val())
-                const old_stock = parseFloat($("#"+stock_id).attr('ref'))
-                const stock = parseFloat($("#"+stock_id).val())
-                const rate = parseFloat($("#"+rate_id).val())
-                const total_stock = parseFloat(stock+old_stock)
-                if (qty.length === 0 || rate.length === 0)
-                {
-                    output.val('')
+            priceTotalForTransfer: function (
+                e,
+                actionID,
+                qty_id,
+                stock_id,
+                rate_id
+            ) {
+                const output = $("#" + actionID);
+                let qty = parseFloat($("#" + qty_id).val());
+                const old_stock = parseFloat($("#" + stock_id).attr("ref"));
+                const stock = parseFloat($("#" + stock_id).val());
+                const rate = parseFloat($("#" + rate_id).val());
+                const total_stock = parseFloat(stock + old_stock);
+                if (qty.length === 0 || rate.length === 0) {
+                    output.val("");
                 }
-                if (total_stock < qty)
-                {
-                    $("#qty").val(total_stock)
-                    $("#qty-edit").val(total_stock)
-                    qty = total_stock
-                    alert("Quantity can't gather then Stock Balance")
+                if (total_stock < qty) {
+                    $("#qty").val(total_stock);
+                    $("#qty-edit").val(total_stock);
+                    qty = total_stock;
+                    alert("Quantity can't gather then Stock Balance");
                 }
-                output.val(parseFloat(Number(qty*rate)))
+                output.val(parseFloat(Number(qty * rate)));
             },
-            fixedAssetOpeningSearch:function (e, outputID)
-            {
-                const company_id = $("#company").val()
-                const reference = $("#ref-src").val()
-                const project = $("#project").val()
-                const rt = $("#r_type").val()
-                if (company_id.length === 0 && reference.length === 0 && project.length === 0 && rt.length === 0)
-                {
-                    alert('All Input are Required!')
-                    return false
+            fixedAssetOpeningSearch: function (e, outputID) {
+                const company_id = $("#company").val();
+                const reference = $("#ref-src").val();
+                const project = $("#project").val();
+                const rt = $("#r_type").val();
+                if (
+                    company_id.length === 0 &&
+                    reference.length === 0 &&
+                    project.length === 0 &&
+                    rt.length === 0
+                ) {
+                    alert("All Input are Required!");
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/get-fixed-asset-opening"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/get-fixed-asset-opening";
                 $.ajax({
-                    url:url,
-                    method:'POST',
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'company_id':company_id,'reference':reference,'branch_id':project,'r_type_id':rt},
-                    success:function(response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            $("#"+outputID).html(response.data)
+                    url: url,
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: {
+                        company_id: company_id,
+                        reference: reference,
+                        branch_id: project,
+                        r_type_id: rt,
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            $("#" + outputID).html(response.data);
                             // Get the current URL
-                            var currentUrl = window.location.href
+                            var currentUrl = window.location.href;
                             // Construct the new URL by appending the ref value
-                            var newUrl = currentUrl.split('?')[0] + '?ref=' + reference + '&project=' + project + '&rt=' + rt + '&c=' + company_id
+                            var newUrl =
+                                currentUrl.split("?")[0] +
+                                "?ref=" +
+                                reference +
+                                "&project=" +
+                                project +
+                                "&rt=" +
+                                rt +
+                                "&c=" +
+                                company_id;
                             // Change the URL without reloading the page
-                            history.pushState({ref: reference}, '', newUrl)
-                        }
-                        else if (response.status === 'warning')
-                        {
-                            alert("Warning:"+response.message)
-                            $("#"+outputID).html('')
-                        }
-                        else if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
+                            history.pushState({ ref: reference }, "", newUrl);
+                        } else if (response.status === "warning") {
+                            alert("Warning:" + response.message);
+                            $("#" + outputID).html("");
+                        } else if (response.status === "error") {
+                            alert("Error:" + response.message);
                             // Handle error
-                            console.log('Error:', response.message)
+                            console.log("Error:", response.message);
                         }
                     },
-                    error:function(xhr)
-                    {
-                        console.log('AJAX Error:', xhr.statusText);
-                    }
-                })
+                    error: function (xhr) {
+                        console.log("AJAX Error:", xhr.statusText);
+                    },
+                });
             },
-            gpEntrySearch:function (e, outputID)
-            {
-                const from_company_id = $("#from_company").val()
-                const to_company_id = $("#to_company").val()
-                const reference = $("#gp_ref").val()
-                const from_project = $("#from_project").val()
-                const to_project = $("#to_project").val()
-                const gp_date = $("#gp_date").val()
-                if (from_company_id.length === 0 && to_company_id.length === 0 && reference.length === 0 && from_project.length === 0 && to_project.length === 0)
-                {
-                    alert('All Input are Empty!')
-                    return false
+            gpEntrySearch: function (e, outputID) {
+                const from_company_id = $("#from_company").val();
+                const to_company_id = $("#to_company").val();
+                const reference = $("#gp_ref").val();
+                const from_project = $("#from_project").val();
+                const to_project = $("#to_project").val();
+                const gp_date = $("#gp_date").val();
+                if (
+                    from_company_id.length === 0 &&
+                    to_company_id.length === 0 &&
+                    reference.length === 0 &&
+                    from_project.length === 0 &&
+                    to_project.length === 0
+                ) {
+                    alert("All Input are Empty!");
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/gp-create"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/gp-create";
                 $.ajax({
-                    url:url,
-                    method:'POST',
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'from_company_id':from_company_id,'to_company_id':to_company_id,'from_branch_id':from_project,'to_branch_id':to_project,'gp_date':gp_date,'gp_reference':reference},
-                    success:function(response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            let ref = reference
-                            let date = gp_date
-                            let f_p = from_project
-                            let t_p = to_project
-                            let f_c = from_company_id
-                            let t_c = to_company_id
-                            let data = response.data.data
-                            let view = response.data.view
-                            if (typeof data !== "undefined" && data !== null)
-                            {
-                                ref = data.reference
-                                date = data.date
-                                f_c = data.from_company_id
-                                t_c = data.to_company_id
-                                f_p = data.from_project_id
-                                t_p = data.to_project_id
+                    url: url,
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: {
+                        from_company_id: from_company_id,
+                        to_company_id: to_company_id,
+                        from_branch_id: from_project,
+                        to_branch_id: to_project,
+                        gp_date: gp_date,
+                        gp_reference: reference,
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            let ref = reference;
+                            let date = gp_date;
+                            let f_p = from_project;
+                            let t_p = to_project;
+                            let f_c = from_company_id;
+                            let t_c = to_company_id;
+                            let data = response.data.data;
+                            let view = response.data.view;
+                            if (typeof data !== "undefined" && data !== null) {
+                                ref = data.reference;
+                                date = data.date;
+                                f_c = data.from_company_id;
+                                t_c = data.to_company_id;
+                                f_p = data.from_project_id;
+                                t_p = data.to_project_id;
                             }
-                            if (ref.length === 0)
-                            {
-                                date = null
+                            if (ref.length === 0) {
+                                date = null;
                             }
                             // Get the current URL
-                            var currentUrl = window.location.href
+                            var currentUrl = window.location.href;
                             // Construct the new URL by appending the ref value
-                            var newUrl = currentUrl.split('?')[0] + '?ref=' + ref + '&from_p=' + f_p+ '&to_p=' + t_p + '&d=' + date + '&from_c=' + f_c + '&to_c=' + t_c
-                            $("#gp_date").val(date)
+                            var newUrl =
+                                currentUrl.split("?")[0] +
+                                "?ref=" +
+                                ref +
+                                "&from_p=" +
+                                f_p +
+                                "&to_p=" +
+                                t_p +
+                                "&d=" +
+                                date +
+                                "&from_c=" +
+                                f_c +
+                                "&to_c=" +
+                                t_c;
+                            $("#gp_date").val(date);
                             // Change the URL without reloading the page
-                            history.pushState({ref: reference}, '', newUrl)
-                            $("#"+outputID).html(view)
-                        }
-                        else if (response.status === 'warning')
-                        {
-                            alert("Warning:"+response.message)
+                            history.pushState({ ref: reference }, "", newUrl);
+                            $("#" + outputID).html(view);
+                        } else if (response.status === "warning") {
+                            alert("Warning:" + response.message);
                             // $("#"+outputID).html('')
-                        }
-                        else if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
-                            $("#"+outputID).html('')
+                        } else if (response.status === "error") {
+                            alert("Error:" + response.message);
+                            $("#" + outputID).html("");
                             // Handle error
                             // console.log('Error:', response.message)
                         }
                     },
-                    error:function(xhr)
-                    {
-                        console.log('AJAX Error:', xhr.statusText);
-                    }
-                })
-            },
-            gpMaterialsSpecificationSearch:function (e,outputID)
-            {
-                const from_company_id = $("#from_company").val()
-                const from_project = $("#from_project").val()
-                const materials_id = $(e).val()
-                if (from_company_id.length === 0 && from_project.length === 0  && materials_id.length === 0 )
-                {
-                    alert('All Input are Empty!')
-                    return false
-                }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/material-specification-search"
-                $.ajax({
-                    url:url,
-                    method:'POST',
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'from_company_id':from_company_id,'from_branch_id':from_project,'materials_id':materials_id},
-                    success:function(response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            updateSelectBoxSingleOption(response.data,outputID,'id','specification')
-                            $("#unite").val(response.data[0].fixed_asset.unit)
-                        }
-                        else if (response.status === 'warning')
-                        {
-                            alert("Warning:"+response.message)
-                        }
-                        else if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
-                        }
+                    error: function (xhr) {
+                        console.log("AJAX Error:", xhr.statusText);
                     },
-                    error:function(xhr)
-                    {
-                        console.log('AJAX Error:', xhr.statusText);
-                    }
-                })
+                });
             },
-            deleteFixedAssetRunningTransfer:function (e)
-            {
-                if (confirm("Are you sure to delete this data?"))
-                {
-                    const id = $(e).attr('ref')
-                    if (id.length === 0)
-                    {
-                        return false
-                    }
-                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-transfer"
-                    $.ajax({
-                        url: url,
-                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
-                        method: "DELETE",
-                        data:{'id':id},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                const view = response.data
-                                window.location.reload()
-                            }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
-                                // Handle error
-                            }
-                            return false
-                        }
-                    })
-                }
-                return false
-            },
-            gpMaterialsSpecificationWiseStockAndRateSearch:function (e,outputID)
-            {
-                const from_company_id = $("#from_company").val()
-                const from_project = $("#from_project").val()
-                const materials_id = $("#materials_id").val()
-                const spec_id = $(e).val()
-                if (from_company_id.length === 0 && from_project.length === 0  && materials_id.length === 0 && spec_id.length === 0 )
-                {
-                    alert('All Input are Empty!')
-                    return false
-                }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/material-specification-wise-stock-rate-search"
-                $.ajax({
-                    url:url,
-                    method:'POST',
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'from_company_id':from_company_id,'from_branch_id':from_project,'materials_id':materials_id,'spec_id':spec_id},
-                    success:function(response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            $('#rate').val(response.data.rate)
-                            $('#stock').val(response.data.stock)
-                            $("#qty").val('')
-                            $("#total").val('')
-                            // console.log(response.data)
-                        }
-                        else if (response.status === 'warning')
-                        {
-                            alert("Warning:"+response.message)
-                            $('#rate').val('')
-                            $('#stock').val('')
-                            $("#qty").val('')
-                            $("#total").val('')
-                        }
-                        else if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
-                            $('#rate').val('')
-                            $('#stock').val('')
-                            $("#qty").val('')
-                            $("#total").val('')
-                        }
-                    },
-                    error:function(xhr)
-                    {
-                        console.log('AJAX Error:', xhr.statusText);
-                    }
-                })
-            },
-            fixedAssetOpeningSpecEdit:function (e)
-            {
-                const id = $(e).attr('ref')
-                if (id.length === 0)
-                    return false
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/edit-fixed-asset-opening-spec"
-                $.ajax({
-                    url: url,
-                    method:'POST',
-                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'id':id},
-                    success:function (response)
-                    {
-                        const view = response.data
-                        $('#fixed-asset-spec-edit').html(view)
-                        $('#editModal').modal('show')
-                    }
-
-                })
-            },
-            updateFixedAssetOpeningSpec:function (e)
-            {
-                const opdate = $('#edit-date').val()
-                const id = $('#edit-id').val()
-                const rate = $('#rate-edit').val()
-                const qty = $('#qty-edit').val()
-                const purpose = $('#edit-purpose').val()
-                const remarks = $('#edit-remarks').val()
-                if (opdate.length === 0 || id.length === 0 || rate.length === 0 || qty.length === 0)
-                {
-                    alert("Error: Empty Field Error!")
+            gpMaterialsSpecificationSearch: function (e, outputID) {
+                const from_company_id = $("#from_company").val();
+                const from_project = $("#from_project").val();
+                const materials_id = $(e).val();
+                if (
+                    from_company_id.length === 0 &&
+                    from_project.length === 0 &&
+                    materials_id.length === 0
+                ) {
+                    alert("All Input are Empty!");
                     return false;
                 }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/update-fixed-asset-opening-spec"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/material-specification-search";
                 $.ajax({
                     url: url,
-                    method:'POST',
-                    headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data:{'id':id,'opening_date':opdate,'rate':rate,'qty':qty,'purpose':purpose,'remarks':remarks},
-                    success:function (response)
-                    {
-                        const view = response.data
-                        if (response.status === 'success')
-                        {
-                            alert(response.message)
-                            $('#editModal').modal('hide')
-                            $('#opening-materials-list').html(view)
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: {
+                        from_company_id: from_company_id,
+                        from_branch_id: from_project,
+                        materials_id: materials_id,
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            updateSelectBoxSingleOption(
+                                response.data,
+                                outputID,
+                                "id",
+                                "specification"
+                            );
+                            $("#unite").val(response.data[0].fixed_asset.unit);
+                        } else if (response.status === "warning") {
+                            alert("Warning:" + response.message);
+                        } else if (response.status === "error") {
+                            alert("Error:" + response.message);
                         }
-                        if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
+                    },
+                    error: function (xhr) {
+                        console.log("AJAX Error:", xhr.statusText);
+                    },
+                });
+            },
+            deleteFixedAssetRunningTransfer: function (e) {
+                if (confirm("Are you sure to delete this data?")) {
+                    const id = $(e).attr("ref");
+                    if (id.length === 0) {
+                        return false;
+                    }
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/fixed-asset-distribution/delete-fixed-asset-transfer";
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "DELETE",
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                const view = response.data;
+                                window.location.reload();
+                            }
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
+                                // Handle error
+                            }
+                            return false;
+                        },
+                    });
+                }
+                return false;
+            },
+            gpMaterialsSpecificationWiseStockAndRateSearch: function (
+                e,
+                outputID
+            ) {
+                const from_company_id = $("#from_company").val();
+                const from_project = $("#from_project").val();
+                const materials_id = $("#materials_id").val();
+                const spec_id = $(e).val();
+                if (
+                    from_company_id.length === 0 &&
+                    from_project.length === 0 &&
+                    materials_id.length === 0 &&
+                    spec_id.length === 0
+                ) {
+                    alert("All Input are Empty!");
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/material-specification-wise-stock-rate-search";
+                $.ajax({
+                    url: url,
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: {
+                        from_company_id: from_company_id,
+                        from_branch_id: from_project,
+                        materials_id: materials_id,
+                        spec_id: spec_id,
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            $("#rate").val(response.data.rate);
+                            $("#stock").val(response.data.stock);
+                            $("#qty").val("");
+                            $("#total").val("");
+                            // console.log(response.data)
+                        } else if (response.status === "warning") {
+                            alert("Warning:" + response.message);
+                            $("#rate").val("");
+                            $("#stock").val("");
+                            $("#qty").val("");
+                            $("#total").val("");
+                        } else if (response.status === "error") {
+                            alert("Error:" + response.message);
+                            $("#rate").val("");
+                            $("#stock").val("");
+                            $("#qty").val("");
+                            $("#total").val("");
+                        }
+                    },
+                    error: function (xhr) {
+                        console.log("AJAX Error:", xhr.statusText);
+                    },
+                });
+            },
+            fixedAssetOpeningSpecEdit: function (e) {
+                const id = $(e).attr("ref");
+                if (id.length === 0) return false;
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/edit-fixed-asset-opening-spec";
+                $.ajax({
+                    url: url,
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: { id: id },
+                    success: function (response) {
+                        const view = response.data;
+                        $("#fixed-asset-spec-edit").html(view);
+                        $("#editModal").modal("show");
+                    },
+                });
+            },
+            updateFixedAssetOpeningSpec: function (e) {
+                const opdate = $("#edit-date").val();
+                const id = $("#edit-id").val();
+                const rate = $("#rate-edit").val();
+                const qty = $("#qty-edit").val();
+                const purpose = $("#edit-purpose").val();
+                const remarks = $("#edit-remarks").val();
+                if (
+                    opdate.length === 0 ||
+                    id.length === 0 ||
+                    rate.length === 0 ||
+                    qty.length === 0
+                ) {
+                    alert("Error: Empty Field Error!");
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/update-fixed-asset-opening-spec";
+                $.ajax({
+                    url: url,
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: {
+                        id: id,
+                        opening_date: opdate,
+                        rate: rate,
+                        qty: qty,
+                        purpose: purpose,
+                        remarks: remarks,
+                    },
+                    success: function (response) {
+                        const view = response.data;
+                        if (response.status === "success") {
+                            alert(response.message);
+                            $("#editModal").modal("hide");
+                            $("#opening-materials-list").html(view);
+                        }
+                        if (response.status === "error") {
+                            alert("Error:" + response.message);
                             // Handle error
                         }
-                        return false
+                        return false;
                     },
-                    error:function(xhr)
-                    {
-                        console.log('AJAX Error:', xhr.statusText);
-                    }
-
-                })
+                    error: function (xhr) {
+                        console.log("AJAX Error:", xhr.statusText);
+                    },
+                });
             },
-            deleteFixedAssetOpeningSpec:function (e)
-            {
-                if (confirm('Are you sure delete this data?'))
-                {
-                    const id = $(e).attr('ref')
-                    if (id.length === 0)
-                        return false
-                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-opening-spec"
+            deleteFixedAssetOpeningSpec: function (e) {
+                if (confirm("Are you sure delete this data?")) {
+                    const id = $(e).attr("ref");
+                    if (id.length === 0) return false;
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/fixed-asset-distribution/delete-fixed-asset-opening-spec";
                     $.ajax({
                         url: url,
-                        method:'DELETE',
-                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        data:{'id':id},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                const view = response.data
-                                $('#opening-materials-list').html(view)
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                const view = response.data;
+                                $("#opening-materials-list").html(view);
                             }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
                                 // Handle error
                             }
-                            return false
-                        }
-
-                    })
+                            return false;
+                        },
+                    });
                 }
             },
-            userProjectPermissionSearch:function (e)
-            {
-                const value = $('#user').val()
-                const company_id = $('#company').val()
-                if (value.length === 0)
-                {
+            userProjectPermissionSearch: function (e) {
+                const value = $("#user").val();
+                const company_id = $("#company").val();
+                if (value.length === 0) {
                     return false;
                 }
-                const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-search"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/control-panel/user-project-permission-search";
                 $.ajax({
                     url: url,
-                    method: 'POST',
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data: {'user':value,'company_id':company_id},
-                    success:function (response)
-                    {
-                        if (response.status === 'success')
-                        {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: { user: value, company_id: company_id },
+                    success: function (response) {
+                        if (response.status === "success") {
                             // alert(response.message)
-                            const view = response.data
-                            $('#user-project-permission-add-list').html(view)
+                            const view = response.data;
+                            $("#user-project-permission-add-list").html(view);
                         }
-                        if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
+                        if (response.status === "error") {
+                            alert("Error:" + response.message);
                             // Handle error
                         }
-                        return false
-
-                    }
-                })
+                        return false;
+                    },
+                });
             },
-            userProjectPermissionAdd:function (e)
-            {
-                const project_id = $('#project').val()
-                const user_id = $('#user_id').val()
-                if (project_id.length === 0 || user_id.length === 0)
-                {
-                    alert('All filed are required')
+            userProjectPermissionAdd: function (e) {
+                const project_id = $("#project").val();
+                const user_id = $("#user_id").val();
+                if (project_id.length === 0 || user_id.length === 0) {
+                    alert("All filed are required");
                     return false;
                 }
-                const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-add"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/control-panel/user-project-permission-add";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    method: 'POST',
-                    data: {'project_id':project_id,'user_id':user_id},
-                    success:function (response)
-                    {
-                        if (response.status === 'success')
-                        {
-                            alert(response.message)
-                            const view = response.data
-                            $('#user-permission-list').html(view)
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { project_id: project_id, user_id: user_id },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            alert(response.message);
+                            const view = response.data;
+                            $("#user-permission-list").html(view);
                         }
-                        if (response.status === 'error')
-                        {
-                            alert("Error:"+response.message)
+                        if (response.status === "error") {
+                            alert("Error:" + response.message);
                             // Handle error
                         }
-                        return false
-                    }
-                })
+                        return false;
+                    },
+                });
             },
-            userProjectPermissionCopy:function (e)
-            {
-                if(confirm('Are you sure to copy all permissions?'))
-                {
-                    const copy_user = $('#copy_user').val()
-                    const user_id = $('#user_id').val()
-                    if (copy_user.length === 0 || user_id.length === 0)
-                    {
-                        alert('All filed are required')
+            userProjectPermissionCopy: function (e) {
+                if (confirm("Are you sure to copy all permissions?")) {
+                    const copy_user = $("#copy_user").val();
+                    const user_id = $("#user_id").val();
+                    if (copy_user.length === 0 || user_id.length === 0) {
+                        alert("All filed are required");
                         return false;
                     }
-                    const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-copy"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/control-panel/user-project-permission-copy";
                     $.ajax({
                         url: url,
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        method: 'POST',
-                        data: {'copy_user_id':copy_user,'user_id':user_id},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                const view = response.data
-                                $('#user-permission-list').html(view)
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "POST",
+                        data: { copy_user_id: copy_user, user_id: user_id },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                const view = response.data;
+                                $("#user-permission-list").html(view);
                             }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
                             }
-                            return false
-                        }
-                    })
+                            return false;
+                        },
+                    });
                 }
             },
-            userProjectPermissionAddAll:function (e)
-            {
-                if(confirm('Are you sure add all project permission?'))
-                {
-                    const user_id = $('#user_id').val()
-                    if (user_id.length === 0)
-                    {
-                        alert('All filed are required')
+            userProjectPermissionAddAll: function (e) {
+                if (confirm("Are you sure add all project permission?")) {
+                    const user_id = $("#user_id").val();
+                    if (user_id.length === 0) {
+                        alert("All filed are required");
                         return false;
                     }
-                    const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-add-all"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/control-panel/user-project-permission-add-all";
                     $.ajax({
                         url: url,
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        method: 'POST',
-                        data: {'user_id':user_id},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                const view = response.data
-                                $('#user-permission-list').html(view)
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "POST",
+                        data: { user_id: user_id },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                const view = response.data;
+                                $("#user-permission-list").html(view);
                             }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
                                 // Handle error
                             }
-                            return false
-                        }
-                    })
+                            return false;
+                        },
+                    });
                 }
-                return false
+                return false;
             },
-            userProjectPermissionDelete:function (e)
-            {
-                if(confirm('Are you sure delete this data?'))
-                {
-                    const value = $(e).attr('ref')
-                    if (value.length === 0)
-                    {
-                        return false
+            userProjectPermissionDelete: function (e) {
+                if (confirm("Are you sure delete this data?")) {
+                    const value = $(e).attr("ref");
+                    if (value.length === 0) {
+                        return false;
                     }
-                    const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-delete"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/control-panel/user-project-permission-delete";
                     $.ajax({
                         url: url,
-                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        method: 'POST',
-                        data: {'value':value},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                const view = response.data
-                                $('#user-permission-list').html(view)
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "POST",
+                        data: { value: value },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                const view = response.data;
+                                $("#user-permission-list").html(view);
                             }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
                                 // Handle error
                             }
-                            return false
-                        }
-                    })
+                            return false;
+                        },
+                    });
                 }
-                return false
+                return false;
             },
-            userProjectPermissionDeleteAll:function (e)
-            {
-                if(confirm('Are you sure to delete all permission for this user?'))
-                {
-                    const user_id = $('#user_id').val()
-                    if (user_id.length === 0)
-                    {
-                        return false
+            userProjectPermissionDeleteAll: function (e) {
+                if (
+                    confirm(
+                        "Are you sure to delete all permission for this user?"
+                    )
+                ) {
+                    const user_id = $("#user_id").val();
+                    if (user_id.length === 0) {
+                        return false;
                     }
-                    const url = window.location.origin + sourceDir + "/control-panel/user-project-permission-delete-all"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/control-panel/user-project-permission-delete-all";
                     $.ajax({
                         url: url,
-                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        method: 'POST',
-                        data: {'user_id':user_id},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                const view = response.data
-                                $('#user-permission-list').html(view)
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "POST",
+                        data: { user_id: user_id },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                const view = response.data;
+                                $("#user-permission-list").html(view);
                             }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
                                 // Handle error
                             }
-                            return false
-                        }
-                    })
+                            return false;
+                        },
+                    });
                 }
-                return false
+                return false;
             },
-            deleteFixedAssetOpening:function (e)
-            {
-                if (confirm("Are you sure to delete this data?"))
-                {
-                    const id = $(e).attr('ref')
-                    if (id.length === 0)
-                    {
-                        return false
+            deleteFixedAssetOpening: function (e) {
+                if (confirm("Are you sure to delete this data?")) {
+                    const id = $(e).attr("ref");
+                    if (id.length === 0) {
+                        return false;
                     }
-                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-opening"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/fixed-asset-distribution/delete-fixed-asset-opening";
                     $.ajax({
                         url: url,
-                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
                         method: "DELETE",
-                        data:{'id':id},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                const view = response.data
-                                window.location.reload()
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                const view = response.data;
+                                window.location.reload();
                             }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
                                 // Handle error
                             }
-                            return false
-                        }
-                    })
+                            return false;
+                        },
+                    });
                 }
-                return false
+                return false;
             },
-            deleteFixedAssetWithRefDocument:function (e)
-            {
-                if (confirm('Are you sure to delete this data?'))
-                {
-                    const id = $(e).attr('ref')
-                    if (id.length === 0)
-                    {
-                        return false
+            deleteFixedAssetWithRefDocument: function (e) {
+                if (confirm("Are you sure to delete this data?")) {
+                    const id = $(e).attr("ref");
+                    if (id.length === 0) {
+                        return false;
                     }
-                    const url = window.location.origin + sourceDir + "/fixed-asset-distribution/delete-fixed-asset-with-ref-document"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/fixed-asset-distribution/delete-fixed-asset-with-ref-document";
                     $.ajax({
                         url: url,
-                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
                         method: "DELETE",
-                        data:{'id':id},
-                        success:function (response)
-                        {
-                            if (response.status === 'success')
-                            {
-                                alert(response.message)
-                                window.location.reload()
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                window.location.reload();
                             }
-                            if (response.status === 'error')
-                            {
-                                alert("Error:"+response.message)
+                            if (response.status === "error") {
+                                alert("Error:" + response.message);
                                 // Handle error
                             }
-                            return false
-                        }
-                    })
-
+                            return false;
+                        },
+                    });
                 }
-                return false
+                return false;
             },
-            companyModulePermission:function (e)
-            {
-                let id = $(e).val()
-                if (id.length === 0)
-                {
-                    return false
+            companyModulePermission: function (e) {
+                let id = $(e).val();
+                if (id.length === 0) {
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/system-operation/parent-wise-module-permission"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/parent-wise-module-permission";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'id':id},
-                    success:function (response)
-                    {
-                        if (response.status === 'error')
-                        {
-                            alert('Error: ' + response.message)
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            updateSelectBox(
+                                response.data,
+                                "permissions",
+                                "id",
+                                "name"
+                            );
                         }
-                        else if (response.status === 'success') {
-                            updateSelectBox(response.data,'permissions','id','name')
-                        }
-                    }
-                })
+                    },
+                });
             },
-            companyDirectoryPermission:function (e)
-            {
-                let cid = $(e).val()
-                let uid = $(e).attr('ref')
-                if (cid.length === 0 || uid.length === 0)
-                {
-                    return false
+            companyDirectoryPermission: function (e) {
+                let cid = $(e).val();
+                let uid = $(e).attr("ref");
+                if (cid.length === 0 || uid.length === 0) {
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/system-operation/company-wise-directory-permission"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/company-wise-directory-permission";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'cid':cid,'uid':uid},
-                    success:function (response)
-                    {
-                        if (response.status === 'error')
-                        {
-                            alert('Error: ' + response.message)
-                        }
-                        else if (response.status === 'success') {
+                    data: { cid: cid, uid: uid },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
                             // console.log(response.data)
-                            const $select = $('#dir');
+                            const $select = $("#dir");
                             // Ensure Selectize is initialized
                             if ($select[0] && $select[0].selectize) {
                                 const selectize = $select[0].selectize;
@@ -2222,447 +2704,740 @@ let Obj = {};
                                 selectize.clear();
                                 selectize.clearOptions(); // Clear existing options
                                 // Loop through the JSON object to add each item as an option
-                                Object.entries(response.data).forEach(([key, value]) => {
-                                    selectize.addOption({ value: value, text: value });
-                                });
+                                Object.entries(response.data).forEach(
+                                    ([key, value]) => {
+                                        selectize.addOption({
+                                            value: value,
+                                            text: value,
+                                        });
+                                    }
+                                );
 
                                 selectize.refreshOptions(true); // Refresh the options in the select box
                             } else {
-                                console.error("Selectize is not initialized for #" + id);
+                                console.error(
+                                    "Selectize is not initialized for #" + id
+                                );
                             }
                         }
-                    }
-                })
+                    },
+                });
             },
-            companyDirectoryPermissionDelete:function (e)
-            {
-                if(!(confirm('Are you sure to delete this data!')))
-                {
-                    return false
+            companyDirectoryPermissionDelete: function (e) {
+                if (!confirm("Are you sure to delete this data!")) {
+                    return false;
                 }
-                let ref = $(e).attr('ref')
-                if (ref.length > 0)
-                {
-                    let url = window.location.origin + sourceDir + "/system-operation/user-per-delete";
+                let ref = $(e).attr("ref");
+                if (ref.length > 0) {
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        "/system-operation/user-per-delete";
                     $.ajax({
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
                         url: url,
                         type: "POST",
-                        data: {'ref':ref},
+                        data: { ref: ref },
                         success: function (response) {
-                            if (response.status === 'error')
-                            {
-                                alert('Error: ' + response.message)
-                            }else if (response.status === 'success') {
-                                $("#f-p-list").html(response.data)
-                                alert(response.message)
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                            } else if (response.status === "success") {
+                                $("#f-p-list").html(response.data);
+                                alert(response.message);
                             }
-                        }
-                    })
+                        },
+                    });
                 }
             },
-            companyWiseFixedAssets:function (e,action_id)
-            {
-                let id = $(e).val()
-                if (id.length === 0)
-                {
-                    return false
+            companyWiseFixedAssets: function (e, action_id) {
+                let id = $(e).val();
+                if (id.length === 0) {
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/fixed-asset/company-wise-fixed-asset"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset/company-wise-fixed-asset";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'id':id},
-                    success:function (response)
-                    {
-                        if (response.status === 'error') {
-                            alert('Error: ' + response.message);
-                            return false
-                        } else if (response.status === 'success') {
-                            updateSelectBoxSingleOption(response.data, action_id, 'recourse_code', 'materials_name');
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            updateSelectBoxSingleOption(
+                                response.data,
+                                action_id,
+                                "recourse_code",
+                                "materials_name"
+                            );
                         }
-                    }
-                })
+                    },
+                });
             },
-            companyWiseUsers:function (e,action_id)//only able to control panel permission
-            {
-                let id = $(e).val()
-                if (id.length === 0)
-                {
-                    return false
+            companyWiseUsers: function (
+                e,
+                action_id //only able to control panel permission
+            ) {
+                let id = $(e).val();
+                if (id.length === 0) {
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/control-panel/company-wise-user"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/control-panel/company-wise-user";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'company_id':id},
-                    success:function (response)
-                    {
-                        if (response.status === 'error') {
-                            alert('Error: ' + response.message);
-                            return false
-                        } else if (response.status === 'success') {
+                    data: { company_id: id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
                             // updateSelectBoxSingleOption(response.data, action_id, 'id', 'name');
-                            const $select = $("#"+action_id);
+                            const $select = $("#" + action_id);
                             // Ensure Selectize is initialized
                             if ($select[0] && $select[0].selectize) {
                                 const selectize = $select[0].selectize;
 
                                 selectize.clear();
                                 selectize.clearOptions(); // Clear existing options
-                                response.data.forEach(function(item) {
-                                    const companyName = item.get_company ? item.get_company.company_name : 'N/A'; // Fallback if get_company is null
-                                    const designationTitle = item.designation ? item.designation.title : 'N/A'; // Fallback if get_designation is null
+                                response.data.forEach(function (item) {
+                                    const companyName = item.get_company
+                                        ? item.get_company.company_name
+                                        : "N/A"; // Fallback if get_company is null
+                                    const designationTitle = item.designation
+                                        ? item.designation.title
+                                        : "N/A"; // Fallback if get_designation is null
                                     const optionText = `${item.name} (ID: ${item.employee_id}) - (Designation: ${designationTitle}) - (Company: ${companyName})`;
 
-                                    selectize.addOption({ value: item.id, text: optionText });
+                                    selectize.addOption({
+                                        value: item.id,
+                                        text: optionText,
+                                    });
                                 });
                                 selectize.refreshOptions(true); // Refresh the options in the select box
-                                $('#user-project-permission-add-list').html('')
+                                $("#user-project-permission-add-list").html("");
                             } else {
-                                console.error("Selectize is not initialized for #" + action_id);
+                                console.error(
+                                    "Selectize is not initialized for #" +
+                                        action_id
+                                );
                             }
                         }
-                    }
-                })
+                    },
+                });
             },
-            companyWiseUsersForReq:function (e,action_id)//only able to requisition
-            {
-                let id = $(e).val()
-                if (id.length === 0)
-                {
-                    return false
+            companyWiseUsersForReq: function (
+                e,
+                action_id //only able to requisition
+            ) {
+                let id = $(e).val();
+                if (id.length === 0) {
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/requisition/company-wise-user"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/requisition/company-wise-user";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'company_id':id},
-                    success:function (response)
-                    {
-                        if (response.status === 'error') {
-                            alert('Error: ' + response.message);
-                            return false
-                        } else if (response.status === 'success') {
+                    data: { company_id: id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
                             // updateSelectBoxSingleOption(response.data, action_id, 'id', 'name');
-                            const $select = $("#"+action_id);
+                            const $select = $("#" + action_id);
                             // Ensure Selectize is initialized
                             if ($select[0] && $select[0].selectize) {
                                 const selectize = $select[0].selectize;
 
                                 selectize.clear();
                                 selectize.clearOptions(); // Clear existing options
-                                response.data.forEach(function(item) {
-                                    const companyName = item.get_company ? item.get_company.company_name : 'N/A'; // Fallback if get_company is null
-                                    const designationTitle = item.designation ? item.designation.title : 'N/A'; // Fallback if get_designation is null
-                                    const departmentTitle = item.department ? item.department.dept_name : 'N/A'; // Fallback if get_department is null
+                                response.data.forEach(function (item) {
+                                    const companyName = item.get_company
+                                        ? item.get_company.company_name
+                                        : "N/A"; // Fallback if get_company is null
+                                    const designationTitle = item.designation
+                                        ? item.designation.title
+                                        : "N/A"; // Fallback if get_designation is null
+                                    const departmentTitle = item.department
+                                        ? item.department.dept_name
+                                        : "N/A"; // Fallback if get_department is null
                                     const optionText = `${item.name} (${item.employee_id}, ${designationTitle},  ${departmentTitle}, ${companyName})`;
 
-                                    selectize.addOption({ value: item.id, text: optionText });
+                                    selectize.addOption({
+                                        value: item.id,
+                                        text: optionText,
+                                    });
                                 });
                                 selectize.refreshOptions(true); // Refresh the options in the select box
-                                $('#user-project-permission-add-list').html('')
+                                $("#user-project-permission-add-list").html("");
                             } else {
-                                console.error("Selectize is not initialized for #" + action_id);
+                                console.error(
+                                    "Selectize is not initialized for #" +
+                                        action_id
+                                );
                             }
                         }
-                    }
-                })
+                    },
+                });
             },
-            companyWiseUsersCompanyPermission:function (e,action_id)// only able to system super admin permission
-            {
-                let id = $(e).val()
-                if (id.length === 0)
-                {
-                    return false
+            companyWiseUsersCompanyPermission: function (
+                e,
+                action_id // only able to system super admin permission
+            ) {
+                let id = $(e).val();
+                if (id.length === 0) {
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/system-operation/company-wise-users-company-permission"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/company-wise-users-company-permission";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'company_id':id},
-                    success:function (response)
-                    {
-                        if (response.status === 'error') {
-                            alert('Error: ' + response.message);
-                            return false
-                        } else if (response.status === 'success') {
+                    data: { company_id: id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
                             // updateSelectBoxSingleOption(response.data, action_id, 'id', 'name');
-                            const $select = $("#"+action_id);
+                            const $select = $("#" + action_id);
                             // Ensure Selectize is initialized
                             if ($select[0] && $select[0].selectize) {
                                 const selectize = $select[0].selectize;
 
                                 selectize.clear();
                                 selectize.clearOptions(); // Clear existing options
-                                if (response.data.length > 0)
-                                {
-                                    selectize.addOption({value:0, text: '@ All'})
+                                if (response.data.length > 0) {
+                                    selectize.addOption({
+                                        value: 0,
+                                        text: "@ All",
+                                    });
                                 }
-                                response.data.forEach(function(item) {
-                                    const companyName = item.get_company ? item.get_company.company_name : 'N/A'; // Fallback if get_company is null
-                                    const designationTitle = item.designation ? item.designation.title : 'N/A'; // Fallback if get_company is null
+                                response.data.forEach(function (item) {
+                                    const companyName = item.get_company
+                                        ? item.get_company.company_name
+                                        : "N/A"; // Fallback if get_company is null
+                                    const designationTitle = item.designation
+                                        ? item.designation.title
+                                        : "N/A"; // Fallback if get_company is null
                                     const optionText = `${item.name} (ID: ${item.employee_id}) - (Designation: ${designationTitle}) - (Company: ${companyName})`;
 
-                                    selectize.addOption({ value: item.id, text: optionText });
+                                    selectize.addOption({
+                                        value: item.id,
+                                        text: optionText,
+                                    });
                                 });
                                 selectize.refreshOptions(true); // Refresh the options in the select box
-                                $('#user-project-permission-add-list').html('')
+                                $("#user-project-permission-add-list").html("");
                             } else {
-                                console.error("Selectize is not initialized for #" + action_id);
+                                console.error(
+                                    "Selectize is not initialized for #" +
+                                        action_id
+                                );
                             }
                         }
-                    }
-                })
+                    },
+                });
             },
-            companyWiseProjects:function (e,action_id)
-            {
-                let id = $(e).val()
-                if (id.length === 0)
+            companyWiseProjects: function (e, action_id) {
+                let id = $(e).val();
+                if (id.length === 0) {
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-wise-projects";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { company_id: id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            updateSelectBoxSingleOption(
+                                response.data,
+                                action_id,
+                                "id",
+                                "branch_name"
+                            );
+                        }
+                    },
+                });
+            },
+            companyWiseProjectsAndDataTypeArchive: function (e, action_id_projects, action_id_types,multiply = null) {
+                let id = $(e).val();
+                if (id.length === 0) {
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-wise-projects-archive";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { company_id: id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            if (multiply)
+                            {
+                                updateSelectBox(
+                                    response.data.projects,
+                                    action_id_projects,
+                                    "id",
+                                    "branch_name"
+                                );
+                                updateSelectBox(
+                                    response.data.types,
+                                    action_id_types,
+                                    "id",
+                                    "voucher_type_title"
+                                );
+                            }
+                            else {
+                                updateSelectBoxSingleOption(
+                                    response.data.projects,
+                                    action_id_projects,
+                                    "id",
+                                    "branch_name"
+                                );
+                                updateSelectBoxSingleOption(
+                                    response.data.types,
+                                    action_id_types,
+                                    "id",
+                                    "voucher_type_title"
+                                );
+                            }
+                        }
+                    },
+                });
+            },
+            archiveDataQuickSearch:function (e) {
+                let company = $("#company").val()
+                let projects = $("#projects").val()//array
+                let data_types = $("#data_types").val()//array
+                let from_date = $("#from_date").val()
+                let to_date = $("#to_date").val()
+                let reference = $("#reference").val()
+                if (company.length <= 0 && projects.length <= 0 && data_types <= 0 && from_date <= 0 && to_date <= 0 && reference <= 0)
                 {
                     return false
                 }
-                const url = window.location.origin + sourceDir + "/company-wise-projects"
-                $.ajax({
-                    url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
-                    method: "POST",
-                    data:{'company_id':id},
-                    success:function (response)
-                    {
-                        if (response.status === 'error') {
-                            alert('Error: ' + response.message);
-                            return false
-                        } else if (response.status === 'success') {
-                            updateSelectBoxSingleOption(response.data,action_id,'id','branch_name')
-                        }
-                    }
-                })
-            },
-            userWiseCompanyProjectPermissions:function (e,user_id,action_id)
-            {
-                let company_id = $(e).val()
-                if (company_id.length === 0 || user_id.length === 0 || action_id.length === 0)
+                if (confirm('Are you sure!'))
                 {
-                    return false
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/archive-data-list-quick";
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "POST",
+                        data: { company_id: company, projects: projects, data_types: data_types, to_date: to_date, from_date: from_date, reference: reference },
+                        success: function (response) {
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                                return false
+                            } else if (response.status === "success") {
+                                // alert(response.message)
+                                $("#quick-list").html(response.data)
+                            }
+                        },
+                    });
                 }
-                const url = window.location.origin + sourceDir + "/user-wise-company-project-permissions"
+                return false
+            },
+            companyWiseDepartments: function (e, action_id) {
+                let id = $(e).val();
+                // console.log(val);
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-wise-departments";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'company_id':company_id,'user_id':user_id},
-                    success:function (response)
-                    {
-                        if (response.status === 'error') {
-                            alert('Error: ' + response.message);
-                            return false
-                        } else if (response.status === 'success') {
-                            updateSelectBox(response.data,action_id,'id','branch_name')
+                    data: { company_id: id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            updateSelectBox(
+                                response.data,
+                                action_id,
+                                "id",
+                                "dept_name"
+                            );
                         }
-                    }
-                })
+                    },
+                });
             },
-            companyProjects:function (e,user_id,action_id,action_id2=null)
-            {
-                let company_id = $(e).val()
-                if (company_id.length === 0 || user_id.length === 0 || action_id.length === 0)
-                {
-                    return false
+            userWiseCompanyProjectPermissions: function (
+                e,
+                user_id,
+                action_id
+            ) {
+                let company_id = $(e).val();
+                if (
+                    company_id.length === 0 ||
+                    user_id.length === 0 ||
+                    action_id.length === 0
+                ) {
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/fixed-asset-distribution/company-projects"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/user-wise-company-project-permissions";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'company_id':company_id,'user_id':user_id},
-                    success:function (response)
-                    {
-                        if (response.status === 'error') {
-                            alert('Error: ' + response.message);
-                            return false
-                        } else if (response.status === 'success') {
-                            updateSelectBoxSingleOption(response.data['project'],action_id,'id','branch_name')
-                            updateSelectBoxSingleOption(response.data['op_ref_type'],action_id2,'id','name')
+                    data: { company_id: company_id, user_id: user_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            updateSelectBox(
+                                response.data,
+                                action_id,
+                                "id",
+                                "branch_name"
+                            );
                         }
-                    }
-                })
+                    },
+                });
             },
-            fixedAssetSpecificationStore:function (e)
-            {
-                let cid = $("#company_id").val()
-                let fid = $("#fixed_asset_id").val()
-                let specification = $("#specification").val()
-                let status = $("#status").val()
-                if (cid.length === 0 || fid.length === 0 || specification.length === 0 || status.length === 0)
-                {
-                    return false
+            companyProjects: function (
+                e,
+                user_id,
+                action_id,
+                action_id2 = null
+            ) {
+                let company_id = $(e).val();
+                if (
+                    company_id.length === 0 ||
+                    user_id.length === 0 ||
+                    action_id.length === 0
+                ) {
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/fixed-asset/store-specification"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-distribution/company-projects";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'cid':cid,'fid':fid,'specification':specification,'status':status},
-                    success:function (response)
-                    {
-                        if (response.status === 'error') {
-                            alert('Error: ' + response.message);
-                            return false
-                        } else if (response.status === 'success') {
-                            $("#specification_data").html(response.data)
+                    data: { company_id: company_id, user_id: user_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            updateSelectBoxSingleOption(
+                                response.data["project"],
+                                action_id,
+                                "id",
+                                "branch_name"
+                            );
+                            updateSelectBoxSingleOption(
+                                response.data["op_ref_type"],
+                                action_id2,
+                                "id",
+                                "name"
+                            );
                         }
-                    }
-                })
+                    },
+                });
             },
-            selectAllOption:function (e){
+            fixedAssetSpecificationStore: function (e) {
+                let cid = $("#company_id").val();
+                let fid = $("#fixed_asset_id").val();
+                let specification = $("#specification").val();
+                let status = $("#status").val();
+                if (
+                    cid.length === 0 ||
+                    fid.length === 0 ||
+                    specification.length === 0 ||
+                    status.length === 0
+                ) {
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset/store-specification";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: {
+                        cid: cid,
+                        fid: fid,
+                        specification: specification,
+                        status: status,
+                    },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            $("#specification_data").html(response.data);
+                        }
+                    },
+                });
+            },
+            selectAllOption: function (e) {
                 const $select = $(e);
 
                 if ($select[0] && $select[0].selectize) {
                     const selectize = $select[0].selectize; // Get the selectize instance
                     const selectedValues = selectize.getValue(); // Get the current selected values as array
-                    if (selectedValues.includes('0')) {  // Check if "All" (value '0') is selected
+                    if (selectedValues.includes("0")) {
+                        // Check if "All" (value '0') is selected
                         // Get all option values except the "All" option
                         const allValues = selectize.options;
-                        const allKeys = Object.keys(allValues).filter(key => key !== '0');  // Exclude "All"
+                        const allKeys = Object.keys(allValues).filter(
+                            (key) => key !== "0"
+                        ); // Exclude "All"
 
                         // Set all other options as selected
                         selectize.setValue(allKeys);
                     }
-                    return true
+                    return true;
                 } else {
-                    console.error("Selectize is not initialized for the provided element.");
-                    return false
+                    console.error(
+                        "Selectize is not initialized for the provided element."
+                    );
+                    return false;
                 }
             },
-            deleteCompanyModulePermissionAll:function (e)
-            {
-                if (confirm("Are you sure delete all permission?"))
-                {
-                    let cid = $(e).attr('ref')
-                    if (cid.length === 0)
-                    {
-                        return false
+            deleteCompanyModulePermissionAll: function (e) {
+                if (confirm("Are you sure delete all permission?")) {
+                    let cid = $(e).attr("ref");
+                    if (cid.length === 0) {
+                        return false;
                     }
-                    const url = window.location.origin + sourceDir + "/system-operation/company-module-permission-delete-all"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/system-operation/company-module-permission-delete-all";
                     $.ajax({
                         url: url,
-                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
                         method: "DELETE",
-                        data:{'company_id':cid},
-                        success:function (response)
-                        {
-                            if (response.status === 'error')
-                            {
-                                alert('Error: ' + response.message)
+                        data: { company_id: cid },
+                        success: function (response) {
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                            } else if (response.status === "success") {
+                                $("#company-permission-list").html(
+                                    response.data
+                                );
+                                alert("Success:" + response.message);
                             }
-                            else if (response.status === 'success') {
-                                $("#company-permission-list").html(response.data)
-                                alert("Success:" + response.message)
-                            }
-                        }
-                    })
+                        },
+                    });
                 }
-                return false
+                return false;
             },
-            deleteCompanyModulePermissionSingle:function (e)
-            {
-                if (confirm("Are you sure delete this permission?"))
-                {
-                    let id = $(e).attr('ref')
-                    if (id.length === 0)
-                    {
-                        return false
+            deleteCompanyModulePermissionSingle: function (e) {
+                if (confirm("Are you sure delete this permission?")) {
+                    let id = $(e).attr("ref");
+                    if (id.length === 0) {
+                        return false;
                     }
-                    const url = window.location.origin + sourceDir + "/system-operation/company-module-permission-delete"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/system-operation/company-module-permission-delete";
                     $.ajax({
                         url: url,
-                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
                         method: "DELETE",
-                        data:{'id':id},
-                        success:function (response)
-                        {
-                            if (response.status === 'error')
-                            {
-                                alert('Error: ' + response.message)
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                            } else if (response.status === "success") {
+                                $("#company-permission-list").html(
+                                    response.data
+                                );
+                                alert("Success:" + response.message);
                             }
-                            else if (response.status === 'success') {
-                                $("#company-permission-list").html(response.data)
-                                alert("Success:" + response.message)
-                            }
-                        }
-                    })
+                        },
+                    });
                 }
-                return false
+                return false;
             },
-            projectWiseMaterials:function (e,company,output)
-            {
-                if(this.selectAllOption(e))
-                {
-                    let company_id = $('#'+ company).val()
-                    let project_ids = $(e).val()
-                    if (company_id.length <= 0 || project_ids.length <= 0)
-                    {
-                        return false
+            projectWiseMaterials: function (e, company, output) {
+                if (this.selectAllOption(e)) {
+                    let company_id = $("#" + company).val();
+                    let project_ids = $(e).val();
+                    if (company_id.length <= 0 || project_ids.length <= 0) {
+                        return false;
                     }
-                    const url = window.location.origin + sourceDir + "/projects-wise-fixed-assets"
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/projects-wise-fixed-assets";
                     $.ajax({
                         url: url,
-                        headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
                         method: "POST",
-                        data: {'company_id': company_id,'project_ids': project_ids},
-                        success:function (response)
-                        {
-                            if (response.status === 'error')
-                            {
-                                alert('Error: ' + response.message)
+                        data: {
+                            company_id: company_id,
+                            project_ids: project_ids,
+                        },
+                        success: function (response) {
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                            } else if (response.status === "success") {
+                                updateSelectBox(
+                                    response.data.data,
+                                    output,
+                                    "id",
+                                    "materials_name"
+                                );
                             }
-                            else if (response.status === 'success') {
-                                updateSelectBox(response.data.data,output,'id','materials_name')
-                            }
-                        }
-                    })
+                        },
+                    });
                 }
             },
-            fixedAssetReportSearch:function (e){
-                let company_id = $("#company").val()
-                let projects = $("#projects").val()
-                let materials = $("#materials").val()
-                let from_date = $("#from_date").val()
-                let to_date = $("#to_date").val()
-                if (company_id.length <= 0)
-                {
-                    return false
+            fixedAssetReportSearch: function (e) {
+                let company_id = $("#company").val();
+                let projects = $("#projects").val();
+                let materials = $("#materials").val();
+                let from_date = $("#from_date").val();
+                let to_date = $("#to_date").val();
+                if (company_id.length <= 0) {
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/fixed-asset-report/stock-report-search"
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/fixed-asset-report/stock-report-search";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data: {'company_id':company_id,'project_ids':projects,'material_ids':materials,'from_date':from_date,'to_date':to_date},
-                    success:function (response)
-                    {
-                        if (response.status === 'error')
-                        {
-                            alert('Error: ' + response.message)
+                    data: {
+                        company_id: company_id,
+                        project_ids: projects,
+                        material_ids: materials,
+                        from_date: from_date,
+                        to_date: to_date,
+                    },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            $("#fixed-asset-body").html(response.data.view);
                         }
-                        else if (response.status === 'success') {
-                            $("#fixed-asset-body").html(response.data.view)
-                        }
-                    }
-                })
+                    },
+                });
             },
             document_field_operation: function (e) {
                 let number_of_document = parseInt($("#d_count").val(), 10);
-                if (number_of_document > 0)
-                {
-                    $(e).removeClass('btn-outline-primary'); // Remove the 'btn-primary' class
-                    $(e).addClass('btn-outline-danger'); // Add the 'btn-danger' class
-                    $(e).html("<i class='fa-solid fa-clock-rotate-left'></i> Reset");
+                if (number_of_document > 0) {
+                    $(e).removeClass("btn-outline-primary"); // Remove the 'btn-primary' class
+                    $(e).addClass("btn-outline-danger"); // Add the 'btn-danger' class
+                    $(e).html(
+                        "<i class='fa-solid fa-clock-rotate-left'></i> Reset"
+                    );
                     $("#document_field").empty(); // Clear previous entries
 
                     for (let i = 1; i <= number_of_document; i++) {
@@ -2676,155 +3451,216 @@ let Obj = {};
                     `);
                     }
                 }
-                return false
+                return false;
             },
-            requisitionDocumentUsersInfo:function (e){
-                let data = $(e).attr('ref')
-                if (data.length <= 0)
-                {
-                    return false
+            requisitionDocumentUsersInfo: function (e) {
+                let data = $(e).attr("ref");
+                if (data.length <= 0) {
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/requisition/req-document-receiver"
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/requisition/req-document-receiver";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data: {'id':data},
-                    success:function (response)
-                    {
-                        if (response.status === 'error')
-                        {
-                            alert('Error: ' + response.message)
+                    data: { id: data },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            $("#heading").html("Receiver List");
+                            $("#documentPreview").html(response.view);
+                            $("#receiverList").modal("show");
                         }
-                        else if (response.status === 'success') {
-                            $("#heading").html("Receiver List")
-                            $('#documentPreview').html(response.view)
-                            $('#receiverList').modal('show')
-                        }
-                    }
-                })
+                    },
+                });
             },
-            requisitionDocumentNeed:function (e){
-                let data = $(e).attr('ref')
-                if (data.length <= 0)
-                {
-                    return false
+            requisitionDocumentNeed: function (e) {
+                let data = $(e).attr("ref");
+                if (data.length <= 0) {
+                    return false;
                 }
-                let url = window.location.origin + sourceDir + "/requisition/requested-document"
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/requisition/requested-document";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data: {'id':data},
-                    success:function (response)
-                    {
-                        if (response.status === 'error')
-                        {
-                            alert('Error: ' + response.message)
+                    data: { id: data },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            $("#heading").html("Requested Document List");
+                            $("#documentPreview").html(response.view);
+                            $("#receiverList").modal("show");
                         }
-                        else if (response.status === 'success') {
-                            $("#heading").html("Requested Document List")
-                            $('#documentPreview').html(response.view)
-                            $('#receiverList').modal('show')
-                        }
-                    }
-                })
+                    },
+                });
             },
-            searchPreviousDocumentReference:function (e,company_id,target_id)
-            {
-                let value = $("#input").val()
-                let company = $("#"+company_id).val()
-                if (value.length === 0 || company.length === 0)
-                {
-                    return false
+            searchPreviousDocumentReference: function (
+                e,
+                company_id,
+                target_id
+            ) {
+                let value = $("#input").val();
+                let company = $("#" + company_id).val();
+                if (value.length === 0 || company.length === 0) {
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/search-previous-document-ref"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/search-previous-document-ref";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'value':value,'company':company},
-                    success:function (response)
-                    {
-                        if (response.status === 'error')
-                        {
-                            alert('Error: ' + response.message)
-                        }
-                        else if (response.status === 'success') {
+                    data: { value: value, company: company },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
                             // updateSelectBoxSingleOption(response.data,target_id,'id','voucher_number')
-                            updateSelectBox(response.data,target_id,'id','voucher_number')
-                            Obj.selectAllOption(e)
-                            return true
+                            updateSelectBox(
+                                response.data,
+                                target_id,
+                                "id",
+                                "voucher_number"
+                            );
+                            Obj.selectAllOption(e);
+                            return true;
                         }
-                    }
-                })
+                    },
+                });
             },
-            searchPreviousDocuments:function (input_id,target_id)
-            {
-                let ids = $("#"+input_id).val()
-                if (ids.length === 0)
-                {
-                    setSelectBoxBlank(target_id)
-                    return false
+            searchPreviousDocuments: function (input_id, target_id) {
+                let ids = $("#" + input_id).val();
+                if (ids.length === 0) {
+                    setSelectBoxBlank(target_id);
+                    return false;
                 }
-                const url = window.location.origin + sourceDir + "/search-previous-document"
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/search-previous-document";
                 $.ajax({
                     url: url,
-                    headers: {'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')},
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
                     method: "POST",
-                    data:{'ids':ids},
-                    success:function (response)
-                    {
-                        if (response.status === 'error')
-                        {
-                            alert('Error: ' + response.message)
+                    data: { ids: ids },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            updateSelectBox(
+                                response.data,
+                                target_id,
+                                "id",
+                                "document"
+                            );
+                            return true;
                         }
-                        else if (response.status === 'success') {
-                            updateSelectBox(response.data,target_id,'id','document')
-                            return true
-                        }
-                    }
-                })
+                    },
+                });
             },
-        }
-    })
+            searchCompanyDepartmentUsers: function (
+                company_id,
+                company_wise_departments,
+                action_id
+            ) {
+                let company = $("#" + company_id).val();
+                let projects_id = $("#" + company_wise_departments).val();
+
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/search-company-department-users";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { ids: projects_id, company_id: company },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            updateSelectBox(
+                                response.data,
+                                action_id,
+                                "id",
+                                "name"
+                            );
+                        }
+                        return true;
+                    },
+                });
+            },
+        };
+    });
     function checkFileExists(url, callback) {
         const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 callback(xhr.status === 200);
             }
         };
-        xhr.open('HEAD', url, true);
+        xhr.open("HEAD", url, true);
         xhr.send();
     }
-    function setSelectBoxBlank (targetID){
-        const $select = $('#' + targetID);
+    function setSelectBoxBlank(targetID) {
+        const $select = $("#" + targetID);
         // Ensure Selectize is initialized
         if ($select[0] && $select[0].selectize) {
             const selectize = $select[0].selectize;
             selectize.clear();
             selectize.clearOptions(); // Clear existing options
             selectize.refreshOptions(true); // Refresh the options in the select box
-
         } else {
             console.error("Selectize is not initialized for #" + id);
         }
     }
-    function updateSelectBox(data,id,value,value_name) {
-        const $select = $('#' + id);
+    function updateSelectBox(data, id, value, value_name) {
+        const $select = $("#" + id);
         // Ensure Selectize is initialized
         if ($select[0] && $select[0].selectize) {
             const selectize = $select[0].selectize;
 
             selectize.clear();
             selectize.clearOptions(); // Clear existing options
-            if (data.length > 0)
-            {
-                selectize.addOption({value:0, text: '@ All'})
+            if (data.length > 0) {
+                selectize.addOption({ value: 0, text: "@ All" });
             }
-            data.forEach(function(item) {
-                selectize.addOption({ value: item[value], text: item[value_name] });
+            data.forEach(function (item) {
+                selectize.addOption({
+                    value: item[value],
+                    text: item[value_name],
+                });
             });
 
             selectize.refreshOptions(true); // Refresh the options in the select box
@@ -2832,17 +3668,20 @@ let Obj = {};
             console.error("Selectize is not initialized for #" + id);
         }
     }
-    function updateSelectBoxWithNone(data,id,value,value_name) {
-        const $select = $('#' + id);
+    function updateSelectBoxWithNone(data, id, value, value_name) {
+        const $select = $("#" + id);
         // Ensure Selectize is initialized
         if ($select[0] && $select[0].selectize) {
             const selectize = $select[0].selectize;
 
             selectize.clear();
             selectize.clearOptions(); // Clear existing options
-            selectize.addOption({value:0, text: '0 - None'})
-            data.forEach(function(item) {
-                selectize.addOption({ value: item[value], text: item[value_name] });
+            selectize.addOption({ value: 0, text: "0 - None" });
+            data.forEach(function (item) {
+                selectize.addOption({
+                    value: item[value],
+                    text: item[value_name],
+                });
             });
 
             selectize.refreshOptions(true); // Refresh the options in the select box
@@ -2850,23 +3689,28 @@ let Obj = {};
             console.error("Selectize is not initialized for #" + id);
         }
     }
-    function updateSelectBoxSingleOption(data,id,value,value_name) {
-        const $select = $('#' + id);
-        // Ensure Selectize is initialized
-        if ($select[0] && $select[0].selectize) {
-            const selectize = $select[0].selectize;
+    function updateSelectBoxSingleOption(data, id, value, value_name) {
+        try {
+            const $select = $("#" + id);
+            // Ensure Selectize is initialized
+            if ($select[0] && $select[0].selectize) {
+                const selectize = $select[0].selectize;
 
-            selectize.clear();
-            selectize.clearOptions(); // Clear existing options
-            data.forEach(function(item) {
-                selectize.addOption({ value: item[value], text: item[value_name] });
-            });
+                selectize.clear();
+                selectize.clearOptions(); // Clear existing options
+                data.forEach(function (item) {
+                    selectize.addOption({
+                        value: item[value],
+                        text: item[value_name],
+                    });
+                });
 
-            selectize.refreshOptions(true); // Refresh the options in the select box
-        } else {
-            console.error("Selectize is not initialized for #" + id);
+                selectize.refreshOptions(true); // Refresh the options in the select box
+            } else {
+                console.error("Selectize is not initialized for #" + id);
+            }
+        } catch (error) {
+            console.error("Error in updateSelectBoxSingleOption:", error);
         }
     }
-
-
-}(jQuery))
+})(jQuery);

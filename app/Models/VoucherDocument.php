@@ -9,7 +9,6 @@ class VoucherDocument extends Model
 {
     use HasFactory;
     protected $fillable = ['company_id','voucher_info_id','document','filepath','created_by','updated_by'];
-
     public function accountVoucherInfo()
     {
         return $this->belongsTo(Account_voucher::class,'voucher_info_id');

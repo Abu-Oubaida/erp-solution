@@ -38,7 +38,7 @@
                         <div class="col-md-2 mb-1">
                             <div class="">
                                 <label for="company">Company Name <span class="text-danger">*</span></label>
-                                <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjects(this,'project')">
+                                <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjectsAndDataTypeArchive(this,'project','data_types',null)">
                                     <option value="">Pick options...</option>
                                     @if(isset($companies) || (count($companies) > 0))
                                         @foreach($companies as $c)
@@ -67,14 +67,14 @@
                             </div>
                         </div>
                         <div class="col-md-2 mb-1">
-                            <div class="form-floating">
-                                <select class="form-control" name="data_type" id="data_type">
-                                    <option value="">--Select a Type--</option>
-                                    @foreach($voucherTypes as $date)
-                                        <option value="{!! $date->id !!}">{!! $date->voucher_type_title !!}</option>
-                                    @endforeach
-                                </select>
+                            <div class="">
                                 <label for="data_type">Type<span class="text-danger">*</span></label>
+                                <select class="form-control text-capitalize select-search" name="data_type" id="data_types">
+                                    <option value="">--Select a Type--</option>
+{{--                                    @foreach($voucherTypes as $date)--}}
+{{--                                        <option value="{!! $date->id !!}">{!! $date->voucher_type_title !!}</option>--}}
+{{--                                    @endforeach--}}
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-2 mb-1">
