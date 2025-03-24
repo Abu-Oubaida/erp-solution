@@ -165,7 +165,12 @@ class ArchiveController extends Controller
     public function archiveDataListPermissionWithUsers(Request $request){
         try{
             if ($request->isMethod('post')){
-                $voucherId = $request->id;
+                if($request->encrypt_voucher_id){
+                    $voucherId = Crypt::decryptString($request->id);
+                }else{
+                    $voucherId = $request->id;
+                }
+                
                 $usersWithPermission = VoucherType::with([
                     'voucherWithUsers' => function ($query) use ($voucherId) {
                         $query->select(
@@ -187,7 +192,7 @@ class ArchiveController extends Controller
                         $query->select('company_infos.id', 'company_infos.company_name'); 
                     }
                 ])->select(['voucher_types.id','voucher_types.voucher_type_title'])->find($voucherId);
-                $view = view('back-end.archive.type.__receiver-list-modal',compact('usersWithPermission'))->render();
+                $view = view('back-end.archive.type.__receiver-list-modal',compact('usersWithPermission','voucherId'))->render();
                 return response()->json(['data' => $view,'status' => 'success','message'=>'Request process successful']);
             }
            

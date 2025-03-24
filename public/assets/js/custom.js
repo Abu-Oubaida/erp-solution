@@ -3520,12 +3520,9 @@ let Obj = {};
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
-                            console.log(response);
                         } else if (response.status === "success") {
                             $("#heading").html("Receiver List");
                             $("#documentPreview").html(response.data);
-                            // console.log('ok');
-                            console.log(response);
                             $("#receiverList").modal("show");
                         }
                     },
@@ -3542,7 +3539,6 @@ let Obj = {};
                     window.location.origin +
                     sourceDir +
                     "/delete_data_type_permission_from_user";
-                //console.log(userId, dataTypeId);
                 $.ajax({
                     url: url,
                     headers: {
@@ -3557,10 +3553,37 @@ let Obj = {};
                     },
                     success: function (response) {
                         alert("Deleted successfully");
-                        //location.reload();
+                        Obj.updatedPermissionWithUsersList(element)
+                        
                     },
                     error: function (xhr) {
-                        // alert("Failed to delete");
+                         alert("Failed to delete");
+                    },
+                });
+            },
+            updatedPermissionWithUsersList:function(element){
+                let voucherId = $(element).data("voucher-id")
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/archive-data-list-permission-users";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { id: voucherId,encrypt_voucher_id:'encrypt_voucher_id' },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            $("#heading").html("Receiver List");
+                            $("#documentPreview").html(response.data);
+                            $("#receiverList").modal("show");
+                        }
                     },
                 });
             },

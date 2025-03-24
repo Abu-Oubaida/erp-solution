@@ -259,9 +259,9 @@ Route::group(['middleware' => ['auth']],function (){
         });//3.7.1 End
 # 3.7.2 Edit voucher Type
 
-       // Route::middleware(['permission:delete_archive_data_type_user_permission'])->group(function () {
+        Route::middleware(['permission:delete_archive_data_type_user_permission'])->group(function () {
             Route::match(['post'],'delete_data_type_permission_from_user','deleteTypePermissionFromUser')->name('delete.data.type.permission.from.user');
-       // });
+        });
 //        Route::middleware(['permission:edit_voucher_type'])->group(function (){
         Route::middleware(['permission:edit_archive_data_type'])->group(function (){
             Route::match(['put','get','post'],'edit-archive-data-type/{archiveTypeID}','editArchiveType')->name('edit.archive.type');

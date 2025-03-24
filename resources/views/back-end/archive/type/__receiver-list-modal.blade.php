@@ -26,9 +26,10 @@
                     <td>{!! @$d->designation->title !!}</td>
                     <td>{!! @$d->department->dept_name !!}</td>
                     <td>{!! @$d->getCompany->company_name !!}</td>
+                    {{-- <td>{{$voucherId}}</td> --}}
                     <td>
                         @if(auth()->user()->hasPermission('delete_archive_data_type_user_permission'))
-                                <button type="button" class="text-danger border-0 inline-block bg-none" onclick="Obj.deleteTypePermissionFromUser(this)" data-user-id = "{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" data-data-type-id="{!! \Illuminate\Support\Facades\Crypt::encryptString($usersWithPermission->id) !!}"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="text-danger border-0 inline-block bg-none" onclick="Obj.deleteTypePermissionFromUser(this)" data-user-id = "{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" data-data-type-id="{!! \Illuminate\Support\Facades\Crypt::encryptString($usersWithPermission->id) !!}"  data-voucher-id="{!! \Illuminate\Support\Facades\Crypt::encryptString($voucherId) !!}"><i class="fas fa-trash"></i></button>
                         @endif
                     </td>
                 </tr>
