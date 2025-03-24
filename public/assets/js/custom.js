@@ -3021,7 +3021,7 @@ let Obj = {};
                 const url =
                     window.location.origin +
                     sourceDir +
-                    "/company-wise-projects-archive";
+                    "/company-wise-projects-and-data-type-archive";
                 $.ajax({
                     url: url,
                     headers: {
@@ -3062,6 +3062,8 @@ let Obj = {};
                                     "id",
                                     "voucher_type_title"
                                 );
+                                setSelectBoxBlank('previous-references')
+                                setSelectBoxBlank('previous-files')
                             }
                         }
                     },
@@ -3625,7 +3627,6 @@ let Obj = {};
                                 "id",
                                 "voucher_number"
                             );
-                            Obj.selectAllOption(e);
                             return true;
                         }
                     },

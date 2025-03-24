@@ -518,7 +518,7 @@ class ArchiveController extends Controller
     {
         try {
             $permission = $this->permissions()->archive_data_list;
-            $voucherInfos = Account_voucher::whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->get();
+            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes(null)->pluck('id')->toArray())->get();
             return view('back-end/archive/list',compact('voucherInfos'))->render();
         }catch (\Throwable $exception)
         {
@@ -598,6 +598,7 @@ class ArchiveController extends Controller
             ->select(
                 'id',
                 'voucher_date',
+                'voucher_type_id',
                 'voucher_number',
                 'remarks',
                 'created_at',
@@ -622,8 +623,7 @@ class ArchiveController extends Controller
             ->with(['updatedBY' => function($query) {
                 $query->select('id', 'name'); // Adjust the columns in updatedBY (User model)
             }])
-            ->where('company_id', $company_id);
-
+            ->where('company_id', $company_id)->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes($company_id)->pluck('id')->toArray());
             if (!empty($projects)) {
                 $archiveInfos->whereIn('project_id', $projects);
             }
@@ -658,7 +658,38 @@ class ArchiveController extends Controller
             ]);
         }
     }
-    public function companyWiseProjects(Request $request)
+    private function getCompanyWiseDataTypes($company_id)
+    {
+        if ($this->user->isSystemSuperAdmin() || $this->user->companyWiseRoleName() == 'superadmin')
+        {
+            if ($company_id == null)
+            {
+                $userWiseVoucherTypePermissionId = VoucherType::all()->pluck('id')->toArray();
+            }
+            else {
+                $userWiseVoucherTypePermissionId = VoucherType::where('company_id',$company_id)->get()->pluck('id')->toArray();
+            }
+        }
+        else
+        {
+            if ($company_id == null)
+            {
+                $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
+            }
+            else {
+                $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('company_id',$company_id)->where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
+            }
+        }
+        if ($company_id == null)
+        {
+            return VoucherType::where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
+        }
+        else{
+            return VoucherType::where('company_id',$company_id)->where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
+        }
+
+    }
+    public function companyWiseProjectsAndDataType(Request $request)
     {
         try {
             if ($request->isMethod('post'))
@@ -669,16 +700,7 @@ class ArchiveController extends Controller
                 extract($request->post());
                 $projects = branch::where('company_id',$company_id)->where('status',1)->get();
                 $userWiseVoucherTypePermissionId = null;
-                if ($this->user->isSystemSuperAdmin() || $user->companyWiseRoleName() == 'superadmin')
-                {
-                    $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('company_id',$company_id)->get()->pluck('voucher_type_id')->toArray();
-                }
-                else
-                {
-                    $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('company_id',$company_id)->where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
-                }
-
-                $types = VoucherType::where('company_id',$company_id)->where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
+                $types = $this->getCompanyWiseDataTypes($company_id);
                 return response()->json([
                     'status' => 'success',
                     'data' => ['projects' => $projects,'types' => $types],
