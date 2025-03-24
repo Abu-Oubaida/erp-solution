@@ -3520,12 +3520,9 @@ let Obj = {};
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
-                            console.log(response);
                         } else if (response.status === "success") {
                             $("#heading").html("Receiver List");
                             $("#documentPreview").html(response.data);
-                            // console.log('ok');
-                            console.log(response);
                             $("#receiverList").modal("show");
                         }
                     },
@@ -3541,8 +3538,7 @@ let Obj = {};
                 let url =
                     window.location.origin +
                     sourceDir +
-                    "/delete_data_type_permission_from_user";
-                //console.log(userId, dataTypeId);
+                    "/delete-data-type-permission-from-user";
                 $.ajax({
                     url: url,
                     headers: {
@@ -3556,11 +3552,44 @@ let Obj = {};
                         data_type_id: dataTypeId,
                     },
                     success: function (response) {
-                        alert("Deleted successfully");
-                        //location.reload();
+                        if (response.status === 'error')
+                        {
+                            alert("Error: " + response.message);
+                            return false
+                        }else if (response.status === 'success')
+                        {
+                            alert(response.message);
+                            Obj.updatedPermissionWithUsersList(element)
+                        }
                     },
                     error: function (xhr) {
-                        // alert("Failed to delete");
+                        console.log(xhr)
+                    },
+                });
+            },
+            updatedPermissionWithUsersList:function(element){
+                let voucherId = $(element).data("voucher-id")
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/archive-data-list-permission-users";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { id: voucherId,encrypt_voucher_id:'encrypt_voucher_id' },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            $("#heading").html("Receiver List");
+                            $("#documentPreview").html(response.data);
+                            $("#receiverList").modal("show");
+                        }
                     },
                 });
             },
