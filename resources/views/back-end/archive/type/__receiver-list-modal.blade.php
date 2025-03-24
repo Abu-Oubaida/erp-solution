@@ -1,6 +1,6 @@
 <div class="modal-header">
     <h1 class="modal-title fs-5" id="heading"><strong>Data Type Name: </strong>{!! @$usersWithPermission->voucher_type_title !!}</h1>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="return window.location.reload()"></button>
 </div>
 <div class="modal-body">
     <table class="table table-sm" id="datatablesSimple">
@@ -39,5 +39,5 @@
     </table>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Understood</button>
+    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="return window.location.reload()">Understood</button>
 </div>

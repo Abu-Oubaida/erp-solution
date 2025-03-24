@@ -170,11 +170,11 @@ class ArchiveController extends Controller
                 }else{
                     $voucherId = $request->id;
                 }
-                
+
                 $usersWithPermission = VoucherType::with([
                     'voucherWithUsers' => function ($query) use ($voucherId) {
                         $query->select(
-                            'users.id', 
+                            'users.id',
                             'users.dept_id',
                             'users.designation_id',
                             'users.company',
@@ -183,19 +183,19 @@ class ArchiveController extends Controller
                         )->where('voucher_type_permission_user.voucher_type_id', $voucherId);
                     },
                     'voucherWithUsers.department' => function ($query) {
-                        $query->select('departments.id', 'departments.dept_name'); 
+                        $query->select('departments.id', 'departments.dept_name');
                     },
                     'voucherWithUsers.designation' => function ($query) {
-                        $query->select('designations.id', 'designations.title'); 
+                        $query->select('designations.id', 'designations.title');
                     },
                     'voucherWithUsers.getCompany' => function ($query) {
-                        $query->select('company_infos.id', 'company_infos.company_name'); 
+                        $query->select('company_infos.id', 'company_infos.company_name');
                     }
                 ])->select(['voucher_types.id','voucher_types.voucher_type_title'])->find($voucherId);
                 $view = view('back-end.archive.type.__receiver-list-modal',compact('usersWithPermission','voucherId'))->render();
                 return response()->json(['data' => $view,'status' => 'success','message'=>'Request process successful']);
             }
-           
+
             return response()->json([
                     'status' => 'error',
                     'message' => 'Request method not allowed!'
@@ -230,11 +230,11 @@ class ArchiveController extends Controller
             'created_at'=>now()
            ]);
            if($delete_history){
-            $deleteData->delete();
-            return response()->json([
-                'status'=> 'success',
-                'message'=> 'Data deleted successfully!',
-            ]);
+                $deleteData->delete();
+                return response()->json([
+                    'status'=> 'success',
+                    'message'=> 'Data deleted successfully!',
+                ]);
            }
            return response()->json([
             'status'=> 'error',
@@ -246,14 +246,13 @@ class ArchiveController extends Controller
             'message'=> 'Data not found!',
         ]);
 
-        
       }catch (\Exception $exception){
         return response()->json([
             'status'=> 'error',
             'message'=> $exception->getMessage(),
         ]);
       }
-      
+
     }
     private function updateArchiveType(Request $request,$voucherTypeID)
     {

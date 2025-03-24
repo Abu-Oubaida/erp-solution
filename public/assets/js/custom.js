@@ -3538,7 +3538,7 @@ let Obj = {};
                 let url =
                     window.location.origin +
                     sourceDir +
-                    "/delete_data_type_permission_from_user";
+                    "/delete-data-type-permission-from-user";
                 $.ajax({
                     url: url,
                     headers: {
@@ -3552,12 +3552,18 @@ let Obj = {};
                         data_type_id: dataTypeId,
                     },
                     success: function (response) {
-                        alert("Deleted successfully");
-                        Obj.updatedPermissionWithUsersList(element)
-                        
+                        if (response.status === 'error')
+                        {
+                            alert("Error: " + response.message);
+                            return false
+                        }else if (response.status === 'success')
+                        {
+                            alert(response.message);
+                            Obj.updatedPermissionWithUsersList(element)
+                        }
                     },
                     error: function (xhr) {
-                         alert("Failed to delete");
+                        console.log(xhr)
                     },
                 });
             },
