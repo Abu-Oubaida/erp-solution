@@ -318,7 +318,7 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::post('search-company-department-users','searchCompanyDepartmentUsers')->name('search.company-department-users');
 
-        Route::post('company-wise-projects-archive','companyWiseProjects');
+        Route::post('company-wise-projects-and-data-type-archive','companyWiseProjectsAndDataType');
     });
 //    Account Controller
     Route::controller(AccountVoucherController::class)->group(function (){

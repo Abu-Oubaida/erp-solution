@@ -77,53 +77,54 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-2 mb-1">
+                        <div class="col-md-2 mb-2">
                             <div class="form-floating">
                                 <input type="file" class="form-control" name="voucher_file[]" multiple id="voucher_file" >
                                 <label for="voucher_file">Archive Document</label>
                                 <small>jpeg,png,pdf/ Maximum size 500 MB</small>
                             </div>
                         </div>
-                        <div class="col-md-2 mb-1">
+                        <div class="col-md-3 mb-1">
                             <div class="form-floating">
                                 <textarea class="form-control" name="remarks" id="remarks" cols="30" rows="10"></textarea>
                                 <label for="remarks">Remarks</label>
                             </div>
                         </div>
-                        <div class="col-md-10 mb-1">
+                        <div class="col-md-8">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-4 mb-1">
                                     <small>Link previously uploaded file here</small>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-3 mb-1">
                                     <div class="input-group">
                                         <input type="text" id="input" class="form-control" placeholder="Reference number">
-                                        <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'company','previous-reference')"><i class="fas fa-search"></i> Search</a>
+                                        <a class="btn btn-outline-secondary" id="search-icon" onclick="return Obj.searchPreviousDocumentReference(this,'company','previous-references')"><i class="fas fa-search"></i> Search</a>
                                     </div>
                                 </div>
-                                <div class="col-sm-3 mb-1">
-                                        <select class="text-capitalize select-search form-control" id="previous-reference" name="previous-reference" onchange="return Obj.selectAllOption(this)" multiple>
-                                            <option>--choose a option--</option>
+                                <div class="col-md-3 col-sm-8 mb-1">
+                                    <div class=" mt-1">
+                                        <small>Choose options</small>
+                                        <select class="text-capitalize select-search form-control" id="previous-references" name="previous-reference" onchange="return Obj.selectAllOption(this)" multiple>
                                         </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-1 mb-1">
-                                    <a class="btn btn-sm btn-outline-secondary" id="previous-reference-search" onclick="return Obj.searchPreviousDocuments('previous-reference','previous-file')"><i class="fas fa-search"></i> Search</a>
+                                <div class="col-md-1 col-sm-3 mb-1">
+                                    <div class="row mt-1">
+                                        <a class="btn btn-sm btn-outline-secondary mt-4" id="previous-reference-search" onclick="return Obj.searchPreviousDocuments('previous-references','previous-files')"><i class="fas fa-search"></i> Search</a>
+                                    </div>
+
                                 </div>
-                                <div class="col-md-3 mb-1">
+                                <div class="col-md-4 mb-1">
                                     <div class="">
-                                        <select class="text-capitalize select-search" id="previous-file" name="previous_files[]" multiple onchange="return Obj.selectAllOption(this)">
+                                        <small>Choose options</small>
+                                        <select class="text-capitalize select-search" id="previous-files" name="previous_files[]" multiple onchange="return Obj.selectAllOption(this)">
                                             <option>--choose a file--</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2 mb-1">
-                                    <div class="float-end">
-                                        <button type="submit" value="" class="btn btn-chl-outline" name="submit" ><i class="fas fa-save"></i> Upload</button>
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1 mb-1">
+                            <div class="float-end">
+                                <button type="submit" value="" class="btn btn-chl-outline mt-4" name="submit" ><i class="fas fa-save"></i> Upload</button>
                             </div>
                         </div>
                     </div>
