@@ -1434,6 +1434,36 @@ let Obj = {};
                     },
                 });
             },
+            archiveEmailLinkStatusChange: function (e) {
+                const ref = $(e).attr("ref");
+                const status = $(e).attr("status");
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/archive-email-link-status-change";
+                $.ajax({
+                    url: url,
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: { ref: ref, status: status },
+                    success: function (data) {
+                        if (data.error) {
+                            alert(data.error.msg);
+                        } else {
+                            data = JSON.parse(data);
+                            alert(data.results);
+                            $("#shareModel").modal("hide");
+                        }
+                    },
+                    error: function (error) {
+                        console.error("Error:", error);
+                    },
+                });
+            },
             getFixedAssetSpecification: function (e) {
                 const value = $(e).val();
                 const url =
@@ -3086,39 +3116,37 @@ let Obj = {};
                 ) {
                     return false;
                 }
-                if (confirm("Are you sure!")) {
-                    const url =
-                        window.location.origin +
-                        sourceDir +
-                        "/archive-data-list-quick";
-                    $.ajax({
-                        url: url,
-                        headers: {
-                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                "content"
-                            ),
-                        },
-                        method: "POST",
-                        data: {
-                            company_id: company,
-                            projects: projects,
-                            data_types: data_types,
-                            to_date: to_date,
-                            from_date: from_date,
-                            reference: reference,
-                        },
-                        success: function (response) {
-                            if (response.status === "error") {
-                                alert("Error: " + response.message);
-                                return false;
-                            } else if (response.status === "success") {
-                                // alert(response.message)
-                                $("#quick-list").html(response.data);
-                            }
-                        },
-                    });
-                }
-                return false;
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/archive-data-list-quick";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: {
+                        company_id: company,
+                        projects: projects,
+                        data_types: data_types,
+                        to_date: to_date,
+                        from_date: from_date,
+                        reference: reference,
+                    },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false
+                        } else if (response.status === "success") {
+                            // alert(response.message)
+                            $("#quick-list").html(response.data)
+                            return true
+                        }
+                    },
+                });
             },
             companyWiseDepartments: function (e, action_id) {
                 let id = $(e).val();
@@ -3593,7 +3621,7 @@ let Obj = {};
                     },
                 });
             },
-            deleteArchiveMultiple:function(){
+            deleteArchiveMultiple:function(e=null,multiplication = false){
                 let selected = [];
                 $('.check-box:checked').each(function() {
                     selected.push($(this).val());
@@ -3620,11 +3648,17 @@ let Obj = {};
                         success: function(response) {
                             if(response.status=='success'){
                                 alert(response.message);
-                                location.reload();
+                                if (multiplication)
+                                {
+                                    Obj.archiveDataQuickSearch(e)
+                                }
+                                else {
+                                    location.reload();
+                                }
                             }else if (response.status=='error'){
                                 alert(response.message);
                             }
-                            
+
                             //location.reload();
                         },
                         error: function(error) {

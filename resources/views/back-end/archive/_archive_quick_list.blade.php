@@ -29,16 +29,18 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow when fixed */
     }
     .table {
-        font-size: 12px;
+        font-size: 12px!important;
     }
 </style>
 @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
-    <div class="row" id="fixedDiv">
+    <div class="row mb-1" id="fixedDiv">
         <div class="col-md-10">
             <input type="checkbox" name="" id="select_all">
             <label for="select_all">Select All</label>
-            <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete"> <i class="fas fa-trash"></i> Delete</button>
-            <button class="btn btn-outline-primary btn-sm"><i class="fa-regular fa-file-zipper"></i> Download Zip</button>
+            @if(auth()->user()->hasPermission('multiple_archive_data_delete'))
+                <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete" onclick="return Obj.deleteArchiveMultiple(this,true)"> <i class="fas fa-trash"></i> Delete Selected</button>
+            @endif
+{{--            <button class="btn btn-outline-primary btn-sm"><i class="fa-regular fa-file-zipper"></i> Download Zip</button>--}}
         </div>
 
     </div>
@@ -55,7 +57,7 @@
         <th>Project</th>
         <th title="Reference Number">Ref. Number</th>
         <th>Type</th>
-        <th>Document</th>
+        <th style="width: 25%">Document</th>
         <th>Upload Date</th>
         <th>Uploaded By</th>
 {{--        <th>Updated By</th>--}}

@@ -82,7 +82,7 @@ Route::group(['middleware' => ['auth']],function (){
 //        Route::middleware(['permission:share_voucher_document'])->group(function (){
         Route::middleware(['permission:share_archive_data'])->group(function (){
             Route::post('share-archive-email','shareArchiveEmail')->name('share.voucher.email');
-//            Route::post('email-link-status-change','emailLinkStatusChange')->name('email.link.status.change');
+            Route::post('archive-email-link-status-change','archiveEmailLinkStatusChange')->name('archive.email.link.status.change');
         });
         Route::post('company-wise-projects','companyWiseProjects');
         Route::post('user-wise-company-project-permissions','userWiseCompanyProjectPermissions');

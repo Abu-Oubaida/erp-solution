@@ -90,7 +90,7 @@
                             </td>
                             <td>@if($e->status) <span class="badge bg-success">Active</span> @else <span class="badge bg-danger">Inactive</span> @endif</td>
                             <td>
-                                @if($e->status) <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure!')? Obj.emailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Inactive</button> @else <button class="btn btn-success btn-sm" onclick="return confirm('Are you sure!')? Obj.emailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Active</button> @endif
+                                @if($e->status) <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure!')? Obj.archiveEmailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Inactive</button> @else <button class="btn btn-success btn-sm" onclick="return confirm('Are you sure!')? Obj.archiveEmailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Active</button> @endif
 
                             </td>
                         </tr>
@@ -102,7 +102,6 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Understood</button>
     </div>
 </div>
 <script>

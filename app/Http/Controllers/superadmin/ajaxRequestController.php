@@ -484,6 +484,55 @@ class ajaxRequestController extends Controller
             ));
         }
     }
+    public function archiveEmailLinkStatusChange(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ref' => 'required','string',
+            'status' => 'required','string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+        try {
+            extract($request->post());
+            $id = Crypt::decryptString($ref);
+            $status = Crypt::decryptString($status);
+            if ($status == 0)
+            {
+                $newStatus = 1;
+            }
+            else{
+                $newStatus = 0;
+            }
+//            Voucher_share_email_link::find($id);
+            if (Voucher_share_email_link::find($id))
+            {
+                Voucher_share_email_link::where('id',$id)->update([
+                    'status'=>$newStatus,
+                ]);
+                echo json_encode(array(
+                    'results' => 'Data update successfully!'
+                ));
+
+            }else{
+                echo json_encode(array(
+                    'error' => array(
+                        'msg' => 'Not Found!',
+                        'code' => '404',
+                    )
+                ));
+            }
+        }catch (\Throwable $exception)
+        {
+            echo json_encode(array(
+                'error' => array(
+                    'msg' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                )
+            ));
+        }
+    }
     public function archiveShareType(Request $request)
     {
         $validator = Validator::make($request->all(), [
