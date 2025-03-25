@@ -3593,6 +3593,46 @@ let Obj = {};
                     },
                 });
             },
+            deleteArchiveMultiple:function(){
+                let selected = [];
+                $('.check-box:checked').each(function() {
+                    selected.push($(this).val());
+                });
+                if (selected.length === 0) {
+                    alert("Please select at least one record to delete.");
+                    return;
+                }
+
+                if (confirm("Are you sure you want to delete selected records?")) {
+                    let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/delete-archive-data";
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "DELETE",
+                        data: { selected:selected,multipleDlt:'multipleDlt'},
+                        success: function(response) {
+                            if(response.status=='success'){
+                                alert(response.message);
+                                location.reload();
+                            }else if (response.status=='error'){
+                                alert(response.message);
+                            }
+                            
+                            //location.reload();
+                        },
+                        error: function(error) {
+                            alert("An error occurred while deleting records.");
+                        }
+                    });
+                }
+            },
             requisitionDocumentNeed: function (e) {
                 let data = $(e).attr("ref");
                 if (data.length <= 0) {

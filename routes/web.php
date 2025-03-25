@@ -282,7 +282,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::put('linked-uploaded-document','linkedUploadedDocument')->name('linked.uploaded.document');
         });
 //        Route::middleware(['permission:voucher_document_delete'])->group(function () {
-        Route::middleware(['permission:archive_data_delete'])->group(function () {
+        Route::middleware(['permission:archive_data_delete','permission:multiple_archive_data_delete'])->group(function () {
             Route::delete('delete-archive-data','delete')->name('delete.archive.info');
         });
 //3.7.3 End

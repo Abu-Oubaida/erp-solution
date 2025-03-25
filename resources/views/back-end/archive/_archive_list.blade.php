@@ -6,7 +6,9 @@
         <div class="col-md-10">
             <input type="checkbox" name="" id="select_all">
             <label for="select_all">Select All</label>
-            <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete"> <i class="fas fa-trash"></i> Delete</button>
+            @if(auth()->user()->hasPermission('multiple_archive_data_delete'))
+            <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete" onclick="return Obj.deleteArchiveMultiple()"> <i class="fas fa-trash"></i> Delete</button>
+            @endif
             <button class="btn btn-outline-primary btn-sm"><i class="fa-regular fa-file-zipper"></i> Download Zip</button>
         </div>
 
