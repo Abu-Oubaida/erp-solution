@@ -28,7 +28,12 @@ class ShareDocumentViewController extends Controller
     }
     public function archiveView(Request $request)
     {
-        $id = Crypt::decryptString($request->get('archive')); //voucher info id
+        $id = null;
+        if ($request->get('archive'))
+        {
+            $id = Crypt::decryptString($request->get('archive')); //voucher info id
+        }
+        
         $shareID = $request->get('share');
         $shareArchives = null;
         if (!$id)

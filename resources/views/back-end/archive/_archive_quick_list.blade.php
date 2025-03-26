@@ -40,6 +40,9 @@
             @if(auth()->user()->hasPermission('multiple_archive_data_delete'))
                 <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete" onclick="return Obj.deleteArchiveMultiple(this,true)"> <i class="fas fa-trash"></i> Delete Selected</button>
             @endif
+            @if(auth()->user()->hasPermission('share_archive_data_multiple'))
+            <button class="btn btn-outline-primary btn-sm" onclick="return Obj.shareArchiveMultiple(this)"> <i class="fas fa-share"></i> Send by Email</button>
+            @endif
 {{--            <button class="btn btn-outline-primary btn-sm"><i class="fa-regular fa-file-zipper"></i> Download Zip</button>--}}
         </div>
 

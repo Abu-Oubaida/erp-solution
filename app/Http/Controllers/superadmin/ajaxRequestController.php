@@ -252,18 +252,61 @@ class ajaxRequestController extends Controller
             $result = Account_voucher::with(['VoucherType'])->select(['id','voucher_date','voucher_number','voucher_type_id'])->find($id);
             $userEmails = User::all(['name','email']);
             $shareData =Voucher_share_email_link::with('ShareEmails')->where('share_voucher_id',$id)->get();
-            return view('back-end/archive/_share_archive_model',compact('result','userEmails','shareData'));
+            $view = view('back-end/archive/_share_archive_model',compact('result','userEmails','shareData'))->render();
+            return response()->json([
+                'status' => 'success',
+                'message'=> 'Request process successfully!',
+                'data'=> $view,
+            ]);
         }catch (\Throwable $exception)
         {
-            echo json_encode(array(
-                'error' => array(
-                    'msg' => $exception->getMessage(),
-                    'code' => $exception->getCode(),
-                )
-            ));
+            return response()->json([
+                'status' => 'error',
+                'message'=> $exception->getMessage(),
+                'code'=> $exception->getCode(),
+            ]);
         }
     }
 
+    public function shareArchiveFiendMultiple(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'ids' => ['array','required'],
+                'ids.*' => ['integer','required','exists:account_voucher_infos,id'],
+            ]);
+            extract($request->post());
+//            $results = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
+            $voucherInfos = Account_voucher::with(['VoucherType'])->select(['id','voucher_date','voucher_number','voucher_type_id'])->whereIn('id',$ids)->get();
+            $userEmails = User::all(['name','email']);
+
+            $shareDatum =Voucher_share_email_link::with(['ShareEmails','shareArchive','shareEmailByShareId','sharedBy'])->whereIn('share_voucher_id',$ids)->where('shared_by',Auth::user()->id)
+            ->select(['id','company_id','share_id','share_voucher_id','status','shared_by'])
+            ->with(['sharedBy'=>function($query){
+                $query->select('users.id','users.name');
+            }])
+            ->with(['ShareEmails'=>function($query){
+                $query->select('share_link_id','email');
+            }])
+            ->with(['shareEmailByShareId'=>function($query){
+                $query->select('share_link_id','email');
+            }])
+            ->get();
+            $view = view('back-end/archive/_share_archive_model_multiple',compact('voucherInfos','userEmails','shareDatum'))->render();
+            return response()->json([
+                'status' => 'success',
+                'message'=> 'Request process successfully!',
+                'data'=> $view,
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=> $exception->getMessage(),
+                'code'=> $exception->getCode(),
+            ]);
+        }
+    }
     private function generateUniqueId($length = 12) {
         $randomString = Str::random($length - 8); // Generate a random string
         $timestamp = now()->timestamp; // Get the current timestamp
@@ -364,7 +407,6 @@ class ajaxRequestController extends Controller
             ));
         }
     }
-
     public function shareArchiveEmail(Request $request)
     {
 
@@ -433,6 +475,76 @@ class ajaxRequestController extends Controller
                     'code' => $exception->getCode(),
                 )
             ));
+        }
+    }
+    public function shareArchiveEmailMultiple(Request $request)
+    {
+
+        DB::beginTransaction();
+        try {
+            $validator = Validator::make($request->all(), [
+                'tags.*' => ['required','email'],
+                'ids' => ['required','array'],
+                'ids.*' => ['integer','required','exists:account_voucher_infos,id'],
+                'message' => 'sometimes','nullable','string',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+            extract($request->post());
+            $share_id = $this->generateUniqueId();
+            $shareLink = route('archive.view',['archive'=>null,'share'=>$share_id]);
+            $insert1_data = [] ;
+            $insert1_data = collect($ids)->map(function ($id) use ($share_id) {
+                return [
+                    'company_id' => Auth::user()->company_id,
+                    'share_id'  =>  $share_id,
+                    'share_voucher_id' =>  $id,
+                    'status'    =>  1,
+                    'shared_by' =>  Auth::user()->id,
+                ];
+            })->toArray();
+            $insert1 = DB::table('voucher_share_email_links')->insert($insert1_data);
+
+            if (!$insert1) {
+                // Rollback the transaction if the second insert for any item failed
+                throw  new \Exception('Failed to execute the insert.');
+            }
+            else{
+
+                $insertData = collect($tags)->map(function ($email) use ($share_id) {
+                    return [
+                        'company_id' => Auth::user()->company_id,
+                        'share_id'  =>  $share_id,
+                        'email'   =>  $email,
+                    ];
+                })->toArray();
+                $insert2 = DB::table('voucher_share_email_lists')->insert($insertData);
+                if (!$insert2) {
+                    // Rollback the transaction if the second insert for any item failed
+                    throw  new \Exception('Failed to execute the insert.');
+                }
+                DB::commit();
+            }
+            if ($tags && (is_array($tags) || is_object($tags))) {
+                Mail::to($tags)->send(new ShareArchive($shareLink, null));
+                // Email sent successfully
+            } else {
+                throw  new \Exception('Invalid recipient list');
+            }
+            return response()->json([
+                'status'=> 'success',
+                'message'=> 'Mail send successfully!',
+            ]);
+            
+        }catch (\Throwable $exception)
+        {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message'=> $exception->getMessage(),
+                'code' => $exception->getCode(),
+            ]);
         }
     }
 

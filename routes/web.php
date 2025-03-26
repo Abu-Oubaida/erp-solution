@@ -58,6 +58,9 @@ Route::controller(ajaxRequestController::class)->group(function (){
     Route::middleware(['permission:share_archive_data'])->group(function (){
         Route::post('share-archive-fiend','shareArchiveFiend')->name('share.archive.document.fiend');
     });
+    Route::middleware(['permission:share_archive_data_multiple'])->group(function (){
+        Route::post('share-archive-fiend-multiple','shareArchiveFiendMultiple')->name('share.archive.document.fiend.multiple');
+    });
     # 2.4 For Auth user company check
     Route::post('company-check-set','companyCheckSet');
 });//2.0 End
@@ -81,8 +84,12 @@ Route::group(['middleware' => ['auth']],function (){
         });
 //        Route::middleware(['permission:share_voucher_document'])->group(function (){
         Route::middleware(['permission:share_archive_data'])->group(function (){
-            Route::post('share-archive-email','shareArchiveEmail')->name('share.voucher.email');
-            Route::post('archive-email-link-status-change','archiveEmailLinkStatusChange')->name('archive.email.link.status.change');
+            Route::post('share-archive-email','shareArchiveEmail');
+            Route::post('archive-email-link-status-change','archiveEmailLinkStatusChange');
+        });
+        Route::middleware(['permission:share_archive_data_multiple'])->group(function (){
+            Route::post('share-archive-email-multiple','shareArchiveEmailMultiple');
+            Route::post('archive-email-link-status-change','archiveEmailLinkStatusChange');
         });
         Route::post('company-wise-projects','companyWiseProjects');
         Route::post('user-wise-company-project-permissions','userWiseCompanyProjectPermissions');
