@@ -1,18 +1,42 @@
 <div class="modal-content">
     <div class="modal-header">
         <h1 class="modal-title fs-5 w-100" id="v_document_title">
-            <div class="row">
-                <div class="col"><strong>Reference No:</strong> {!! $result->voucher_number !!}</div>
-                <div class="col"><strong>Type:</strong> {!! @$result->VoucherType->voucher_type_title !!}</div>
-                <div class="col"><strong>Date:</strong> {!! $result->voucher_date !!}</div>
-            </div>
+            Share archive here
         </h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body">
         <div class="row">
             <div class="col-md-12">
-                <span><i class="fa-regular fa-envelope"></i> You can share your document link via email <sup class="text-danger">*</sup></span>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr class="table-success">
+                            <th colspan="4" class="text-center"><h5>Share archive list</h5></th>
+                        </tr>
+                        <tr class="table-active">
+                            <th>SL</th>
+                            <th>Reference</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                @if (isset($voucherInfos) && count($voucherInfos))
+                    @php($i=1)
+                    @foreach ($voucherInfos as $voucherInfo)
+                        <tr>
+                            <td>{!! $i++ !!}</td>
+                            <td>{!! $voucherInfo->voucher_number !!}</td>
+                            <td>{!! $voucherInfo->VoucherType->voucher_type_title !!}</td>
+                            <td>{!! date('d-M-Y', strtotime($voucherInfo->voucher_date)) !!}</td>
+                        </tr>
+                    @endforeach
+                @endif
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <h5><i class="fa-regular fa-envelope"></i> You can share your document link via email <sup class="text-danger">*</sup></h5>
                 <div class="form-floating mb-3">
                     <div class="tags-input" id="tags-input">
                         <input class="tag-input" type="text" list="users_email_list" placeholder="Add a people and group *" id="tag-input" onkeyup="return Obj.tagInput(this)">
@@ -35,17 +59,22 @@
             </div>
             <div class="col-md-12">
                 <div class="form-floating mb-3 float-end">
-                    <button class="btn btn-success" id="submit-tags" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($result->id) !!}" onclick="return Obj.sendArchiveEmail(this)" type="button"><i class="fa-solid fa-share-from-square"></i> Send Mail</button>
+                    <button class="btn btn-success" id="submit-tags" 
+                        data-ids='@json($voucherInfos->pluck("id"))'
+                        onclick="return Obj.sendArchiveEmailMultiple(this)" 
+                        type="button">
+                        <i class="fa-solid fa-share-from-square"></i> Send Mail
+                    </button>
                 </div>
             </div>
 
-            <div class="col-md-12">
+            {{-- <div class="col-md-12">
                 <div class="hr-text">
                     <hr>
                     <span>OR</span>
                     <hr>
                 </div>
-            </div>
+            </div> --}}
 {{--            <div class="col-md-12">--}}
 {{--                <br>--}}
 {{--                <span><i class="fa-solid fa-earth-americas"></i> Anyone on the internet of this system with the link can view</span>--}}
@@ -68,10 +97,11 @@
 {{--                <button class="btn btn-success" onclick="return Obj.copyDocumentShareLink(this)" type="button"><i class="fa-regular fa-copy"></i> Copy link</button>--}}
 {{--            </div>--}}
             <div class="col-md-12">
-                <span><i class="fa-regular fa-envelope"></i> This document share via email list</span>
+                <h5><i class="fa-regular fa-envelope"></i> Previous shared history</h5>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>Archive Reference</th>
                             <th>Share ID</th>
                             <th>Share Emails</th>
                             <th>Share Status</th>
@@ -79,9 +109,10 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    @foreach($shareData as $e)
+                    @foreach($shareDatum as $e)
                         <tr>
-                            <td><a href="{!! $shareLink = route('archive.view',['archive'=>Crypt::encryptString($e->share_voucher_id),'share'=>$e->share_id]) !!}" target="_blank">{!! $e->share_id !!}</a></td>
+                            <td>{!! $e->shareArchive->voucher_number !!}</td>
+                            <td><a href="{!! $shareLink = route('archive.view',['archive'=>null,'share'=>$e->share_id]) !!}" target="_blank">{!! $e->share_id !!}</a></td>
                             <td>
                                 @if(count($e->ShareEmails))
                                     @foreach($e->ShareEmails as $email)

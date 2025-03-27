@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\UserCompanyPermission;
 use App\Models\userProjectPermission;
 use App\Models\Voucher_share_email_link;
+use App\Models\Voucher_share_email_list;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentShareEmailLink;
 use App\Models\VoucherDocumentShareEmailList;
@@ -231,7 +232,21 @@ class ajaxRequestController extends Controller
             $id = Crypt::decryptString($id);
             $result = VoucherDocument::select(['id','document'])->find($id);
             $userEmails = User::all(['name','email']);
-            $shareData =VoucherDocumentShareEmailLink::with('ShareEmails')->where('share_document_id',$id)->get();
+            $shareData =VoucherDocumentShareEmailLink::with('ShareEmails','sharedBy')->where('share_document_id',$id)
+            ->with(['sharedBy'=>function ($query){
+                $query->select('id','name');
+            }]);
+            if( !Auth::user()->isSystemSuperAdmin())
+            {
+                if (!Auth::user()->companyWiseRoleName() == 'superadmin')
+                {
+                    $shareData->where('shared_by',Auth::user()->id)->where('company_id',Auth::user()->company);
+                }
+                else {
+                    $shareData->where('company_id',Auth::user()->company);
+                }
+            }
+            $shareData = $shareData->get();
             return view('back-end/archive/_share_document_model',compact('result','userEmails','shareData'));
         }catch (\Throwable $exception)
         {
@@ -251,19 +266,88 @@ class ajaxRequestController extends Controller
 //            $results = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
             $result = Account_voucher::with(['VoucherType'])->select(['id','voucher_date','voucher_number','voucher_type_id'])->find($id);
             $userEmails = User::all(['name','email']);
-            $shareData =Voucher_share_email_link::with('ShareEmails')->where('share_voucher_id',$id)->get();
-            return view('back-end/archive/_share_archive_model',compact('result','userEmails','shareData'));
+            $shareData =Voucher_share_email_link::with('ShareEmails','sharedBy')->where('share_voucher_id',$id)
+            ->with(['sharedBy'=>function ($query){
+                $query->select('id','name');
+            }]);
+            if( !Auth::user()->isSystemSuperAdmin())
+            {
+                if (!Auth::user()->companyWiseRoleName() == 'superadmin')
+                {
+                    $shareData->where('shared_by',Auth::user()->id)->where('company_id',Auth::user()->company);
+                }
+                else {
+                    $shareData->where('company_id',Auth::user()->company);
+                }
+            }
+            $shareData = $shareData->get();
+            $view = view('back-end/archive/_share_archive_model',compact('result','userEmails','shareData'))->render();
+            return response()->json([
+                'status' => 'success',
+                'message'=> 'Request process successfully!',
+                'data'=> $view,
+            ]);
         }catch (\Throwable $exception)
         {
-            echo json_encode(array(
-                'error' => array(
-                    'msg' => $exception->getMessage(),
-                    'code' => $exception->getCode(),
-                )
-            ));
+            return response()->json([
+                'status' => 'error',
+                'message'=> $exception->getMessage(),
+                'code'=> $exception->getCode(),
+            ]);
         }
     }
 
+    public function shareArchiveFiendMultiple(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'ids' => ['array','required'],
+                'ids.*' => ['integer','required','exists:account_voucher_infos,id'],
+            ]);
+            extract($request->post());
+//            $results = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
+            $voucherInfos = Account_voucher::with(['VoucherType'])->select(['id','voucher_date','voucher_number','voucher_type_id'])->whereIn('id',$ids)->get();
+            $userEmails = User::all(['name','email']);
+
+            $shareDatum =Voucher_share_email_link::with(['ShareEmails','shareArchive','shareEmailByShareId','sharedBy'])
+            ->select(['id','company_id','share_id','share_voucher_id','status','shared_by'])
+            ->with(['sharedBy'=>function($query){
+                $query->select('users.id','users.name');
+            }])
+            ->with(['ShareEmails'=>function($query){
+                $query->select('share_link_id','email');
+            }])
+            ->with(['shareEmailByShareId'=>function($query){
+                $query->select('share_id','share_link_id','email');
+            }])
+            ->whereIn('share_voucher_id',$ids);
+            // dd(Auth::user()->isSystemSuperAdmin());
+            if( !Auth::user()->isSystemSuperAdmin())
+            {
+                if (!Auth::user()->companyWiseRoleName() == 'superadmin')
+                {
+                    $shareDatum->where('shared_by',Auth::user()->id)->where('company_id',Auth::user()->company);
+                }
+                else {
+                    $shareDatum->where('company_id',Auth::user()->company);
+                }
+            }
+            $shareDatum = $shareDatum->get();
+            $view = view('back-end/archive/_share_archive_model_multiple',compact('voucherInfos','userEmails','shareDatum'))->render();
+            return response()->json([
+                'status' => 'success',
+                'message'=> 'Request process successfully!',
+                'data'=> $view,
+            ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=> $exception->getMessage(),
+                'code'=> $exception->getCode(),
+            ]);
+        }
+    }
     private function generateUniqueId($length = 12) {
         $randomString = Str::random($length - 8); // Generate a random string
         $timestamp = now()->timestamp; // Get the current timestamp
@@ -364,7 +448,6 @@ class ajaxRequestController extends Controller
             ));
         }
     }
-
     public function shareArchiveEmail(Request $request)
     {
 
@@ -435,6 +518,77 @@ class ajaxRequestController extends Controller
             ));
         }
     }
+    public function shareArchiveEmailMultiple(Request $request)
+    {
+
+        DB::beginTransaction();
+        try {
+            $validator = Validator::make($request->all(), [
+                'tags.*' => ['required','email'],
+                'ids' => ['required','array'],
+                'ids.*' => ['integer','required','exists:account_voucher_infos,id'],
+                'message' => 'sometimes','nullable','string',
+            ]);
+            if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+            }
+            extract($request->post());
+            $share_id = $this->generateUniqueId();
+            $shareLink = route('archive.view',['archive'=>null,'share'=>$share_id]);
+            $insert1_data = [] ;
+            $insert1_data = collect($ids)->map(function ($id) use ($share_id) {
+                return [
+                    'company_id' => Auth::user()->company_id,
+                    'share_id'  =>  $share_id,
+                    'share_voucher_id' =>  $id,
+                    'status'    =>  1,
+                    'shared_by' =>  Auth::user()->id,
+                ];
+            })->toArray();
+            $insert1 = DB::table('voucher_share_email_links')->insert($insert1_data);
+
+            if (!$insert1) {
+                // Rollback the transaction if the second insert for any item failed
+                throw  new \Exception('Failed to execute the insert.');
+            }
+            else{
+                // Voucher_share_email_link::insert($insert1_data);
+                // Voucher_share_email_list::insert($insert1_data);
+                $insertData = collect($tags)->map(function ($email) use ($share_id) {
+                    return [
+                        'company_id' => Auth::user()->company_id,
+                        'share_id'  =>  $share_id,
+                        'email'   =>  $email,
+                    ];
+                })->toArray();
+                $insert2 = DB::table('voucher_share_email_lists')->insert($insertData);
+                if (!$insert2) {
+                    // Rollback the transaction if the second insert for any item failed
+                    throw  new \Exception('Failed to execute the insert.');
+                }
+                DB::commit();
+            }
+            if ($tags && (is_array($tags) || is_object($tags))) {
+                Mail::to($tags)->send(new ShareArchive($shareLink, null));
+                // Email sent successfully
+            } else {
+                throw  new \Exception('Invalid recipient list');
+            }
+            return response()->json([
+                'status'=> 'success',
+                'message'=> 'Mail send successfully!',
+            ]);
+            
+        }catch (\Throwable $exception)
+        {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message'=> $exception->getMessage(),
+                'code' => $exception->getCode(),
+            ]);
+        }
+    }
 
     public function emailLinkStatusChange(Request $request)
     {
@@ -460,6 +614,55 @@ class ajaxRequestController extends Controller
             if (VoucherDocumentShareEmailLink::find($id))
             {
                 VoucherDocumentShareEmailLink::where('id',$id)->update([
+                    'status'=>$newStatus,
+                ]);
+                echo json_encode(array(
+                    'results' => 'Data update successfully!'
+                ));
+
+            }else{
+                echo json_encode(array(
+                    'error' => array(
+                        'msg' => 'Not Found!',
+                        'code' => '404',
+                    )
+                ));
+            }
+        }catch (\Throwable $exception)
+        {
+            echo json_encode(array(
+                'error' => array(
+                    'msg' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                )
+            ));
+        }
+    }
+    public function archiveEmailLinkStatusChange(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ref' => 'required','string',
+            'status' => 'required','string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+        try {
+            extract($request->post());
+            $id = Crypt::decryptString($ref);
+            $status = Crypt::decryptString($status);
+            if ($status == 0)
+            {
+                $newStatus = 1;
+            }
+            else{
+                $newStatus = 0;
+            }
+//            Voucher_share_email_link::find($id);
+            if (Voucher_share_email_link::find($id))
+            {
+                Voucher_share_email_link::where('id',$id)->update([
                     'status'=>$newStatus,
                 ]);
                 echo json_encode(array(

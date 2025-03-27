@@ -9,7 +9,7 @@ class Voucher_share_email_list extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company_id','share_link_id','email'];
+    protected $fillable = ['company_id','share_link_id','share_id','email'];
 
     public function shareLink()
     {

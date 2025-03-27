@@ -1185,16 +1185,51 @@ let Obj = {};
                     url: url,
                     type: "POST",
                     data: { id: id },
-                    success: function (data) {
-                        if (data.error) {
-                            alert(data.error.msg);
-                        } else {
+                    success: function (response) {
+                        if (response.status === "success") {
                             while (tags.length > 0) {
-                                tags.pop();
+                                tags.pop(); //update global veriable value as null
                             }
-                            $("#model_dialog").html(data);
+                            $("#model_dialog").html(response.data);
                             $("#shareModel").modal("show");
+                        } else {
+                            alert("Error: " + response.message);
                         }
+                        return false;
+                    },
+                });
+                return false;
+            },
+
+            shareArchiveMultiple: function (e) {
+                let selected = [];
+                $(".check-box:checked").each(function () {
+                    selected.push($(this).val());
+                });
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/share-archive-fiend-multiple";
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    url: url,
+                    type: "POST",
+                    data: { ids: selected },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            while (tags.length > 0) {
+                                tags.pop(); //update global veriable value as null
+                            }
+                            $("#model_dialog").html(response.data);
+                            $("#shareModel").modal("show");
+                        } else {
+                            alert("Error: " + response.message);
+                        }
+                        return false;
                     },
                 });
                 return false;
@@ -1404,6 +1439,43 @@ let Obj = {};
                     });
                 }
             },
+            sendArchiveEmailMultiple: function (e) {
+                let ids = $(e).data("ids");
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/share-archive-email-multiple";
+                const message = $("#message").val();
+                // const data = { tags: tags, refId: refId };
+                if (tags.length <= 0) {
+                    alert("Error! Empty Field");
+                    return false;
+                } else {
+                    $.ajax({
+                        url: url,
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        data: { tags: tags, ids: ids, message: message },
+                        success: function (response) {
+                            if (response.status === "success") {
+                                alert(response.message);
+                                $("#shareModel").modal("hide");
+                                return true;
+                            } else {
+                                alert("Error: " + response.message);
+                                return false;
+                            }
+                        },
+                        error: function (error) {
+                            console.error("Error:", error);
+                        },
+                    });
+                }
+            },
             emailLinkStatusChange: function (e) {
                 const ref = $(e).attr("ref");
                 const status = $(e).attr("status");
@@ -1411,6 +1483,36 @@ let Obj = {};
                     window.location.origin +
                     sourceDir +
                     "/email-link-status-change";
+                $.ajax({
+                    url: url,
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: { ref: ref, status: status },
+                    success: function (data) {
+                        if (data.error) {
+                            alert(data.error.msg);
+                        } else {
+                            data = JSON.parse(data);
+                            alert(data.results);
+                            $("#shareModel").modal("hide");
+                        }
+                    },
+                    error: function (error) {
+                        console.error("Error:", error);
+                    },
+                });
+            },
+            archiveEmailLinkStatusChange: function (e) {
+                const ref = $(e).attr("ref");
+                const status = $(e).attr("status");
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/archive-email-link-status-change";
                 $.ajax({
                     url: url,
                     method: "POST",
@@ -3062,8 +3164,8 @@ let Obj = {};
                                     "id",
                                     "voucher_type_title"
                                 );
-                                setSelectBoxBlank('previous-references')
-                                setSelectBoxBlank('previous-files')
+                                setSelectBoxBlank("previous-references");
+                                setSelectBoxBlank("previous-files");
                             }
                         }
                     },
@@ -3086,39 +3188,37 @@ let Obj = {};
                 ) {
                     return false;
                 }
-                if (confirm("Are you sure!")) {
-                    const url =
-                        window.location.origin +
-                        sourceDir +
-                        "/archive-data-list-quick";
-                    $.ajax({
-                        url: url,
-                        headers: {
-                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                "content"
-                            ),
-                        },
-                        method: "POST",
-                        data: {
-                            company_id: company,
-                            projects: projects,
-                            data_types: data_types,
-                            to_date: to_date,
-                            from_date: from_date,
-                            reference: reference,
-                        },
-                        success: function (response) {
-                            if (response.status === "error") {
-                                alert("Error: " + response.message);
-                                return false;
-                            } else if (response.status === "success") {
-                                // alert(response.message)
-                                $("#quick-list").html(response.data);
-                            }
-                        },
-                    });
-                }
-                return false;
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/archive-data-list-quick";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: {
+                        company_id: company,
+                        projects: projects,
+                        data_types: data_types,
+                        to_date: to_date,
+                        from_date: from_date,
+                        reference: reference,
+                    },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            // alert(response.message)
+                            $("#quick-list").html(response.data);
+                            return true;
+                        }
+                    },
+                });
             },
             companyWiseDepartments: function (e, action_id) {
                 let id = $(e).val();
@@ -3552,23 +3652,21 @@ let Obj = {};
                         data_type_id: dataTypeId,
                     },
                     success: function (response) {
-                        if (response.status === 'error')
-                        {
+                        if (response.status === "error") {
                             alert("Error: " + response.message);
-                            return false
-                        }else if (response.status === 'success')
-                        {
+                            return false;
+                        } else if (response.status === "success") {
                             alert(response.message);
-                            Obj.updatedPermissionWithUsersList(element)
+                            Obj.updatedPermissionWithUsersList(element);
                         }
                     },
                     error: function (xhr) {
-                        console.log(xhr)
+                        console.log(xhr);
                     },
                 });
             },
-            updatedPermissionWithUsersList:function(element){
-                let voucherId = $(element).data("voucher-id")
+            updatedPermissionWithUsersList: function (element) {
+                let voucherId = $(element).data("voucher-id");
                 let url =
                     window.location.origin +
                     sourceDir +
@@ -3581,7 +3679,10 @@ let Obj = {};
                         ),
                     },
                     method: "POST",
-                    data: { id: voucherId,encrypt_voucher_id:'encrypt_voucher_id' },
+                    data: {
+                        id: voucherId,
+                        encrypt_voucher_id: "encrypt_voucher_id",
+                    },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
@@ -3592,6 +3693,55 @@ let Obj = {};
                         }
                     },
                 });
+            },
+            deleteArchiveMultiple: function (e = null, multiplication = false) {
+                let selected = [];
+                $(".check-box:checked").each(function () {
+                    selected.push($(this).val());
+                });
+                if (selected.length === 0) {
+                    alert("Please select at least one record to delete.");
+                    return;
+                }
+
+                if (
+                    confirm("Are you sure you want to delete selected records?")
+                ) {
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        "/delete-archive-data";
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "DELETE",
+                        data: {
+                            selected: selected,
+                            multipleDlt: "multipleDlt",
+                        },
+                        success: function (response) {
+                            if (response.status == "success") {
+                                alert(response.message);
+                                if (multiplication) {
+                                    Obj.archiveDataQuickSearch(e);
+                                } else {
+                                    location.reload();
+                                }
+                            } else if (response.status == "error") {
+                                alert(response.message);
+                            }
+
+                            //location.reload();
+                        },
+                        error: function (error) {
+                            alert("An error occurred while deleting records.");
+                        },
+                    });
+                }
             },
             requisitionDocumentNeed: function (e) {
                 let data = $(e).attr("ref");

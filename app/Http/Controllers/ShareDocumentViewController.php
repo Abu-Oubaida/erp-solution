@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account_voucher;
 use App\Models\Voucher_share_email_link;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentShareEmailLink;
@@ -27,15 +28,25 @@ class ShareDocumentViewController extends Controller
     }
     public function archiveView(Request $request)
     {
-        $id = Crypt::decryptString($request->get('archive')); //voucher info id
+        $id = null;
+        if ($request->get('archive'))
+        {
+            $id = Crypt::decryptString($request->get('archive')); //voucher info id
+        }
+        
         $shareID = $request->get('share');
-        $documentEmail = Voucher_share_email_link::with('shareArchive','shareArchive.voucherDocuments')->where('status',1)->where('share_voucher_id',$id)->where('share_id',$shareID)->first();
-        $archiveInfo = $documentEmail->shareArchive;
-        $document = VoucherDocumentShareLink::with('voucherDocument')->where('status',1)->where('share_document_id',$id)->where('share_id',$shareID)->first();
-        if ($document)
-            return view('back-end/view-document/archive_view',compact('document'));
-        elseif ($archiveInfo)
-            return view('back-end/view-document/archive_view',compact('archiveInfo'));
+        $shareArchives = null;
+        if (!$id)
+        {
+            $shareArchives = Voucher_share_email_link::with('shareArchive','shareArchive.voucherDocuments')->where('status',1)->where('share_id',$shareID)->get()->pluck('share_voucher_id')->toArray();
+        }
+        else
+        {
+            $shareArchives = Voucher_share_email_link::with('shareArchive','shareArchive.voucherDocuments')->where('status',1)->where('share_voucher_id',$id)->where('share_id',$shareID)->get()->pluck('share_voucher_id')->toArray();
+        }
+        $archives = Account_voucher::with(['voucherDocuments','VoucherType','company'])->whereIn('id',$shareArchives)->get();
+        if (count($archives))
+            return view('back-end/view-document/archive_view',compact('archives'));
         else
             abort(404, 'This is a custom 404 message.');
     }

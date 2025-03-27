@@ -45,19 +45,31 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @if(isset($archiveInfo))
+                    @if(isset($archives) )
                         @php($sl=1)
-                        @foreach($archiveInfo->voucherDocuments as $d)
+                        @foreach($archives as $a)
                             <tr class="">
                                 <td>{!! $sl++ !!}</td>
-                                <td>{!! date('d-M-y', strtotime($archiveInfo->voucher_date)) !!}</td>
-                                <td>{!! $archiveInfo->company->company_name !!}</td>
-                                <td>{!! $archiveInfo->voucher_number !!}</td>
-                                <td>{!! $archiveInfo->remarks??"-" !!}</td>
+                                <td>{!! $a->voucher_date !!}</td>
+{{--                                <td>{!! date('d-M-y', strtotime($a->voucher_date)) !!}</td>--}}
+                                <td>{!! $a->company->company_name !!}</td>
+                                <td>{!! $a->voucher_number !!}</td>
+                                <td>{!! $a->remarks??"-" !!}</td>
                                 <td class="text-start text-left">
-                                    <div>
-                                        <a href="{!! url($d->filepath.'/'.$d->document) !!}" title="View on new window" target="_blank">{!! $d->document !!}</a>
-                                    </div>
+                                    <table class="table table-hover table-sm table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>Document Name</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($a->voucherDocuments as $d)
+                                            <tr>
+                                                <td><a href="{!! url($d->filepath.'/'.$d->document) !!}" title="View on new window" target="_blank">{!! $d->document !!}</a></td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
                                 </td>
                             </tr>
 

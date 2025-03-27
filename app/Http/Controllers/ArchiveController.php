@@ -132,7 +132,7 @@ class ArchiveController extends Controller
         }catch (\Throwable $exception)
         {
             DB::rollBack();
-            return back()->with('error',$exception->getMessage().$exception->getLine())->withInput();
+            return back()->with('error',$exception->getMessage())->withInput();
         }
     }
     public function editArchiveType(Request $request, $voucherTypeID)
@@ -298,13 +298,13 @@ class ArchiveController extends Controller
         try {
             extract($request->post());
             $vtID = Crypt::decryptString($id);
-            $av = VoucherType::with(['accountVoucher'])->find($vtID);
-            if($av->accountVoucher != null)
+            $av = VoucherType::with(['accountVoucher','voucherWithUsers'])->find($vtID);
+            if($av->accountVoucher != null || count($av->voucherWithUsers)>0)    
             {
                 return back()->with('error','A relationship exists between other tables. Data delete not possible');
             }
-            VoucherType::where('id',$vtID)->delete();
-            Voucher_type_permission_user::where('voucher_type_id',$vtID)->delete();
+            $av->delete();
+            // Voucher_type_permission_user::where('voucher_type_id',$vtID)->delete();
             return back()->with('success','Data delete successfully');
         }catch (\Throwable $exception)
         {
@@ -350,6 +350,7 @@ class ArchiveController extends Controller
             ]);
             extract($request->post());
             $user = Auth::user();
+            $documentIds = array();
             $v_type = VoucherType::where('id',$data_type)->first();
 //            $firstInsert = archive infos
             $firstInsert = DB::table('account_voucher_infos')->insertGetId([
@@ -367,7 +368,6 @@ class ArchiveController extends Controller
                 throw new \Exception('Failed to insert data');
             }
             if ($firstInsert && $request->hasFile('voucher_file')) {
-                $documentIds = array();
                 foreach ($request->file('voucher_file') as $file) {
                     // Handle each file
                     $fileName = $reference_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
@@ -948,22 +948,46 @@ class ArchiveController extends Controller
     {
         try {
             $permission = $this->permissions()->archive_data_delete;
-            if ($request->isMethod('delete'))
-            {
                 $request->validate([
-                    'id'  =>    ['required','string']
+                    'id'       => ['required_without:selected', 'string'],  // 'id' is required if 'selected' is missing
+                    'selected' => ['required_without:id', 'array'],        // 'selected' is required if 'id' is missing
+                    'selected.*' => ['string'],  
                 ]);
-                extract($request->post());
                 $user = Auth::user();
-                $id = Crypt::decryptString($id);
-                $v = Account_voucher::with(['VoucherDocument'])->where('id',$id)->first();
-                if(isset($v) && $this->deleteVoucherInfoWithHistory($v))
-                {
-                    return back()->with('success','Data delete successfully!');
+                if($request->multipleDlt){
+                    $ids = array_map(function ($id) {
+                        return $id;
+                    }, $request->selected);
+
+                    $deletion_check = 0;
+                    foreach ($ids as $id){
+                        $v = Account_voucher::with(['VoucherDocument'])->where('id',$id)->first();
+                        if(isset($v) && $this->deleteVoucherInfoWithHistory($v))
+                        {
+                            $deletion_check++;
+                        }
+                    }
+                    if ($deletion_check){
+                    return response()->json([
+                                'status'=>'success',
+                                'message'=> $deletion_check.' Data delete successfully!'
+                        ]);
+                    }else{
+                        return response()->json([
+                        'status'=>'error',
+                        'message'=> 'Data not found on database!'
+                    ]);
+                    }
+                }else{
+                    $id = Crypt::decryptString($request->id);
+                    $v = Account_voucher::with(['VoucherDocument'])->where('id',$id)->first();
+                    if(isset($v) && $this->deleteVoucherInfoWithHistory($v))
+                    {
+                        return back()->with('success','Data delete successfully!');
+                    }else{
+                        return back()->with('error','Data not found on database!');
+                    }
                 }
-                return back()->with('error','Data not found on database!');
-            }
-            return back()->with('error','Requested data not valid!');
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
