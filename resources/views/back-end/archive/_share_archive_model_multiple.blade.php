@@ -114,6 +114,11 @@
                             <td>{!! $e->shareArchive->voucher_number !!}</td>
                             <td><a href="{!! $shareLink = route('archive.view',['archive'=>null,'share'=>$e->share_id]) !!}" target="_blank">{!! $e->share_id !!}</a></td>
                             <td>
+                                @if(count($e->ShareEmails))
+                                    @foreach($e->ShareEmails as $email)
+                                        {!! $email->email !!} <br>
+                                    @endforeach
+                                @endif
                                 @if(count($e->shareEmailByShareId))
                                     @foreach($e->shareEmailByShareId as $email)
                                         {!! $email->email !!} <br>

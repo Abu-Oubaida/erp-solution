@@ -75,20 +75,27 @@
                             <th>Share ID</th>
                             <th>Share Emails</th>
                             <th>Share Status</th>
+                            <th>Shared By</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     @foreach($shareData as $e)
                         <tr>
-                            <td><a href="{!! $shareLink = route('archive.view',['archive'=>Crypt::encryptString($e->share_voucher_id),'share'=>$e->share_id]); !!}" target="_blank">{!! $e->share_id !!}</a></td>
+                            <td><a href="{!! $shareLink = route('archive.view',['archive'=>Crypt::encryptString($e->share_voucher_id),'share'=>$e->share_id]) !!}" target="_blank">{!! $e->share_id !!}</a></td>
                             <td>
                                 @if(count($e->ShareEmails))
                                     @foreach($e->ShareEmails as $email)
                                         {!! $email->email !!} <br>
                                     @endforeach
                                 @endif
+                                @if(count($e->shareEmailByShareId))
+                                    @foreach($e->shareEmailByShareId as $email)
+                                        {!! $email->email !!} <br>
+                                    @endforeach
+                                @endif
                             </td>
                             <td>@if($e->status) <span class="badge bg-success">Active</span> @else <span class="badge bg-danger">Inactive</span> @endif</td>
+                            <td>{!! $e->sharedBy->name !!}</td>
                             <td>
                                 @if($e->status) <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure!')? Obj.archiveEmailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Inactive</button> @else <button class="btn btn-success btn-sm" onclick="return confirm('Are you sure!')? Obj.archiveEmailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Active</button> @endif
 

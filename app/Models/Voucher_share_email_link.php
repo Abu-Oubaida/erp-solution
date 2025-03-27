@@ -24,7 +24,7 @@ class Voucher_share_email_link extends Model
     {
         return $this->hasMany(Voucher_share_email_list::class,'share_id','share_id');
     }
-    public function sharedBy(array $params = [])
+    public function sharedBy()
     {
         return $this->belongsTo(User::class,'shared_by');
     }

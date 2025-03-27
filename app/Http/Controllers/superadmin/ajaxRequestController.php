@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\UserCompanyPermission;
 use App\Models\userProjectPermission;
 use App\Models\Voucher_share_email_link;
+use App\Models\Voucher_share_email_list;
 use App\Models\VoucherDocument;
 use App\Models\VoucherDocumentShareEmailLink;
 use App\Models\VoucherDocumentShareEmailList;
@@ -231,7 +232,21 @@ class ajaxRequestController extends Controller
             $id = Crypt::decryptString($id);
             $result = VoucherDocument::select(['id','document'])->find($id);
             $userEmails = User::all(['name','email']);
-            $shareData =VoucherDocumentShareEmailLink::with('ShareEmails')->where('share_document_id',$id)->get();
+            $shareData =VoucherDocumentShareEmailLink::with('ShareEmails','sharedBy')->where('share_document_id',$id)
+            ->with(['sharedBy'=>function ($query){
+                $query->select('id','name');
+            }]);
+            if( !Auth::user()->isSystemSuperAdmin())
+            {
+                if (!Auth::user()->companyWiseRoleName() == 'superadmin')
+                {
+                    $shareData->where('shared_by',Auth::user()->id)->where('company_id',Auth::user()->company);
+                }
+                else {
+                    $shareData->where('company_id',Auth::user()->company);
+                }
+            }
+            $shareData = $shareData->get();
             return view('back-end/archive/_share_document_model',compact('result','userEmails','shareData'));
         }catch (\Throwable $exception)
         {
@@ -251,7 +266,21 @@ class ajaxRequestController extends Controller
 //            $results = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
             $result = Account_voucher::with(['VoucherType'])->select(['id','voucher_date','voucher_number','voucher_type_id'])->find($id);
             $userEmails = User::all(['name','email']);
-            $shareData =Voucher_share_email_link::with('ShareEmails')->where('share_voucher_id',$id)->get();
+            $shareData =Voucher_share_email_link::with('ShareEmails','sharedBy')->where('share_voucher_id',$id)
+            ->with(['sharedBy'=>function ($query){
+                $query->select('id','name');
+            }]);
+            if( !Auth::user()->isSystemSuperAdmin())
+            {
+                if (!Auth::user()->companyWiseRoleName() == 'superadmin')
+                {
+                    $shareData->where('shared_by',Auth::user()->id)->where('company_id',Auth::user()->company);
+                }
+                else {
+                    $shareData->where('company_id',Auth::user()->company);
+                }
+            }
+            $shareData = $shareData->get();
             $view = view('back-end/archive/_share_archive_model',compact('result','userEmails','shareData'))->render();
             return response()->json([
                 'status' => 'success',
@@ -280,7 +309,7 @@ class ajaxRequestController extends Controller
             $voucherInfos = Account_voucher::with(['VoucherType'])->select(['id','voucher_date','voucher_number','voucher_type_id'])->whereIn('id',$ids)->get();
             $userEmails = User::all(['name','email']);
 
-            $shareDatum =Voucher_share_email_link::with(['ShareEmails','shareArchive','shareEmailByShareId','sharedBy'])->whereIn('share_voucher_id',$ids)->where('shared_by',Auth::user()->id)
+            $shareDatum =Voucher_share_email_link::with(['ShareEmails','shareArchive','shareEmailByShareId','sharedBy'])
             ->select(['id','company_id','share_id','share_voucher_id','status','shared_by'])
             ->with(['sharedBy'=>function($query){
                 $query->select('users.id','users.name');
@@ -289,9 +318,21 @@ class ajaxRequestController extends Controller
                 $query->select('share_link_id','email');
             }])
             ->with(['shareEmailByShareId'=>function($query){
-                $query->select('share_link_id','email');
+                $query->select('share_id','share_link_id','email');
             }])
-            ->get();
+            ->whereIn('share_voucher_id',$ids);
+            // dd(Auth::user()->isSystemSuperAdmin());
+            if( !Auth::user()->isSystemSuperAdmin())
+            {
+                if (!Auth::user()->companyWiseRoleName() == 'superadmin')
+                {
+                    $shareDatum->where('shared_by',Auth::user()->id)->where('company_id',Auth::user()->company);
+                }
+                else {
+                    $shareDatum->where('company_id',Auth::user()->company);
+                }
+            }
+            $shareDatum = $shareDatum->get();
             $view = view('back-end/archive/_share_archive_model_multiple',compact('voucherInfos','userEmails','shareDatum'))->render();
             return response()->json([
                 'status' => 'success',
@@ -511,7 +552,8 @@ class ajaxRequestController extends Controller
                 throw  new \Exception('Failed to execute the insert.');
             }
             else{
-
+                // Voucher_share_email_link::insert($insert1_data);
+                // Voucher_share_email_list::insert($insert1_data);
                 $insertData = collect($tags)->map(function ($email) use ($share_id) {
                     return [
                         'company_id' => Auth::user()->company_id,

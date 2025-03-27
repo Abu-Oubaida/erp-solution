@@ -69,6 +69,7 @@
                             <th>Share ID</th>
                             <th>Share Emails</th>
                             <th>Share Status</th>
+                            <th>Share By</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -83,6 +84,7 @@
                                 @endif
                             </td>
                             <td>@if($e->status) <span class="badge bg-success">Active</span> @else <span class="badge bg-danger">Inactive</span> @endif</td>
+                            <td>{!! @$e->sharedBy->name !!}</td>
                             <td>
                                 @if($e->status) <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure!')? Obj.emailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Inactive</button> @else <button class="btn btn-success btn-sm" onclick="return confirm('Are you sure!')? Obj.emailLinkStatusChange(this):false" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->id) !!}" status="{!! \Illuminate\Support\Facades\Crypt::encryptString($e->status) !!}">Make Active</button> @endif
 

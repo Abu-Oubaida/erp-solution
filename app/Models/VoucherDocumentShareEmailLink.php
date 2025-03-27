@@ -18,4 +18,8 @@ class VoucherDocumentShareEmailLink extends Model
     {
         return $this->belongsTo(VoucherDocument::class,'share_document_id');
     }
+
+    public function sharedBy(){
+        return $this->belongsTo(User::class,'shared_by');
+    }
 }
