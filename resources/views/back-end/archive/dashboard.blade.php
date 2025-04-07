@@ -25,14 +25,24 @@
                                         <td>{{ @$diskTotal }} GB</td>
                                     </tr>
                                     <tr>
-                                        <th>Total Archive Used</th>
+                                        <th>Total Free Space</th>
+                                        <th>:</th>
+                                        <td>{{ @$diskFree }} GB</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Used Space</th>
                                         <th>:</th>
                                         <td>{{ @$totalUsed }} GB</td>
                                     </tr>
                                     <tr>
-                                        <th>Total Free Disk Space</th>
+                                        <th>Archived</th>
                                         <th>:</th>
-                                        <td>{{ @$diskFree }} GB</td>
+                                        <td>{{ @$archiveUsed }} GB</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Other</th>
+                                        <th>:</th>
+                                        <td>{{ @$otherUsed }} GB</td>
                                     </tr>
                                     <tr>
                                         <th>Total Data Type</th>
@@ -48,7 +58,7 @@
                             </div>
                             <div class="col">
                                 <div class="align-items-center">
-                                    <div id="chart-container" style="width: 250px; float:right">
+                                    <div id="chart-container" style="width: 300px; float:right">
                                         <canvas id="levelChart"
                                             style="width: 100% !important;height: 100% !important;"></canvas>
 
@@ -56,12 +66,12 @@
                                             <div class="progress-bar bg-danger" role="progressbar"
                                                 style="width: {!! $totalUsed !!}%"
                                                 aria-valuenow="{!! $totalUsed !!}" aria-valuemin="0"
-                                                aria-valuemax="{{ $diskTotal }}">
+                                                aria-valuemax="{{ $diskTotal }}" title="Total Used ({!! $totalUsed !!}) GB">
                                                 Used ( {!! $totalUsed !!} GB )</div>
                                             <div class="progress-bar bg-success" role="progressbar"
                                                 style="width: {!! $diskFree !!}%"
                                                 aria-valuenow="{!! $diskFree !!}" aria-valuemin="0"
-                                                aria-valuemax="{{ $diskTotal }}">Free ( {!! $diskFree !!} GB )
+                                                aria-valuemax="{{ $diskTotal }}" title="Free Spase ({!! $diskFree !!}) GB">Free ( {!! $diskFree !!} GB )
                                             </div>
                                         </div>
                                         <p class="text-center"><strong>Total Storage:</strong> {{ $diskTotal }} GB</p>
@@ -86,23 +96,58 @@
             </div>
         </div>
         <div class="row mt-3">
-            <div class="col-xl-3 col-md-6">
-                <div class="card bg-primary text-white mb-4">
-                    <div class="card-body">Primary Card</div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">View
-                            Details</a>
-                        <div class="small text-white"><svg class="svg-inline--fa fa-angle-right" aria-hidden="true"
-                                focusable="false" data-prefix="fas" data-icon="angle-right" role="img"
-                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" data-fa-i2svg="">
-                                <path fill="currentColor"
-                                    d="M246.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 41.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z">
-                                </path>
-                            </svg><!-- <i class="fas fa-angle-right"></i> Font Awesome fontawesome.com -->
+            @if(isset($dataTypes) && count($dataTypes))
+                @php
+                    $colors = ['info', 'success', 'primary', 'warning','secondary'];
+                    $prevColor = null;
+                    $prevPrevColor = null;
+                @endphp
+                @foreach($dataTypes as $dataType)
+                    @php
+                        // Filter available colors
+                        $availableColors = array_filter($colors, function ($color) use ($prevColor, $prevPrevColor) {
+                            return $color !== $prevColor && $color !== $prevPrevColor;
+                        });
+
+                        $availableColors = array_values($availableColors);
+                        $chosenColor = $availableColors[array_rand($availableColors)];
+
+                        // Update tracking colors
+                        $prevPrevColor = $prevColor;
+                        $prevColor = $chosenColor;
+                    @endphp
+                    <div class="col">
+                        <div class="card bg-{{ $chosenColor }} text-white mb-4">
+                            <div class="card-header">
+                                <h4 class="text-capitalize"><i class="fas fa-file"></i> {!! $dataType['voucher_type_title'] !!}</h4>
+                            </div>
+                            <div class="card-body text-capitalize">
+                                <div class="row">
+                                    <div class="col text-start">
+                                        <h2 class="text-chl">{!! $dataType['archive_document_infos_count'] !!}</h2>
+                                        <a class="small text-white stretched-link text-decoration-none" href="#">Reference <i class="fas fa-angle-right"></i></a>
+                                    </div>
+                                    <div class="col text-end">
+                                        <h2 class="text-chl">{!! $dataType['archive_documents_count'] !!}</h2>
+                                        <a class="small text-white stretched-link text-decoration-none" href="#">Documents <i class="fas fa-angle-right"></i></a>
+                                    </div>
+                                </div>
+{{--                                <ul>--}}
+{{--                                    <li>Unique Archive Reference <h5 class="display-inline float-end"></h5></li>--}}
+{{--                                    <li>Data type wise document count <h5 class="display-inline float-end">{!! $dataType['archive_documents_count'] !!}</h5></li>--}}
+{{--                                </ul>--}}
+                            </div>
+{{--                            <div class="card-footer d-flex align-items-center justify-content-between">--}}
+{{--                                <a class="small text-white stretched-link" href="#">View--}}
+{{--                                    Details</a>--}}
+{{--                                <div class="small text-white">--}}
+{{--                                    <i class="fas fa-angle-right"></i>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
                         </div>
                     </div>
-                </div>
-            </div>
+                @endforeach
+            @endif
         </div>
 
 
@@ -113,17 +158,19 @@
         const levelChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: ["Used", "Free"],
+                labels: ["Free", 'Archive', 'Other',],
                 datasets: [{
                     label: 'Disk Usage',
-                    data: [{!! @$totalUsed !!}, {!! @$diskFree !!}],
+                    data: [{!! @$diskFree !!}, {!! @$archiveUsed !!}, {!! @$otherUsed !!},],
                     backgroundColor: [
-                        '#dc3545', // Used - Red
                         '#198754', // Free - Blue
+                        '#da3545', // Archive Used
+                        '#8a8a8a', // Other Used
                     ],
                     borderColor: [
-                        '#dc3545', // Used - Red
                         '#198754', // Free - Blue
+                        '#da3545', // Archive Used
+                        '#8a8a8a', // Other Used
                     ],
                     borderWidth: 1
                 }]

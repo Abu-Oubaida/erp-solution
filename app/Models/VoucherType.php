@@ -28,6 +28,13 @@ class VoucherType extends Model
         // return $this->hasMany(Voucher_type_permission_user::class,'voucher_type_id');
         return $this->belongsToMany(User::class,'voucher_type_permission_user','voucher_type_id','user_id');
     }
+    public function archiveDocumentInfos(){
+        return $this->hasMany(Account_voucher::class,'voucher_type_id');
+    }
+    public function archiveDocuments()
+    {
+        return $this->hasManyThrough(VoucherDocument::class,Account_voucher::class,'voucher_type_id','voucher_info_id','id','id');
+    }
     public function company()
     {
         return $this->belongsTo(company_info::class,'company_id');

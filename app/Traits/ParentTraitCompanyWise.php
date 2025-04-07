@@ -436,11 +436,27 @@ trait ParentTraitCompanyWise
     }
     private function archiveTypeList($permission)
     {
-        return VoucherType::withCount('voucherWithUsers')->with(['voucherWithUsers','createdBY','updatedBY','company'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission));
+        $voucherTypes = VoucherType::withCount(['voucherWithUsers','archiveDocuments','archiveDocumentInfos'])->with(['voucherWithUsers','createdBY','updatedBY','company','archiveDocumentInfos','archiveDocuments']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $voucherTypes;
+        }
+        else
+        {
+            $voucherTypes = $voucherTypes->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission));
+            if ($this->user->companyWiseRoleName() == 'superadmin')
+            {
+                return $voucherTypes;
+            }
+            else {
+                $voucherTypeUserPermissions = Voucher_type_permission_user::where('company_id',$this->getCompany()->id)->where('user_id',$this->user->id)->pluck('voucher_type_id')->toArray();
+                return $voucherTypes->whereIn('id',$voucherTypeUserPermissions);
+            }
+        }
     }
     public function getArchiveList($permission)
     {
             return Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes(null)->pluck('id')->toArray());
-        
+
     }
 }
