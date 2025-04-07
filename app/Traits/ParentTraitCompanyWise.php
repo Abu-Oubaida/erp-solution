@@ -449,7 +449,7 @@ trait ParentTraitCompanyWise
                 return $voucherTypes;
             }
             else {
-                $voucherTypeUserPermissions = Voucher_type_permission_user::where('company_id',$this->getCompany()->id)->where('user_id',$this->user->id)->pluck('voucher_type_id')->toArray();
+                $voucherTypeUserPermissions = Voucher_type_permission_user::where('user_id',$this->user->id)->pluck('voucher_type_id')->toArray();
                 return $voucherTypes->whereIn('id',$voucherTypeUserPermissions);
             }
         }
