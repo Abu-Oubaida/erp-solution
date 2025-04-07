@@ -298,7 +298,7 @@ class ArchiveController extends Controller
             extract($request->post());
             $vtID = Crypt::decryptString($id);
             $av = VoucherType::with(['accountVoucher','voucherWithUsers'])->find($vtID);
-            if($av->accountVoucher != null || count($av->voucherWithUsers)>0)    
+            if($av->accountVoucher != null || count($av->voucherWithUsers)>0)
             {
                 return back()->with('error','A relationship exists between other tables. Data delete not possible');
             }
@@ -535,12 +535,24 @@ class ArchiveController extends Controller
     {
         try {
             $permission = $this->permissions()->archive_data_list_quick;
+            $dataType = null;
+            $voucherInfos = null;
             if ($request->isMethod('post'))
             {
                 return $this->archiveListQuickSearch($request);
             }
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            return view('back-end/archive/quick-list',compact('companies'))->render();
+            if ($request->get('c') && $request->get('t'))
+            {
+                $request->validate([
+                    'c' =>['required', 'integer', 'exists:company_infos,id'],
+                    't' =>['required', 'integer', 'exists:voucher_types,id'],
+                ]);
+                $companyID = $this->getCompanyModulePermissionWise($permission)->where('id',$request->get('c'))->first('id');
+                $dataType = $this->archiveTypeList($permission)->where('company_id',$companyID->id)->where('id',$request->get('t'))->where('status',1)->select('id','voucher_type_title')->first();
+                $voucherInfos = $this->archiveListInfo($request->get('c'),$request->get('t'));
+            }
+            return view('back-end/archive/quick-list',compact('companies','dataType','voucherInfos'))->render();
         }catch (\Throwable $exception)
         {
             if ($request->isMethod('post'))
@@ -552,6 +564,49 @@ class ArchiveController extends Controller
             }
             return back()->with('error',$exception->getMessage());
         }
+    }
+
+    private function archiveListInfo($company_id,$type_id)
+    {
+        return Account_voucher::with([
+            'VoucherDocument',
+            'voucherDocuments',
+            'VoucherType',
+            'company',
+            'createdBY',
+            'updatedBY'
+        ])
+            ->select(
+                'id',
+                'voucher_date',
+                'voucher_type_id',
+                'voucher_number',
+                'remarks',
+                'created_at',
+                'company_id',
+                'voucher_type_id',
+                'created_by',
+                'updated_by',
+                'project_id'
+            )
+            ->with(['VoucherDocument' => function($query) {
+                $query->select('voucher_info_id', 'document', 'filepath'); // Adjust the columns in VoucherDocument
+            }])
+            ->with(['VoucherType' => function($query) {
+                $query->select('id', 'voucher_type_title', 'code'); // Adjust the columns in VoucherType
+            }])
+            ->with(['company' => function($query) {
+                $query->select('id', 'company_name', 'company_code'); // Adjust the columns in company
+            }])
+            ->with(['createdBY' => function($query) {
+                $query->select('id', 'name'); // Adjust the columns in createdBY (User model)
+            }])
+            ->with(['updatedBY' => function($query) {
+                $query->select('id', 'name'); // Adjust the columns in updatedBY (User model)
+            }])
+            ->where('company_id', $company_id)
+            ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes($company_id)->pluck('id')->toArray())
+            ->where('voucher_type_id',$type_id)->get();
     }
     private function archiveListQuickSearch(Request $request)
     {
@@ -951,7 +1006,7 @@ class ArchiveController extends Controller
                 $request->validate([
                     'id'       => ['required_without:selected', 'string'],  // 'id' is required if 'selected' is missing
                     'selected' => ['required_without:id', 'array'],        // 'selected' is required if 'id' is missing
-                    'selected.*' => ['string'],  
+                    'selected.*' => ['string'],
                 ]);
                 $user = Auth::user();
                 if($request->multipleDlt){
