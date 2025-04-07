@@ -40,15 +40,14 @@ class ArchiveController extends Controller
 
     public function createArchiveType(Request $request)
     {
+        // dd(round(disk_total_space($this->accounts_document_path) / (1024 ** 3), 2),round(disk_($this->accounts_document_path) / (1024 ** 3), 2));
         $permission = $this->permissions()->add_archive_data_type;
         try {
             if ($request->isMethod('post'))
             {
                 return $this->storeArchiveType($request);
             }
-            $voucherTypes = $this->archiveTypeList($permission);
-            Log::info(json_encode($voucherTypes,JSON_PRETTY_PRINT));
-            //Log::info(json_encode($voucherTypes->company,JSON_PRETTY_PRINT));
+            $voucherTypes = $this->getArchiveTypeList($permission);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/archive/type/add',compact('voucherTypes','companies'))->render();
         }catch (\Throwable $exception)
@@ -58,7 +57,7 @@ class ArchiveController extends Controller
     }
     public function listArchiveDataType(Request $request){
         $permission = $this->permissions()->archive_data_type_list;
-        $voucherTypes = $this->archiveTypeList($permission);
+        $voucherTypes = $this->getArchiveTypeList($permission);
             return view('back-end/archive/type/list',compact('voucherTypes'))->render();
     }
     private function storeArchiveType(Request $request,$voucherTypeID=null):RedirectResponse
@@ -149,7 +148,7 @@ class ArchiveController extends Controller
             }
             $vtID = Crypt::decryptString($voucherTypeID);
             $voucherType = VoucherType::find($vtID);
-            $voucherTypes = $this->archiveTypeList($permission);
+            $voucherTypes = $this->getArchiveTypeList($permission);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/archive/type/edit',compact('voucherType','voucherTypes','companies'))->render();
         }catch (\Throwable $exception)
@@ -158,9 +157,9 @@ class ArchiveController extends Controller
         }
     }
 
-    private function archiveTypeList($permission)
+    private function getArchiveTypeList($permission)
     {
-        return VoucherType::withCount('voucherWithUsers')->with(['voucherWithUsers','createdBY','updatedBY','company'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->get();
+        return $this->archiveTypeList($permission)->get();
     }
     public function archiveDataListPermissionWithUsers(Request $request){
         try{
@@ -521,8 +520,10 @@ class ArchiveController extends Controller
     public function archiveList()
     {
         try {
-            $permission = $this->permissions()->archive_data_list;
-            $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes(null)->pluck('id')->toArray())->get();
+             $permission = $this->permissions()->archive_data_list;
+            // $voucherInfos = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes(null)->pluck('id')->toArray())->get();
+
+            $voucherInfos = $this->getArchiveList($permission)->get();
             return view('back-end/archive/list',compact('voucherInfos'))->render();
         }catch (\Throwable $exception)
         {
@@ -662,37 +663,36 @@ class ArchiveController extends Controller
             ]);
         }
     }
-    private function getCompanyWiseDataTypes($company_id)
-    {
-        if ($this->user->isSystemSuperAdmin() || $this->user->companyWiseRoleName() == 'superadmin')
-        {
-            if ($company_id == null)
-            {
-                $userWiseVoucherTypePermissionId = VoucherType::all()->pluck('id')->toArray();
-            }
-            else {
-                $userWiseVoucherTypePermissionId = VoucherType::where('company_id',$company_id)->get()->pluck('id')->toArray();
-            }
-        }
-        else
-        {
-            if ($company_id == null)
-            {
-                $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
-            }
-            else {
-                $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('company_id',$company_id)->where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
-            }
-        }
-        if ($company_id == null)
-        {
-            return VoucherType::where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
-        }
-        else{
-            return VoucherType::where('company_id',$company_id)->where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
-        }
+    // {
+    //     if ($this->user->isSystemSuperAdmin() || $this->user->companyWiseRoleName() == 'superadmin')
+    //     {
+    //         if ($company_id == null)
+    //         {
+    //             $userWiseVoucherTypePermissionId = VoucherType::all()->pluck('id')->toArray();
+    //         }
+    //         else {
+    //             $userWiseVoucherTypePermissionId = VoucherType::where('company_id',$company_id)->get()->pluck('id')->toArray();
+    //         }
+    //     }
+    //     else
+    //     {
+    //         if ($company_id == null)
+    //         {
+    //             $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
+    //         }
+    //         else {
+    //             $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('company_id',$company_id)->where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
+    //         }
+    //     }
+    //     if ($company_id == null)
+    //     {
+    //         return VoucherType::where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
+    //     }
+    //     else{
+    //         return VoucherType::where('company_id',$company_id)->where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
+    //     }
 
-    }
+    // }
     public function companyWiseProjectsAndDataType(Request $request)
     {
         try {

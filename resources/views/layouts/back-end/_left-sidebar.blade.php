@@ -293,6 +293,10 @@
                         <div class="collapse" id="pagesUploadOption" aria-labelledby="headingOne" data-bs-parent="#pagesUploadOption">
                     @endif
                             <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{{route('data.archive.dashboard.interface')}}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                    Dashboard
+                                </a>
                                 {{--            Upload Voucher Permission Check Start--}}
                                 @if(auth()->user()->hasPermission('add_archive_data_type'))
                                     @if(Route::currentRouteName() == 'add.archive.type')

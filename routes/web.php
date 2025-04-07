@@ -8,6 +8,7 @@ use App\Http\Controllers\BranchTypeController;
 use App\Http\Controllers\ComplainController;
 use App\Http\Controllers\ControlPanelController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataArchiveDashboardController;
 use App\Http\Controllers\DocumentRequisitionInfoController;
 use App\Http\Controllers\editor\ImageController;
 use App\Http\Controllers\FileManagerController;
@@ -251,7 +252,9 @@ Route::group(['middleware' => ['auth']],function (){
     Route::middleware(['permission:file_manager'])->group(function (){
         Route::get("file_manager", [FileManagerController::class,'index'])->name('file-manager');
     });//3.6 End
-
+   Route::controller(DataArchiveDashboardController::class)->group(function(){
+        Route::match(['get'],'data-archive-dashboard','index')->name('data.archive.dashboard.interface');
+   });
 # 3.7 Data Archive Controller
     Route::controller(ArchiveController::class)->group(function (){
         Route::post('search-previous-document-ref','searchPreviousDocumentRef')->name('search.previous-document-ref');//for ajax

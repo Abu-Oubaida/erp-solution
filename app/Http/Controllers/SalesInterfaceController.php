@@ -14,7 +14,7 @@ class SalesInterfaceController extends Controller
     {
         return view('back-end.sales.dashboard');
     }
-    public function addLead(Request $request)
+    public function addLead(Request $request): bool|Factory|RedirectResponse|View
     {
         try {
             if ($request->isMethod('post'))
