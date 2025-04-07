@@ -56,7 +56,7 @@
                                     </tr>
                                 </table>
                             </div>
-                            <div class="col">
+                            <div class="col-2">
                                 <div class="align-items-center">
                                     <div id="chart-container" style="width: 300px; float:right">
                                         <canvas id="levelChart"
