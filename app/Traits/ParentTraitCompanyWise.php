@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Models\Account_voucher;
 use App\Models\BloodGroup;
 use App\Models\branch;
 use App\Models\BranchType;
@@ -23,6 +24,8 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
 use App\Models\userProjectPermission;
+use App\Models\Voucher_type_permission_user;
+use App\Models\VoucherType;
 use Illuminate\Database\Eloquent\Builder;
 use Log;
 
@@ -400,4 +403,60 @@ trait ParentTraitCompanyWise
     //               ->where('company', $company_id); // Filtering users by company ID
     //     }])->get();
     // }
+    private function getCompanyWiseDataTypes($company_id)
+    {
+        if ($this->user->isSystemSuperAdmin() || $this->user->companyWiseRoleName() == 'superadmin')
+        {
+            if ($company_id == null)
+            {
+                $userWiseVoucherTypePermissionId = VoucherType::all()->pluck('id')->toArray();
+            }
+            else {
+                $userWiseVoucherTypePermissionId = VoucherType::where('company_id',$company_id)->get()->pluck('id')->toArray();
+            }
+        }
+        else
+        {
+            if ($company_id == null)
+            {
+                $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
+            }
+            else {
+                $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('company_id',$company_id)->where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
+            }
+        }
+        if ($company_id == null)
+        {
+            return VoucherType::where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
+        }
+        else{
+            return VoucherType::where('company_id',$company_id)->where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
+        }
+
+    }
+    private function archiveTypeList($permission)
+    {
+        $voucherTypes = VoucherType::withCount(['voucherWithUsers','archiveDocuments','archiveDocumentInfos'])->with(['voucherWithUsers','createdBY','updatedBY','company','archiveDocumentInfos','archiveDocuments']);
+        if ($this->user->isSystemSuperAdmin())
+        {
+            return $voucherTypes;
+        }
+        else
+        {
+            $voucherTypes = $voucherTypes->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission));
+            if ($this->user->companyWiseRoleName() == 'superadmin')
+            {
+                return $voucherTypes;
+            }
+            else {
+                $voucherTypeUserPermissions = Voucher_type_permission_user::where('company_id',$this->getCompany()->id)->where('user_id',$this->user->id)->pluck('voucher_type_id')->toArray();
+                return $voucherTypes->whereIn('id',$voucherTypeUserPermissions);
+            }
+        }
+    }
+    public function getArchiveList($permission)
+    {
+            return Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes(null)->pluck('id')->toArray());
+
+    }
 }
