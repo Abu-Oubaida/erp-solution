@@ -122,7 +122,7 @@
                     <div class="col-3">
                         <div class="card bg-{{ $chosenColor }} text-white mb-4">
                             <div class="card-header">
-                                <h4 class="text-capitalize"><i class="fas fa-file-lines"></i> {!! $dataType['voucher_type_title'] !!}</h4>
+                                <h4 class="text-capitalize"><i class="fas fa-file-lines"></i> {!! $dataType['voucher_type_title'] !!} ({!! $dataType['company_name'] !!})</h4>
                             </div>
                             <div class="card-body text-capitalize">
                                 <div class="row">

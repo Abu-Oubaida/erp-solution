@@ -37,6 +37,7 @@ class DataArchiveDashboardController extends Controller
             return [
                 'id' => $item->id,
                 'company_id' => $item->company_id,
+                'company_name' => $item->company->company_code,
                 'voucher_type_title' => $item->voucher_type_title,
                 'archive_documents_count' => $item->archive_documents_count,
                 'archive_document_infos_count' => $item->archive_document_infos_count,
@@ -46,9 +47,9 @@ class DataArchiveDashboardController extends Controller
 
         $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
         $endOfLastWeek = Carbon::now()->subWeek()->endOfWeek();
-        
+
         $documents = VoucherDocument::whereBetween('created_at', [$startOfLastWeek, $endOfLastWeek])->get();
-        
+
         $documentCountsPerDay = [
             'Monday' => 0,
             'Tuesday' => 0,
@@ -58,7 +59,7 @@ class DataArchiveDashboardController extends Controller
             'Saturday' => 0,
             'Sunday' => 0,
         ];
-        
+
         foreach ($documents as $doc) {
             $day = Carbon::parse($doc->created_at)->format('l'); // Get full day name
             $documentCountsPerDay[$day]++;
