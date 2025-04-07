@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\VoucherType;
+use App\Models\VoucherDocument;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Log;
+use Carbon\Carbon;
 
 class DataArchiveDashboardController extends Controller
 {
@@ -40,7 +42,29 @@ class DataArchiveDashboardController extends Controller
                 'archive_document_infos_count' => $item->archive_document_infos_count,
             ];
         });
-        return view('back-end.archive.dashboard', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed'));
+        $labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday', 'Sunday'];
+
+        $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
+        $endOfLastWeek = Carbon::now()->subWeek()->endOfWeek();
+        
+        $documents = VoucherDocument::whereBetween('created_at', [$startOfLastWeek, $endOfLastWeek])->get();
+        
+        $documentCountsPerDay = [
+            'Monday' => 0,
+            'Tuesday' => 0,
+            'Wednesday' => 0,
+            'Thursday' => 0,
+            'Friday' => 0,
+            'Saturday' => 0,
+            'Sunday' => 0,
+        ];
+        
+        foreach ($documents as $doc) {
+            $day = Carbon::parse($doc->created_at)->format('l'); // Get full day name
+            $documentCountsPerDay[$day]++;
+        }
+        $totalDocumentCount = array_sum($documentCountsPerDay);
+        return view('back-end.archive.dashboard', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount'));
     }
 
     private function getFolderSize($dir)
