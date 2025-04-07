@@ -74,7 +74,7 @@
     })
 </script>
 <script src="{!! url('assets/js/customRawScript.js') !!}"></script>
-// <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {{--<script>--}}
 {{--    // Disable right-click context menu--}}
 {{--    window.addEventListener('contextmenu', function (e) {--}}
