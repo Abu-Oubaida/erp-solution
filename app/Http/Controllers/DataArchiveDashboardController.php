@@ -8,6 +8,7 @@ use App\Models\VoucherDocument;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Log;
+use DB;
 use Carbon\Carbon;
 
 class DataArchiveDashboardController extends Controller
@@ -23,7 +24,6 @@ class DataArchiveDashboardController extends Controller
 
     function index(Request $request){
         $permission = $this->permissions()->data_archive;
-        $permission_archive_data_list = $this->permissions()->archive_data_list;
         $path = env('APP_FILE_MANAGER').'\Account Document';
 
         $diskTotal = round(disk_total_space($path) / (1024 * 1024 * 1024),2);     // total space in bytes
@@ -32,7 +32,8 @@ class DataArchiveDashboardController extends Controller
         $totalUsed = $diskTotal - $diskFree;
         $otherUsed = $totalUsed - $archiveUsed;
         $dataTypeCount = $this->archiveTypeList($permission)->distinct()->count('id');
-        $archiveDocumentCount = $this->getArchiveList($permission_archive_data_list)->get()->pluck('voucherDocuments')->flatten(1)->pluck('id')->count();
+        $archiveDocumentCount = $this->getArchiveList($permission)->get()->pluck('voucherDocuments')->flatten(1)->pluck('id')->count();
+        $accountVoucherInfosCount = DB::table('account_voucher_infos')->count('id');
         $dataTypes = $this->archiveTypeList($permission)->where('status',1)->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -65,7 +66,7 @@ class DataArchiveDashboardController extends Controller
             $documentCountsPerDay[$day]++;
         }
         $totalDocumentCount = array_sum($documentCountsPerDay);
-        return view('back-end.archive.dashboard', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount'));
+        return view('back-end.archive.dashboard', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount'));
     }
 
     private function getFolderSize($dir)

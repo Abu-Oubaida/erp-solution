@@ -32,7 +32,7 @@
         font-size: 12px!important;
     }
 </style>
-@if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
+@if(isset($voucherInfos) && count($voucherInfos))
     <div class="row mb-1" id="fixedDiv">
         <div class="col-md-10">
             <input type="checkbox" name="" id="select_all">
@@ -68,6 +68,7 @@
         <th>Remarks</th>
     </tr>
     </thead>
+    @if(isset($voucherInfos) && count($voucherInfos))
     <tfoot id="fixedDiv2">
     <tr>
     @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
@@ -87,6 +88,7 @@
         <th>Remarks</th>
     </tr>
     </tfoot>
+    @endif
     <tbody>
     @if(isset($voucherInfos) && count($voucherInfos))
         @php
@@ -105,7 +107,7 @@
                 <td>{!! $data->VoucherType->voucher_type_title !!}</td>
                 <td class="text-start text-left">
                     @php $x = 1;@endphp
-                    <table class="table table-bordered table-sm table-hover dataTableSmall">
+                    <table class="table table-bordered table-sm table-hover">
                         <thead>
                             <tr>
                                 <th>Document Name</th>

@@ -4,6 +4,7 @@
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item"><a href="" class="text-capitalize text-chl">Dashboard</a></li>
         </ol>
+        @if(auth()->user()->hasPermission('archive_dashboard'))
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
@@ -54,6 +55,11 @@
                                         <th>:</th>
                                         <td>{{ @$archiveDocumentCount }}</td>
                                     </tr>
+                                    <tr>
+                                        <th>Total Unique Reference</th>
+                                        <th>:</th>
+                                        <td>{{ @$accountVoucherInfosCount }}</td>
+                                    </tr>
                                 </table>
                             </div>
                             <div class="col">
@@ -98,6 +104,7 @@
                 </div>
             </div>
         </div>
+        @endif
         <div class="row mt-3">
             @if (isset($dataTypes) && count($dataTypes))
                 @php
@@ -129,12 +136,12 @@
                                     <div class="col text-start">
                                         <h2 class="text-chl">{!! $dataType['archive_document_infos_count'] !!}</h2>
                                         <a class="small text-white stretched-link text-decoration-none"
-                                            href="#">Reference <i class="fas fa-angle-right"></i></a>
+                                            href="{!! route('uploaded.archive.list.quick',['c'=>$dataType['company_id'],'t'=>$dataType['id']]) !!}" target="_blank">Reference <i class="fas fa-angle-right"></i></a>
                                     </div>
                                     <div class="col text-end">
                                         <h2 class="text-chl">{!! $dataType['archive_documents_count'] !!}</h2>
                                         <a class="small text-white stretched-link text-decoration-none"
-                                            href="#">Documents <i class="fas fa-angle-right"></i></a>
+                                            href="{!! route('uploaded.archive.list.quick',['c'=>$dataType['company_id'],'t'=>$dataType['id']]) !!}" target="_blank">Documents <i class="fas fa-angle-right"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -190,15 +197,17 @@
                 datasets: [{
                     label: 'Documents Uploaded per Day',
                     data: {!! json_encode($documentCountsPerDay) !!},
-                    backgroundColor: ['rgba(255, 99, 132, 0.2)',
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
                         'rgba(255, 159, 64, 0.2)',
                         'rgba(255, 205, 86, 0.2)',
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
                         'rgba(153, 102, 255, 0.2)',
                         'rgba(201, 203, 207, 0.2)'
-                    ], // Light gray color for the bar
-                    borderColor: ['rgba(255, 99, 132, 0.2)',
+                    ], 
+                    borderColor: [
+                        'rgba(255, 99, 132, 0.2)',
                         'rgba(255, 159, 64, 0.2)',
                         'rgba(255, 205, 86, 0.2)',
                         'rgba(75, 192, 192, 0.2)',

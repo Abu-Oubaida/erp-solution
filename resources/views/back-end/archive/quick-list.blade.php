@@ -26,7 +26,7 @@
                                 <option value="">--select option--</option>
                                 @if(isset($companies) || (count($companies) > 0))
                                     @foreach($companies as $c)
-                                        <option value="{{$c->id}}">{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                        <option value="{{$c->id}}" @if($c->id == request()->get('c')) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
                                     @endforeach
                                 @endif
                             </select>
@@ -44,6 +44,9 @@
                         <div class="">
                             <label for="data_types">Data Types<span class="text-danger">*</span></label>
                             <select class="form-control text-capitalize select-search" name="data_type" id="data_types" multiple>
+                                @if(request()->get('t') && isset($dataType))
+                                    <option value="{!! $dataType->id !!}" selected>{!! $dataType->voucher_type_title !!}</option>
+                                @endif
                                 <option value="">--Select options--</option>
                             </select>
                         </div>
@@ -66,15 +69,29 @@
                             <input class="form-control" type="text" name="reference" id="reference">
                         </div>
                     </div>
+                    @if(!(request()->get('t') && isset($dataType) && request()->get('c')))
                     <div class="col">
                         <button class="float-end btn btn-chl-outline mt-4" onclick="return Obj.archiveDataQuickSearch(this)"><i class="fas fa-search"></i> Search</button>
                     </div>
+                    @else
+                        <div class="col">
+                            <button
+                                class="float-end btn btn-outline-danger mt-4"
+                                onclick="if(confirm('Are you sure?')) { window.location.href='{{ route('uploaded.archive.list.quick') }}'; } return false;"
+                            >
+                                <i class="fas fa-power-off"></i> Reset
+                            </button>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
 
         <div class="card mb-4">
             <div class="card-body" id="quick-list">
+                @if(isset($voucherInfos))
+                    @include('back-end.archive._archive_quick_list')
+                @endif
             </div>
         </div>
     </div>
