@@ -4,7 +4,7 @@
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item"><a href="" class="text-capitalize text-chl">Dashboard</a></li>
         </ol>
-        @if (auth()->user()->hasPermission('archive_dashboard'))
+        @if (auth()->user()->hasPermission('archive_chart_view'))
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
