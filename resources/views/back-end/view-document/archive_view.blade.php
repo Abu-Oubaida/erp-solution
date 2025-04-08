@@ -65,7 +65,7 @@
                                         <tbody>
                                         @foreach($a->voucherDocuments as $d)
                                             <tr>
-                                                <td><a href="{!! url($d->filepath.'/'.$d->document) !!}" title="View on new window" target="_blank">{!! $d->document !!}</a></td>
+                                                <td><a href="{!! asset('storage/archive_data/'.$d->filepath.'/'.$d->document) !!}" title="View on new window" target="_blank">{!! $d->document !!}</a></td>
                                             </tr>
                                         @endforeach
                                         </tbody>

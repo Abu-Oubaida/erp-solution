@@ -62,6 +62,12 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
+        'custom_uploads' => [
+            'driver' => 'local',
+            'root' => env('APP_ARCHIVE_DATA', 'I:/archive_data'), // path can be dynamic
+            'url' => env('APP_URL') . '/storage/uploads',
+            'visibility' => 'public',
+        ],
 
     ],
 
