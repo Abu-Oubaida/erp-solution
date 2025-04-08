@@ -44,28 +44,25 @@ class DataArchiveDashboardController extends Controller
                 'archive_document_infos_count' => $item->archive_document_infos_count,
             ];
         });
-        $labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday', 'Sunday'];
 
-        $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
-        $endOfLastWeek = Carbon::now()->subWeek()->endOfWeek();
+        $startDate = Carbon::today()->subDays(6);
+        $endDate  = Carbon::now();
+        // dd($startDate->format('d-m-y'),$endDate->format('d-m-y'),);
+        $dailyCounts = VoucherDocument::whereBetween('created_at', [$startDate, $endDate])
+        ->select(DB::raw('DAYNAME(created_at) as day','created_at'), DB::raw('COUNT(id) as count'))
+        ->groupBy('day')
+        ->orderByRaw("FIELD(day, 'Saturday', 'Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')")
+        ->get();
 
-        $documents = VoucherDocument::whereBetween('created_at', [$startOfLastWeek, $endOfLastWeek])->get();
+        $rawCounts = $dailyCounts->keyBy('day');
+        $labels = ['Saturday', 'Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        $documentCountsPerDay = [];
 
-        $documentCountsPerDay = [
-            'Monday' => 0,
-            'Tuesday' => 0,
-            'Wednesday' => 0,
-            'Thursday' => 0,
-            'Friday' => 0,
-            'Saturday' => 0,
-            'Sunday' => 0,
-        ];
-
-        foreach ($documents as $doc) {
-            $day = Carbon::parse($doc->created_at)->format('l'); // Get full day name
-            $documentCountsPerDay[$day]++;
+        foreach ($labels as $day) {
+            $documentCountsPerDay[$day] = $rawCounts[$day]->count ?? 0;
         }
-        $totalDocumentCount = array_sum($documentCountsPerDay);
+        
+        $totalDocumentCount = (max($documentCountsPerDay)+2);
         return view('back-end.archive.dashboard', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount'));
     }
 
