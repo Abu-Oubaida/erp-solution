@@ -6,6 +6,7 @@ use App\Models\Account_voucher;
 use App\Models\ArchiveInfoLinkDocument;
 use App\Models\ArchiveLinkDocumentDeleteHistory;
 use App\Models\branch;
+use App\Models\company_info;
 use App\Models\User;
 use App\Models\Voucher_type_permission_user_delete_history;
 use App\Models\VoucherDocument;
@@ -23,7 +24,7 @@ use Illuminate\Validation\Rule;
 use App\Models\department;
 use App\Models\Voucher_type_permission_user;
 use Log;
-
+use function PHPUnit\Framework\directoryExists;
 
 
 class ArchiveController extends Controller
@@ -36,7 +37,7 @@ class ArchiveController extends Controller
             return $next($request);
         });
     }
-    private $accounts_document_path = "file-manager/Account Document/";
+    private $accounts_document_path = "file-manager/archive/";
 
     public function createArchiveType(Request $request)
     {
@@ -350,7 +351,11 @@ class ArchiveController extends Controller
             extract($request->post());
             $user = Auth::user();
             $documentIds = array();
+            $company_code = company_info::find($company)->company_code;
             $v_type = VoucherType::where('id',$data_type)->first();
+            $file_path = $company_code.'/'.$v_type->voucher_type_title.'/';
+            $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
+
 //            $firstInsert = archive infos
             $firstInsert = DB::table('account_voucher_infos')->insertGetId([
                 'company_id'        =>  $company,
@@ -367,13 +372,16 @@ class ArchiveController extends Controller
                 throw new \Exception('Failed to insert data');
             }
             if ($firstInsert && $request->hasFile('voucher_file')) {
+                if (!is_dir($destinationPath)) {
+                    mkdir($destinationPath, 0777, true); // recursive mkdir
+                }
                 foreach ($request->file('voucher_file') as $file) {
                     // Handle each file
                     $fileName = $reference_number."_".$v_type->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
 
-                    $filePath = $this->accounts_document_path . '/' . $fileName;
+                    $filePath = $destinationPath . $fileName;
 
-                    if (!$file->move($this->accounts_document_path,$fileName))
+                    if (!$file->move($destinationPath,$fileName))
                     {
                         throw new \Exception('Failed to upload file ['.$file->getClientOriginalName().']');
                     }
@@ -384,7 +392,7 @@ class ArchiveController extends Controller
                         'company_id'        =>  $company,
                         'voucher_info_id'   =>  $firstInsert,
                         'document'          =>  $fileName,
-                        'filepath'          =>  $this->accounts_document_path,
+                        'filepath'          =>  $file_path,
                         'created_by'        =>  $user->id,
                         'created_at'        =>  now(),
                     ]);
@@ -467,13 +475,19 @@ class ArchiveController extends Controller
                 ]);
                 extract($request->post());
                 $user = Auth::user();
-                $voucherInfo = Account_voucher::with(['VoucherType'])->where('id',Crypt::decryptString($id))->first();
+                $voucherInfo = Account_voucher::with(['VoucherType','company'])->where('id',Crypt::decryptString($id))->first();
+                $company_code = $voucherInfo->company->company_code;
+                $file_path = $company_code.'/'.$voucherInfo->VoucherType->voucher_type_title.'/';
+                $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
                 $uploadedFiles = []; // Track successfully uploaded files
 
                 foreach ($request->file('voucher_file') as $file) {
+                    if (!is_dir($destinationPath)) {
+                        mkdir($destinationPath, 0777, true); // recursive mkdir
+                    }
                     $fileName = $voucherInfo->voucher_number."_".$voucherInfo->VoucherType->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
-                    $filePath = $this->accounts_document_path . '/' . $fileName;
-                    if (!$file->move($this->accounts_document_path,$fileName))
+                    $filePath = $destinationPath . $fileName;
+                    if (!$file->move($destinationPath,$fileName))
                     {
                         throw new \Exception('Failed to upload file.['.$file->getClientOriginalName().']');
                     }
@@ -482,7 +496,7 @@ class ArchiveController extends Controller
                         'company_id'        =>  $voucherInfo->company_id,
                         'voucher_info_id'   =>  $voucherInfo->id,
                         'document'          =>  $fileName,
-                        'filepath'          =>  $this->accounts_document_path,
+                        'filepath'          =>  $file_path,
                         'created_by'        =>  $user->id,
                         'created_at'        =>  now(),
                     ]);

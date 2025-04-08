@@ -24,8 +24,8 @@ class DataArchiveDashboardController extends Controller
 
     function index(Request $request){
         $permission = $this->permissions()->data_archive;
-        $path = env('APP_FILE_MANAGER').'\Account Document';
-
+        $path = env('APP_ARCHIVE_DATA');
+//        dd($path);
         $diskTotal = round(disk_total_space($path) / (1024 * 1024 * 1024),2);     // total space in bytes
         $archiveUsed = round($this->getFolderSize($path) / (1024 * 1024 * 1024), 2); // in bytes
         $diskFree = round(disk_free_space($path) / (1024 * 1024 * 1024), 2);       // free space in bytes
@@ -61,7 +61,7 @@ class DataArchiveDashboardController extends Controller
         foreach ($labels as $day) {
             $documentCountsPerDay[$day] = $rawCounts[$day]->count ?? 0;
         }
-        
+
         $totalDocumentCount = (max($documentCountsPerDay)+2);
         return view('back-end.archive.dashboard', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount'));
     }

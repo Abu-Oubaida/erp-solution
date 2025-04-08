@@ -37,19 +37,19 @@
 
             @if (in_array($fileExtension, ['pdf', 'doc', 'txt','jpg','jpeg','png','JPG'])) <!-- Add your allowed extensions -->
             <!-- Embed the PDF using iframe -->
-            <embed src="{{ url($document->filepath.$document->document) }}#toolbar=0" style="width:100%; height:100vh;" />
+            <embed src="{{ asset('storage/archive_data/'.$document->filepath.$document->document) }}#toolbar=0" style="width:100%; height:100vh;" />
             {{--                                                                @elseif (in_array($fileExtension, ['dox', 'excel', 'xlsx', 'txt','docx']))--}}
             {{--                                                                    <iframe src="https://docs.google.com/viewer?url={{ url($d->filepath.$d->document) }}&embedded=true" style="width: 100%; height: 600px;"></iframe>--}}
             @elseif ($fileExtension === ['mp4'])
                 <video controls style="width: 80%">
-                    <source src="{{ url($document->filepath.$document->document) }}" type="video/mp4">
+                    <source src="{{ asset('storage/archive_data/'.$document->filepath.$document->document) }}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
             @else
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <h1 class="text-center">Sorry! This file type is not supported for preview.</h1>
-                        <a class="btn btn-success text-center" href="{{ url($document->filepath.$document->document) }}" download>
+                        <a class="btn btn-success text-center" href="{{ asset('storage/archive_data/'.$document->filepath.$document->document) }}" download>
                             Click To Download
                         </a>
                     </div>

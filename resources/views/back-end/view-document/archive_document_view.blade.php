@@ -47,17 +47,17 @@
 
                 @if (in_array($fileExtension, ['pdf', 'doc', 'txt','jpg','jpeg','png','JPG'])) <!-- Add your allowed extensions -->
                 <!-- Embed the PDF using iframe -->
-                <embed id="pdfViewer" type="application/pdf" oncontextmenu="return false;" src="{{ url($documentEmail->voucherDocument->filepath.$documentEmail->voucherDocument->document) }}#toolbar=0" style="width:100%; height:100vh;" />
+                <embed id="pdfViewer" type="application/pdf" oncontextmenu="return false;" src="{{ asset('storage/archive_data/'.$documentEmail->voucherDocument->filepath.$documentEmail->voucherDocument->document) }}#toolbar=0" style="width:100%; height:100vh;" />
                 @elseif (in_array($fileExtension, ['mp4', 'webm', 'ogg']))
                     <video controls style="width: 80%">
-                        <source src="{{ url($documentEmail->voucherDocument->filepath.$documentEmail->voucherDocument->document) }}" type="video/mp4">
+                        <source src="{{ asset('storage/archive_data/'.$documentEmail->voucherDocument->filepath.$documentEmail->voucherDocument->document) }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                 @else
                     <div class="row">
                         <div class="col-md-12 text-center">
                             <h1 class="text-center">Sorry! This file type is not supported for preview.</h1>
-                            <a class="btn btn-success text-center" href="{{ url($documentEmail->voucherDocument->filepath.$documentEmail->voucherDocument->document) }}" download>
+                            <a class="btn btn-success text-center" href="{{ asset('storage/archive_data/'.$documentEmail->voucherDocument->filepath.$documentEmail->voucherDocument->document) }}" download>
                                 Click To Download
                             </a>
                         </div>
@@ -72,10 +72,10 @@
                 @if (in_array($fileExtension, ['pdf', 'doc', 'txt','jpg','jpeg','png','JPG'])) <!-- Add your allowed extensions -->
                 <!-- Embed the PDF using iframe -->
             @if($document->share_type == 2)
-                <embed id="pdfViewer" type="application/pdf" oncontextmenu="return false;" src="{{ url($document->voucherDocument->filepath.$document->voucherDocument->document) }}" style="width:100%; height:100vh;" />
+                <embed id="pdfViewer" type="application/pdf" oncontextmenu="return false;" src="{{ asset('storage/archive_data/'.$document->voucherDocument->filepath.$document->voucherDocument->document) }}" style="width:100%; height:100vh;" />
 
             @else
-                <embed id="pdfViewer" type="application/pdf" oncontextmenu="return false;" src="{{ url($document->voucherDocument->filepath.$document->voucherDocument->document) }}#toolbar=0" style="width:100%; height:100vh;" />
+                <embed id="pdfViewer" type="application/pdf" oncontextmenu="return false;" src="{{ asset('storage/archive_data/'.$document->voucherDocument->filepath.$document->voucherDocument->document) }}#toolbar=0" style="width:100%; height:100vh;" />
 {{--                    <embed id="pdfViewer" type="application/pdf" oncontextmenu="return false;"--}}
 {{--                           src="{{ route('document.view', ['id' =>  \Illuminate\Support\Facades\Crypt::encryptString($document->voucherDocument->id)]) }}"--}}
 {{--                           style="width:100%; height:100vh;" />--}}
@@ -83,14 +83,14 @@
 
                 @elseif (in_array($fileExtension, ['mp4', 'webm', 'ogg']))
                     <video controls style="width: 80%">
-                        <source src="{{ url($document->voucherDocument->filepath.$document->voucherDocument->document) }}" type="video/mp4">
+                        <source src="{{ asset('storage/archive_data/'.$document->voucherDocument->filepath.$document->voucherDocument->document) }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                 @else
                     <div class="row">
                         <div class="col-md-12 text-center">
                             <h1 class="text-center">Sorry! This file type is not supported for preview.</h1>
-                            <a class="btn btn-success text-center" href="{{ url($document->voucherDocument->filepath.$document->voucherDocument->document) }}" download>
+                            <a class="btn btn-success text-center" href="{{ asset('storage/archive_data/'.$document->voucherDocument->filepath.$document->voucherDocument->document) }}" download>
                                 Click To Download
                             </a>
                         </div>

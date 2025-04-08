@@ -198,6 +198,7 @@ class ajaxRequestController extends Controller
         try {
             extract($request->post());
             $path = Crypt::decryptString($path);
+//            dd($path);
             echo $path;
 //            $results = VoucherDocument::find($id);
 //            if ($results)
@@ -578,7 +579,7 @@ class ajaxRequestController extends Controller
                 'status'=> 'success',
                 'message'=> 'Mail send successfully!',
             ]);
-            
+
         }catch (\Throwable $exception)
         {
             DB::rollBack();
