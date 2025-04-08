@@ -51,7 +51,7 @@
 <table class="table table-sm table-hover" @if(isset($voucherInfos) && count($voucherInfos)) id="DataTable2" @endif>
     <thead>
     <tr class="">
-    @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
+    @if(isset($voucherInfos) && count($voucherInfos))
         <th>Select</th>
     @endif
         <th>SL</th>
@@ -71,7 +71,7 @@
     @if(isset($voucherInfos) && count($voucherInfos))
     <tfoot id="fixedDiv2">
     <tr>
-    @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
+    @if(isset($voucherInfos) && count($voucherInfos))
         <th>Select</th>
     @endif
         <th>SL</th>
@@ -96,7 +96,7 @@
         @endphp
         @foreach($voucherInfos as $data)
             <tr class="">
-            @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
+            @if(isset($voucherInfos) && count($voucherInfos))
                 <th><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $data->id !!}" value="{!! $data->id !!}"></th>
             @endif
                 <td>{!! $no++ !!}</td>

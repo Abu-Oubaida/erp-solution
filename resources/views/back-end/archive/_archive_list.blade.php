@@ -35,7 +35,7 @@
 {{--<form action="{!! route('voucher.multiple.submit') !!}" method="post">--}}
 {{--<form>--}}
 {{--    @csrf--}}
-@if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
+@if(isset($voucherInfos) && count($voucherInfos))
     <div class="row mb-2" id="fixedDiv">
         <div class="col-md-10">
             <input type="checkbox" name="" id="select_all">
@@ -55,7 +55,7 @@
 <table id="archiveDataTable" class="table table-sm table-hover">
     <thead>
     <tr class="text-center">
-    @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
+    @if(isset($voucherInfos) && count($voucherInfos))
         <th>Select</th>
     @endif
         <th>SL</th>
@@ -74,7 +74,7 @@
     </thead>
     <tfoot id="fixedDiv2">
         <tr>
-        @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
+        @if(isset($voucherInfos) && count($voucherInfos))
             <th>Select</th>
         @endif
             <th>SL</th>
