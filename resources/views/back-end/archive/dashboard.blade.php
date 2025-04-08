@@ -6,15 +6,15 @@
         </ol>
         @if (auth()->user()->hasPermission('archive_chart_view'))
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-xl-6 col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fa-solid fa-hard-drive"></i> Storage Information Details</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col">
-                                    <table class="table table-bordered mt-4">
+                                <div class="col col-md-6 col-sm-12">
+                                    <table class="table table-bordered mt-4" style="width: 100%">
                                         <tr>
                                             <th>Module Name</th>
                                             <th>:</th>
@@ -62,9 +62,9 @@
                                         </tr>
                                     </table>
                                 </div>
-                                <div class="col">
+                                <div class="col col-md-6 col-sm-12">
                                     <div class="align-items-center">
-                                        <div id="chart-container" style="width: 355px; float:right">
+                                        <div id="chart-container" style="width: 100%; float:right">
                                             <canvas id="levelChart"
                                                 style="width: 100% !important;height: 100% !important;"></canvas>
 
@@ -92,14 +92,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-xl-6 col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fa-solid fa-chart-column"></i> Last 7 Days Uploaded Documents</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <canvas id="documentTypeChart" width="600" class="mt-4"></canvas>
+                                <div style="width: 100%">
+                                    <canvas id="documentTypeChart" width="600" class="mt-4"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
