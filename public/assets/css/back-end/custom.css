@@ -161,3 +161,30 @@ tfoot {
     width: 100%;
     overflow-x: auto; /* Ensure horizontal scrolling if needed */
 }
+.bg-info-light {
+    background-color: rgb(13 202 240 / 47%);
+    border: rgb(13 202 240 / 47%);
+    color: #184c56;
+}
+
+.bg-success-light {
+    background-color: rgba(25, 135, 84, 0.2);
+    border: rgba(25, 135, 84, 0.2);
+    color: rgb(9 50 35 / 81%);
+}
+
+.bg-primary-light {
+    background-color: rgba(13, 110, 253, 0.2);
+    border: rgba(13, 110, 253, 0.2);
+    color: #494f58;
+}
+
+.bg-warning-light {
+    background-color: rgba(255, 193, 7, 0.2);
+    border: rgba(255, 193, 7, 0.2);
+}
+
+.bg-secondary-light {
+    background-color: rgba(108, 117, 125, 0.2);
+    border: rgba(108, 117, 125, 0.2);
+}
