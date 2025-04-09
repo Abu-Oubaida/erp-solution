@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account_voucher;
 use App\Models\company_info;
 use App\Models\VoucherType;
 use App\Models\VoucherDocument;
@@ -39,7 +40,7 @@ class DataArchiveDashboardController extends Controller
         $otherUsed = $totalUsed - $archiveUsed;
         $dataTypeCount = $this->archiveTypeList($permission)->distinct()->count('id');
         $archiveDocumentCount = $this->getArchiveList($permission)->get()->pluck('voucherDocuments')->flatten(1)->pluck('id')->count();
-        $accountVoucherInfosCount = DB::table('account_voucher_infos')->count('id');
+        $accountVoucherInfosCount = Account_voucher::whereIn('voucher_type_id',$this->archiveTypeList($permission)->pluck('id')->toArray())->distinct()->count('id');
         $dataTypes = $this->archiveTypeList($permission)->where('status',1)->get()->map(function ($item) {
             return [
                 'id' => $item->id,
