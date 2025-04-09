@@ -13,8 +13,8 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col col-md-6 col-sm-12">
-                                    <table class="table table-bordered mt-4" style="width: 100%">
+                                <div class="col">
+                                    <table class="table table-bordered mt-3" style="width: 100%">
                                         <tr>
                                             <th>Module Name</th>
                                             <th>:</th>
@@ -62,21 +62,20 @@
                                         </tr>
                                     </table>
                                 </div>
-                                <div class="col col-md-6 col-sm-12">
+                                <div class="col">
                                     <div class="align-items-center">
-                                        <div id="chart-container" style="width: 100%; float:right">
-                                            <canvas id="levelChart"
-                                                style="width: 100% !important;height: 100% !important;"></canvas>
+                                        <div id="chart-container" style="width: 95%; float:right">
+                                            <canvas id="levelChart"></canvas>
 
                                             <div class="progress" title="Total: {{ $diskTotal }} GB">
-                                                <div class="progress-bar bg-danger" role="progressbar"
-                                                    style="width: {!! $totalUsed !!}%"
+                                                <div class="progress-bar" role="progressbar"
+                                                    style="width: {!! $totalUsed !!}%; background: rgb(255, 99, 132)"
                                                     aria-valuenow="{!! $totalUsed !!}" aria-valuemin="0"
                                                     aria-valuemax="{{ $diskTotal }}"
                                                     title="Total Used ({!! $totalUsed !!}) GB">
                                                     Used ( {!! $totalUsed !!} GB )</div>
-                                                <div class="progress-bar bg-success" role="progressbar"
-                                                    style="width: {!! $diskFree !!}%"
+                                                <div class="progress-bar" role="progressbar"
+                                                    style="width: {!! $diskFree !!}%; background: rgb(54, 162, 235)"
                                                     aria-valuenow="{!! $diskFree !!}" aria-valuemin="0"
                                                     aria-valuemax="{{ $diskTotal }}"
                                                     title="Free Spase ({!! $diskFree !!}) GB">Free (
@@ -111,7 +110,7 @@
         <div class="row mt-3">
             @if (isset($dataTypes) && count($dataTypes))
                 @php
-                    $colors = ['info', 'success', 'primary', 'warning', 'secondary'];
+                    $colors = ['info-light', 'success-light', 'primary-light', 'warning-light', 'secondary-light'];
                     $prevColor = null;
                     $prevPrevColor = null;
                 @endphp
@@ -130,7 +129,7 @@
                         $prevColor = $chosenColor;
                     @endphp
                     <div class="col-3">
-                        <div class="card bg-{{ $chosenColor }} text-white mb-4">
+                        <div class="card bg-{{ $chosenColor }}  mb-4">
                             <div class="card-header">
                                 <h4 class="text-capitalize"><i class="fas fa-file-lines"></i> {!! $dataType['voucher_type_title'] !!}
                                     ({!! $dataType['company_name'] !!})
@@ -140,12 +139,12 @@
                                 <div class="row">
                                     <div class="col text-start">
                                         <h2 class="text-chl">{!! $dataType['archive_document_infos_count'] !!}</h2>
-                                        <a class="small text-white stretched-link text-decoration-none"
+                                        <a class="small  stretched-link text-decoration-none"
                                             href="{!! route('uploaded.archive.list.quick',['c'=>$dataType['company_id'],'t'=>$dataType['id']]) !!}" target="_blank">Reference <i class="fas fa-angle-right"></i></a>
                                     </div>
                                     <div class="col text-end">
                                         <h2 class="text-chl">{!! $dataType['archive_documents_count'] !!}</h2>
-                                        <a class="small text-white stretched-link text-decoration-none"
+                                        <a class="small  stretched-link text-decoration-none"
                                             href="{!! route('uploaded.archive.list.quick',['c'=>$dataType['company_id'],'t'=>$dataType['id']]) !!}" target="_blank">Documents <i class="fas fa-angle-right"></i></a>
                                     </div>
                                 </div>
@@ -163,21 +162,21 @@
     <script>
         const ctx = document.getElementById('levelChart').getContext('2d');
         const levelChart = new Chart(ctx, {
-            type: 'pie',
+            type: 'doughnut',
             data: {
                 labels: ["Free", 'Archive', 'Other', ],
                 datasets: [{
                     label: 'Disk Usage',
                     data: [{!! @$diskFree !!}, {!! @$archiveUsed !!}, {!! @$otherUsed !!}, ],
                     backgroundColor: [
-                        '#198754', // Free - Blue
-                        '#da3545', // Archive Used
-                        '#8a8a8a', // Other Used
+                        'rgb(54, 162, 235)',// Free - Blue
+                        'rgb(255, 99, 132)',// Archive Used
+                        'rgb(255, 205, 86)'// Other Used
                     ],
                     borderColor: [
-                        '#198754', // Free - Blue
-                        '#da3545', // Archive Used
-                        '#8a8a8a', // Other Used
+                        'rgb(54, 162, 235)',// Free - Blue
+                        'rgb(255, 99, 132)',// Archive Used
+                        'rgb(255, 205, 86)'// Other Used
                     ],
                     borderWidth: 1
                 }]

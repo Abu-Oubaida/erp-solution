@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\company_info;
 use App\Models\VoucherType;
 use App\Models\VoucherDocument;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Log;
 use DB;
 use Carbon\Carbon;
@@ -24,6 +26,10 @@ class DataArchiveDashboardController extends Controller
 
     function index(Request $request){
         $permission = $this->permissions()->data_archive;
+//        $companies = null;
+//        if ($this->user->isSystemSuperAdmin()) {
+//            $companies = company_info::select('company_code')->get();
+//        }
         $path = env('APP_ARCHIVE_DATA');
 //        dd($path);
         $diskTotal = round(disk_total_space($path) / (1024 * 1024 * 1024),2);     // total space in bytes
