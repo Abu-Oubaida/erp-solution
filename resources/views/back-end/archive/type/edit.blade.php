@@ -35,7 +35,7 @@
                                         <select class="text-capitalize select-search" id="company" name="company">
                                             @if(isset($companies) || (count($companies) > 0))
                                                 @foreach($companies as $c)
-                                                    <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                                    <option value="{{$c->id}}" @if($voucherType->company_id == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
                                                 @endforeach
                                             @endif
                                         </select>
