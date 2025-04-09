@@ -3,7 +3,12 @@
     <div class="card mb-4">
         <div class="card-header">
             <div class="row">
-                <h3 class="text-capitalize"><i class="fas fa-list"></i> Data Type List</h3>
+                <div class="col-8">
+                    <h3 class="text-capitalize"><i class="fas fa-list"></i> Data Type List</h3>
+                </div>
+                <div class="col-4">
+                    <a class="btn btn-success btn-sm float-end mt-1" href="{!! route('add.archive.type') !!}"><i class="fa-solid fa-circle-plus"></i> Add Type</a>
+                </div>
             </div>
         </div>
         <div class="card-body">
@@ -84,7 +89,7 @@
                     <div class="modal modal-xl fade" id="receiverList" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="receiverListLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content" id="documentPreview">
-                                
+
                             </div>
                         </div>
                     </div>

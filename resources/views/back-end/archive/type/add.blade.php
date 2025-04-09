@@ -22,7 +22,12 @@
                 <div class="card mb-4">
                     <div class="card-header">
                         <div class="row">
-                            <h3 class="text-capitalize"><i class="fas fa-plus"></i> Add new data type</h3>
+                            <div class="col-8">
+                                <h3 class="text-capitalize"><i class="fas fa-plus"></i> Add new data type</h3>
+                            </div>
+                            <div class="col-4">
+                                <a class="btn btn-primary btn-sm float-end mt-1" href="{!! route('archive.data.type.list') !!}"><i class="fa-solid fa-list"></i> Data Type List</a>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -42,7 +47,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-2">
                                     <div class="form-floating mb-">
                                         <input class="form-control" id="data_type_title" name="data_type_title" type="text" placeholder="Enter Voucher Type Title" value="{!! old('data_type_title') !!}" required/>

@@ -712,7 +712,7 @@ class ArchiveController extends Controller
             }
 
             if (!empty($reference)) {
-                $archiveInfos->where('voucher_number', $reference);
+                $archiveInfos->where('voucher_number','LIKE', "%$reference%");
             }
 
             $archiveInfos = $archiveInfos->get();
@@ -1211,5 +1211,17 @@ class ArchiveController extends Controller
         //     $query->whereColumn('company_id', 'company'); // Compare company_id with company directly
         // }])
         // ->get();
+    }
+
+    public function setting()
+    {
+        try {
+            $permission = $this->permissions()->archive_setting;
+            $companies = $this->getCompanyModulePermissionWise($permission)->get(['id','company_name','company_code']);
+            return view('back-end.archive.setting',compact('companies'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
     }
 }
