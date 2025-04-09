@@ -49,8 +49,8 @@
     </div>
 @endif
 <table class="table table-sm table-hover" @if(isset($voucherInfos) && count($voucherInfos)) id="DataTable2" @endif>
-    <thead>
-    <tr class="">
+    <thead class="">
+    <tr class="bg-secondary text-chl-white">
     @if(isset($voucherInfos) && count($voucherInfos))
         <th>Select</th>
     @endif
@@ -107,13 +107,7 @@
                 <td>{!! $data->VoucherType->voucher_type_title !!}</td>
                 <td class="text-start text-left">
                     @php $x = 1;@endphp
-                    <table class="table table-bordered table-sm table-hover">
-                        <thead>
-                            <tr>
-                                <th>Document Name</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
+                    <table class="table table-sm table-hover">
                         <tbody>
                         @foreach($data->voucherDocuments as $d)
                             <tr>
@@ -292,7 +286,7 @@
                                 format: {
                                     header: function (data, columnIdx) {
                                         // Extract the header text from the <th> element, ignoring the input field
-                                        return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                                        return $('#DataTable2 thead th').eq(columnIdx).text();
                                     }
                                 }
                             }
@@ -308,7 +302,7 @@
                                 columns: ':visible',
                                 format: {
                                     header: function (data, columnIdx) {
-                                        return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                                        return $('#DataTable2 thead th').eq(columnIdx).text();
                                     }
                                 }
                             }
@@ -320,7 +314,7 @@
                                 columns: ':visible',
                                 format: {
                                     header: function (data, columnIdx) {
-                                        return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                                        return $('#DataTable2 thead th').eq(columnIdx).text();
                                     }
                                 }
                             }
@@ -332,7 +326,7 @@
                                 columns: ':visible',
                                 format: {
                                     header: function (data, columnIdx) {
-                                        return $('#DataTable2 tfoot th').eq(columnIdx).text();
+                                        return $('#DataTable2 thead th').eq(columnIdx).text();
                                     }
                                 }
                             }

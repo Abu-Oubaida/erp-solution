@@ -3164,8 +3164,13 @@ let Obj = {};
                                     "id",
                                     "voucher_type_title"
                                 );
-                                setSelectBoxBlank("previous-references");
-                                setSelectBoxBlank("previous-files");
+                                if ($("#previous-references").length) {
+                                    setSelectBoxBlank("previous-references");
+                                }
+
+                                if ($("#previous-files").length) {
+                                    setSelectBoxBlank("previous-files");
+                                }
                             }
                         }
                     },

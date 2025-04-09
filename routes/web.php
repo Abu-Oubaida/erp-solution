@@ -252,10 +252,12 @@ Route::group(['middleware' => ['auth']],function (){
     Route::middleware(['permission:file_manager'])->group(function (){
         Route::get("file_manager", [FileManagerController::class,'index'])->name('file-manager');
     });//3.6 End
-   Route::controller(DataArchiveDashboardController::class)->group(function(){
-        Route::match(['get'],'data-archive-dashboard','index')->name('data.archive.dashboard.interface');
-   });
 # 3.7 Data Archive Controller
+    Route::controller(DataArchiveDashboardController::class)->group(function(){
+        Route::middleware(['permission:archive_dashboard'])->group(function (){
+            Route::match(['get'],'data-archive-dashboard','index')->name('data.archive.dashboard.interface');
+        });
+    });
     Route::controller(ArchiveController::class)->group(function (){
         Route::post('search-previous-document-ref','searchPreviousDocumentRef')->name('search.previous-document-ref');//for ajax
         Route::post('search-previous-document','searchPreviousDocument')->name('search.previous-document');//for ajax
@@ -325,6 +327,9 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:multiple_archive_operation'])->group(function (){
             Route::post('archive-multiple-submit','archiveMultipleSubmit')->name('archive.multiple.submit');
 //            Route::delete('delete-voucher','deleteVoucherMultiple')->name('delete.voucher.multiple');
+        });
+        Route::middleware(['permission:archive_setting'])->group(function (){
+            Route::get('setting','setting')->name('data.archive.setting');
         });
         Route::post('search-company-department-users','searchCompanyDepartmentUsers')->name('search.company-department-users');
 

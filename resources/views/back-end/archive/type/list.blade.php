@@ -9,7 +9,7 @@
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a style="text-decoration: none;" href="#" class="text-capitalize">Add data type</a>
+                        <a style="text-decoration: none;" href="#" class="text-capitalize">Data type list</a>
                     </li>
                 </ol>
             </div>

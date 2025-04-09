@@ -20,12 +20,12 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="text-capitalize"><i class="fas fa-file-circle-plus"></i> Upload documents here</h3>
+                        <h3 class="text-capitalize"><i class="fas fa-file-circle-plus"></i> Upload documents</h3>
                     </div>
                     <div class="col">
                         <div class="float-end">
                             @if(auth()->user()->hasPermission('archive_data_list'))
-                                <a class="btn btn-success btn-sm" href="{{route("uploaded.archive.list")}}"><i class="fas fa-list-check"></i> Uploaded List</a>
+                                <a class="btn btn-success btn-sm mt-1" href="{{route("uploaded.archive.list.quick")}}"><i class="fas fa-list-check"></i> Uploaded List</a>
                             @endif
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                                     <option value="">Pick options...</option>
                                     @if(isset($companies) || (count($companies) > 0))
                                         @foreach($companies as $c)
-                                            <option value="{{$c->id}}" @if(old('company') == $c->id) selected @endif>{{$c->company_name}} ({!! $c->company_code !!})</option>
+                                            <option value="{{$c->id}}">{{$c->company_name}} ({!! $c->company_code !!})</option>
                                         @endforeach
                                     @endif
                                 </select>
