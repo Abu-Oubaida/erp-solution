@@ -85,7 +85,7 @@ class DataArchiveDashboardController extends Controller
             $documentCountsPerDay[$day] = $rawCounts[$day]->count ?? 0;
         }
 
-        $totalDocumentCount = (max($documentCountsPerDay)+2);
+        $totalDocumentCount = (max($documentCountsPerDay)+40);
         return view('back-end.archive.dashboard', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount','today_uploaded_data_by_users'));
     }
 

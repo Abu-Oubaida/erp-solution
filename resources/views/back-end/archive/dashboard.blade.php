@@ -139,9 +139,9 @@
                                     ];
                                 }
                                 // Calculate max count for any user's total documents
-                                $totalDocumentCount = collect($today_uploaded_data_by_users)->map(function ($item) {
-                                    return $item['document_counts']->sum();
-                                })->max() + 2; // Add extra 2
+//                                $totalDocumentCount = collect($today_uploaded_data_by_users)->map(function ($item) {
+//                                    return $item['document_counts']->sum();
+//                                })->max() + 40; // Add extra 2
                                 $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
                             @endphp
                             <canvas id="user-wise-data-uploaded-today" width="400" height="200"></canvas>
@@ -302,7 +302,7 @@
                         min: 0,
                         max: {!! json_encode($totalDocumentCount) !!}, // Y-axis range from 0 to max
                         ticks: {
-                            stepSize: 5 // Increase by 10, i.e., 0, 10, 20
+                            stepSize: 10 // Increase by 10, i.e., 0, 10, 20
                         }
                     }
                 }
