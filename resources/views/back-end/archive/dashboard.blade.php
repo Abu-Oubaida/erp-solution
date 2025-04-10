@@ -111,14 +111,14 @@
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i class="fas fa-user"></i> Today Uploaded Document By User</h3>
+                        <h3 class="text-capitalize"><i class="fas fa-user"></i> User wise uploaded documents (Today)</h3>
                     </div>
                     <div class="card-body">
                         <div id="">
                             @if($today_uploaded_data_by_users)
                             @php
-                                $labels = [];
-                                $datasets = [];
+                                $user_wise_labels = [];
+                                $user_wise_datasets = [];
 
                                 // Get document types dynamically
                                 $documentTypes = collect();
@@ -130,7 +130,7 @@
                                 $documentTypes = $documentTypes->unique()->values();
 
                                 foreach ($documentTypes as $docType) {
-                                    $datasets[] = [
+                                    $user_wise_datasets[] = [
                                         'label' => $docType,
                                         'data' => collect($today_uploaded_data_by_users)->map(function ($item) use ($docType) {
                                             return $item['document_counts']->get($docType, 0);
@@ -142,7 +142,7 @@
                                 $totalDocumentCount = collect($today_uploaded_data_by_users)->map(function ($item) {
                                     return $item['document_counts']->sum();
                                 })->max() + 2; // Add extra 2
-                                $labels = collect($today_uploaded_data_by_users)->pluck('user_name');
+                                $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
                             @endphp
                             <canvas id="user-wise-data-uploaded-today" width="400" height="200"></canvas>
                             @endif
@@ -312,8 +312,8 @@
         const today_ctx = document.getElementById('user-wise-data-uploaded-today').getContext('2d');
 
         const today_data = {
-            labels: {!! json_encode($labels) !!},
-            datasets: {!! json_encode($datasets) !!}
+            labels: {!! json_encode($user_wise_labels) !!},
+            datasets: {!! json_encode($user_wise_datasets) !!}
         };
 
         const config = {
