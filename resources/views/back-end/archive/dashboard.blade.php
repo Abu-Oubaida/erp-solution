@@ -202,8 +202,10 @@
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Include the chartjs-plugin-datalabels -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script>
+        Chart.register(ChartDataLabels);
         const ctx = document.getElementById('levelChart').getContext('2d');
         const levelChart = new Chart(ctx, {
             type: 'doughnut',
@@ -245,8 +247,8 @@
             data: {
                 labels: {!! json_encode($labels) !!},
                 datasets: [{
-                    label: 'Documents Uploaded per Day',
-                    data: {!! json_encode($documentCountsPerDay) !!},
+                    label: 'Documents Uploaded Last 7 Days',
+                    data: Object.values({!! json_encode($documentCountsPerDay) !!}).map(Number),
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.5)',
                         'rgba(255, 159, 64, 0.5)',
@@ -285,11 +287,11 @@
                     datalabels: {
                         anchor: 'end',
                         align: 'end',
-                        color: '#d3d3d3', // Light gray color for data labels
+                        color: '#000000', // Light gray color for data labels
                         font: {
                             weight: 'bold'
                         },
-                        formatter: function(value) {
+                        formatter: function(value,context) {
                             return value; // Simply displays the value
                         }
                     }
@@ -308,7 +310,7 @@
             plugins: [ChartDataLabels] // Enables the ChartDataLabels plugin
         });
 
-        @if($today_uploaded_data_by_users)
+    @if($today_uploaded_data_by_users)
         const today_ctx = document.getElementById('user-wise-data-uploaded-today').getContext('2d');
 
         const today_data = {
@@ -338,6 +340,23 @@
                         display: false,
                         text: 'Document Counts by User'
                     },
+                    // Add the datalabels plugin to show user-wise total on each bar
+                    datalabels: {
+                        display: true,
+                        color: 'black', // Adjust text color
+                        anchor: 'end', // Position the text at the top of the bars
+                        align: 'top',  // Align text above the bars
+                        font: {
+                            weight: 'bold',
+                            size: 12, // Adjust font size
+                        },
+                        formatter: function(value, context) {
+                            if (context.datasetIndex === 0) { // Ensure labels appear only once
+                                return userTotalSums[context.dataIndex];
+                            }
+                            return ""; // Hide for other datasets
+                        }
+                    }
                 },
                 interaction: {
                     mode: 'index',
@@ -363,7 +382,7 @@
                         min: 0,
                         max: maxTotal, // Use the calculated max + 2
                         ticks: {
-                            stepSize: 1 // Or 2/5/10 as per your preferred spacing
+                            stepSize: 10 // Or 2/5/10 as per your preferred spacing
                         }
                     }
                 },
@@ -376,6 +395,6 @@
         };
 
         new Chart(today_ctx, config);
-        @endif
+    @endif
     </script>
 @stop
