@@ -316,6 +316,17 @@
             datasets: {!! json_encode($user_wise_datasets) !!}
         };
 
+        // Calculate the sum of values per user (level-wise) and find the highest total sum
+        const userTotalSums = today_data.labels.map((label, index) => {
+            return today_data.datasets.reduce((sum, dataset) => {
+                return sum + (dataset.data[index] || 0); // Add values for this user across all datasets
+            }, 0);
+        });
+
+        // Find the maximum sum and add 2 for the max value
+        const maxTotal = Math.max(...userTotalSums) + 2;
+
+
         const config = {
             type: 'bar',
             data: today_data,
@@ -350,7 +361,7 @@
                         stacked: true,
                         beginAtZero: true,
                         min: 0,
-                        max: {{ $totalDocumentCount }}, // Use the calculated max + 2
+                        max: maxTotal, // Use the calculated max + 2
                         ticks: {
                             stepSize: 1 // Or 2/5/10 as per your preferred spacing
                         }
