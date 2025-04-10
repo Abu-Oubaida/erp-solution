@@ -166,11 +166,23 @@ tfoot {
     border: rgb(13 202 240 / 47%);
     color: #184c56;
 }
+.bg-info-light:hover {
+    background-color: rgb(13 202 240 / 100%);
+    border: rgb(13 202 240 / 100%);
+    transition: color 0.3s ease;
+    /*color: #0b2227;*/
+}
 
 .bg-success-light {
     background-color: rgba(25, 135, 84, 0.2);
     border: rgba(25, 135, 84, 0.2);
     color: rgb(9 50 35 / 81%);
+}
+.bg-success-light:hover {
+    background-color: rgba(25, 135, 84, 0.5);
+    border: rgba(25, 135, 84, 0.5);
+    transition: color 0.3s ease;
+    /*color: rgb(234, 234, 234);*/
 }
 
 .bg-primary-light {
@@ -178,13 +190,43 @@ tfoot {
     border: rgba(13, 110, 253, 0.2);
     color: #494f58;
 }
+.bg-primary-light:hover {
+    background-color: rgba(13, 110, 253, 0.5);
+    border: rgba(13, 110, 253, 0.5);
+    transition: color 0.3s ease;
+    /*color: #25282c;*/
+}
 
 .bg-warning-light {
     background-color: rgba(255, 193, 7, 0.2);
     border: rgba(255, 193, 7, 0.2);
 }
+.bg-warning-light:hover {
+    background-color: rgba(255, 193, 7, 0.5);
+    transition: color 0.3s ease;
+    /*border: rgba(255, 193, 7, 0.5);*/
+}
 
 .bg-secondary-light {
     background-color: rgba(108, 117, 125, 0.2);
     border: rgba(108, 117, 125, 0.2);
+}
+.bg-secondary-light:hover {
+    background-color: rgba(108, 117, 125, 0.5);
+    transition: color 0.3s ease;
+    /*border: rgba(108, 117, 125, 0.5);*/
+}
+.card-heading-text-color {
+    color: #ff6384;
+}
+.sub-card:hover {
+    color: #ffffff;
+}
+.sub-card:hover .card-heading-text-color {
+    color: #ffffff;
+    transition: color 0.3s ease;
+}
+.sub-card:hover a {
+    color: #ffffff;
+    transition: color 0.3s ease;
 }

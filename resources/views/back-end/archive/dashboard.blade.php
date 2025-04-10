@@ -129,7 +129,7 @@
                         $prevColor = $chosenColor;
                     @endphp
                     <div class="col-3">
-                        <div class="card bg-{{ $chosenColor }}  mb-4">
+                        <div class="card bg-{{ $chosenColor }} sub-card  mb-4">
                             <div class="card-header">
                                 <h5 class="text-capitalize"><i class="fas fa-file-lines"></i> {!! $dataType['voucher_type_title'] !!}
                                     ({!! $dataType['company_name'] !!})
@@ -138,12 +138,12 @@
                             <div class="card-body text-capitalize">
                                 <div class="row">
                                     <div class="col text-start">
-                                        <h2 class="text-chl">{!! $dataType['archive_document_infos_count'] !!}</h2>
+                                        <h2 class="card-heading-text-color">{!! $dataType['archive_document_infos_count'] !!}</h2>
                                         <a class="small  stretched-link text-decoration-none"
                                             href="{!! route('uploaded.archive.list.quick',['c'=>$dataType['company_id'],'t'=>$dataType['id']]) !!}" target="_blank">Reference <i class="fas fa-angle-right"></i></a>
                                     </div>
                                     <div class="col text-end">
-                                        <h2 class="text-chl">{!! $dataType['archive_documents_count'] !!}</h2>
+                                        <h2 class="card-heading-text-color">{!! $dataType['archive_documents_count'] !!}</h2>
                                         <a class="small  stretched-link text-decoration-none"
                                             href="{!! route('uploaded.archive.list.quick',['c'=>$dataType['company_id'],'t'=>$dataType['id']]) !!}" target="_blank">Documents <i class="fas fa-angle-right"></i></a>
                                     </div>
