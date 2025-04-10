@@ -324,7 +324,7 @@
         });
 
         // Find the maximum sum and add 2 for the max value
-        const maxTotal = Math.max(...userTotalSums) + 2;
+        const maxTotal = Math.round(Math.max(...userTotalSums) + 50)
 
 
         const config = {
