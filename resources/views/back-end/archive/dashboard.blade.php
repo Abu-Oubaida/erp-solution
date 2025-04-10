@@ -107,6 +107,50 @@
                 </div>
             </div>
         @endif
+        <div class="row mt-2">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user"></i> Today Uploaded Document By User</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="">
+                            @if($today_uploaded_data_by_users)
+                            @php
+                                $labels = [];
+                                $datasets = [];
+
+                                // Get document types dynamically
+                                $documentTypes = collect();
+
+                                foreach ($today_uploaded_data_by_users as $item) {
+                                    $documentTypes = $documentTypes->merge(array_keys($item['document_counts']->toArray()));
+                                }
+
+                                $documentTypes = $documentTypes->unique()->values();
+
+                                foreach ($documentTypes as $docType) {
+                                    $datasets[] = [
+                                        'label' => $docType,
+                                        'data' => collect($today_uploaded_data_by_users)->map(function ($item) use ($docType) {
+                                            return $item['document_counts']->get($docType, 0);
+                                        }),
+                                        'stack' => 'Stack 0',
+                                    ];
+                                }
+                                // Calculate max count for any user's total documents
+                                $totalDocumentCount = collect($today_uploaded_data_by_users)->map(function ($item) {
+                                    return $item['document_counts']->sum();
+                                })->max() + 2; // Add extra 2
+                                $labels = collect($today_uploaded_data_by_users)->pluck('user_name');
+                            @endphp
+                            <canvas id="user-wise-data-uploaded-today" width="400" height="200"></canvas>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row mt-3">
             @if (isset($dataTypes) && count($dataTypes))
                 @php
@@ -192,6 +236,8 @@
         });
 
 
+
+
         const barCtx = document.getElementById('documentTypeChart').getContext('2d');
 
         const documentTypeChart = new Chart(barCtx, {
@@ -261,5 +307,64 @@
             },
             plugins: [ChartDataLabels] // Enables the ChartDataLabels plugin
         });
+
+        @if($today_uploaded_data_by_users)
+        const today_ctx = document.getElementById('user-wise-data-uploaded-today').getContext('2d');
+
+        const today_data = {
+            labels: {!! json_encode($labels) !!},
+            datasets: {!! json_encode($datasets) !!}
+        };
+
+        const config = {
+            type: 'bar',
+            data: today_data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: false,
+                        text: 'Document Counts by User'
+                    },
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            // align: 'start', // Align label text left
+                        },
+                        offset: true, // Remove center spacing
+                        grid: {
+                            offset: false
+                        },
+                        categoryPercentage: 0.5,
+                        barPercentage: 0.5,
+                        // padding: 20,
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        min: 0,
+                        max: {{ $totalDocumentCount }}, // Use the calculated max + 2
+                        ticks: {
+                            stepSize: 1 // Or 2/5/10 as per your preferred spacing
+                        }
+                    }
+                },
+                datasets: {
+                    bar: {
+                        barThickness: 40, // Make bars thinner
+                    }
+                }
+            },
+        };
+
+        new Chart(today_ctx, config);
+        @endif
     </script>
 @stop

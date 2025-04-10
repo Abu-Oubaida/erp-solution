@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Account_voucher;
 use App\Models\company_info;
+use App\Models\User;
 use App\Models\VoucherType;
 use App\Models\VoucherDocument;
 use App\Traits\ParentTraitCompanyWise;
@@ -41,6 +42,21 @@ class DataArchiveDashboardController extends Controller
         $dataTypeCount = $this->archiveTypeList($permission)->distinct()->count('id');
         $archiveDocumentCount = $this->getArchiveList($permission)->get()->pluck('voucherDocuments')->flatten(1)->pluck('id')->count();
         $accountVoucherInfosCount = Account_voucher::whereIn('voucher_type_id',$this->archiveTypeList($permission)->pluck('id')->toArray())->distinct()->count('id');
+        $today = today();
+        $today_uploaded_data_by_users = User::with(['archiveDocuments.accountVoucherInfo.VoucherType'])->whereHas('archiveDocuments', function ($query) use ($today) {
+            $query->whereDate('created_at', $today);
+        })
+        ->get()->map(function ($user) use ($today) {
+                $grouped = $user->archiveDocuments
+                    ->where('created_at', '>=', $today) // extra check for safety
+                    ->groupBy(fn($doc) => optional($doc->accountVoucherInfo->VoucherType)->voucher_type_title ?? 'Unknown');
+
+                return [
+                    'user_id' => $user->id,
+                    'user_name' => $user->name,
+                    'document_counts' => $grouped->map->count()
+                ];
+            });
         $dataTypes = $this->archiveTypeList($permission)->where('status',1)->get()->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -70,7 +86,7 @@ class DataArchiveDashboardController extends Controller
         }
 
         $totalDocumentCount = (max($documentCountsPerDay)+2);
-        return view('back-end.archive.dashboard', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount'));
+        return view('back-end.archive.dashboard', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount','today_uploaded_data_by_users'));
     }
 
     private function getFolderSize($dir)
