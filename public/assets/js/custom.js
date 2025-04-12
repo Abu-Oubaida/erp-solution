@@ -1052,7 +1052,35 @@ let Obj = {};
                     },
                 });
             },
-
+            companyWiseArchiveDashboard: function (e,company_id,output_id){
+                if (company_id.length !== 0)
+                {
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        "/company-wise-archive-dashboard";
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        url: url,
+                        type: "POST",
+                        data: { company_id: company_id },
+                        success: function (response) {
+                            if (response.status === 'error') {
+                                alert(response.message);
+                                return false
+                            } else {
+                                $("#"+output_id).html(response.data)
+                            }
+                        },
+                    });
+                }
+                return false;
+            }
+            ,
             findDocument: function (e, actionID, actionID2, actionID3) {
                 let path = $(e).attr("path");
                 let v_type = $(e).attr("vtype");
