@@ -61,7 +61,7 @@ class DataArchiveDashboardController extends Controller
                 $diskFree = round(disk_free_space($path) / (1024 * 1024 * 1024), 2);       // free space in bytes
                 $totalUsed = $diskTotal - $diskFree;
                 $otherUsed = $totalUsed - $archiveUsed;
-                $dataTypeCount = $this->archiveTypeList($permission)->distinct()->count('id');
+                $dataTypeCount = $this->archiveTypeList($permission)->where('company_id',$company->id)->distinct()->count('id');
                 $archiveDocumentCount = $this->getArchiveList($permission)->where('company_id',$company->id)->get()->pluck('voucherDocuments')->flatten(1)->pluck('id')->count();
                 $accountVoucherInfosCount = Account_voucher::whereIn('voucher_type_id',$this->archiveTypeList($permission)->pluck('id')->toArray())->where('company_id',$company->id)->distinct()->count('id');
                 $today = today();
