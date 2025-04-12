@@ -20,6 +20,12 @@
     <title style="">{{ucwords(str_replace('.', ' ', \Route::currentRouteName()))}} | {{str_replace('-', '-', config('app.name'))}}</title>
     <link rel="icon" href="{{url("image/logo/default/icon/360.png")}}">
     <x-back-end._header-link/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include the chartjs-plugin-datalabels -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+{{--    <script>--}}
+{{--        Chart.register(ChartDataLabels);--}}
+{{--    </script>--}}
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 </head>
 {{--<body class="sb-nav-fixed sb-sidenav-toggled">--}}
