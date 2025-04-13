@@ -331,7 +331,8 @@
                     Route::currentRouteName() == 'uploaded.archive.list' ||
                     Route::currentRouteName() == 'view.archive.document' ||
                     Route::currentRouteName() == 'uploaded.archive.list.quick' ||
-                    Route::currentRouteName() == 'data.archive.dashboard.interface')
+                    Route::currentRouteName() == 'data.archive.dashboard.interface' ||
+                    Route::currentRouteName() == 'data.archive.setting')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption"
                     aria-expanded="true" aria-controls="pagesUploadOption">
                     <div class="sb-nav-link-icon"><i class="fas fa-receipt" aria-hidden="true"></i></div>
@@ -447,6 +448,20 @@
                         <a class="nav-link"
                             href="{{ route('view.archive.document', ['vID' => \Illuminate\Support\Facades\Request::route('vID')]) }}">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-receipt"></i></div> Document View
+                        </a>
+                    @endif
+                @endif
+                @if (auth()->user()->hasPermission('archive_setting'))
+
+                    @if (Route::currentRouteName() == 'data.archive.setting')
+                        <a class="nav-link" href="{{ route('data.archive.setting') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
+                            Settings
+                        </a>
+                    @else
+                        <a class="nav-link text-chl" href="{{ route('data.archive.setting') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
+                            Settings
                         </a>
                     @endif
                 @endif
