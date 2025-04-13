@@ -29,16 +29,24 @@
                         <a class="nav-link text-chl" href="{{route("user.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
                     @endif
                 @endif
-                @if(auth()->user()->hasPermission('user_screen_permission'))
-                    @if(Route::currentRouteName() == 'user.screen.permission')
-                    <a class="nav-link" href="{{route("user.screen.permission",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>Screen Permission</a>
+
+                @php
+                \Log::info('User roles:', auth()->user()->roles->pluck('name')->toArray());
+            @endphp
+
+                    @if(auth()->user()->hasPermission('user_screen_permission'))
+                        @if(Route::currentRouteName() == 'user.screen.permission')
+                        <a class="nav-link" href="{{route("user.screen.permission",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>Screen Permission</a>
+                        @endif
                     @endif
-                @endif
-                @if(auth()->user()->hasPermission('file_manager_permission'))
-                    @if(Route::currentRouteName() == 'file.manager.permission')
-                    <a class="nav-link" href="{{route("file.manager.permission",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>File Permission</a>
+               
+
+                    @if(auth()->user()->hasPermission('file_manager_permission'))
+                        @if(Route::currentRouteName() == 'file.manager.permission')
+                        <a class="nav-link" href="{{route("file.manager.permission",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>File Permission</a>
+                        @endif
                     @endif
-                @endif
+
                 @if(auth()->user()->hasPermission('view_user'))
                     @if(Route::currentRouteName() == 'user.single.view')
                         <a class="nav-link" href="{{route("user.single.view",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
