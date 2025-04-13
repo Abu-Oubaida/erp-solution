@@ -2598,7 +2598,7 @@ let Obj = {};
                 if (confirm("Are you sure add all project permission?")) {
                     const user_id = $("#user_id").val();
                     const company_id = $("#company_id").val();
-                    if (user_id.length === 0) {
+                    if (user_id.length === 0 || company_id.length === 0) {
                         alert("All filed are required");
                         return false;
                     }
@@ -2634,7 +2634,8 @@ let Obj = {};
             userProjectPermissionDelete: function (e) {
                 if (confirm("Are you sure delete this data?")) {
                     const value = $(e).attr("ref");
-                    if (value.length === 0) {
+                    const company_id = $("#company_id").val();
+                    if (value.length === 0 || company_id.length === 0) {
                         return false;
                     }
                     const url =
@@ -2649,7 +2650,7 @@ let Obj = {};
                             ),
                         },
                         method: "POST",
-                        data: { value: value },
+                        data: { value: value, company_id:company_id},
                         success: function (response) {
                             if (response.status === "success") {
                                 alert(response.message);

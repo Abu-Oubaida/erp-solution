@@ -278,6 +278,7 @@ class ControlPanelController extends Controller
         try {
             $request->validate([
                 'value' => ['required', 'string','exists:user_project_permissions,id'],
+                'company_id'  => [ 'required', 'integer', 'exists:company_infos,id' ],
             ]);
             if ($request->isMethod('post'))
             {
@@ -285,7 +286,7 @@ class ControlPanelController extends Controller
                 $user_id = $this->deleteProjectPermission($value);
                 if ($user_id)
                 {
-                    $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $this->user->company_id)->where('user_id', $user_id)->get();
+                    $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $company_id)->where('user_id', $user_id)->get();
                     $view = view('back-end.control-panel.__user-permission-list',compact('userProjectPermissions'))->render();
                     return \response()->json([
                         'status'=>'success',
