@@ -337,7 +337,7 @@ class ArchiveController extends Controller
         try {
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
-                'project'               => ['sometimes','nullable', 'integer', 'exists:branches,id'],
+                'project'               => ['sometimes','nullable', 'integer', 'exists:branches,id',Rule::exists('user_project_permissions','project_id')->where('user_id',Auth::id())],
                 'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
                     return $query->where('company_id',$request->post('company'));
                 })],
@@ -625,6 +625,7 @@ class ArchiveController extends Controller
     private function archiveListQuickSearch(Request $request)
     {
         try {
+            $permission = $this->permissions()->archive_data_list_quick;
             $validated = $request->validate([
                 'company_id'    =>  ['required', 'integer', 'exists:company_infos,id'],
                 'projects'      =>  ['array', 'sometimes', 'nullable'],
@@ -682,6 +683,7 @@ class ArchiveController extends Controller
                 'updated_by',
                 'project_id'
             )
+            ->whereIn('project_id', $this->getUserProjectPermissions(Auth::id(),$permission)->pluck('id')->toArray())
             ->with(['VoucherDocument' => function($query) {
                 $query->select('voucher_info_id', 'document', 'filepath'); // Adjust the columns in VoucherDocument
             }])
@@ -765,13 +767,14 @@ class ArchiveController extends Controller
     public function companyWiseProjectsAndDataType(Request $request)
     {
         try {
+            $permission = $this->permissions()->data_archive;
             if ($request->isMethod('post'))
             {
                 $request->validate([
                     'company_id' => ['required','string','exists:company_infos,id'],
                 ]);
                 extract($request->post());
-                $projects = branch::where('company_id',$company_id)->where('status',1)->get();
+                $projects = branch::where('company_id',$company_id)->whereIn('id',$this->getUserProjectPermissions(Auth::user()->id,$permission)->pluck('id')->toArray())->where('status',1)->get();
                 $userWiseVoucherTypePermissionId = null;
                 $types = $this->getCompanyWiseDataTypes($company_id);
                 return response()->json([

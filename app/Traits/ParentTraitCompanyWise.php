@@ -450,7 +450,11 @@ trait ParentTraitCompanyWise
             }
             else {
                 $voucherTypeUserPermissions = Voucher_type_permission_user::where('user_id',$this->user->id)->pluck('voucher_type_id')->toArray();
-                return $voucherTypes->whereIn('id',$voucherTypeUserPermissions);
+                $permittedProjectIds = $this->getUserProjectPermissions($this->user->id, $permission)->pluck('id')->toArray();
+                $archive_type_lists = $voucherTypes->whereHas('archiveDocumentInfos', function ($query) use ($permittedProjectIds) {
+                    $query->whereIn('project_id', $permittedProjectIds);
+                })->whereIn('id',$voucherTypeUserPermissions);
+                return $archive_type_lists;
             }
         }
     }
