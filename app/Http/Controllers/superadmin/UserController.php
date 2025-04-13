@@ -273,6 +273,7 @@ class UserController extends Controller
             else {
                 $users = $this->getUser($permission)->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
             }
+            Log::info(json_encode($users, JSON_PRETTY_PRINT));
             return view('back-end.user.list',compact('users'))->render();
         }catch (\Throwable $exception)
         {
@@ -810,14 +811,16 @@ class UserController extends Controller
                 $roles = Role::where('company_id', $user->company)
                     ->orWhere(function ($query) {
                         $query->whereNull('company_id') // For system-wide roles
-                        ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
+                        // 'systemsuperadmin', 'systemadmin', 'superadmin','admin','user'
+                        ->whereIn('name', ['systemsuperadmin']);
                     })->get();
             }
             else if ($this->user->isSuperAdmin()){
                 $roles = Role::where('company_id', $user->company)
                     ->orWhere(function ($query) {
                         $query->whereNull('company_id') // For system-wide roles
-                        ->whereIn('name', ['superadmin','admin','user']);
+                        // 'superadmin','admin','user'
+                        ->whereIn('name', ['superadmin']);
                     })->get();
             }
             else{
@@ -828,7 +831,7 @@ class UserController extends Controller
                     })->get();
             }
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
-            $roleNew = $this->user->roles->first();
+            $roleNew = $user->roles->first()->name;
             return view('back-end.user.user_screen_permission',compact('userID','user','roles','userPermissions','userCompanies','roleNew'))->render();
         }catch (\Throwable $exception)
         {
@@ -877,7 +880,7 @@ class UserController extends Controller
                     })->get();
             }
             $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
-            $roleNew = $this->user->roles->first();
+            $roleNew = $user->roles->first()->name;
             return view('back-end.user.file_manager_permission',compact('user','filPermission','roles','userCompanies','roleNew'))->render();
         }catch (\Throwable $exception)
         {

@@ -22,6 +22,7 @@ use App\Models\VoucherDocumentShareEmailLink;
 use App\Models\VoucherDocumentShareEmailList;
 use App\Models\VoucherDocumentShareLink;
 use App\Models\VoucherType;
+use Complex\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -806,6 +807,42 @@ class ajaxRequestController extends Controller
                 'status' => 'error',
                 'message'=> 'Request method not allowed!'
             ]);
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function searchCompanyBranchUsers(Request $request)
+    {
+        try {
+
+            if ($request->ajax())
+            {
+                $validatedData = $request->validate([
+                    'company_id' => ['required','string','exists:company_infos,id'],
+                    'branches_id' => ['required','array'],
+                    'branches_id.*' => ['required','string','exists:branches,id'],
+                ]);
+                extract($validatedData);
+                $users = User::with(['department'=>function ($query) {
+                    $query->select('id','dept_name');
+                }])->where('company',$company_id)->whereIn('branch_id',array_values($branches_id))->where('status',1)->get(['id','dept_id','name'])->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name.' ('.$user->department->dept_name.')',
+                    ];
+                });
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $users,
+                    'message' => 'Request processed successfully!'
+                ]);
+            }
+            throw new \Exception("Request method not allowed!");
         }catch (\Throwable $exception)
         {
             return response()->json([

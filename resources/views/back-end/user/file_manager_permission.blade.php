@@ -3,13 +3,16 @@
     <div class="container-fluid px-4">
         <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-12">
                 <ol class="breadcrumb mb-4">
                     <li class="breadcrumb-item">
                         <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
+                        <a href="{!! route('user.list') !!}" class="text-capitalize text-chl">User List</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a style="text-decoration: none;" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
                     </li>
                 </ol>
             </div>
@@ -25,12 +28,15 @@
                                     </div>
                                 </div>
                             @else
-                                @if(strtolower(@$roleNew) == strtolower('systemsuperadmin'))
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <strong class="text-center text-info">System/Super Admin has all the permissions by default! </strong>
-                                        </div>
+                            @if ($roleNew === 'systemsuperadmin')
+                                <div class="col-md-10 mx-auto">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                            <strong class="text-info">System/Super Admin has all the permissions by default!
+                                            </strong>
                                     </div>
+                                </div>
+                                </div>
                                 @else
                                 <div class="card mb-4">
                                     <div class="card-header">

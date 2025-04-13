@@ -184,7 +184,7 @@ trait ParentTraitCompanyWise
         {
             return $object;
         }
-        $user = $this->getUser($permission)->where('id',$user_id)->first();
+        $user = User::where('id',$user_id)->first();
         if ($user->companyWiseRoleName() == 'superadmin')
         {
             return $object->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission));
@@ -451,6 +451,7 @@ trait ParentTraitCompanyWise
             else {
                 $voucherTypeUserPermissions = Voucher_type_permission_user::where('user_id',$this->user->id)->pluck('voucher_type_id')->toArray();
                 $permittedProjectIds = $this->getUserProjectPermissions($this->user->id, $permission)->pluck('id')->toArray();
+//                dd($permittedProjectIds);
                 $archive_type_lists = $voucherTypes->whereHas('archiveDocumentInfos', function ($query) use ($permittedProjectIds) {
                     $query->whereIn('project_id', $permittedProjectIds);
                 })->whereIn('id',$voucherTypeUserPermissions);
@@ -460,7 +461,11 @@ trait ParentTraitCompanyWise
     }
     public function getArchiveList($permission)
     {
-            return Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes(null)->pluck('id')->toArray());
-
+        $permittedProjectIds = $this->getUserProjectPermissions($this->user->id, $permission)->pluck('id')->toArray();
+        $data = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments'])
+            ->whereIn('company_id',$this->getCompanyModulePermissionWiseArray($permission))
+            ->whereIn('project_id', $permittedProjectIds)
+            ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes(null)->pluck('id')->toArray());
+        return $data;
     }
 }
