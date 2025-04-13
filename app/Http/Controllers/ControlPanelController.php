@@ -95,7 +95,7 @@ class ControlPanelController extends Controller
                 $permission_users = $this->getUser($permision)->whereIn('id',$userIDs)->whereDoesntHave('roles', function ($query) {
                     $query->where('name', 'systemsuperadmin');
                 })->get();
-                $view = view('back-end.control-panel._user-project-permission-add',compact('projects','userProjectPermissions','user','permission_users'))->render();
+                $view = view('back-end.control-panel._user-project-permission-add',compact('projects','userProjectPermissions','user','permission_users','company_id'))->render();
                 return \response()->json([
                     'status'=>'success',
                     'data'=>$view,
@@ -121,13 +121,14 @@ class ControlPanelController extends Controller
             $request->validate([
                 'copy_user_id'  => [ 'required', 'string', 'exists:user_project_permissions,user_id' ],
                 'user_id'  => [ 'required', 'string', 'exists:users,id'],
+                'company_id' => ['required','string','exists:company_infos,id'],
             ]);
             if ($request->isMethod('post')) {
                 extract($request->post());
-                $copy_user_permissions = userProjectPermission::where('user_id', $copy_user_id)->where('company_id', $this->user->company_id)->get();
+                $copy_user_permissions = userProjectPermission::where('user_id', $copy_user_id)->get();
                 if (count($copy_user_permissions))
                 {
-                    $user_old_permission = userProjectPermission::where('user_id',$user_id)->get();
+                    $user_old_permission = userProjectPermission::where('user_id',$user_id)->where('company_id',$company_id)->get();
                     foreach ($user_old_permission as $uop)
                     {
                         $this->deleteProjectPermission($uop->id);
@@ -138,11 +139,11 @@ class ControlPanelController extends Controller
                             'date'  => now(),
                             'user_id' => $user_id,
                             'project_id' => $cup->project_id,
-                            'company_id' => $this->user->company_id,
+                            'company_id' => $company_id,
                             'created_by'    =>  $this->user->user_id,
                         ]);
                     }
-                    $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $this->user->company_id)->where('user_id', $user_id)->get();
+                    $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $company_id)->where('user_id', $user_id)->get();
                     $view = view('back-end.control-panel.__user-permission-list',compact('userProjectPermissions'))->render();
                     return \response()->json([
                         'status'=>'success',
@@ -176,6 +177,7 @@ class ControlPanelController extends Controller
                 'user_id'  => [ 'required', 'string', 'exists:users,id' ],
                 'project_id'  => [ 'required', 'array'],
                 'project_id.*'  => [ 'required', 'string', 'exists:branches,id' ],
+                'company_id'  => [ 'required', 'integer', 'exists:company_infos,id' ],
             ]);
             if ($request->isMethod('post')) {
                 extract($request->post());
@@ -193,12 +195,12 @@ class ControlPanelController extends Controller
                             'date'  => now(),
                             'user_id' => $user_id,
                             'project_id' => $value,
-                            'company_id' => $this->user->company_id,
+                            'company_id' => $company_id,
                             'created_by'    =>  $this->user->user_id,
                         ]);
                     }
                 }
-                return $this->userProjectPermissionAddReturn($user_id,$message);
+                return $this->userProjectPermissionAddReturn($user_id,$message,$company_id);
             }
             return \response()->json([
                 'status'=>'error',
@@ -212,9 +214,9 @@ class ControlPanelController extends Controller
             ],200);
         }
     }
-    private function userProjectPermissionAddReturn($user_id,$message)
+    private function userProjectPermissionAddReturn($user_id,$message,$company_id)
     {
-        $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $this->user->company_id)->where('user_id', $user_id)->get();
+        $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $company_id)->where('user_id', $user_id)->get();
         $view = view('back-end.control-panel.__user-permission-list',compact('userProjectPermissions'))->render();
         if ($message)
         {
@@ -235,10 +237,11 @@ class ControlPanelController extends Controller
         try {
             $request->validate([
                 'user_id'  => [ 'required', 'string', 'exists:users,id' ],
+                'company_id'  => [ 'required', 'integer', 'exists:company_infos,id' ],
             ]);
             if ($request->isMethod('post')) {
                 extract($request->post());
-                $projects = branch::where('status', 1)->where('company_id', $this->user->company_id)->get();
+                $projects = branch::where('status', 1)->where('company_id', $company_id)->get();
                 $message = null;
                 $alreadyExists = 0;
                 foreach ($projects as $p) {
@@ -251,12 +254,12 @@ class ControlPanelController extends Controller
                             'date'  => now(),
                             'user_id' => $user_id,
                             'project_id' => $p->id,
-                            'company_id' => $this->user->company_id,
+                            'company_id' => $company_id,
                             'created_by'    =>  $this->user->user_id,
                         ]);
                     }
                 }
-                return $this->userProjectPermissionAddReturn($user_id,$message);
+                return $this->userProjectPermissionAddReturn($user_id,$message,$company_id);
             }
             return \response()->json([
                 'status'=>'error',
@@ -311,18 +314,19 @@ class ControlPanelController extends Controller
         try {
             $request->validate([
                 'user_id' => ['required', 'string','exists:user_project_permissions,user_id'],
+                'company_id'  => [ 'required', 'integer', 'exists:company_infos,id' ],
             ]);
             if ($request->isMethod('post'))
             {
                 extract($request->post());
-                $user_old_permission = userProjectPermission::where('user_id',$user_id)->get();
+                $user_old_permission = userProjectPermission::where('user_id',$user_id)->where('company_id',$company_id)->get();
                 if (count($user_old_permission))
                 {
                     foreach ($user_old_permission as $value) {
                         $this->deleteProjectPermission($value->id);
                     }
                 }
-                $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $this->user->company_id)->where('user_id', $user_id)->get();
+                $userProjectPermissions = userProjectPermission::with(['user','projects'])->where('company_id', $company_id)->where('user_id', $user_id)->get();
                 $view = view('back-end.control-panel.__user-permission-list',compact('userProjectPermissions'))->render();
                 return \response()->json([
                     'status'=>'success',
@@ -344,7 +348,7 @@ class ControlPanelController extends Controller
     private function deleteProjectPermission($id)
     {
         try {
-            $delete_data = userProjectPermission::where('id',$id)->where('company_id',$this->user->company_id);
+            $delete_data = userProjectPermission::where('id',$id);
             if ($d = $delete_data->first())
             {
                 $user_id = $d->user_id;
