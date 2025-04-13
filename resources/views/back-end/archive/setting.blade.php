@@ -32,7 +32,7 @@
                                 <div class="col-md-2 mb-1">
                                     <div class="">
                                         <label for="company">Company Name <span class="text-danger">*</span></label>
-                                        <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjectsAndDataTypeArchive(this,'project','data_types',true)">
+                                        <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjectsAndDataTypeArchive(this,'projects','data_types',true)">
                                             <option value="">Pick options...</option>
                                             @if(isset($companies) || (count($companies) > 0))
                                                 @foreach($companies as $c)
@@ -54,13 +54,26 @@
                                     </div>
                                 </div>
                                 <div class="col-md-2 mb-1">
-                                    <label for="project">Enter Branch Name</label>
-                                    <select id="project" name="project" class="select-search cursor-pointer" multiple onchange="Obj.selectAllOption(this)">
+                                    <label for="projects">Branch Name<span class="text-danger">*</span></label>
+                                    <select id="projects" name="project" class="select-search cursor-pointer" multiple onchange="Obj.selectAllOption(this)">
                                         <option value="">Pick options...</option>
                                     </select>
                                 </div>
                                 <div class="col-md-1">
-                                    <button class="btn btn-sm btn-outline-secondary mt-4"><i class="fas fa-search"></i> Search User</button>
+                                    <a class="btn btn-sm btn-outline-secondary mt-4" onclick="return Obj.searchCompanyAndBranchWiseUsers('company','projects','permission_users')"><i class="fas fa-search"></i> Search User</a>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <label for="permission_users">Users<span class="text-danger">*</span></label>
+                                            <select id="permission_users" name="users" class="select-search cursor-pointer" multiple onchange="Obj.selectAllOption(this)">
+                                                <option value="">Pick options...</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-chl-outline mt-4 btn-sm"><i class="fas fa-save"></i> Save Permission</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </form>

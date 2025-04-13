@@ -4019,6 +4019,42 @@ let Obj = {};
                     },
                 });
             },
+            searchCompanyAndBranchWiseUsers: function (
+                company_id,
+                branch_id,
+                action_id
+            ) {
+                let company = $("#" + company_id).val();
+                let branches_id = $("#" + branch_id).val();
+
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/search-company-branch-users";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { branches_id: branches_id, company_id: company },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            updateSelectBox(
+                                response.data,
+                                action_id,
+                                "id",
+                                "name"
+                            );
+                        }
+                        return true;
+                    },
+                });
+            },
         };
     });
     function checkFileExists(url, callback) {

@@ -92,6 +92,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::post('share-archive-email-multiple','shareArchiveEmailMultiple');
             Route::post('archive-email-link-status-change','archiveEmailLinkStatusChange');
         });
+        Route::post('search-company-branch-users','searchCompanyBranchUsers');
         Route::post('company-wise-projects','companyWiseProjects');
         Route::post('user-wise-company-project-permissions','userWiseCompanyProjectPermissions');
         Route::post('company-wise-departments','companyWiseDepartments');
@@ -175,7 +176,7 @@ Route::group(['middleware' => ['auth']],function (){
              Route::middleware(['permission:delete_user_screen_permission'])->group(function (){
                  Route::delete('delete-user-permission','removePermission')->name('remove.user.permission');
                  Route::delete('delete-multiple-user-permission','removeMultiplePermission')->name('delete-multiple-user-permission');
-                
+
             });
         });//3.2.2 End
         # 3.2.3 User File manager permission
