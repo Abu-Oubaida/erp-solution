@@ -118,7 +118,6 @@ class User extends Authenticatable
         }
         else{
             if ($this->company == $this->getCompanyIdAttribute()) {
-
                 return (($roles = $this->belongsToMany(Role::class,'role_user','user_id','role_id'))->count() > 0)? $roles->first()->name : null;
             }
             else{
