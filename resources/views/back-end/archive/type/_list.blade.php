@@ -14,7 +14,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                    <table id="datatablesSimple">
+                    <table id="datatablesSimple" class="table table-hover table-sm">
                         <thead>
                         <tr>
                             <th>No</th>
@@ -80,7 +80,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="8" class="text-danger text-center">Not Found!</td>
+                                <td colspan="10" class="text-danger text-center">Not Found!</td>
                             </tr>
                         @endif
                         </tbody>

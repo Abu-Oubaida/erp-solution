@@ -4,6 +4,8 @@
 @if(count($filPermission))
     @foreach($filPermission as $fp)
         <tr>
+            <th><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $fp->id !!}"
+                value="{!! $fp->id !!}"></th>
             <td>{!! $no++ !!}</td>
             <td>{!! @$fp->company->company_name !!}</td>
             <td>{!! $fp->dir_name !!}</td>

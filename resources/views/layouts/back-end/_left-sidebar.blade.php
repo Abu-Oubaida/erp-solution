@@ -42,7 +42,9 @@
                                 Route::currentRouteName() == 'add.role' ||
                                 Route::currentRouteName() == 'edit.role' ||
                                 Route::currentRouteName() == 'role.list' ||
-                                Route::currentRouteName() == 'delete.role')
+                                Route::currentRouteName() == 'delete.role'||
+                                Route::currentRouteName() == 'user.screen.permission'||
+                                Route::currentRouteName() == 'file.manager.permission')
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts"
                                 aria-expanded="true" aria-controls="userLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-user-group"></i></div>

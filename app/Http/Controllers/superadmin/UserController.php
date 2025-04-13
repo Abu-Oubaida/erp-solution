@@ -38,6 +38,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpParser\Node\Stmt\If_;
+use Log;
 
 class UserController extends Controller
 {
@@ -272,7 +273,6 @@ class UserController extends Controller
             else {
                 $users = $this->getUser($permission)->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
             }
-//            dd($users->first()->getCompany);
             return view('back-end.user.list',compact('users'))->render();
         }catch (\Throwable $exception)
         {
@@ -433,6 +433,33 @@ class UserController extends Controller
                 $userID = filemanager_permission::where('id',$id)->select('user_id')->first();
                 filemanager_permission::where('id',$id)->update(['status'=>0]);
                 $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID->user_id)->orderBy('id', 'DESC')->get();
+                $view = view("back-end.user._file-permission-list",compact('filPermission'))->render();
+                return response()->json([
+                   'status' => 'success',
+                   'data' => $view,
+                   'message' => 'Record deleted successfully.',
+                ]);
+
+            }
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+
+        }
+    }
+    public function UserPerMultipleDelete(Request $request)
+    {
+        try {
+            extract($request->post());
+            $ids = $request->selected;
+            if ($ids)
+            {
+                $userIDs = filemanager_permission::whereIn('id',$ids)->pluck('user_id');
+                filemanager_permission::whereIn('id',$ids)->update(['status'=>0]);
+                $filPermission = filemanager_permission::with(['company'])->where('status',1)->whereIn('user_id',$userIDs)->orderBy('id', 'DESC')->get();
                 $view = view("back-end.user._file-permission-list",compact('filPermission'))->render();
                 return response()->json([
                    'status' => 'success',
@@ -770,6 +797,91 @@ class UserController extends Controller
                 'status' => 'error',
                 'message' => $exception->getMessage()
             ]);
+        }
+    }
+    public function getUserScreenPermission(Request $request,$id){
+        try {
+            $permission = $this->permissions()->user_screen_permission;
+            $userID = Crypt::decryptString($id);
+            $user = $this->getUser($this->permissions()->user_screen_permission)->where('users.id',$userID)->first();
+            $userPermissions = PermissionUser::with(['permissionParent','company'])->where('user_id',$userID)->orderBy('permission_name','asc')->get();
+            if ($this->user->isSystemSuperAdmin())
+            {
+                $roles = Role::where('company_id', $user->company)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
+                    })->get();
+            }
+            else if ($this->user->isSuperAdmin()){
+                $roles = Role::where('company_id', $user->company)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['superadmin','admin','user']);
+                    })->get();
+            }
+            else{
+                $roles = Role::where('company_id', $user->company)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['user']);
+                    })->get();
+            }
+            $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
+            $roleNew = $this->user->roles->first();
+            return view('back-end.user.user_screen_permission',compact('userID','user','roles','userPermissions','userCompanies','roleNew'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+    public function fetchUserPermissionsAfterDelete(Request $request){
+       $userID = $request->userID;
+       $userPermissions = PermissionUser::with(['permissionParent','company'])->where('user_id',$userID)->orderBy('permission_name','asc')->get();
+       $userPermissionUpdated = view('back-end.user.user_screen_permission_table',compact('userID','userPermissions'))->render();
+       return response()->json([
+        'status'=>'success',
+        'userPermissionUpdated'=>$userPermissionUpdated
+       ]);
+    }
+    public function getFileManagerPermission(Request $request,$id){
+        try {
+            $permission = $this->permissions()->file_manager_permission;
+            if ($request->isMethod('put'))
+            {
+                $this->UserUpdate($request);
+            }
+            $userID = Crypt::decryptString($id);
+            $user = $this->getUser($this->permissions()->file_manager_permission)->where('users.id',$userID)->first();
+            $filPermission = filemanager_permission::with(['company'])->where('status',1)->where('user_id',$userID)->get();
+            if ($this->user->isSystemSuperAdmin())
+            {
+                $roles = Role::where('company_id', $user->company)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['systemsuperadmin', 'systemadmin', 'superadmin','admin','user']);
+                    })->get();
+            }
+            else if ($this->user->isSuperAdmin()){
+                $roles = Role::where('company_id', $user->company)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['superadmin','admin','user']);
+                    })->get();
+            }
+            else{
+                $roles = Role::where('company_id', $user->company)
+                    ->orWhere(function ($query) {
+                        $query->whereNull('company_id') // For system-wide roles
+                        ->whereIn('name', ['user']);
+                    })->get();
+            }
+            $userCompanies = company_info::whereIn('id',$this->getUserCompanyPermissionArray($userID))->get();
+            $roleNew = $this->user->roles->first();
+            return view('back-end.user.file_manager_permission',compact('user','filPermission','roles','userCompanies','roleNew'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
         }
     }
 }

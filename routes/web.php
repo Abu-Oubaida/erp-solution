@@ -96,7 +96,7 @@ Route::group(['middleware' => ['auth']],function (){
         Route::post('user-wise-company-project-permissions','userWiseCompanyProjectPermissions');
         Route::post('company-wise-departments','companyWiseDepartments');
     });//3.2 End
-
+    // Route::delete('/delete-multiple-user-permission',[UserPermissionController::class,'removeMultiplePermission'])->name('delete-multiple-user-permission');
 # 3.2 System Admin Controller
     Route::group(['prefix'=>'system-operation'],function (){
         # 3.2.1 Only for system super admin
@@ -167,12 +167,15 @@ Route::group(['middleware' => ['auth']],function (){
             });
         });
         # 3.2.2 User Screen Permission Controller
+        // Route::delete('/delete-multiple-user-permission',[UserPermissionController::class,'removeMultiplePermission'])->name('delete-multiple-user-permission');
         Route::controller(UserPermissionController::class)->group(function (){
             Route::middleware(['permission:add_user_screen_permission'])->group(function (){
                 Route::post('add-user-permission','addPermission')->name('add.user.permission');
             });
              Route::middleware(['permission:delete_user_screen_permission'])->group(function (){
                  Route::delete('delete-user-permission','removePermission')->name('remove.user.permission');
+                 Route::delete('delete-multiple-user-permission','removeMultiplePermission')->name('delete-multiple-user-permission');
+                
             });
         });//3.2.2 End
         # 3.2.3 User File manager permission
@@ -183,6 +186,9 @@ Route::group(['middleware' => ['auth']],function (){
             Route::middleware(['permission:delete_user_file_manager_permission'])->group(function (){
                 Route::post('user-per-delete','UserPerDelete');
             });
+            Route::middleware(['permission:delete_user_file_manager_permission'])->group(function (){
+                Route::post('user-per-multiple-delete','UserPerMultipleDelete');
+            });
         });//3.2.3 End
 
 
@@ -191,6 +197,13 @@ Route::group(['middleware' => ['auth']],function (){
 # 3.3 User Management Controller
     Route::controller(UserController::class,)->group(function (){
 # 3.3.1 Add user
+        Route::middleware(['permission:user_screen_permission'])->group(function (){
+            Route::match(['get'],'user-screen-permission/{userID}','getUserScreenPermission')->name('user.screen.permission');
+            Route::match(['get'],'fetch-user-permissions-after-delete','fetchUserPermissionsAfterDelete')->name('fetch.user.permissions.after.delete');
+        });
+        Route::middleware(['permission:file_manager_permission'])->group(function (){
+            Route::match(['get'],'file-manager-permission/{userID}','getFileManagerPermission')->name('file.manager.permission');
+        });
         Route::middleware(['permission:add_user'])->group(function (){
             Route::match(['post','get'],'add-user','create')->name('add.user');
             Route::match(['post'],'add-user-excel','excelStore');

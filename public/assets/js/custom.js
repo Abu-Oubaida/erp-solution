@@ -2884,6 +2884,40 @@ let Obj = {};
                     });
                 }
             },
+            companyDirectoryPermissionMultipleDelete: function (e) {
+                let selected = [];
+                $(".check-box:checked").each(function () {
+                    selected.push($(this).val());
+                });
+                console.log(selected);
+                if (selected.length === 0) {
+                    alert("Please select at least one record to delete.");
+                    return;
+                }else{
+                    let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/user-per-multiple-delete";
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    url: url,
+                    type: "POST",
+                    data: { selected: selected },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            $("#f-p-list").html(response.data);
+                            alert(response.message);
+                        }
+                    },
+                });
+                }
+            },
             companyWiseFixedAssets: function (e, action_id) {
                 let id = $(e).val();
                 if (id.length === 0) {
@@ -3771,6 +3805,71 @@ let Obj = {};
 
                             //location.reload();
                         },
+                        error: function (error) {
+                            alert("An error occurred while deleting records.");
+                        },
+                    });
+                }
+            },
+            deleteUserPermissionMultiple: function (userID) {
+                let selected = [];
+                $(".check-box:checked").each(function () {
+                    selected.push($(this).val());
+                });
+                if (selected.length === 0) {
+                    alert("Please select at least one record to delete.");
+                    return;
+                }
+
+                if (
+                    confirm("Are you sure you want to delete selected records?")
+                ) {
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        "/system-operation/delete-multiple-user-permission";
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "DELETE",
+                        data: {
+                            selected: selected,
+                            multipleDlt: "multipleDlt",
+                            userID:userID
+                        },
+                        success: function (response) {
+                            if (response.status == "success") {
+                                alert(response.message);
+                                let url =
+                                window.location.origin +
+                                sourceDir +
+                                "/fetch-user-permissions-after-delete";
+                            $.ajax({
+                                url: url,
+                                headers: {
+                                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                        "content"
+                                    ),
+                                },
+                                method: "GET",
+                                data: {
+                                    userID:userID
+                                },
+                                success:function(response){
+                                    if (response.status == "success") {
+                                        $('#user-permissions-container').html(response.userPermissionUpdated);
+                                    }
+                                },
+                                error: function (error) {
+                                    alert("An error occurred while fetching updated record.");
+                                },
+                            }); 
+                        }
+                    },
                         error: function (error) {
                             alert("An error occurred while deleting records.");
                         },

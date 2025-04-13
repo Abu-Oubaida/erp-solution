@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Log;
 
 class UserPermissionController extends Controller
 {
@@ -124,4 +125,53 @@ class UserPermissionController extends Controller
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
+    public function removeMultiplePermission(Request $request)
+    {
+        $pids = $request->selected;
+        $uid = $request->userID;
+        $user = User::findOrFail($uid);
+         try {
+            // Fetch all the permissions associated with the selected $pids
+            $userPermissions = $user->permissions()->whereIn('id', $pids);
+            if ($userPermissions->get()->isNotEmpty()) {
+                // Prepare an array of history records to insert
+                $historyData = [];
+                foreach ($userPermissions->get() as $userPermission) {
+                    $historyData[] = [
+                        'company_id' => $userPermission->company_id,
+                        'admin_id' => Auth::id(),
+                        'user_id' => $user->id,
+                        'permission_id' => $userPermission->id,
+                        'operation_name' => 'deleted'
+                    ];
+                }
+        
+                // Bulk insert the history records into PermissionUserHistory
+                PermissionUserHistory::insert($historyData);
+        
+                // Perform a bulk delete on all fetched permissions in a single query
+                $userPermissions->delete();
+        
+                // Return a successful JSON response
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Permissions removed successfully.'
+                ], 200);
+            } else {
+                // Return error if no permissions found
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No permissions found to delete.'
+                ], 400);
+            }
+        } catch (\Throwable $exception) {
+            // Handle the exception and provide an error message  
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while deleting permissions. Please try again later.',
+                'error' => $exception->getMessage(),
+            ], 500);
+        }
+
+}
 }

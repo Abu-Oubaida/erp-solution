@@ -116,9 +116,11 @@
                                         </button>
                                         <ul class="dropdown-menu">
                                             @if(auth()->user()->hasPermission('edit_user'))
-                                            <li><a class="dropdown-item" type="button" href="{{route('user.edit',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" title="Edit"><i class='fas fa-edit'></i> Edit User</a></li>
+                                            <li><a class="dropdown-item" type="button" href="{{route('user.edit',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" title="Edit" target="_blank"><i class='fas fa-edit'></i> Edit User</a></li>
                                             @endif
-                                            <li><a href="" class="dropdown-item" type="button"><i class="fa-solid fa-shield-halved"></i> Company Permission</a></li>
+                                            <li><a href="" class="dropdown-item" type="button" target="_blank"><i class="fa-solid fa-shield-halved"></i> Company Permission</a></li>
+                                            <li><a class="dropdown-item" type="button" href="{{route('user.screen.permission',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" title="User Screen Permission" target="_blank"><i class="fa-solid fa-user"></i> User Screen Permission</a></li>
+                                            <li><a class="dropdown-item" type="button" href="{{route('file.manager.permission',["userID"=>\Illuminate\Support\Facades\Crypt::encryptString($u->id)])}}" title="File Manager Permission" target="_blank"><i class="fa-solid fa-file"></i> File Manager Permission</a></li>
                                         </ul>
                                     </div>
 {{--                                    <button type="button" class="btn btn-sm btn-primary" value="{!! $u->id !!}" onclick="return Obj.receivedComplainAction(this,'complain-action')" data-bs-toggle="modal" data-bs-target="#complain-action"> View </button>--}}
