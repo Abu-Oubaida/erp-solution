@@ -2526,6 +2526,7 @@ let Obj = {};
             userProjectPermissionAdd: function (e) {
                 const project_id = $("#project").val();
                 const user_id = $("#user_id").val();
+                const company_id = $("#company_id").val();
                 if (project_id.length === 0 || user_id.length === 0) {
                     alert("All filed are required");
                     return false;
@@ -2542,7 +2543,7 @@ let Obj = {};
                         ),
                     },
                     method: "POST",
-                    data: { project_id: project_id, user_id: user_id },
+                    data: { project_id: project_id, user_id: user_id, company_id:company_id },
                     success: function (response) {
                         if (response.status === "success") {
                             alert(response.message);
@@ -2561,6 +2562,7 @@ let Obj = {};
                 if (confirm("Are you sure to copy all permissions?")) {
                     const copy_user = $("#copy_user").val();
                     const user_id = $("#user_id").val();
+                    const company_id = $("#company_id").val();
                     if (copy_user.length === 0 || user_id.length === 0) {
                         alert("All filed are required");
                         return false;
@@ -2577,7 +2579,7 @@ let Obj = {};
                             ),
                         },
                         method: "POST",
-                        data: { copy_user_id: copy_user, user_id: user_id },
+                        data: { copy_user_id: copy_user, user_id: user_id, company_id:company_id },
                         success: function (response) {
                             if (response.status === "success") {
                                 alert(response.message);
@@ -2595,6 +2597,7 @@ let Obj = {};
             userProjectPermissionAddAll: function (e) {
                 if (confirm("Are you sure add all project permission?")) {
                     const user_id = $("#user_id").val();
+                    const company_id = $("#company_id").val();
                     if (user_id.length === 0) {
                         alert("All filed are required");
                         return false;
@@ -2611,7 +2614,7 @@ let Obj = {};
                             ),
                         },
                         method: "POST",
-                        data: { user_id: user_id },
+                        data: { user_id: user_id,company_id:company_id },
                         success: function (response) {
                             if (response.status === "success") {
                                 alert(response.message);
@@ -2670,7 +2673,8 @@ let Obj = {};
                     )
                 ) {
                     const user_id = $("#user_id").val();
-                    if (user_id.length === 0) {
+                    const company_id = $("#company_id").val();
+                    if (user_id.length === 0 || company_id.length === 0) {
                         return false;
                     }
                     const url =
@@ -2685,7 +2689,7 @@ let Obj = {};
                             ),
                         },
                         method: "POST",
-                        data: { user_id: user_id },
+                        data: { user_id: user_id, company_id: company_id},
                         success: function (response) {
                             if (response.status === "success") {
                                 alert(response.message);
@@ -3867,7 +3871,7 @@ let Obj = {};
                                 error: function (error) {
                                     alert("An error occurred while fetching updated record.");
                                 },
-                            }); 
+                            });
                         }
                     },
                         error: function (error) {

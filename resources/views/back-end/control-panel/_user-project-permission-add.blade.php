@@ -21,6 +21,7 @@
                     @endif
                 </select>
                 <input type="hidden" id="user_id" name="user_id" value="@if(isset($user)){!! $user !!} @endif">
+                <input type="hidden" id="company_id" name="company_id" value="@if(isset($company_id)){!! $company_id !!} @endif">
             </div>
             <div class="col-md-5 mt-4">
                 <button class="btn btn-chl-outline" type="button" id="ref-src-btn" onclick="return Obj.userProjectPermissionAdd(this)">
