@@ -1071,6 +1071,7 @@ let Obj = {};
                         success: function (response) {
                             if (response.status === 'error') {
                                 alert(response.message);
+                                $("#"+output_id).html("")
                                 return false
                             } else {
                                 $("#"+output_id).html(response.data)
