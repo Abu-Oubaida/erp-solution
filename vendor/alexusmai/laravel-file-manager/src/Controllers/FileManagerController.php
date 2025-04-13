@@ -55,7 +55,6 @@ class FileManagerController extends Controller
     public function initialize(): JsonResponse
     {
         event(new BeforeInitialization());
-
         return response()->json(
             $this->fm->initialize()
         );
