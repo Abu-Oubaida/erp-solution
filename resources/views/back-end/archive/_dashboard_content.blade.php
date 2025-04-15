@@ -147,7 +147,7 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#date-wise-document"
                             type="button" role="tab" aria-controls="date-wise-document" aria-selected="false"
-                            onclick="return Obj.dateWiseUserUplodedDocuments(this,{!! @$company_id !!},'all','date-wise-document')">ALL</a>
+                                onclick="return Obj.dateWiseUserUplodedDocuments(this,{!! @$company_id !!},'all','date-wise-document')">ALL</button>
                     </li>
                 </ul>
                 <div class="tab-content" id="userWiseUploadTabContent">
