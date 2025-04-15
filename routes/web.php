@@ -271,6 +271,7 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:archive_dashboard'])->group(function (){
             Route::match(['get'],'data-archive-dashboard','index')->name('data.archive.dashboard.interface');
             Route::post('company-wise-archive-dashboard','companyWiseArchiveDashboard');
+            Route::post('company-wise-archive-dashboard-date-wise','companyWiseArchiveDashboardDateWise');
         });
     });
     Route::controller(ArchiveController::class)->group(function (){
@@ -286,6 +287,9 @@ Route::group(['middleware' => ['auth']],function (){
         });//3.7.1 End
 # 3.7.2 Edit voucher Type
 
+        Route::middleware(['permission:add_archive_data_type_user_permission'])->group(function () {
+            Route::post('archive-data-type-user-permission-add','archiveDataTypeUserPermissionAdd')->name('archive.data.type.user.permission.add');
+        });
         Route::middleware(['permission:delete_archive_data_type_user_permission'])->group(function () {
             Route::match(['post'],'delete-data-type-permission-from-user','deleteTypePermissionFromUser')->name('delete.data.type.permission.from.user');
         });

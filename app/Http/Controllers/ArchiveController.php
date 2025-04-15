@@ -65,66 +65,39 @@ class ArchiveController extends Controller
     {
         DB::beginTransaction();
         try {
-            if(!empty($voucherTypeID)){
-                $vtID = Crypt::decryptString($voucherTypeID);
-                $request->validate([
-                    'company'               => ['required', 'integer', 'exists:company_infos,id'],
-                    'company_departments_users'=> ['required','array'],
-                    'company_departments_users.*' => ['integer','exists:users,id', Rule::unique('voucher_type_permission_user','user_id')->where('voucher_type_id',$vtID)->where('company_id',$request->post('company'))],
-                ]);
-            }else{
-                $request->validate([
-                    'data_type_title'   =>  ['required', 'string', 'max:255',Rule::unique('voucher_types','voucher_type_title')->where('company_id', $request->post('company'))],
-                    'data_type_code'    =>  ['sometimes','nullable', 'numeric', Rule::unique('voucher_types','code')->where('company_id', $request->post('company'))],
-                    'status'               =>  ['required', 'numeric'],
-                    'remarks'              =>  ['sometimes','nullable', 'string'],
-                    'company'               => ['sometimes', 'integer', 'exists:company_infos,id'],
-                    'company_departments_users'=> ['sometimes','array','exists:users,id'],
-                ]);
-            }
+            $request->validate([
+                'data_type_title'   =>  ['required', 'string', 'max:255',Rule::unique('voucher_types','voucher_type_title')->where('company_id', $request->post('company'))],
+                'data_type_code'    =>  ['sometimes','nullable', 'numeric', Rule::unique('voucher_types','code')->where('company_id', $request->post('company'))],
+                'status'               =>  ['required', 'numeric'],
+                'remarks'              =>  ['sometimes','nullable', 'string'],
+                'company'               => ['sometimes', 'integer', 'exists:company_infos,id'],
+                'company_departments_users'=> ['sometimes','array','exists:users,id'],
+            ]);
             extract($request->post());
             $user = Auth::user();
-            if(!empty($vtID)){
-                if (!empty($company_departments_users) && is_array($company_departments_users)) {
-                    $insertData = collect($company_departments_users)->map(function ($department_user_id) use ($vtID, $company, $user) {
-                        return [
-                            'voucher_type_id' => $vtID,
-                            'user_id' => $department_user_id,
-                            'company_id' => $company,
-                            'created_by' => $user->id,
-                            'updated_by' => null,
-                        ];
-                    })->toArray();
+            $voucherType = VoucherType::create([
+                'company_id'=> $company,
+                'status'    =>  $status,
+                'voucher_type_title'=>  $data_type_title,
+                'code'      =>  $data_type_code,
+                'remarks'   =>  $remarks,
+                'created_by'=>  $user->id,
+                'updated_by'=>  $user->id,
+            ]);
+            if (
+                !empty($company_departments_users) && is_array($company_departments_users)) {
+                $insertData = collect($company_departments_users)->map(function ($department_user_id) use ($voucherType,$company, $user) {
+                    return [
+                        'voucher_type_id' => $voucherType->id,
+                        'user_id' => $department_user_id,
+                        'company_id' => $company,
+                        'created_by' => $user->id,
+                        'updated_by' => null,
+                    ];
+                })->toArray();
 
-                    if (!empty($insertData)) {
-                        DB::table('voucher_type_permission_user')->insert($insertData);
-                    }
-                }
-            }else{
-                $voucherType = VoucherType::create([
-                    'company_id'=> $company,
-                    'status'    =>  $status,
-                    'voucher_type_title'=>  $data_type_title,
-                    'code'      =>  $data_type_code,
-                    'remarks'   =>  $remarks,
-                    'created_by'=>  $user->id,
-                    'updated_by'=>  $user->id,
-                ]);
-                if (
-                    !empty($company_departments_users) && is_array($company_departments_users)) {
-                    $insertData = collect($company_departments_users)->map(function ($department_user_id) use ($voucherType,$company, $user) {
-                        return [
-                            'voucher_type_id' => $voucherType->id,
-                            'user_id' => $department_user_id,
-                            'company_id' => $company,
-                            'created_by' => $user->id,
-                            'updated_by' => null,
-                        ];
-                    })->toArray();
-
-                    if (!empty($insertData)) {
-                        DB::table('voucher_type_permission_user')->insert($insertData);
-                    }
+                if (!empty($insertData)) {
+                    DB::table('voucher_type_permission_user')->insert($insertData);
                 }
             }
             DB::commit();
@@ -135,6 +108,95 @@ class ArchiveController extends Controller
             return back()->with('error',$exception->getMessage())->withInput();
         }
     }
+    private function dataTypeUserPermissionStore($type_company_id,array $type_ids, array $user_ids)
+    {
+        try {
+            if (empty($type_ids) || empty($user_ids) || empty($type_company_id)) {
+                throw new \Exception('Empty parameter error');
+            }
+            $insertData = [];
+            $alreadyHasPermission = [];
+            foreach ($type_ids as $type_id) {
+                foreach ($user_ids as $user_id) {
+                    if (!Voucher_type_permission_user::where('company_id', $type_company_id)->where('user_id', $user_id)->where('voucher_type_id',$type_id)->exists()) {
+                        $insertData[] = [
+                            'company_id' => $type_company_id,
+                            'voucher_type_id' => $type_id,
+                            'user_id' => $user_id,
+                            'created_by' => $this->user->id,
+                            'created_at' => now(),
+                            'updated_at' => NULL,
+                        ];
+                    }
+                    else{
+                        $alreadyHasPermission[] = [
+                            'company_id' => $type_company_id,
+                            'voucher_type_id' => $type_id,
+                            'user_id' => $user_id,
+                        ];
+                    }
+                }
+            }
+            if (!empty($insertData)) {
+                if (Voucher_type_permission_user::insert($insertData)) {
+                    return [
+                        'status' => true,
+                        'message' => 'Inserted successfully',
+                        'already_exists' => $alreadyHasPermission,
+                    ];
+                }
+                throw new \Exception('Data insertion error. Try again');
+            }
+            // All were duplicates
+            return [
+                'status' => false,
+                'message' => 'All selected permissions already exist.',
+                'already_exists' => $alreadyHasPermission,
+            ];
+        }catch (\Throwable $exception)
+        {
+            return response()->exception;
+        }
+
+    }
+
+    public function archiveDataTypeUserPermissionAdd(Request $request)
+    {
+        try {
+            if ($request->ajax())
+            {
+                $validatedData = $request->validate([
+                    'type_company_id' => ['required','integer','exists:company_infos,id'],
+                    'data_types' => ['required','array'],
+                    'data_types.*' => ['integer', 'exists:voucher_types,id'],
+                    'permission_users' => ['required', 'array'],
+                    'permission_users.*' => ['integer', 'exists:users,id'],
+                ]);
+                extract($validatedData);
+                $result = $this->dataTypeUserPermissionStore($type_company_id, $data_types, $permission_users);
+
+                if ($result['status']) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => $result['message']. (count($result['already_exists'])? " And ".count($result['already_exists'])." items have been archived.":''),
+                    ]);
+                }
+
+                // No new insert, all already existed
+                return response()->json([
+                    'status' => 'success',
+                    'message' => $result['message'],
+                ]);
+            }
+            throw new \Exception('Requested method not allowed!');
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status' => 'error',
+                'message'=>$exception->getMessage()
+            ]);
+        }
+    }
     public function editArchiveType(Request $request, $voucherTypeID)
     {
         try {
@@ -142,10 +204,6 @@ class ArchiveController extends Controller
             if ($request->isMethod('put'))
             {
                 return $this->updateArchiveType($request,$voucherTypeID);
-            }
-            if ($request->isMethod('post'))
-            {
-                return $this->storeArchiveType($request,$voucherTypeID);
             }
             $vtID = Crypt::decryptString($voucherTypeID);
             $voucherType = VoucherType::find($vtID);
@@ -337,7 +395,7 @@ class ArchiveController extends Controller
         try {
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
-                'project'               => ['sometimes','nullable', 'integer', 'exists:branches,id',Rule::exists('user_project_permissions','project_id')->where('user_id',Auth::id())],
+                'project'               => ['sometimes','nullable', 'integer', 'exists:branches,id',],
                 'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
                     return $query->where('company_id',$request->post('company'));
                 })],

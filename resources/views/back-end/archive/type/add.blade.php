@@ -25,9 +25,11 @@
                             <div class="col-8">
                                 <h3 class="text-capitalize"><i class="fas fa-plus"></i> Add new data type</h3>
                             </div>
+                        @if(auth()->user()->haspermission('archive_data_type_list'))
                             <div class="col-4">
                                 <a class="btn btn-primary btn-sm float-end mt-1" href="{!! route('archive.data.type.list') !!}"><i class="fa-solid fa-list"></i> Data Type List</a>
                             </div>
+                        @endif
                         </div>
                     </div>
                     <div class="card-body">
@@ -78,7 +80,7 @@
                                         <label for="remarks">Remarks</label>
                                     </div>
                                 </div>
-
+                                @if(auth()->user()->hasPermission('add_archive_data_type_user_permission'))
                                 <div class="col-md-5 mb-1">
                                     <label for="department">Enter Department Name</label>
                                     <select id="company_wise_departments" multiple name="department" class="select-search cursor-pointer" onchange="return Obj.selectAllOption(this)">
@@ -94,8 +96,10 @@
                                         <option value="">Pick options...</option>
                                     </select>
                                 </div>
-
                                 <div class="col-md-1">
+                                @else
+                                <div class="col-md-12">
+                                @endif
                                     <div class="form-floating mb-3 float-end">
                                         <button type="submit" class="btn btn-chl-outline mt-4" name="submit" ><i class="fas fa-save"></i> Add</button>
                                     </div>

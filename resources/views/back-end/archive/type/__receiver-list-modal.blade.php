@@ -1,5 +1,7 @@
 <div class="modal-header">
-    <h1 class="modal-title fs-5" id="heading"><strong>Data Type Name: </strong>{!! @$usersWithPermission->voucher_type_title !!}</h1>
+    <h1 class="modal-title fs-5" id="heading"><strong>Data Type Name: </strong>{!! @$usersWithPermission->voucher_type_title !!} @if(auth()->user()->hasPermission('add_archive_data_type_user_permission'))
+            <a href="{{route('edit.archive.type',["archiveTypeID"=>\Illuminate\Support\Facades\Crypt::encryptString($usersWithPermission->id)])}}" class="text-black btn btn-sm btn-outline-info" title="Add User Permission"><i class='fas fa-key'></i> Add user permission</a>
+        @endif</h1>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="return window.location.reload()"></button>
 </div>
 <div class="modal-body">

@@ -69,16 +69,16 @@
 
                                     <div class="progress" title="Total: {{ $diskTotal }} GB">
                                         <div class="progress-bar" role="progressbar"
-                                             style="width: {!! $totalUsed !!}%; background: rgb(255, 99, 132)"
-                                             aria-valuenow="{!! $totalUsed !!}" aria-valuemin="0"
-                                             aria-valuemax="{{ $diskTotal }}"
-                                             title="Total Used ({!! $totalUsed !!}) GB">
+                                            style="width: {!! $totalUsed !!}%; background: rgb(255, 99, 132)"
+                                            aria-valuenow="{!! $totalUsed !!}" aria-valuemin="0"
+                                            aria-valuemax="{{ $diskTotal }}"
+                                            title="Total Used ({!! $totalUsed !!}) GB">
                                             Used ( {!! $totalUsed !!} GB )</div>
                                         <div class="progress-bar" role="progressbar"
-                                             style="width: {!! $diskFree !!}%; background: rgb(54, 162, 235)"
-                                             aria-valuenow="{!! $diskFree !!}" aria-valuemin="0"
-                                             aria-valuemax="{{ $diskTotal }}"
-                                             title="Free Spase ({!! $diskFree !!}) GB">Free (
+                                            style="width: {!! $diskFree !!}%; background: rgb(54, 162, 235)"
+                                            aria-valuenow="{!! $diskFree !!}" aria-valuemin="0"
+                                            aria-valuemax="{{ $diskTotal }}"
+                                            title="Free Spase ({!! $diskFree !!}) GB">Free (
                                             {!! $diskFree !!} GB )
                                         </div>
                                     </div>
@@ -116,28 +116,45 @@
             <div class="card-body">
                 <ul class="nav nav-tabs" id="userWiseUpload" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="today-tab" data-bs-toggle="tab" data-bs-target="#today" type="button" role="tab" aria-controls="today" aria-selected="true">Today</a>
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#date-wise-document"
+                            type="button" role="tab" aria-controls="date-wise-document" aria-selected="true"
+                            onclick="return Obj.dateWiseUserUplodedDocuments(this,{!! @$company_id !!},'today','date-wise-document')">Today</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="last-day-tab" data-bs-toggle="tab" data-bs-target="#last-day" type="button" role="tab" aria-controls="last-day" aria-selected="false">Last Day</button>
+                        <button class="nav-link " data-bs-toggle="tab" data-bs-target="#date-wise-document"
+                            type="button" role="tab" aria-controls="date-wise-document" aria-selected="false"
+                            onclick="return Obj.dateWiseUserUplodedDocuments(this,{!! @$company_id !!},'yesterday','date-wise-document')">Last
+                            Day</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="week-tab" data-bs-toggle="tab" data-bs-target="#week" type="button" role="tab" aria-controls="week" aria-selected="false">Last Week</button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#date-wise-document"
+                            type="button" role="tab" aria-controls="date-wise-document" aria-selected="false"
+                            onclick="return Obj.dateWiseUserUplodedDocuments(this,{!! @$company_id !!},'last_7_days','date-wise-document')">Last
+                            7 Days</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="month-tab" data-bs-toggle="tab" data-bs-target="#month" type="button" role="tab" aria-controls="month" aria-selected="false">Last Month</button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#date-wise-document"
+                            type="button" role="tab" aria-controls="date-wise-document" aria-selected="false"
+                            onclick="return Obj.dateWiseUserUplodedDocuments(this,{!! @$company_id !!},'last_30_days','date-wise-document')">Last
+                            30 Days</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="year-tab" data-bs-toggle="tab" data-bs-target="#year" type="button" role="tab" aria-controls="year" aria-selected="false">Last Year</button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#date-wise-document"
+                            type="button" role="tab" aria-controls="date-wise-document" aria-selected="false"
+                            onclick="return Obj.dateWiseUserUplodedDocuments(this,{!! @$company_id !!},'last_year','date-wise-document')">Last
+                            365 Days</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="all-time-tab" data-bs-toggle="tab" data-bs-target="#all-time" type="button" role="tab" aria-controls="all-time" aria-selected="false">ALL</a>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#date-wise-document"
+                            type="button" role="tab" aria-controls="date-wise-document" aria-selected="false"
+                            onclick="return Obj.dateWiseUserUplodedDocuments(this,{!! @$company_id !!},'all','date-wise-document')">ALL</a>
                     </li>
                 </ul>
                 <div class="tab-content" id="userWiseUploadTabContent">
-                    <div class="tab-pane fade show active" id="today" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="tab-pane fade show active" id="date-wise-document" role="tabpanel"
+                        aria-labelledby="home-tab">
                         <div id="">
-                            @if($today_uploaded_data_by_users)
+                            @if ($today_uploaded_data_by_users)
                                 @php
                                     $user_wise_labels = [];
                                     $user_wise_datasets = [];
@@ -146,7 +163,9 @@
                                     $documentTypes = collect();
 
                                     foreach ($today_uploaded_data_by_users as $item) {
-                                        $documentTypes = $documentTypes->merge(array_keys($item['document_counts']->toArray()));
+                                        $documentTypes = $documentTypes->merge(
+                                            array_keys($item['document_counts']->toArray()),
+                                        );
                                     }
 
                                     $documentTypes = $documentTypes->unique()->values();
@@ -154,27 +173,24 @@
                                     foreach ($documentTypes as $docType) {
                                         $user_wise_datasets[] = [
                                             'label' => $docType,
-                                            'data' => collect($today_uploaded_data_by_users)->map(function ($item) use ($docType) {
+                                            'data' => collect($today_uploaded_data_by_users)->map(function ($item) use (
+                                                $docType,
+                                            ) {
                                                 return $item['document_counts']->get($docType, 0);
                                             }),
                                             'stack' => 'Stack 0',
                                         ];
                                     }
                                     // Calculate max count for any user's total documents
-    //                                $totalDocumentCount = collect($today_uploaded_data_by_users)->map(function ($item) {
-    //                                    return $item['document_counts']->sum();
-    //                                })->max() + 40; // Add extra 2
-                                    $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
+//                                $totalDocumentCount = collect($today_uploaded_data_by_users)->map(function ($item) {
+//                                    return $item['document_counts']->sum();
+//                                })->max() + 40; // Add extra 2
+$user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
                                 @endphp
                                 <canvas id="user-wise-data-uploaded-today" width="400" height="200"></canvas>
                             @endif
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="last-day" role="tabpanel" aria-labelledby="last-day-tab">Last Day</div>
-                    <div class="tab-pane fade" id="week" role="tabpanel" aria-labelledby="week-tab">...</div>
-                    <div class="tab-pane fade" id="month" role="tabpanel" aria-labelledby="month-tab">...</div>
-                    <div class="tab-pane fade" id="year" role="tabpanel" aria-labelledby="year-tab">...</div>
-                    <div class="tab-pane fade" id="all-time" role="tabpanel" aria-labelledby="all-time-tab">...</div>
                 </div>
             </div>
         </div>
@@ -212,13 +228,13 @@
                         <div class="row">
                             <div class="col text-start">
                                 <h2 class="card-heading-text-color">{!! $dataType['archive_document_infos_count'] !!}</h2>
-                                <a class="small  stretched-link text-decoration-none"
-                                   href="{!! route('uploaded.archive.list.quick',['c'=>$dataType['company_id'],'t'=>$dataType['id']]) !!}" target="_blank">Reference <i class="fas fa-angle-right"></i></a>
+                                <a class="small  stretched-link text-decoration-none" href="{!! route('uploaded.archive.list.quick', ['c' => $dataType['company_id'], 't' => $dataType['id']]) !!}"
+                                    target="_blank">Reference <i class="fas fa-angle-right"></i></a>
                             </div>
                             <div class="col text-end">
                                 <h2 class="card-heading-text-color">{!! $dataType['archive_documents_count'] !!}</h2>
-                                <a class="small  stretched-link text-decoration-none"
-                                   href="{!! route('uploaded.archive.list.quick',['c'=>$dataType['company_id'],'t'=>$dataType['id']]) !!}" target="_blank">Documents <i class="fas fa-angle-right"></i></a>
+                                <a class="small  stretched-link text-decoration-none" href="{!! route('uploaded.archive.list.quick', ['c' => $dataType['company_id'], 't' => $dataType['id']]) !!}"
+                                    target="_blank">Documents <i class="fas fa-angle-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -228,7 +244,7 @@
     @endif
 </div>
 
-@if($otherUsed)
+@if ($otherUsed)
     <script>
         var ctx = document.getElementById('levelChart').getContext('2d');
         var levelChart = new Chart(ctx, {
@@ -239,14 +255,14 @@
                     label: 'Disk Usage',
                     data: [{!! @$diskFree !!}, {!! @$archiveUsed !!}, {!! @$otherUsed !!}, ],
                     backgroundColor: [
-                        'rgb(54, 162, 235)',// Free - Blue
-                        'rgb(255, 99, 132)',// Archive Used
-                        'rgb(255, 205, 86)'// Other Used
+                        'rgb(54, 162, 235)', // Free - Blue
+                        'rgb(255, 99, 132)', // Archive Used
+                        'rgb(255, 205, 86)' // Other Used
                     ],
                     borderColor: [
-                        'rgb(54, 162, 235)',// Free - Blue
-                        'rgb(255, 99, 132)',// Archive Used
-                        'rgb(255, 205, 86)'// Other Used
+                        'rgb(54, 162, 235)', // Free - Blue
+                        'rgb(255, 99, 132)', // Archive Used
+                        'rgb(255, 205, 86)' // Other Used
                     ],
                     borderWidth: 1
                 }]
@@ -258,14 +274,14 @@
                         position: 'bottom'
                     },
                     datalabels: {
-                        display:false
+                        display: false
                     }
                 }
             }
         })
     </script>
 @endif
-@if($documentCountsPerDay && $labels)
+@if ($documentCountsPerDay && $labels)
     <script>
         var barCtx = document.getElementById('documentTypeChart').getContext('2d');
 
@@ -318,7 +334,7 @@
                         font: {
                             weight: 'bold'
                         },
-                        formatter: function(value,context) {
+                        formatter: function(value, context) {
                             return value; // Simply displays the value
                         }
                     }
@@ -338,7 +354,7 @@
         });
     </script>
 @endif
-@if($today_uploaded_data_by_users)
+@if ($today_uploaded_data_by_users)
     <script>
         var today_ctx = document.getElementById('user-wise-data-uploaded-today').getContext('2d');
 
@@ -361,6 +377,95 @@
         var config = {
             type: 'bar',
             data: today_data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: false,
+                        text: 'Document Counts by User'
+                    },
+                    // Add the datalabels plugin to show user-wise total on each bar
+                    datalabels: {
+                        display: true,
+                        // color: 'black', // Adjust text color
+                        anchor: 'end', // Position the text at the top of the bars
+                        align: 'top', // Align text above the bars
+                        font: {
+                            weight: 'bold',
+                            size: 12, // Adjust font size
+                        },
+                        formatter: function(value, context) {
+                            if (context.datasetIndex === 0) { // Ensure labels appear only once
+                                return userTotalSums[context.dataIndex];
+                            }
+                            return ""; // Hide for other datasets
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            // align: 'start', // Align label text left
+                        },
+                        offset: true, // Remove center spacing
+                        grid: {
+                            offset: false
+                        },
+                        categoryPercentage: 0.5,
+                        barPercentage: 0.5,
+                        // padding: 20,
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        min: 0,
+                        max: maxTotal, // Use the calculated max + 2
+                        ticks: {
+                            stepSize: 10 // Or 2/5/10 as per your preferred spacing
+                        }
+                    }
+                },
+                datasets: {
+                    bar: {
+                        barThickness: 40, // Make bars thinner
+                    }
+                }
+            },
+        };
+
+        new Chart(today_ctx, config);
+    </script>
+@endif
+
+{{-- @if ($lastday_uploaded_data_by_users)
+    <script>
+        var lastday_ctx = document.getElementById('lastday_uploaded_data_by_users').getContext('2d');
+
+        var lastday_data = {
+            labels: {!! json_encode($user_wise_l) !!},
+            datasets: {!! json_encode($user_wise_dat) !!}
+        };
+
+        // Calculate the sum of values per user (level-wise) and find the highest total sum
+        var userTotalSums = lastday_data.labels.map((label, index) => {
+            return lastday_data.datasets.reduce((sum, dataset) => {
+                return sum + (dataset.data[index] || 0); // Add values for this user across all datasets
+            }, 0);
+        });
+
+        // Find the maximum sum and add 2 for the max value
+        var maxTotal = Math.round(Math.max(...userTotalSums) + 50)
+
+
+        var config = {
+            type: 'bar',
+            data: lastday_data,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -423,6 +528,96 @@
             },
         };
 
-        new Chart(today_ctx, config);
+        new Chart(lastday_ctx, config);
     </script>
-@endif
+@endif --}}
+
+
+{{-- @if ($lastWeek_uploaded_data_by_users)
+    <script>
+        var lastWeek_ctx = document.getElementById('lastWeek_uploaded_data_by_users').getContext('2d');
+
+        var lastWeek_data = {
+            labels: {!! json_encode($lastWeek_wise_labels) !!},
+            datasets: {!! json_encode($lastWeek_wise_datasets) !!}
+        };
+
+        // Calculate the sum of values per user (level-wise) and find the highest total sum
+        var userTotalSums = lastday_data.labels.map((label, index) => {
+            return lastday_data.datasets.reduce((sum, dataset) => {
+                return sum + (dataset.data[index] || 0); // Add values for this user across all datasets
+            }, 0);
+        });
+
+        // Find the maximum sum and add 2 for the max value
+        var maxTotal = Math.round(Math.max(...userTotalSums) + 50)
+
+
+        var config = {
+            type: 'bar',
+            data: lastWeek_data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: false,
+                        text: 'Document Counts by User'
+                    },
+                    // Add the datalabels plugin to show user-wise total on each bar
+                    datalabels: {
+                        display: true,
+                        // color: 'black', // Adjust text color
+                        anchor: 'end', // Position the text at the top of the bars
+                        align: 'top',  // Align text above the bars
+                        font: {
+                            weight: 'bold',
+                            size: 12, // Adjust font size
+                        },
+                        formatter: function(value, context) {
+                            if (context.datasetIndex === 0) { // Ensure labels appear only once
+                                return userTotalSums[context.dataIndex];
+                            }
+                            return ""; // Hide for other datasets
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            // align: 'start', // Align label text left
+                        },
+                        offset: true, // Remove center spacing
+                        grid: {
+                            offset: false
+                        },
+                        categoryPercentage: 0.5,
+                        barPercentage: 0.5,
+                        // padding: 20,
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        min: 0,
+                        max: maxTotal, // Use the calculated max + 2
+                        ticks: {
+                            stepSize: 10 // Or 2/5/10 as per your preferred spacing
+                        }
+                    }
+                },
+                datasets: {
+                    bar: {
+                        barThickness: 40, // Make bars thinner
+                    }
+                }
+            },
+        };
+
+        new Chart(lastWeek_ctx, config);
+    </script>
+@endif --}}
