@@ -396,10 +396,20 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
                             size: 12, // Adjust font size
                         },
                         formatter: function(value, context) {
-                            if (context.datasetIndex === 0) { // Ensure labels appear only once
-                                return userTotalSums[context.dataIndex];
+                            const { chart, dataIndex } = context;
+
+                            const datasets = chart.data.datasets;
+                            let isTop = true;
+
+                            // Check if any dataset after this one has a value at this index (i.e., above it in the stack)
+                            for (let i = context.datasetIndex + 1; i < datasets.length; i++) {
+                                if (datasets[i].data[dataIndex] !== 0 && datasets[i].data[dataIndex] !== null && datasets[i].data[dataIndex] !== undefined) {
+                                    isTop = false;
+                                    break;
+                                }
                             }
-                            return ""; // Hide for other datasets
+
+                            return isTop ? value : "";
                         }
                     }
                 },
