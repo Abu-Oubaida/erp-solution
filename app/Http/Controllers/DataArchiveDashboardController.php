@@ -65,51 +65,35 @@ class DataArchiveDashboardController extends Controller
                 $totalUsed = $diskTotal - $diskFree;
                 $otherUsed = $totalUsed - $archiveUsed;
                 $dataTypeCount = $this->archiveTypeList($permission)->where('company_id',$company->id)->distinct()->count('id');
-                $archiveDocumentCount = $this->getArchiveList($permission)->where('company_id',$company->id)->distinct()->get()->pluck('voucherDocuments')->flatten(1)->pluck('id')->count();
+                $archiveDocumentCount = $this->getArchiveList($permission)
+                    ->where('company_id', $company->id)
+                    ->with('voucherDocuments') // only need this relationship
+                    ->get()
+                    ->flatMap(function ($voucher) {
+                        return $voucher->voucherDocuments;
+                    })
+                    ->pluck('id')
+                    ->unique()
+                    ->count();
                 $accountVoucherInfosCount = Account_voucher::whereIn('voucher_type_id',$this->archiveTypeList($permission)->pluck('id')->toArray())->where('company_id',$company->id)->distinct()->count('id');
 
-                    if(isset($output_id) && $output_id==='last_day'){
-                        $yesterday = Carbon::yesterday();
+                $today = today();
+                $today_uploaded_data_by_users = User::with(['archiveDocuments.accountVoucherInfo.VoucherType'])->whereHas('archiveDocuments', function ($query) use ($today, $company) {
+                    $query->whereDate('created_at', $today)->where('company_id', $company->id);
+                })
+                    ->get()->map(function ($user) use ($today,$company) {
+                        $grouped = $user->archiveDocuments
+                            ->where('created_at', '>=', $today) // extra check for safety
+                            ->where('company_id', $company->id)
+                            ->groupBy(fn($doc) => optional($doc->accountVoucherInfo->VoucherType)->voucher_type_title ?? 'Unknown');
 
-                        $startOfDay = $yesterday->copy()->startOfDay();
-                        $endOfDay = $yesterday->copy()->endOfDay();
+                        return [
+                            'user_id' => $user->id,
+                            'user_name' => $user->name,
+                            'document_counts' => $grouped->map->count()
+                        ];
+                    });
 
-                        $lastday_uploaded_data_by_users = User::with(['archiveDocuments.accountVoucherInfo.VoucherType'])
-                            ->whereHas('archiveDocuments', function ($query) use ($startOfDay, $endOfDay, $company) {
-                                $query->whereBetween('created_at', [$startOfDay, $endOfDay])
-                                    ->where('company_id', $company->id);
-                            })
-                            ->get()
-                            ->map(function ($user) use ($startOfDay, $endOfDay, $company) {
-                                $grouped = $user->archiveDocuments
-                                    ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                                    ->where('company_id', $company->id)
-                                    ->groupBy(fn($doc) => optional($doc->accountVoucherInfo->VoucherType)->voucher_type_title ?? 'Unknown');
-
-                                return [
-                                    'user_id' => $user->id,
-                                    'user_name' => $user->name,
-                                    'document_counts' => $grouped->map->count()
-                                ];
-                            });
-                    }else{
-                        $today = today();
-                        $today_uploaded_data_by_users = User::with(['archiveDocuments.accountVoucherInfo.VoucherType'])->whereHas('archiveDocuments', function ($query) use ($today, $company) {
-                            $query->whereDate('created_at', $today)->where('company_id', $company->id);
-                        })
-                            ->get()->map(function ($user) use ($today,$company) {
-                                $grouped = $user->archiveDocuments
-                                    ->where('created_at', '>=', $today) // extra check for safety
-                                    ->where('company_id', $company->id)
-                                    ->groupBy(fn($doc) => optional($doc->accountVoucherInfo->VoucherType)->voucher_type_title ?? 'Unknown');
-
-                                return [
-                                    'user_id' => $user->id,
-                                    'user_name' => $user->name,
-                                    'document_counts' => $grouped->map->count()
-                                ];
-                            });
-                    }
                 $dataTypes = $this->archiveTypeList($permission)->where('status',1)->where('company_id',$company->id)->get()->map(function ($item) {
                     return [
                         'id' => $item->id,
@@ -140,12 +124,7 @@ class DataArchiveDashboardController extends Controller
 
                 $totalDocumentCount = (max($documentCountsPerDay)+40);
                 $today_uploaded_data_by_users=$today_uploaded_data_by_users??[];
-                $lastday_uploaded_data_by_users=$lastday_uploaded_data_by_users??[];
-                $lastweek_uploaded_data_by_users=$lastweek_uploaded_data_by_users??[];
-                $lastmonth_uploaded_data_by_users=$lastmonth_uploaded_data_by_users??[];
-                $lastyear_uploaded_data_by_users=$lastyear_uploaded_data_by_users??[];
-                $all_uploaded_data_by_users=$all_uploaded_data_by_users??[];
-                $view = view('back-end.archive._dashboard_content', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount','today_uploaded_data_by_users','lastday_uploaded_data_by_users','lastweek_uploaded_data_by_users','lastmonth_uploaded_data_by_users','lastyear_uploaded_data_by_users','all_uploaded_data_by_users','company_id'))->render();
+                $view = view('back-end.archive._dashboard_content', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount','today_uploaded_data_by_users','company_id'))->render();
                 return response()->json([
                     'status' => 'success',
                     'data' => $view,
@@ -229,7 +208,7 @@ class DataArchiveDashboardController extends Controller
         }
 
         $lastday_uploaded_data_by_users=$this->getCompanyWiseDashboardDocuments3Param($company_id,$range['from'], $range['to']);
-        $view = view('back-end.archive._day_wise_document_dashboard_content', compact('lastday_uploaded_data_by_users',))->render();
+        $view = view('back-end.archive._day_wise_document_dashboard_content', compact('lastday_uploaded_data_by_users'))->render();
         return response()->json([
             'status' => 'success',
             'data' => $view,
