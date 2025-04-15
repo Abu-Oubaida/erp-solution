@@ -109,7 +109,7 @@
                 <td>{!! $data->VoucherType->voucher_type_title !!}</td>
                 <td class="text-start text-left">
                     @php $x = 1;@endphp
-                    <table class="table table-bordered table-sm table-hover dataTableSmall">
+                    <table class="table table-bordered table-sm table-hover">
                         <thead>
                         <tr>
                             <th>Document Name</th>
