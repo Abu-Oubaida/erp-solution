@@ -622,9 +622,8 @@ class ArchiveController extends Controller
                 ]);
                 $companyID = $this->getCompanyModulePermissionWise($permission)->where('id',$request->get('c'))->first('id');
                 $dataType = $this->archiveTypeList($permission)->where('company_id',$companyID->id)->where('id',$request->get('t'))->where('status',1)->select('id','voucher_type_title')->first();
-                $voucherInfos = $this->archiveListInfo($request->get('c'),$request->get('t'));
             }
-            return view('back-end/archive/quick-list',compact('companies','dataType','voucherInfos'))->render();
+            return view('back-end/archive/quick-list',compact('companies','dataType'))->render();
         }catch (\Throwable $exception)
         {
             if ($request->isMethod('post'))
@@ -637,7 +636,34 @@ class ArchiveController extends Controller
             return back()->with('error',$exception->getMessage());
         }
     }
-
+    public function typeWiseArchiveDataShow(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->archive_data_list_quick;
+            if ($request->ajax()) {
+                $request->validate([
+                    'company_id' => ['required', 'integer', 'exists:company_infos,id'],
+                    'data_type' => ['required', 'integer', 'exists:voucher_types,id'],
+                ]);
+                extract($request->post());
+//                $companyID = $this->getCompanyModulePermissionWise($permission)->where('id',$company_id)->first('id');
+//                $dataType = $this->archiveTypeList($permission)->where('company_id',$companyID->id)->where('id',$data_type)->where('status',1)->select('id','voucher_type_title')->first();
+                $voucherInfos = $this->archiveListInfo($company_id, $data_type);
+                $view = view('back-end/archive/_archive_list', compact('voucherInfos'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $view,
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            throw new \Exception('Request method not supported!');
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
     private function archiveListInfo($company_id,$type_id)
     {
         return Account_voucher::with([

@@ -4264,6 +4264,32 @@ let Archive = {};
                     })
                 }
             },
+
+            typeWiseDataView:function (e, company_id, type_id, output_id){
+                if (company_id.length === 0 || type_id.length === 0)
+                {
+                    return false
+                }
+                const url =window.location.origin + sourceDir + "/archive-data-type-wise-data-show";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { company_id: company_id,data_type: type_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            $("#"+output_id).html(response.data)
+                        }
+                        return true;
+                    },
+                })
+            },
         };
     });
     function checkFileExists(url, callback) {
