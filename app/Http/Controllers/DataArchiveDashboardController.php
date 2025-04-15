@@ -65,15 +65,15 @@ class DataArchiveDashboardController extends Controller
                 $totalUsed = $diskTotal - $diskFree;
                 $otherUsed = $totalUsed - $archiveUsed;
                 $dataTypeCount = $this->archiveTypeList($permission)->where('company_id',$company->id)->distinct()->count('id');
-                $archiveDocumentCount = $this->getArchiveList($permission)->where('company_id',$company->id)->get()->pluck('voucherDocuments')->flatten(1)->pluck('id')->count();
+                $archiveDocumentCount = $this->getArchiveList($permission)->where('company_id',$company->id)->distinct()->get()->pluck('voucherDocuments')->flatten(1)->pluck('id')->count();
                 $accountVoucherInfosCount = Account_voucher::whereIn('voucher_type_id',$this->archiveTypeList($permission)->pluck('id')->toArray())->where('company_id',$company->id)->distinct()->count('id');
-                
-                    if(isset($output_id) && $output_id==='last_day'){
-                        $yesterday = Carbon::yesterday(); 
 
-                        $startOfDay = $yesterday->copy()->startOfDay(); 
-                        $endOfDay = $yesterday->copy()->endOfDay();     
-    
+                    if(isset($output_id) && $output_id==='last_day'){
+                        $yesterday = Carbon::yesterday();
+
+                        $startOfDay = $yesterday->copy()->startOfDay();
+                        $endOfDay = $yesterday->copy()->endOfDay();
+
                         $lastday_uploaded_data_by_users = User::with(['archiveDocuments.accountVoucherInfo.VoucherType'])
                             ->whereHas('archiveDocuments', function ($query) use ($startOfDay, $endOfDay, $company) {
                                 $query->whereBetween('created_at', [$startOfDay, $endOfDay])
@@ -85,7 +85,7 @@ class DataArchiveDashboardController extends Controller
                                     ->whereBetween('created_at', [$startOfDay, $endOfDay])
                                     ->where('company_id', $company->id)
                                     ->groupBy(fn($doc) => optional($doc->accountVoucherInfo->VoucherType)->voucher_type_title ?? 'Unknown');
-    
+
                                 return [
                                     'user_id' => $user->id,
                                     'user_name' => $user->name,
@@ -102,7 +102,7 @@ class DataArchiveDashboardController extends Controller
                                     ->where('created_at', '>=', $today) // extra check for safety
                                     ->where('company_id', $company->id)
                                     ->groupBy(fn($doc) => optional($doc->accountVoucherInfo->VoucherType)->voucher_type_title ?? 'Unknown');
-        
+
                                 return [
                                     'user_id' => $user->id,
                                     'user_name' => $user->name,
@@ -163,7 +163,7 @@ class DataArchiveDashboardController extends Controller
     private function getDateRange($rangeType)
     {
         $now = Carbon::now();
-    
+
         return match ($rangeType) {
             'today' => [
                 'from' => $now->copy()->startOfDay(),
@@ -219,7 +219,7 @@ class DataArchiveDashboardController extends Controller
         else if ($date_range_name == 'last_30_days')
         {
             $range = $this->getDateRange('last_30_days');
-        }   
+        }
         else if ($date_range_name == 'last_365_days' || $date_range_name == 'last_year' || $date_range_name == 'last_12_months')
         {
             $range = $this->getDateRange('last_12_months');
@@ -227,7 +227,7 @@ class DataArchiveDashboardController extends Controller
         else {
             $range = $this->getDateRange('all');
         }
-             
+
         $lastday_uploaded_data_by_users=$this->getCompanyWiseDashboardDocuments3Param($company_id,$range['from'], $range['to']);
         $view = view('back-end.archive._day_wise_document_dashboard_content', compact('lastday_uploaded_data_by_users',))->render();
         return response()->json([
@@ -237,7 +237,7 @@ class DataArchiveDashboardController extends Controller
         ]);
     }
 
-    
+
     public function getCompanyWiseDashboardDocuments3Param($company_id,$start,$end){
         $company = company_info::find($company_id);
         if($start == null || $end == null){
@@ -279,6 +279,6 @@ class DataArchiveDashboardController extends Controller
                 ];
             });
         }
-        
+
     }
 }
