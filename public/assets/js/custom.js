@@ -1053,9 +1053,8 @@ let Archive = {};
                     },
                 });
             },
-            companyWiseArchiveDashboard: function (e,company_id,output_id){
-                if (company_id.length !== 0)
-                {
+            companyWiseArchiveDashboard: function (e, company_id, output_id) {
+                if (company_id.length !== 0) {
                     let url =
                         window.location.origin +
                         sourceDir +
@@ -1070,19 +1069,167 @@ let Archive = {};
                         type: "POST",
                         data: { company_id: company_id },
                         success: function (response) {
-                            if (response.status === 'error') {
+                            if (response.status === "error") {
                                 alert(response.message);
-                                $("#"+output_id).html("")
-                                return false
+                                $("#" + output_id).html("");
+                                return false;
                             } else {
-                                $("#"+output_id).html(response.data)
+                                $("#" + output_id).html(response.data);
                             }
                         },
                     });
                 }
                 return false;
-            }
-            ,
+            },
+            dateWiseUserUplodedDocuments: function (
+                e,
+                company_id,
+                date_range_name,
+                output_id
+            ) {
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-wise-archive-dashboard-date-wise";
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    url: url,
+                    type: "POST",
+                    data: {
+                        company_id: company_id,
+                        date_range_name: date_range_name,
+                    },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert(response.message);
+                            $("#" + output_id).html("");
+                            return false;
+                        } else {
+                            $("#" + output_id).html(response.data);
+                        }
+                    },
+                });
+            },
+            companyWiseArchiveDashboardLastWeek: function (
+                e,
+                company_id,
+                output_id
+            ) {
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-wise-archive-dashboard-last_week";
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    url: url,
+                    type: "POST",
+                    data: { company_id: company_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert(response.message);
+                            $("#" + output_id).html("");
+                            return false;
+                        } else {
+                            $("#" + output_id).html(response.data);
+                        }
+                    },
+                });
+            },
+            companyWiseArchiveDashboardLastMonth: function (
+                e,
+                company_id,
+                output_id
+            ) {
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-wise-archive-dashboard-last_month";
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    url: url,
+                    type: "POST",
+                    data: { company_id: company_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert(response.message);
+                            $("#" + output_id).html("");
+                            return false;
+                        } else {
+                            $("#" + output_id).html(response.data);
+                        }
+                    },
+                });
+            },
+            companyWiseArchiveDashboardLastYear: function (
+                e,
+                company_id,
+                output_id
+            ) {
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-wise-archive-dashboard-last_year";
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    url: url,
+                    type: "POST",
+                    data: { company_id: company_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert(response.message);
+                            $("#" + output_id).html("");
+                            return false;
+                        } else {
+                            $("#" + output_id).html(response.data);
+                        }
+                    },
+                });
+            },
+            companyWiseArchiveDashboardAll: function (
+                e,
+                company_id,
+                output_id
+            ) {
+                let url =
+                    window.location.origin +
+                    sourceDir +
+                    "/company-wise-archive-dashboard-all";
+                $.ajax({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    url: url,
+                    type: "POST",
+                    data: { company_id: company_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert(response.message);
+                            $("#" + output_id).html("");
+                            return false;
+                        } else {
+                            $("#" + output_id).html(response.data);
+                        }
+                    },
+                });
+            },
             findDocument: function (e, actionID, actionID2, actionID3) {
                 let path = $(e).attr("path");
                 let v_type = $(e).attr("vtype");
@@ -2544,7 +2691,11 @@ let Archive = {};
                         ),
                     },
                     method: "POST",
-                    data: { project_id: project_id, user_id: user_id, company_id:company_id },
+                    data: {
+                        project_id: project_id,
+                        user_id: user_id,
+                        company_id: company_id,
+                    },
                     success: function (response) {
                         if (response.status === "success") {
                             alert(response.message);
@@ -2580,7 +2731,11 @@ let Archive = {};
                             ),
                         },
                         method: "POST",
-                        data: { copy_user_id: copy_user, user_id: user_id, company_id:company_id },
+                        data: {
+                            copy_user_id: copy_user,
+                            user_id: user_id,
+                            company_id: company_id,
+                        },
                         success: function (response) {
                             if (response.status === "success") {
                                 alert(response.message);
@@ -2615,7 +2770,7 @@ let Archive = {};
                             ),
                         },
                         method: "POST",
-                        data: { user_id: user_id,company_id:company_id },
+                        data: { user_id: user_id, company_id: company_id },
                         success: function (response) {
                             if (response.status === "success") {
                                 alert(response.message);
@@ -2651,7 +2806,7 @@ let Archive = {};
                             ),
                         },
                         method: "POST",
-                        data: { value: value, company_id:company_id},
+                        data: { value: value, company_id: company_id },
                         success: function (response) {
                             if (response.status === "success") {
                                 alert(response.message);
@@ -2691,7 +2846,7 @@ let Archive = {};
                             ),
                         },
                         method: "POST",
-                        data: { user_id: user_id, company_id: company_id},
+                        data: { user_id: user_id, company_id: company_id },
                         success: function (response) {
                             if (response.status === "success") {
                                 alert(response.message);
@@ -2899,29 +3054,29 @@ let Archive = {};
                 if (selected.length === 0) {
                     alert("Please select at least one record to delete.");
                     return;
-                }else{
+                } else {
                     let url =
-                    window.location.origin +
-                    sourceDir +
-                    "/system-operation/user-per-multiple-delete";
-                $.ajax({
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                            "content"
-                        ),
-                    },
-                    url: url,
-                    type: "POST",
-                    data: { selected: selected },
-                    success: function (response) {
-                        if (response.status === "error") {
-                            alert("Error: " + response.message);
-                        } else if (response.status === "success") {
-                            $("#f-p-list").html(response.data);
-                            alert(response.message);
-                        }
-                    },
-                });
+                        window.location.origin +
+                        sourceDir +
+                        "/system-operation/user-per-multiple-delete";
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        url: url,
+                        type: "POST",
+                        data: { selected: selected },
+                        success: function (response) {
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                            } else if (response.status === "success") {
+                                $("#f-p-list").html(response.data);
+                                alert(response.message);
+                            }
+                        },
+                    });
                 }
             },
             companyWiseFixedAssets: function (e, action_id) {
@@ -3852,37 +4007,43 @@ let Archive = {};
                         data: {
                             selected: selected,
                             multipleDlt: "multipleDlt",
-                            userID:userID
+                            userID: userID,
                         },
                         success: function (response) {
                             if (response.status == "success") {
                                 alert(response.message);
                                 let url =
-                                window.location.origin +
-                                sourceDir +
-                                "/fetch-user-permissions-after-delete";
-                            $.ajax({
-                                url: url,
-                                headers: {
-                                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                        "content"
-                                    ),
-                                },
-                                method: "GET",
-                                data: {
-                                    userID:userID
-                                },
-                                success:function(response){
-                                    if (response.status == "success") {
-                                        $('#user-permissions-container').html(response.userPermissionUpdated);
-                                    }
-                                },
-                                error: function (error) {
-                                    alert("An error occurred while fetching updated record.");
-                                },
-                            });
-                        }
-                    },
+                                    window.location.origin +
+                                    sourceDir +
+                                    "/fetch-user-permissions-after-delete";
+                                $.ajax({
+                                    url: url,
+                                    headers: {
+                                        "X-CSRF-TOKEN": $(
+                                            'meta[name="csrf-token"]'
+                                        ).attr("content"),
+                                    },
+                                    method: "GET",
+                                    data: {
+                                        userID: userID,
+                                    },
+                                    success: function (response) {
+                                        if (response.status == "success") {
+                                            $(
+                                                "#user-permissions-container"
+                                            ).html(
+                                                response.userPermissionUpdated
+                                            );
+                                        }
+                                    },
+                                    error: function (error) {
+                                        alert(
+                                            "An error occurred while fetching updated record."
+                                        );
+                                    },
+                                });
+                            }
+                        },
                         error: function (error) {
                             alert("An error occurred while deleting records.");
                         },

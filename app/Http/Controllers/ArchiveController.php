@@ -395,7 +395,7 @@ class ArchiveController extends Controller
         try {
             $request->validate([
                 'company'               => ['required', 'integer', 'exists:company_infos,id'],
-                'project'               => ['sometimes','nullable', 'integer', 'exists:branches,id',Rule::exists('user_project_permissions','project_id')->where('user_id',Auth::id())],
+                'project'               => ['sometimes','nullable', 'integer', 'exists:branches,id',],
                 'reference_number'    =>  ['required','string',Rule::unique('account_voucher_infos','voucher_number')->where(function ($query) use ($request){
                     return $query->where('company_id',$request->post('company'));
                 })],

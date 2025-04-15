@@ -271,6 +271,7 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:archive_dashboard'])->group(function (){
             Route::match(['get'],'data-archive-dashboard','index')->name('data.archive.dashboard.interface');
             Route::post('company-wise-archive-dashboard','companyWiseArchiveDashboard');
+            Route::post('company-wise-archive-dashboard-date-wise','companyWiseArchiveDashboardDateWise');
         });
     });
     Route::controller(ArchiveController::class)->group(function (){
