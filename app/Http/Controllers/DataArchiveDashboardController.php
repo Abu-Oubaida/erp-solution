@@ -105,8 +105,8 @@ class DataArchiveDashboardController extends Controller
                     ];
                 });
 
-                $startDate = Carbon::today()->subDays(6);
-                $endDate  = Carbon::now();
+                $startDate = Carbon::now()->copy()->subDays(7)->startOfDay();
+                $endDate  = Carbon::now()->endOfDay();
                 // dd($startDate->format('d-m-y'),$endDate->format('d-m-y'),);
                 $dailyCounts = VoucherDocument::whereBetween('created_at', [$startDate, $endDate])->where('company_id',$company->id)
                     ->select(DB::raw('DAYNAME(created_at) as day','created_at'), DB::raw('COUNT(id) as count'))
