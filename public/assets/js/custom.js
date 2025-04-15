@@ -1,4 +1,5 @@
 let Obj = {};
+let Archive = {};
 // Show loader immediately when the page starts loading
 (function ($) {
     //     $(document).ready(function() {
@@ -3207,18 +3208,25 @@ let Obj = {};
                             return false;
                         } else if (response.status === "success") {
                             if (multiply) {
-                                updateSelectBox(
-                                    response.data.projects,
-                                    action_id_projects,
-                                    "id",
-                                    "branch_name"
-                                );
-                                updateSelectBox(
-                                    response.data.types,
-                                    action_id_types,
-                                    "id",
-                                    "voucher_type_title"
-                                );
+                                if (action_id_projects !== null)
+                                {
+                                    updateSelectBox(
+                                        response.data.projects,
+                                        action_id_projects,
+                                        "id",
+                                        "branch_name"
+                                    );
+                                }
+                                if (action_id_types !== null)
+                                {
+                                    updateSelectBox(
+                                        response.data.types,
+                                        action_id_types,
+                                        "id",
+                                        "voucher_type_title"
+                                    );
+                                }
+
                             } else {
                                 updateSelectBoxSingleOption(
                                     response.data.projects,
@@ -4054,6 +4062,46 @@ let Obj = {};
                         return true;
                     },
                 });
+            },
+        };
+        Archive = {
+            settingSetTypePermission:function (e,type_company_id,types, users){
+                let company_id = $("#"+type_company_id).val()
+                let data_types = $("#"+types).val()
+                let permission_users = $("#"+users).val()
+                // Ensure data_types is always an array
+                if (!Array.isArray(data_types)) {
+                    data_types = [data_types];
+                }
+                if (data_types.length === 0 || permission_users.length === 0 || company_id.length === 0)
+                {
+                    return false
+                }
+                else {
+                    if (!confirm('Are you sure?'))
+                    {
+                        return false
+                    }
+                    const url =window.location.origin + sourceDir + "/archive-data-type-user-permission-add";
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "POST",
+                        data: { type_company_id: company_id,data_types: data_types, permission_users: permission_users },
+                        success: function (response) {
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                            } else if (response.status === "success") {
+                                alert(response.message)
+                            }
+                            return true;
+                        },
+                    })
+                }
             },
         };
     });
