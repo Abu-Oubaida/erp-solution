@@ -33,8 +33,8 @@
     }
 </style>
 @if(isset($voucherInfos) && count($voucherInfos))
-    <div class="row mb-1" id="fixedDiv">
-        <div class="col-md-10">
+    <div class="row mb-1 mobile-none" id="fixedDiv">
+        <div class="col-md-12">
             <input type="checkbox" name="" id="select_all">
             <label for="select_all">Select All</label>
             @if(auth()->user()->hasPermission('multiple_archive_data_delete'))
@@ -52,7 +52,7 @@
     <thead class="">
     <tr class="bg-secondary text-chl-white">
     @if(isset($voucherInfos) && count($voucherInfos))
-        <th>Select</th>
+        <th class="mobile-none">Select</th>
     @endif
         <th>SL</th>
         <th>Date</th>
@@ -72,7 +72,7 @@
     <tfoot id="fixedDiv2">
     <tr>
     @if(isset($voucherInfos) && count($voucherInfos))
-        <th>Select</th>
+        <th class="mobile-none">Select</th>
     @endif
         <th>SL</th>
         <th>Date</th>
@@ -97,7 +97,7 @@
         @foreach($voucherInfos as $data)
             <tr class="">
             @if(isset($voucherInfos) && count($voucherInfos))
-                <th><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $data->id !!}" value="{!! $data->id !!}"></th>
+                <td class="mobile-none"><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $data->id !!}" value="{!! $data->id !!}"></td>
             @endif
                 <td>{!! $no++ !!}</td>
                 <td>{!! date('d-M-y', strtotime($data->voucher_date)) !!}</td>

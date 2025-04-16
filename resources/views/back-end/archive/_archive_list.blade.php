@@ -36,8 +36,8 @@
 {{--<form>--}}
 {{--    @csrf--}}
 @if(isset($voucherInfos) && count($voucherInfos))
-    <div class="row mb-2" id="fixedDiv">
-        <div class="col-md-10">
+    <div class="row mb-2 mobile-none" id="fixedDiv">
+        <div class="col-md-12">
             <input type="checkbox" name="" id="select_all">
             <label for="select_all">Select All</label>
             @if(auth()->user()->hasPermission('multiple_archive_data_delete'))
@@ -56,7 +56,7 @@
     <thead>
     <tr class="text-center">
     @if(isset($voucherInfos) && count($voucherInfos))
-        <th>Select</th>
+        <th class="mobile-none">Select</th>
     @endif
         <th>SL</th>
         <th>Date</th>
@@ -75,7 +75,7 @@
     <tfoot id="fixedDiv2">
         <tr>
         @if(isset($voucherInfos) && count($voucherInfos))
-            <th>Select</th>
+            <th class="mobile-none">Select</th>
         @endif
             <th>SL</th>
             <th>Date</th>
@@ -99,7 +99,7 @@
         @foreach($voucherInfos as $data)
             <tr class="text-center">
             @if(\Illuminate\Support\Facades\Auth::user()->roles()->first()->display_name == "Systemsuperadmin")
-                <th><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $data->id !!}" value="{!! $data->id !!}"></th>
+                <td class="mobile-none"><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $data->id !!}" value="{!! $data->id !!}"></td>
             @endif
                 <td>{!! $no++ !!}</td>
                 <td>{!! date('d-M-y', strtotime($data->voucher_date)) !!}</td>
@@ -109,7 +109,7 @@
                 <td>{!! $data->VoucherType->voucher_type_title !!}</td>
                 <td class="text-start text-left">
                     @php $x = 1;@endphp
-                    <table class="table table-bordered table-sm table-hover">
+                    <table class="table table-sm table-hover">
                         <thead>
                         <tr>
                             <th>Document Name</th>

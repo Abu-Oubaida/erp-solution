@@ -33,16 +33,6 @@ class DataArchiveDashboardController extends Controller
         return view('back-end.archive.dashboard', compact('companies'));
     }
 
-    private function getFolderSize($dir)
-    {
-        $size = 0;
-        foreach (scandir($dir) as $file) {
-            if ($file === '.' || $file === '..') continue;
-            $path = $dir . DIRECTORY_SEPARATOR . $file;
-            $size += is_file($path) ? filesize($path) : $this->getFolderSize($path);
-        }
-        return $size;
-    }
 
     public function companyWiseArchiveDashboard(Request $request)
     {
@@ -124,7 +114,7 @@ class DataArchiveDashboardController extends Controller
 
                 foreach ($period as $date) {
                     $labels[] = [
-                        'key' => $date->format('d-m-Y  (l)'), // e.g., "Monday (08-04-2025)"
+                        'key' => $date->format('l (M-d)'), // e.g., "Monday (08-04-2025)"
                         'date' => $date->toDateString(),
                         'day' => $date->format('l'),
                     ];
