@@ -114,7 +114,7 @@ class DataArchiveDashboardController extends Controller
 
                 foreach ($period as $date) {
                     $labels[] = [
-                        'key' => $date->format('l (M-d)'), // e.g., "Monday (08-04-2025)"
+                        'key' => $date->format('D (M-d)'), // e.g., "Monday (08-04-2025)"
                         'date' => $date->toDateString(),
                         'day' => $date->format('l'),
                     ];
