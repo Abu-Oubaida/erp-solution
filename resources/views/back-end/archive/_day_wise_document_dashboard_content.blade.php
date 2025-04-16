@@ -55,7 +55,9 @@ $user_wise_l = collect($lastday_uploaded_data_by_users)->pluck('user_name');
         });
 
         // Find the maximum sum and add 2 for the max value
-        var maxTotal = Math.round(Math.max(...userTotalSums) + 50)
+        var stepSize = 10;
+        // Find the maximum sum and add 2 for the max value
+        var maxTotal = Math.round(Math.max(...userTotalSums) / stepSize) * stepSize + stepSize
 
 
         var config = {
@@ -111,7 +113,7 @@ $user_wise_l = collect($lastday_uploaded_data_by_users)->pluck('user_name');
                         min: 0,
                         max: maxTotal, // Use the calculated max + 2
                         ticks: {
-                            stepSize: 10 // Or 2/5/10 as per your preferred spacing
+                            stepSize: stepSize // Or 2/5/10 as per your preferred spacing
                         }
                     }
                 },
