@@ -649,7 +649,7 @@ class ArchiveController extends Controller
 //                $companyID = $this->getCompanyModulePermissionWise($permission)->where('id',$company_id)->first('id');
 //                $dataType = $this->archiveTypeList($permission)->where('company_id',$companyID->id)->where('id',$data_type)->where('status',1)->select('id','voucher_type_title')->first();
                 $voucherInfos = $this->archiveListInfo($company_id, $data_type);
-                $view = view('back-end/archive/_archive_list', compact('voucherInfos'))->render();
+                $view = view('back-end/archive/_archive_quick_list', compact('voucherInfos'))->render();
                 return response()->json([
                     'status' => 'success',
                     'data' => $view,
@@ -1305,7 +1305,18 @@ class ArchiveController extends Controller
         try {
             $permission = $this->permissions()->archive_setting;
             $companies = $this->getCompanyModulePermissionWise($permission)->get(['id','company_name','company_code']);
-            return view('back-end.archive.setting',compact('companies'))->render();
+            $path = env('APP_ARCHIVE_DATA');
+            $base_dir = round(disk_total_space($path) / (1024 * 1024 * 1024),2);
+            $company_wise_storage = $companies->map(function ($company) use ($path) {
+            $company_dir = $path.'/'.$company->company_code;
+                return [
+                    'company_id' => $company->id,
+                    'company_name' => $company->company_name,
+                    'company_code' => $company->company_code,
+                    'company_used_storage' => round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2),
+                ];
+            });
+            return view('back-end.archive.setting',compact('companies','base_dir'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

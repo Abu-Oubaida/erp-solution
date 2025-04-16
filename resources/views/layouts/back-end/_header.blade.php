@@ -4,7 +4,7 @@
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 text-chl-important" id="sidebarToggle"><i class="fas fa-bars"></i></button>
     @if(!empty(\Illuminate\Support\Facades\Auth::user()->companyInfo()->logo))
-        <img src="{{url(\Illuminate\Support\Facades\Auth::user()->companyInfo()->logo)
+        <img class="company-custom-logo" src="{{url(\Illuminate\Support\Facades\Auth::user()->companyInfo()->logo)
     }}" width="7%" alt="Logo not found">
     @else
         <h3 class="text-chl text-capitalize">{!! \Illuminate\Support\Facades\Auth::user()->companyInfo()->company_name !!}</h3>

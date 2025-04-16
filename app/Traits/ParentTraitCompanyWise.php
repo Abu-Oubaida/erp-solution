@@ -468,4 +468,14 @@ trait ParentTraitCompanyWise
             ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes(null)->pluck('id')->toArray());
         return $data;
     }
+    protected function getFolderSize($dir)
+    {
+        $size = 0;
+        foreach (scandir($dir) as $file) {
+            if ($file === '.' || $file === '..') continue;
+            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            $size += is_file($path) ? filesize($path) : $this->getFolderSize($path);
+        }
+        return $size;
+    }
 }

@@ -95,7 +95,14 @@
 
         @if(auth()->user()->hasPermission('archive_company_storage_management'))
         <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fa-solid fa-chart-pie"></i> Company Wise Storage Information</h3></div>
+                    <div class="card-body">
 
+                    </div>
+                </div>
+            </div>
         </div>
         @endif
     </div>
