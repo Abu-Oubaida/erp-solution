@@ -281,14 +281,19 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
         })
     </script>
 @endif
-@if ($documentCountsPerDay && $labels)
+@if ($documentCountsPerDay)
     <script>
+        var documentData = {!! json_encode($documentCountsPerDay) !!};
+        var dataValues = Object.values(documentData).map(Number);
+        var stepSize = 10;
+        var maxYValue = Math.ceil(Math.max(...dataValues) / stepSize) * stepSize;
+
         var barCtx = document.getElementById('documentTypeChart').getContext('2d');
 
         var documentTypeChart = new Chart(barCtx, {
             type: 'bar',
             data: {
-                labels: {!! json_encode($labels) !!},
+                labels: Object.keys({!! json_encode($documentCountsPerDay) !!}),
                 datasets: [{
                     label: 'Documents Uploaded Last 7 Days',
                     data: Object.values({!! json_encode($documentCountsPerDay) !!}).map(Number),
@@ -343,7 +348,7 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
                     y: {
                         beginAtZero: true,
                         min: 0,
-                        max: {!! json_encode($totalDocumentCount) !!}, // Y-axis range from 0 to max
+                        max: maxYValue, // Y-axis range from 0 to max
                         ticks: {
                             stepSize: 10 // Increase by 10, i.e., 0, 10, 20
                         }
