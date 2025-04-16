@@ -12,8 +12,8 @@ use App\Traits\ParentTraitCompanyWise;
 use Database\Seeders\CompanyInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Log;
-use DB;
 use Carbon\Carbon;
 
 class DataArchiveDashboardController extends Controller
@@ -105,26 +105,41 @@ class DataArchiveDashboardController extends Controller
                     ];
                 });
 
-                $startDate = Carbon::now()->copy()->subDays(7)->startOfDay();
-                $endDate  = Carbon::now()->endOfDay();
-                // dd($startDate->format('d-m-y'),$endDate->format('d-m-y'),);
-                $dailyCounts = VoucherDocument::whereBetween('created_at', [$startDate, $endDate])->where('company_id',$company->id)
-                    ->select(DB::raw('DAYNAME(created_at) as day','created_at'), DB::raw('COUNT(id) as count'))
-                    ->groupBy('day')
-                    ->orderByRaw("FIELD(day, 'Saturday', 'Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')")
+                $startDate = Carbon::now()->copy()->subDays(6)->startOfDay();
+                $endDate = Carbon::now()->endOfDay();
+
+                $dailyCounts = VoucherDocument::whereBetween('created_at', [$startDate, $endDate])
+                    ->where('company_id', $company->id)
+                    ->select(
+                        DB::raw("DATE(created_at) as date"),
+                        DB::raw("DAYNAME(created_at) as day"),
+                        DB::raw("COUNT(id) as count")
+                    )
+                    ->groupBy(DB::raw("DATE(created_at)"), DB::raw("DAYNAME(created_at)"))
+                    ->orderBy("date")
                     ->get();
 
-                $rawCounts = $dailyCounts->keyBy('day');
-                $labels = ['Saturday', 'Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                $labels = [];
+                $period = Carbon::parse($startDate)->daysUntil($endDate);
+
+                foreach ($period as $date) {
+                    $labels[] = [
+                        'key' => $date->format('d-m-Y  (l)'), // e.g., "Monday (08-04-2025)"
+                        'date' => $date->toDateString(),
+                        'day' => $date->format('l'),
+                    ];
+                }
+                $rawCounts = $dailyCounts->keyBy('date');
+
                 $documentCountsPerDay = [];
 
-                foreach ($labels as $day) {
-                    $documentCountsPerDay[$day] = $rawCounts[$day]->count ?? 0;
+                foreach ($labels as $label) {
+                    $count = $rawCounts[$label['date']]->count ?? 0;
+                    $documentCountsPerDay[$label['key']] = $count;
                 }
-
                 $totalDocumentCount = (max($documentCountsPerDay)+40);
                 $today_uploaded_data_by_users=$today_uploaded_data_by_users??[];
-                $view = view('back-end.archive._dashboard_content', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount','today_uploaded_data_by_users','company_id'))->render();
+                $view = view('back-end.archive._dashboard_content', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount','today_uploaded_data_by_users','company_id'))->render();
                 return response()->json([
                     'status' => 'success',
                     'data' => $view,

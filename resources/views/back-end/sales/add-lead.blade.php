@@ -1,8 +1,6 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
-        <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm"><i class="fas fa-chevron-left"></i> Go Back</a>
-        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>
         <div class="row">
             <div class="col-md-10">
                 <ol class="breadcrumb mb-4">
@@ -14,309 +12,300 @@
                     </li>
                 </ol>
             </div>
-{{--            <div class="col-md-6">--}}
-{{--                <div class="float-start">--}}
-{{--                    <strong>For uploading your employee.xlsx use this section. <a href="{!! route('export.employee.data.prototype') !!}">Prototype is here</a> Please flowing the exact format</strong>--}}
-{{--                    <div class="input-group mb-3">--}}
-{{--                        <input type="file" class="form-control" id="employee_file_upload">--}}
-{{--                        <label class="input-group-text" for="employee_file_upload"><i class="fa-solid fa-cloud-arrow-up"></i> &nbsp; Upload</label>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
             <div class="col-md-2">
-                <div class="row float-end">
-{{--                    <div class="col">--}}
-{{--                        <a class="btn btn-success btn-sm float-end" href="{{route('add.department')}}"><i class="fa-solid fa-building-user"></i> Add Department</a>--}}
-{{--                    </div>--}}
-                    <div class="col">
-                        <a class="btn btn-info btn-sm float-end" href="{{route('user.list')}}"><i class="fas fa-list-check"></i>  Lead List</a>
-                    </div>
-                </div>
+                <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
             </div>
         </div>
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="row">
-                    <h3 class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
-                </div>
-                <form action="{{ route('add.sales.lead') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
                         <div class="row">
+                            <h3 class="text-capitalize"><i class="fas fa-leaf"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('add.sales.lead') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
                             <div class="col-md-12">
-                                <h6># Basic Information</h6>
-                                <hr>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <input class="form-control" id="name" name="name" type="text" placeholder="Enter full name" value="{{old('name')}}"/>
-                                    <label for="name">Full name <span class="text-danger">*</span></label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <input class="form-control" id="phone" name="phone" type="number" placeholder="Enter phone number" value="{{old('phone')}}"/>
-                                    <label for="phone">Mobile number <span class="text-danger">*</span></label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <input class="form-control" id="email" name="email" type="email" placeholder="Enter email address" value="{{old('email')}}"/>
-                                    <label for="email">Email address </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <input class="form-control" id="relation" name="relation" type="text" placeholder="Enter husband/wife name" value="{{old('relation')}}"/>
-                                    <label for="relation">Husband/Wife </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <input class="form-control" id="phone2" name="phone2" type="number" placeholder="Enter phone number 2" value="{{old('phone2')}}"/>
-                                    <label for="phone">Alternative Mobile number </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <input class="form-control" id="email2" name="email2" type="email" placeholder="Enter alternative email address" value="{{old('email2')}}"/>
-                                    <label for="email2">Alternative email address </label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="profession" list="profession-list" name="profession" placeholder="profession">
-                                    <datalist id="profession-list">
-                                        <option value="Business">Business</option>
-                                        <option value="Teacher">Teacher</option>
-                                        <option value="Solder">Solder</option>
-                                        <option value="Doctor">Doctor</option>
-                                        <option value="Engineer">Engineer</option>
-                                        <option value="Bankar">Bankar</option>
-                                        <option value="Politician">Politician</option>
-                                        <option value="Actor">Actor</option>
-                                    </datalist>
-                                    <label for="branch">Profession <span class="text-danger">*</span></label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="company" name="company" placeholder="Company">
-                                    <label for="company">Company</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="designation" name="designation" placeholder="Designation">
-                                        <label for="designation">Designation</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <div class="form-floating mb-3">
-                                        <textarea type="text" class="form-control" id="notes" name="notes" placeholder="Notes"></textarea>
-                                        <label for="Designation">Notes</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6># Source Information</h6>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" id="source" list="source-list" name="source" placeholder="Source">
-                                            <datalist id="source-list">
-                                                <option value="None">None</option>
-                                                <option value="Newspaper">Newspaper</option>
-                                                <option value="Hotline">Hotline</option>
-                                                <option value="Social">Social</option>
-                                                <option value="Reference">Reference</option>
-                                            </datalist>
-                                            <label for="branch">Source <span class="text-danger">*</span></label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <select id="team-leader" class="form-control" name="team_leader">
-                                                <option value="">--Select Option--</option>
-                                                <option value="db_leader_id">Leader 1</option>
-                                                <option value="db_leader_id">Leader 2</option>
-                                            </select>
-                                            <label for="team-leader">Team Leader <span class="text-danger">*</span></label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <select id="associate" class="form-control" name="associate">
-                                                <option value="">--Select Option--</option>
-                                                <option value="db_associate_id">Associate 1</option>
-                                                <option value="db_associate_id">Associate 2</option>
-                                            </select>
-                                            <label for="associate">Associate <span class="text-danger">*</span></label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <input type="text" name="recorded_by" id="recorded_by" class="form-control">
-                                            <label for="recorded_by">Recorded By</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <select id="rating" class="form-control" name="rating">
-                                                <option value="">--Select Option--</option>
-                                                <option value="db_rating_id">Rating 1</option>
-                                                <option value="db_rating_id">Rating 2</option>
-                                            </select>
-                                            <label for="rating">Rating</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <select id="industry" class="form-control" name="industry">
-                                                <option value="">--Select Option--</option>
-                                                <option value="db_industry_id">Industry 1</option>
-                                                <option value="db_industry_id">Industry 2</option>
-                                            </select>
-                                            <label for="industry">Industry</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <select id="branch" class="form-control" name="branch">
-                                                <option value="">--Select Option--</option>
-                                                @if(count($branches))
-                                                    @foreach($branches as $branch)
-                                                        <option value="{!! $branch->id !!}">{!! $branch->branch_name !!}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                            <label for="branch">Branch Name</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <select id="lead-creat-dept" class="form-control" name="lead_create_dept">
-                                                <option value="">--Select Option--</option>
-                                                @if(count($depts))
-                                                    @foreach($depts as $dept)
-                                                        <option value="{!! $dept->id !!}">{!! $dept->dept_name !!}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                            <label for="lead-creat-dept">Lead Create Department</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6># Prospect Preference</h6>
-                                <hr>
                                 <div class="row">
                                     <div class="col-md-12">
+                                        <h6># Basic Information</h6>
+                                        <hr>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="name" name="name" type="text" placeholder="Enter full name" value="{{old('name')}}"/>
+                                            <label for="name">Full name <span class="text-danger">*</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="phone" name="phone" type="number" placeholder="Enter phone number" value="{{old('phone')}}"/>
+                                            <label for="phone">Mobile number <span class="text-danger">*</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="email" name="email" type="email" placeholder="Enter email address" value="{{old('email')}}"/>
+                                            <label for="email">Email address </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="relation" name="relation" type="text" placeholder="Enter husband/wife name" value="{{old('relation')}}"/>
+                                            <label for="relation">Husband/Wife </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="phone2" name="phone2" type="number" placeholder="Enter phone number 2" value="{{old('phone2')}}"/>
+                                            <label for="phone">Alternative Mobile number </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="email2" name="email2" type="email" placeholder="Enter alternative email address" value="{{old('email2')}}"/>
+                                            <label for="email2">Alternative email address </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession" placeholder="profession">
+                                            <datalist id="profession-list">
+                                                <option value="Business">Business</option>
+                                                <option value="Teacher">Teacher</option>
+                                                <option value="Solder">Solder</option>
+                                                <option value="Doctor">Doctor</option>
+                                                <option value="Engineer">Engineer</option>
+                                                <option value="Bankar">Bankar</option>
+                                                <option value="Politician">Politician</option>
+                                                <option value="Actor">Actor</option>
+                                            </datalist>
+                                            <label for="branch">Profession <span class="text-danger">*</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="company" name="company" placeholder="Company">
+                                            <label for="company">Company</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
                                         <div class="form-floating mb-3">
                                             <div class="form-floating mb-3">
-                                                <textarea type="text" class="form-control" id="preference-notes" name="p_notes" placeholder="Preference Notes"></textarea>
-                                                <label for="preference-notes">Preference Notes</label>
+                                                <input type="text" class="form-control" id="designation" name="designation" placeholder="Designation">
+                                                <label for="designation">Designation</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-floating mb-3">
+                                            <div class="form-floating mb-3">
+                                                <textarea type="text" class="form-control" id="notes" name="notes" placeholder="Notes"></textarea>
+                                                <label for="Designation">Notes</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <select id="apartment-type" class="form-control" name="apartment_type">
-                                                <option value="">--Select Option--</option>
-                                                <option value="db_apartment_type_id">apartment type 1</option>
-                                                <option value="db_apartment_type_id">apartment type 1</option>
-                                            </select>
-                                            <label for="associate">Apartment Type </label>
+                                        <h6># Source Information</h6>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <input type="text" class="form-control" id="source" list="source-list" name="source" placeholder="Source">
+                                                    <datalist id="source-list">
+                                                        <option value="None">None</option>
+                                                        <option value="Newspaper">Newspaper</option>
+                                                        <option value="Hotline">Hotline</option>
+                                                        <option value="Social">Social</option>
+                                                        <option value="Reference">Reference</option>
+                                                    </datalist>
+                                                    <label for="branch">Source <span class="text-danger">*</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <select id="team-leader" class="form-control" name="team_leader">
+                                                        <option value="">--Select Option--</option>
+                                                        <option value="db_leader_id">Leader 1</option>
+                                                        <option value="db_leader_id">Leader 2</option>
+                                                    </select>
+                                                    <label for="team-leader">Team Leader <span class="text-danger">*</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <select id="associate" class="form-control" name="associate">
+                                                        <option value="">--Select Option--</option>
+                                                        <option value="db_associate_id">Associate 1</option>
+                                                        <option value="db_associate_id">Associate 2</option>
+                                                    </select>
+                                                    <label for="associate">Associate <span class="text-danger">*</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <input type="text" name="recorded_by" id="recorded_by" class="form-control">
+                                                    <label for="recorded_by">Recorded By</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <select id="rating" class="form-control" name="rating">
+                                                        <option value="">--Select Option--</option>
+                                                        <option value="db_rating_id">Rating 1</option>
+                                                        <option value="db_rating_id">Rating 2</option>
+                                                    </select>
+                                                    <label for="rating">Rating</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <select id="industry" class="form-control" name="industry">
+                                                        <option value="">--Select Option--</option>
+                                                        <option value="db_industry_id">Industry 1</option>
+                                                        <option value="db_industry_id">Industry 2</option>
+                                                    </select>
+                                                    <label for="industry">Industry</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <select id="branch" class="form-control" name="branch">
+                                                        <option value="">--Select Option--</option>
+                                                        @if(count($branches))
+                                                            @foreach($branches as $branch)
+                                                                <option value="{!! $branch->id !!}">{!! $branch->branch_name !!}</option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                    <label for="branch">Branch Name</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <select id="lead-creat-dept" class="form-control" name="lead_create_dept">
+                                                        <option value="">--Select Option--</option>
+                                                        @if(count($depts))
+                                                            @foreach($depts as $dept)
+                                                                <option value="{!! $dept->id !!}">{!! $dept->dept_name !!}</option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                    <label for="lead-creat-dept">Lead Create Department</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" id="preferred-location" list="preferred-location-list" name="preferred_location" placeholder="Source">
-                                            <datalist id="preferred-location-list">
-                                                <option value="Gulshan">Gulshan</option>
-                                                <option value="Banani">Banani</option>
-                                                <option value="Baridhara">Baridhara</option>
-                                                <option value="Uttra">Uttra</option>
-                                                <option value="Dhanmondi">Dhanmondi</option>
-                                                <option value="Mohammadpur">Mohammadpur</option>
-                                                <option value="Lalmatia">Lalmatia</option>
-                                                <option value="Kalabagan">Kalabagan</option>
-                                            </datalist>
-                                            <label for="preferred-location">Preferred Location </label>
+                                        <h6># Prospect Preference</h6>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-floating mb-3">
+                                                    <div class="form-floating mb-3">
+                                                        <textarea type="text" class="form-control" id="preference-notes" name="p_notes" placeholder="Preference Notes"></textarea>
+                                                        <label for="preference-notes">Preference Notes</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <select id="apartment-type" class="form-control" name="apartment_type">
+                                                        <option value="">--Select Option--</option>
+                                                        <option value="db_apartment_type_id">apartment type 1</option>
+                                                        <option value="db_apartment_type_id">apartment type 1</option>
+                                                    </select>
+                                                    <label for="associate">Apartment Type </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <input type="text" class="form-control" id="preferred-location" list="preferred-location-list" name="preferred_location" placeholder="Source">
+                                                    <datalist id="preferred-location-list">
+                                                        <option value="Gulshan">Gulshan</option>
+                                                        <option value="Banani">Banani</option>
+                                                        <option value="Baridhara">Baridhara</option>
+                                                        <option value="Uttra">Uttra</option>
+                                                        <option value="Dhanmondi">Dhanmondi</option>
+                                                        <option value="Mohammadpur">Mohammadpur</option>
+                                                        <option value="Lalmatia">Lalmatia</option>
+                                                        <option value="Kalabagan">Kalabagan</option>
+                                                    </datalist>
+                                                    <label for="preferred-location">Preferred Location </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <select class="form-control" id="apartment-size" name="apartment_size">
+                                                        <option value="">--Select--</option>
+                                                        <option value="db_size_id">1200 sft</option>
+                                                        <option value="db_size_id">1300 sft</option>
+                                                        <option value="db_size_id">1600 sft</option>
+                                                    </select>
+                                                    <label for="apartment-size">Apartment Size </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    <select class="form-control" id="apartment-floor" name="apartment_floor">
+                                                        <option value="">--Select--</option>
+                                                        <option value="1">1st Floor</option>
+                                                        <option value="2">2nd Floor</option>
+                                                        <option value="3">3rd Floor</option>
+                                                        <option value="4">4th Floor</option>
+                                                    </select>
+                                                    <label for="apartment-floor">Apartment Floor </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating mb-3">
+                                                    <select class="form-control" id="apartment-facing" name="apartment_facing">
+                                                        <option value="">--Select--</option>
+                                                        <option value="south">South</option>
+                                                        <option value="north">North</option>
+                                                        <option value="east">East</option>
+                                                        <option value="west">West</option>
+                                                    </select>
+                                                    <label for="apartment-facing">Facing </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating mb-3">
+                                                    <select class="form-control" id="apartment-view" name="apartment_view">
+                                                        <option value="">--Select--</option>
+                                                        <option value="south">South</option>
+                                                        <option value="north">North</option>
+                                                        <option value="east">East</option>
+                                                        <option value="west">West</option>
+                                                    </select>
+                                                    <label for="apartment-view">View </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating mb-3">
+                                                    <input type="number" class="form-control" placeholder="budget" id="budget">
+                                                    <label for="budget">Budget </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <select class="form-control" id="apartment-size" name="apartment_size">
-                                                <option value="">--Select--</option>
-                                                <option value="db_size_id">1200 sft</option>
-                                                <option value="db_size_id">1300 sft</option>
-                                                <option value="db_size_id">1600 sft</option>
-                                            </select>
-                                            <label for="apartment-size">Apartment Size </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <select class="form-control" id="apartment-floor" name="apartment_floor">
-                                                <option value="">--Select--</option>
-                                                <option value="1">1st Floor</option>
-                                                <option value="2">2nd Floor</option>
-                                                <option value="3">3rd Floor</option>
-                                                <option value="4">4th Floor</option>
-                                            </select>
-                                            <label for="apartment-floor">Apartment Floor </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3">
-                                            <select class="form-control" id="apartment-facing" name="apartment_facing">
-                                                <option value="">--Select--</option>
-                                                <option value="south">South</option>
-                                                <option value="north">North</option>
-                                                <option value="east">East</option>
-                                                <option value="west">West</option>
-                                            </select>
-                                            <label for="apartment-facing">Facing </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3">
-                                            <select class="form-control" id="apartment-view" name="apartment_view">
-                                                <option value="">--Select--</option>
-                                                <option value="south">South</option>
-                                                <option value="north">North</option>
-                                                <option value="east">East</option>
-                                                <option value="west">West</option>
-                                            </select>
-                                            <label for="apartment-view">View </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating mb-3">
-                                            <input type="number" class="form-control" placeholder="budget" id="budget">
-                                            <label for="budget">Budget </label>
+
+                                    <div class="col-md-12">
+                                        <div class="form-floating mb-3 float-end">
+                                            <input type="submit" value="Insert User" class="btn btn-chl-outline" name="submit" >
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-12">
-                                <div class="form-floating mb-3 float-end">
-                                    <input type="submit" value="Insert User" class="btn btn-chl-outline" name="submit" >
-                                </div>
-                            </div>
-                        </div>
+                        </form>
                     </div>
-
-                </form>
+                </div>
             </div>
         </div>
+
     </div>
     <!-- Modal -->
     <div class="modal modal-xl fade" id="myModal" tabindex="-1" aria-labelledby="userDataModelLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">

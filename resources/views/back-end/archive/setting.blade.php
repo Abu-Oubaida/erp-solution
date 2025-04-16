@@ -16,8 +16,8 @@
                 <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
             </div>
         </div>
-        <div class="row">
         @if(auth()->user()->hasPermission('add_archive_data_type_user_permission'))
+        <div class="row">
             <div class="col">
                 <div class="card mb-4">
                     <div class="card-header">
@@ -78,7 +78,7 @@
                                 <a class="btn btn-sm btn-outline-secondary mt-2" id="search-icon" onclick="return Obj.searchCompanyDepartmentUsers('company2','company_wise_departments','permission_users')"><i class="fas fa-search"></i> Find Users</a>
                             </div>
                             <div class="col-md-3 mb-1">
-                                <label for="department">User List</label>
+                                <label for="department">User List <span class="text-danger">*</span></label>
                                 <select id="permission_users" name="company_departments_users[]" class="select-search cursor-pointer" onchange="return Obj.selectAllOption(this)" multiple>
                                     <option value="">Pick options...</option>
                                 </select>
@@ -90,8 +90,14 @@
                     </div>
                 </div>
             </div>
-        @endif
         </div>
+        @endif
+
+        @if(auth()->user()->hasPermission('archive_company_storage_management'))
+        <div class="row">
+
+        </div>
+        @endif
     </div>
 @stop
 
