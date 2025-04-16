@@ -286,7 +286,7 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
         var documentData = {!! json_encode($documentCountsPerDay) !!};
         var dataValues = Object.values(documentData).map(Number);
         var stepSize = 10;
-        var maxYValue = Math.ceil(Math.max(...dataValues) / stepSize) * stepSize;
+        var maxYValue = Math.ceil(Math.max(...dataValues) / stepSize) * stepSize + stepSize;
 
         var barCtx = document.getElementById('documentTypeChart').getContext('2d');
 
@@ -350,7 +350,7 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
                         min: 0,
                         max: maxYValue, // Y-axis range from 0 to max
                         ticks: {
-                            stepSize: 10 // Increase by 10, i.e., 0, 10, 20
+                            stepSize: stepSize // Increase by 10, i.e., 0, 10, 20
                         }
                     }
                 }
@@ -375,8 +375,9 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
             }, 0);
         });
 
+        var stepSize = 10;
         // Find the maximum sum and add 2 for the max value
-        var maxTotal = Math.round(Math.max(...userTotalSums) + 50)
+        var maxTotal = Math.round(Math.max(...userTotalSums) / stepSize) * stepSize + stepSize
 
 
         var config = {
@@ -442,7 +443,7 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
                         min: 0,
                         max: maxTotal, // Use the calculated max + 2
                         ticks: {
-                            stepSize: 10 // Or 2/5/10 as per your preferred spacing
+                            stepSize: stepSize // Or 2/5/10 as per your preferred spacing
                         }
                     }
                 },
@@ -457,182 +458,3 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
         new Chart(today_ctx, config);
     </script>
 @endif
-
-{{-- @if ($lastday_uploaded_data_by_users)
-    <script>
-        var lastday_ctx = document.getElementById('lastday_uploaded_data_by_users').getContext('2d');
-
-        var lastday_data = {
-            labels: {!! json_encode($user_wise_l) !!},
-            datasets: {!! json_encode($user_wise_dat) !!}
-        };
-
-        // Calculate the sum of values per user (level-wise) and find the highest total sum
-        var userTotalSums = lastday_data.labels.map((label, index) => {
-            return lastday_data.datasets.reduce((sum, dataset) => {
-                return sum + (dataset.data[index] || 0); // Add values for this user across all datasets
-            }, 0);
-        });
-
-        // Find the maximum sum and add 2 for the max value
-        var maxTotal = Math.round(Math.max(...userTotalSums) + 50)
-
-
-        var config = {
-            type: 'bar',
-            data: lastday_data,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: false,
-                        text: 'Document Counts by User'
-                    },
-                    // Add the datalabels plugin to show user-wise total on each bar
-                    datalabels: {
-                        display: true,
-                        // color: 'black', // Adjust text color
-                        anchor: 'end', // Position the text at the top of the bars
-                        align: 'top',  // Align text above the bars
-                        font: {
-                            weight: 'bold',
-                            size: 12, // Adjust font size
-                        },
-                        formatter: function(value, context) {
-                            if (context.datasetIndex === 0) { // Ensure labels appear only once
-                                return userTotalSums[context.dataIndex];
-                            }
-                            return ""; // Hide for other datasets
-                        }
-                    }
-                },
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            autoSkip: false,
-                            // align: 'start', // Align label text left
-                        },
-                        offset: true, // Remove center spacing
-                        grid: {
-                            offset: false
-                        },
-                        categoryPercentage: 0.5,
-                        barPercentage: 0.5,
-                        // padding: 20,
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        min: 0,
-                        max: maxTotal, // Use the calculated max + 2
-                        ticks: {
-                            stepSize: 10 // Or 2/5/10 as per your preferred spacing
-                        }
-                    }
-                },
-                datasets: {
-                    bar: {
-                        barThickness: 40, // Make bars thinner
-                    }
-                }
-            },
-        };
-
-        new Chart(lastday_ctx, config);
-    </script>
-@endif --}}
-
-
-{{-- @if ($lastWeek_uploaded_data_by_users)
-    <script>
-        var lastWeek_ctx = document.getElementById('lastWeek_uploaded_data_by_users').getContext('2d');
-
-        var lastWeek_data = {
-            labels: {!! json_encode($lastWeek_wise_labels) !!},
-            datasets: {!! json_encode($lastWeek_wise_datasets) !!}
-        };
-
-        // Calculate the sum of values per user (level-wise) and find the highest total sum
-        var userTotalSums = lastday_data.labels.map((label, index) => {
-            return lastday_data.datasets.reduce((sum, dataset) => {
-                return sum + (dataset.data[index] || 0); // Add values for this user across all datasets
-            }, 0);
-        });
-
-        // Find the maximum sum and add 2 for the max value
-        var maxTotal = Math.round(Math.max(...userTotalSums) + 50)
-
-
-        var config = {
-            type: 'bar',
-            data: lastWeek_data,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: false,
-                        text: 'Document Counts by User'
-                    },
-                    // Add the datalabels plugin to show user-wise total on each bar
-                    datalabels: {
-                        display: true,
-                        // color: 'black', // Adjust text color
-                        anchor: 'end', // Position the text at the top of the bars
-                        align: 'top',  // Align text above the bars
-                        font: {
-                            weight: 'bold',
-                            size: 12, // Adjust font size
-                        },
-                        formatter: function(value, context) {
-                            if (context.datasetIndex === 0) { // Ensure labels appear only once
-                                return userTotalSums[context.dataIndex];
-                            }
-                            return ""; // Hide for other datasets
-                        }
-                    }
-                },
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            autoSkip: false,
-                            // align: 'start', // Align label text left
-                        },
-                        offset: true, // Remove center spacing
-                        grid: {
-                            offset: false
-                        },
-                        categoryPercentage: 0.5,
-                        barPercentage: 0.5,
-                        // padding: 20,
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        min: 0,
-                        max: maxTotal, // Use the calculated max + 2
-                        ticks: {
-                            stepSize: 10 // Or 2/5/10 as per your preferred spacing
-                        }
-                    }
-                },
-                datasets: {
-                    bar: {
-                        barThickness: 40, // Make bars thinner
-                    }
-                }
-            },
-        };
-
-        new Chart(lastWeek_ctx, config);
-    </script>
-@endif --}}
