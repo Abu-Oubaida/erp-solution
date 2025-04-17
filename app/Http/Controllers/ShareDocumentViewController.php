@@ -33,7 +33,7 @@ class ShareDocumentViewController extends Controller
         {
             $id = Crypt::decryptString($request->get('archive')); //voucher info id
         }
-        
+
         $shareID = $request->get('share');
         $shareArchives = null;
         if (!$id)
@@ -72,6 +72,19 @@ class ShareDocumentViewController extends Controller
             'Expires' => '0',
             'X-Content-Type-Options' => 'nosniff',
             'Content-Security-Policy' => "default-src 'self'; script-src 'self'",
+        ]);
+    }
+    public function streamSecurePdf($id){
+        $document = VoucherDocument::findOrFail($id);
+        $path = storage_path('app/public/archive_data/' . $document->filepath . $document->document);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->file($path, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$document->document.'"',
         ]);
     }
 }

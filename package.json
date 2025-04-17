@@ -15,7 +15,7 @@
         "@vitejs/plugin-vue": "^4.1.0",
         "alpinejs": "^3.4.2",
         "autoprefixer": "^10.4.2",
-        "axios": "^0.25",
+        "axios": "^1.8.4",
         "laravel-mix": "^6.0.6",
         "laravel-vite-plugin": "^0.7.4",
         "lodash": "^4.17.19",
@@ -24,6 +24,9 @@
         "vite": "^4.2.1"
     },
     "dependencies": {
+        "@fluent/bundle": "^0.19.1",
+        "@fluent/dom": "^0.10.1",
+        "pdfjs-dist": "^5.1.91",
         "simple-datatables": "^9.0.4"
     }
 }

@@ -115,8 +115,8 @@
                                     <strong>{!! $x++ !!}.</strong>
                                     {!! preg_replace('/^.*_/', '', pathinfo($d->document, PATHINFO_FILENAME)) . '.' . pathinfo($d->document, PATHINFO_EXTENSION) !!}
                                 <td>
-                                    <a class="text-primary" href="" title="Quick View" vtype="{!! $data->VoucherType->voucher_type_title !!}" vno="{!! $data->voucher_number !!}" path="{!! \Illuminate\Support\Facades\Crypt::encryptString(asset('storage/archive_data/'.$d->filepath.$d->document)) !!}" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','v_type','v_no')"> <i class="fa-solid fa-eye"></i></a>
-                                    &nbsp;
+                                    <a href="" class="text-primary cursor-pointer" title="Quick View" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview')"> <i class="fa-solid fa-eye"></i></a>
+                                    &nbsp
                                     <a class="text-success" href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
                                     &nbsp
                                     @if(auth()->user()->hasPermission('share_archive_data_individual'))
@@ -182,18 +182,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="v_document_name"></h1>
+                <h1 class="modal-title fs-5" id="v_document_name"> <i class="fas fa-eye"></i> Document Quick View</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <strong>Reference No: <span id="v_no"></span></strong>
-                    </div>
-                    <div class="col-md-6 text-end">
-                        <strong>Data Type: <span id="v_type"></span></strong>
-                    </div>
-                </div>
                 <div id="documentPreview"></div>
             </div>
             <div class="modal-footer">

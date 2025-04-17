@@ -197,33 +197,27 @@ class ajaxRequestController extends Controller
     public function findArchiveDocument(Request $request)
     {
         try {
-            extract($request->post());
-            $path = Crypt::decryptString($path);
-//            dd($path);
-            echo $path;
-//            $results = VoucherDocument::find($id);
-//            if ($results)
-//            {
-//                echo json_encode(array(
-//                    'results' => $results
-//                ));
-//            }
-//            else{
-//                echo json_encode(array(
-//                    'error' => array(
-//                        'msg' => "Not Found!",
-//                        'code' => "404",
-//                    )
-//                ));
-//            }
+            if (request()->ajax()) {
+                $validateData = $request->validate([
+                    'id'=> ['required','string'],
+                ]);
+                extract($validateData);
+                $id = Crypt::decryptString($id);
+                $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
+                $view = view('back-end.archive._single-view-modal',compact('document'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $view,
+                    'message' => 'Document found'
+                ]);
+            }
+            throw new \Exception('Invalid request');
         }catch (\Throwable $exception)
         {
-            echo json_encode(array(
-                'error' => array(
-                    'msg' => $exception->getMessage(),
-                    'code' => $exception->getCode(),
-                )
-            ));
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
         }
     }
 
