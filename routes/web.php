@@ -645,5 +645,6 @@ Route::controller(ShareDocumentViewController::class)->group(function (){
     Route::get('archive-document-view','archiveDocumentView')->name('archive.document.view');
     Route::get('/secure-document/{id}', 'viewDocument')->name('document.view');
     Route::get('archive-view','archiveView')->name('archive.view');
+    Route::get('/view-pdf/{id}', 'streamSecurePdf')->name('pdf.secure.view');
 });
 require __DIR__.'/auth.php';
