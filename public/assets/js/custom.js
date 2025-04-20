@@ -1,5 +1,6 @@
 let Obj = {};
 let Archive = {};
+let AppSetting = {};
 // Show loader immediately when the page starts loading
 (function ($) {
     //     $(document).ready(function() {
@@ -4232,6 +4233,153 @@ let Archive = {};
                 })
             },
         };
+        AppSetting = {
+            addArchivePackage:function (e,output_id){
+                let package_name = $("#package_name").val()
+                let package_size = $("#package_size").val()
+                let package_status = $("#package_status").val()
+                if (package_name.length === 0 || package_size.length === 0 || package_status.length === 0)
+                {
+                    return false
+                }
+                else {
+                    if (!confirm('Are you sure?'))
+                    {
+                        return false
+                    }
+                    else {
+                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-add";
+                        $.ajax({
+                            url: url,
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                    "content"
+                                ),
+                            },
+                            method: "POST",
+                            data: { package_name: package_name, package_size: package_size, package_status: package_status },
+                            success: function (response) {
+                                if (response.status === "error") {
+                                    alert("Error: " + response.message);
+                                } else if (response.status === "success") {
+                                    alert(response.message)
+                                    $("#"+output_id).html(response.data)
+                                }
+                                return true;
+                            },
+                        })
+                    }
+                }
+            },
+            editArchivePackage:function (e,output_id){
+                let edit_id = $(e).attr("ref")
+                if (edit_id.length === 0)
+                {
+                    return false
+                }
+                else {
+                    if (!confirm('Are you sure?'))
+                    {
+                        return false
+                    }
+                    else {
+                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-edit";
+                        $.ajax({
+                            url: url,
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                    "content"
+                                ),
+                            },
+                            method: "POST",
+                            data: { edit_id: edit_id},
+                            success: function (response) {
+                                if (response.status === "error") {
+                                    alert("Error: " + response.message);
+                                } else if (response.status === "success") {
+                                    $("#"+output_id+"_content").html(response.data)
+                                    $("#"+output_id).modal("show")
+                                }
+                                return true;
+                            },
+                        })
+                    }
+                }
+            },
+            updateArchivePackage:function (e,output_id){
+                let package_name = $("#edit_package_name").val()
+                let package_size = $("#edit_package_size").val()
+                let package_status = $("#edit_package_status").val()
+                let package_id = $("#edit_package_id").val()
+                if (package_name.length === 0 || package_size.length === 0 || package_status.length === 0 || package_id.length === 0)
+                {
+                    return false
+                }
+                else {
+                    if (!confirm('Are you sure?'))
+                    {
+                        return false
+                    }
+                    else {
+                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-update";
+                        $.ajax({
+                            url: url,
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                    "content"
+                                ),
+                            },
+                            method: "POST",
+                            data: { package_name: package_name, package_size: package_size, package_status: package_status,package_id:package_id },
+                            success: function (response) {
+                                if (response.status === "error") {
+                                    alert("Error: " + response.message);
+                                } else if (response.status === "success") {
+                                    alert(response.message)
+                                    $("#"+output_id).html(response.data)
+                                }
+                                return true;
+                            },
+                        })
+                    }
+                }
+            },
+            deleteArchivePackage:function (e,output_id){
+                let delete_id = $(e).attr("ref")
+                if (delete_id.length === 0)
+                {
+                    return false
+                }
+                else {
+                    if (!confirm('Are you sure?'))
+                    {
+                        return false
+                    }
+                    else {
+                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-delete";
+                        $.ajax({
+                            url: url,
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                    "content"
+                                ),
+                            },
+                            method: "POST",
+                            data: { delete_id: delete_id},
+                            success: function (response) {
+                                if (response.status === "error") {
+                                    alert("Error: " + response.message);
+                                } else if (response.status === "success") {
+                                    alert(response.message)
+                                    $("#"+output_id).html(response.data)
+                                }
+                                return true;
+                            },
+                        })
+                    }
+                }
+            },
+        }
     });
     function checkFileExists(url, callback) {
         const xhr = new XMLHttpRequest();

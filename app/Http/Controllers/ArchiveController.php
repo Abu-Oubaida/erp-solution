@@ -1308,7 +1308,7 @@ class ArchiveController extends Controller
             $path = env('APP_ARCHIVE_DATA');
             $base_dir = round(disk_total_space($path) / (1024 * 1024 * 1024),2);
             $company_wise_storage = $companies->map(function ($company) use ($path) {
-            $company_dir = $path.'/'.$company->company_code;
+                $company_dir = $path.'/'.$company->company_code;
                 return [
                     'company_id' => $company->id,
                     'company_name' => $company->company_name,
@@ -1316,7 +1316,7 @@ class ArchiveController extends Controller
                     'company_used_storage' => round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2),
                 ];
             });
-            return view('back-end.archive.setting',compact('companies','base_dir'))->render();
+            return view('back-end.archive.setting',compact('companies','base_dir','company_wise_storage'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

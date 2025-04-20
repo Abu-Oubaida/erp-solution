@@ -8,6 +8,7 @@ use App\Models\branch;
 use App\Models\BranchType;
 use App\Models\company_info;
 use App\Models\CompanyModulePermission;
+use App\Models\Data_archive_storage_package;
 use App\Models\department;
 use App\Models\Designation;
 use App\Models\Document_requisition_info;
@@ -477,5 +478,15 @@ trait ParentTraitCompanyWise
             $size += is_file($path) ? filesize($path) : $this->getFolderSize($path);
         }
         return $size;
+    }
+
+    protected function getStoragePackages()
+    {
+        return Data_archive_storage_package::withCount('useesCompany')
+            ->with([
+                'createdBy:id,name',
+                'updatedBy:id,name',
+                'useesCompany:id,company_name'
+            ]);
     }
 }

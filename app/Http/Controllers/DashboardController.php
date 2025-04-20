@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Data_archive_storage_package;
 use App\Models\User;
 use App\Traits\AuthTrait;
 use App\Traits\ParentTraitCompanyWise;
@@ -133,10 +134,17 @@ class DashboardController extends Controller
     public function appSetting(Request $request)
     {
         try {
-            return view('back-end.app-setting')->render();
+            $storage_packages = null;
+            if (Auth::user()->isSystemSuperAdmin())
+            {
+                $storage_packages = $this->getStoragePackages()->get();
+            }
+//            dd($storage_packages);
+            return view('back-end.app-setting',compact('storage_packages'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
         }
     }
+
 }

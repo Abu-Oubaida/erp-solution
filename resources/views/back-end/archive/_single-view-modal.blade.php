@@ -44,6 +44,25 @@
             .textLayer {
                 pointer-events: none; /* Makes text unselectable */
             }
+            #pdf-container-wrapper {
+                position: relative;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                overflow-y: auto;
+                padding-top: 20px; /* if you want top spacing */
+                text-align: center;
+                background: white;
+                max-height: 700px;
+                scroll-behavior: smooth; /* smooth scroll */
+            }
+
+            #pdf-container {
+                margin: 0 auto;
+                z-index: 1;
+                align-items: center;
+            }
         </style>
         <div class="col-md-12">
             <div class="row">
@@ -70,7 +89,9 @@
             </div>
         </div>
         <div class="col-md-12">
-            <div class="text-center" id="pdf-container"></div>
+            <div id="pdf-container-wrapper">
+                <div class="text-center" id="pdf-container"></div>
+            </div>
             <script>
                 var url = "{{ $pdfUrl }}";
 

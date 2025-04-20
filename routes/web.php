@@ -28,6 +28,7 @@ use App\Http\Controllers\superadmin\RoleController;
 use App\Http\Controllers\superadmin\UserController;
 use App\Http\Controllers\superadmin\UserPermissionController;
 use App\Http\Controllers\superadmin\DesignationController;
+use App\Http\Controllers\systemsuperadmin\DataArchivePackageController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 # 0.0 Clear
@@ -154,6 +155,13 @@ Route::group(['middleware' => ['auth']],function (){
                     Route::match(['delete'],'delete-blood-group','destroy')->name('delete.blood.group');
                 });
             });// 3.2.1.4 End
+
+            Route::controller(DataArchivePackageController::class)->group(function (){
+                Route::post('archive-package-add','store')->name('add.archive.package');
+                Route::post('archive-package-edit','edit')->name('edit.archive.package');
+                Route::post('archive-package-update','update')->name('update.archive.package');
+                Route::post('archive-package-delete','destroy')->name('delete.archive.package');
+            });
         });//3.2.1 End
         Route::controller(CompanySetupController::class)->group(function (){
             Route::middleware(['permission:add_user_company_permission'])->group(function (){

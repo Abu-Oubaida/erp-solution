@@ -99,6 +99,32 @@
                 <div class="card">
                     <div class="card-header"><h3><i class="fa-solid fa-chart-pie"></i> Company Wise Storage Information</h3></div>
                     <div class="card-body">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Total Storage</th>
+                                <th>Used Storage</th>
+                                <th>Free Storage</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @if($company_wise_storage)
+                                @foreach($company_wise_storage as $c)
+                                    <tr>
+                                        <td>{{$c['company_name']}}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <a href="" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> View</a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                            </tbody>
+                        </table>
 
                     </div>
                 </div>
