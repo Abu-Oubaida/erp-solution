@@ -49,7 +49,7 @@ class DataArchivePackageController extends Controller
             {
                 $validate = $request->validate([
                     'package_name' => ['required','string','max:255','unique:data_archive_storage_packages,package_name'],
-                    'package_size' => ['required','numeric','max:255'],
+                    'package_size' => ['required','numeric'],
                     'package_status' => ['required','in:0,1'],
                 ]);
                 extract($validate);
@@ -140,7 +140,7 @@ class DataArchivePackageController extends Controller
             {
                 $validate = $request->validate([
                     'package_id' => ['required','integer','exists:data_archive_storage_packages,id'],
-                    'package_name' => ['required','string','max:255', Rule::unique('data_archive_storage_packages','package_name')->ignore($request->post('package_id'))],
+                    'package_name' => ['required','string', Rule::unique('data_archive_storage_packages','package_name')->ignore($request->post('package_id'))],
                     'package_size' => ['required','numeric','max:255'],
                     'package_status' => ['required','in:0,1'],
                 ]);
