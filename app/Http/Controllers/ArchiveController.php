@@ -648,6 +648,7 @@ class ArchiveController extends Controller
                 extract($request->post());
 //                $companyID = $this->getCompanyModulePermissionWise($permission)->where('id',$company_id)->first('id');
 //                $dataType = $this->archiveTypeList($permission)->where('company_id',$companyID->id)->where('id',$data_type)->where('status',1)->select('id','voucher_type_title')->first();
+
                 $voucherInfos = $this->archiveListInfo($company_id, $data_type);
                 $view = view('back-end/archive/_archive_quick_list', compact('voucherInfos'))->render();
                 return response()->json([
@@ -703,6 +704,7 @@ class ArchiveController extends Controller
                 $query->select('id', 'name'); // Adjust the columns in updatedBY (User model)
             }])
             ->where('company_id', $company_id)
+            ->whereIn('project_id', $this->getUserProjectPermissions($this->user->id, $this->permissions()->archive_data_list_quick)->pluck('id')->toArray())
             ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes($company_id)->pluck('id')->toArray())
             ->where('voucher_type_id',$type_id)->get();
     }
