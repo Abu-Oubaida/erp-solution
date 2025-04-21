@@ -1313,6 +1313,7 @@ class ArchiveController extends Controller
                     'company_id' => $company->id,
                     'company_name' => $company->company_name,
                     'company_code' => $company->company_code,
+                    'company_storage_package' => $company->archiveStorage,
                     'company_used_storage' => round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2),
                 ];
             });

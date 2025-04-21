@@ -6,7 +6,7 @@
 </script>
 @if (auth()->user()->hasPermission('archive_chart_view'))
     <div class="row">
-        <div class="col-xl-6 col-md-12 mb-2">
+        <div class="col mb-2">
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fa-solid fa-hard-drive"></i> Storage Information Details</h3>
@@ -91,7 +91,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-6 col-md-12">
+        <div class="col">
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fa-solid fa-chart-column"></i> Last 7 Days Uploaded Documents</h3>
