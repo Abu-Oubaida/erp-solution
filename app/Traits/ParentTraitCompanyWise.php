@@ -437,7 +437,20 @@ trait ParentTraitCompanyWise
     }
     private function archiveTypeList($permission)
     {
-        $voucherTypes = VoucherType::withCount(['voucherWithUsers','archiveDocuments','archiveDocumentInfos'])->with(['voucherWithUsers','createdBY','updatedBY','company','archiveDocumentInfos','archiveDocuments']);
+        $permittedProjectIds = $this->getUserProjectPermissions($this->user->id, $permission)
+            ->pluck('id')
+            ->toArray();
+        $voucherTypes = VoucherType::withCount(['voucherWithUsers',
+            // Filtered count for archiveDocuments
+            'archiveDocuments as archive_documents_count' => function ($query) use ($permittedProjectIds) {
+                $query->whereIn('project_id', $permittedProjectIds);
+            },
+            // Filtered count for archiveDocumentInfos
+            'archiveDocumentInfos as archive_document_infos_count' => function ($query) use ($permittedProjectIds) {
+                $query->whereIn('project_id', $permittedProjectIds);
+            },
+            ])
+            ->with(['voucherWithUsers','createdBY','updatedBY','company','archiveDocumentInfos','archiveDocuments']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $voucherTypes;
