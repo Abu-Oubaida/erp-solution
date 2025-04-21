@@ -4,8 +4,9 @@
 <script>
     Chart.register(ChartDataLabels);
 </script>
-@if (auth()->user()->hasPermission('archive_chart_view'))
+@if (auth()->user()->hasPermission('archive_storage_view') || auth()->user()->hasPermission('archive_uploaded_last_week_view'))
     <div class="row">
+    @if (auth()->user()->hasPermission('archive_storage_view'))
         <div class="col mb-2">
             <div class="card">
                 <div class="card-header">
@@ -91,6 +92,43 @@
                 </div>
             </div>
         </div>
+        <script>
+            var ctx = document.getElementById('levelChart').getContext('2d');
+            var levelChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ["Free", 'Archive', 'Other', ],
+                    datasets: [{
+                        label: 'Disk Usage',
+                        data: [{!! @$diskFree !!}, {!! @$archiveUsed !!}, {!! @$otherUsed !!}, ],
+                        backgroundColor: [
+                            'rgb(54, 162, 235)', // Free - Blue
+                            'rgb(255, 99, 132)', // Archive Used
+                            'rgb(255, 205, 86)' // Other Used
+                        ],
+                        borderColor: [
+                            'rgb(54, 162, 235)', // Free - Blue
+                            'rgb(255, 99, 132)', // Archive Used
+                            'rgb(255, 205, 86)' // Other Used
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        datalabels: {
+                            display: false
+                        }
+                    }
+                }
+            })
+        </script>
+    @endif
+    @if (auth()->user()->hasPermission('archive_uploaded_last_week_view'))
         <div class="col">
             <div class="card">
                 <div class="card-header">
@@ -105,8 +143,88 @@
                 </div>
             </div>
         </div>
+        @if ($documentCountsPerDay)
+        <script>
+            var documentData = {!! json_encode($documentCountsPerDay) !!};
+            var dataValues = Object.values(documentData).map(Number);
+            var stepSize = 10;
+            var maxYValue = Math.ceil(Math.max(...dataValues) / stepSize) * stepSize + stepSize;
+
+            var barCtx = document.getElementById('documentTypeChart').getContext('2d');
+
+            var documentTypeChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys({!! json_encode($documentCountsPerDay) !!}),
+                    datasets: [{
+                        label: 'Documents Uploaded Last 7 Days',
+                        data: Object.values({!! json_encode($documentCountsPerDay) !!}).map(Number),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(255, 159, 64, 0.5)',
+                            'rgba(255, 205, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(153, 102, 255, 0.5)',
+                            'rgba(201, 203, 207, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(255, 159, 64, 0.5)',
+                            'rgba(255, 205, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(153, 102, 255, 0.5)',
+                            'rgba(201, 203, 207, 0.5)'
+                        ],
+                        borderWidth: 1,
+                        barPercentage: 0.5, //Decrease width of bars, 50% of the available space for each bar
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false // Hides the legend
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.parsed.y} documents`; // Custom tooltip text
+                                }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            // color: '#000000', // Light gray color for data labels
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function(value, context) {
+                                return value; // Simply displays the value
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: maxYValue, // Y-axis range from 0 to max
+                            ticks: {
+                                stepSize: stepSize // Increase by 10, i.e., 0, 10, 20
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels] // Enables the ChartDataLabels plugin
+            });
+        </script>
+        @endif
+    @endif
     </div>
 @endif
+@if(auth()->user()->hasPermission('archive_uploaded_by_user_data_view'))
 <div class="row mt-2">
     <div class="col">
         <div class="card">
@@ -181,11 +299,7 @@
                                             'stack' => 'Stack 0',
                                         ];
                                     }
-                                    // Calculate max count for any user's total documents
-//                                $totalDocumentCount = collect($today_uploaded_data_by_users)->map(function ($item) {
-//                                    return $item['document_counts']->sum();
-//                                })->max() + 40; // Add extra 2
-$user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
+                                $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
                                 @endphp
                                 <canvas id="user-wise-data-uploaded-today" width="400" height="200"></canvas>
                             @endif
@@ -196,169 +310,6 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
         </div>
     </div>
 </div>
-<div class="row mt-3">
-    @if (isset($dataTypes) && count($dataTypes))
-        @php
-            $colors = ['info-light', 'success-light', 'primary-light', 'warning-light', 'secondary-light'];
-            $prevColor = null;
-            $prevPrevColor = null;
-        @endphp
-        @foreach ($dataTypes as $dataType)
-            @php
-                // Filter available colors
-                $availableColors = array_filter($colors, function ($color) use ($prevColor, $prevPrevColor) {
-                    return $color !== $prevColor && $color !== $prevPrevColor;
-                });
-
-                $availableColors = array_values($availableColors);
-                $chosenColor = $availableColors[array_rand($availableColors)];
-
-                // Update tracking colors
-                $prevPrevColor = $prevColor;
-                $prevColor = $chosenColor;
-            @endphp
-            <div class="col-md-3">
-                <div class="card bg-{{ $chosenColor }} sub-card  mb-4">
-                    <div class="card-header">
-                        <h5 class="text-capitalize"><i class="fas fa-file-lines"></i> {!! $dataType['voucher_type_title'] !!}
-                            ({!! $dataType['company_name'] !!})
-                        </h5>
-                    </div>
-                    <div class="card-body text-capitalize">
-                        <div class="row">
-                            <div class="col text-start">
-                                <h2 class="card-heading-text-color">{!! $dataType['archive_document_infos_count'] !!}</h2>
-                                <a class="small  stretched-link text-decoration-none" href="{!! route('uploaded.archive.list.quick', ['c' => $dataType['company_id'], 't' => $dataType['id']]) !!}"
-                                    target="_blank">Reference <i class="fas fa-angle-right"></i></a>
-                            </div>
-                            <div class="col text-end">
-                                <h2 class="card-heading-text-color">{!! $dataType['archive_documents_count'] !!}</h2>
-                                <a class="small  stretched-link text-decoration-none" href="{!! route('uploaded.archive.list.quick', ['c' => $dataType['company_id'], 't' => $dataType['id']]) !!}"
-                                    target="_blank">Documents <i class="fas fa-angle-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endforeach
-    @endif
-</div>
-
-@if ($otherUsed)
-    <script>
-        var ctx = document.getElementById('levelChart').getContext('2d');
-        var levelChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ["Free", 'Archive', 'Other', ],
-                datasets: [{
-                    label: 'Disk Usage',
-                    data: [{!! @$diskFree !!}, {!! @$archiveUsed !!}, {!! @$otherUsed !!}, ],
-                    backgroundColor: [
-                        'rgb(54, 162, 235)', // Free - Blue
-                        'rgb(255, 99, 132)', // Archive Used
-                        'rgb(255, 205, 86)' // Other Used
-                    ],
-                    borderColor: [
-                        'rgb(54, 162, 235)', // Free - Blue
-                        'rgb(255, 99, 132)', // Archive Used
-                        'rgb(255, 205, 86)' // Other Used
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    datalabels: {
-                        display: false
-                    }
-                }
-            }
-        })
-    </script>
-@endif
-@if ($documentCountsPerDay)
-    <script>
-        var documentData = {!! json_encode($documentCountsPerDay) !!};
-        var dataValues = Object.values(documentData).map(Number);
-        var stepSize = 10;
-        var maxYValue = Math.ceil(Math.max(...dataValues) / stepSize) * stepSize + stepSize;
-
-        var barCtx = document.getElementById('documentTypeChart').getContext('2d');
-
-        var documentTypeChart = new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys({!! json_encode($documentCountsPerDay) !!}),
-                datasets: [{
-                    label: 'Documents Uploaded Last 7 Days',
-                    data: Object.values({!! json_encode($documentCountsPerDay) !!}).map(Number),
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.5)',
-                        'rgba(255, 159, 64, 0.5)',
-                        'rgba(255, 205, 86, 0.5)',
-                        'rgba(75, 192, 192, 0.5)',
-                        'rgba(54, 162, 235, 0.5)',
-                        'rgba(153, 102, 255, 0.5)',
-                        'rgba(201, 203, 207, 0.5)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 0.5)',
-                        'rgba(255, 159, 64, 0.5)',
-                        'rgba(255, 205, 86, 0.5)',
-                        'rgba(75, 192, 192, 0.5)',
-                        'rgba(54, 162, 235, 0.5)',
-                        'rgba(153, 102, 255, 0.5)',
-                        'rgba(201, 203, 207, 0.5)'
-                    ],
-                    borderWidth: 1,
-                    barPercentage: 0.5, //Decrease width of bars, 50% of the available space for each bar
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false // Hides the legend
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return ` ${context.parsed.y} documents`; // Custom tooltip text
-                            }
-                        }
-                    },
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'end',
-                        // color: '#000000', // Light gray color for data labels
-                        font: {
-                            weight: 'bold'
-                        },
-                        formatter: function(value, context) {
-                            return value; // Simply displays the value
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: maxYValue, // Y-axis range from 0 to max
-                        ticks: {
-                            stepSize: stepSize // Increase by 10, i.e., 0, 10, 20
-                        }
-                    }
-                }
-            },
-            plugins: [ChartDataLabels] // Enables the ChartDataLabels plugin
-        });
-    </script>
-@endif
 @if ($today_uploaded_data_by_users)
     <script>
         var today_ctx = document.getElementById('user-wise-data-uploaded-today').getContext('2d');
@@ -448,3 +399,51 @@ $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
         new Chart(today_ctx, config);
     </script>
 @endif
+@endif
+<div class="row mt-3">
+    @if (isset($dataTypes) && count($dataTypes))
+        @php
+            $colors = ['info-light', 'success-light', 'primary-light', 'warning-light', 'secondary-light'];
+            $prevColor = null;
+            $prevPrevColor = null;
+        @endphp
+        @foreach ($dataTypes as $dataType)
+            @php
+                // Filter available colors
+                $availableColors = array_filter($colors, function ($color) use ($prevColor, $prevPrevColor) {
+                    return $color !== $prevColor && $color !== $prevPrevColor;
+                });
+
+                $availableColors = array_values($availableColors);
+                $chosenColor = $availableColors[array_rand($availableColors)];
+
+                // Update tracking colors
+                $prevPrevColor = $prevColor;
+                $prevColor = $chosenColor;
+            @endphp
+            <div class="col-md-3">
+                <div class="card bg-{{ $chosenColor }} sub-card  mb-4">
+                    <div class="card-header">
+                        <h5 class="text-capitalize"><i class="fas fa-file-lines"></i> {!! $dataType['voucher_type_title'] !!}
+                            ({!! $dataType['company_name'] !!})
+                        </h5>
+                    </div>
+                    <div class="card-body text-capitalize">
+                        <div class="row">
+                            <div class="col text-start">
+                                <h2 class="card-heading-text-color">{!! $dataType['archive_document_infos_count'] !!}</h2>
+                                <a class="small  stretched-link text-decoration-none" href="{!! route('uploaded.archive.list.quick', ['c' => $dataType['company_id'], 't' => $dataType['id']]) !!}"
+                                    target="_blank">Reference <i class="fas fa-angle-right"></i></a>
+                            </div>
+                            <div class="col text-end">
+                                <h2 class="card-heading-text-color">{!! $dataType['archive_documents_count'] !!}</h2>
+                                <a class="small  stretched-link text-decoration-none" href="{!! route('uploaded.archive.list.quick', ['c' => $dataType['company_id'], 't' => $dataType['id']]) !!}"
+                                    target="_blank">Documents <i class="fas fa-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @endif
+</div>
