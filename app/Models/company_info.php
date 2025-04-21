@@ -45,4 +45,9 @@ class company_info extends Model
     {
         return $this->hasMany(department::class,'company_id');
     }
+
+    public function archiveStorage()
+    {
+        return $this->hasMany(Company_wise_archive_storage_info::class,'company_id');
+    }
 }

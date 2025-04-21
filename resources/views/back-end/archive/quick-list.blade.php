@@ -36,7 +36,7 @@
                             </div>
                             <div class="col-md-4 mb-1">
                                 <div class="">
-                                    <label for="projects">Projects<span class="text-danger">*</span></label>
+                                    <label for="projects">Projects</label>
                                     <select class="form-control text-capitalize select-search" name="projects" id="projects" multiple>
                                         <option value="">--Select options--</option>
                                     </select>
@@ -44,7 +44,7 @@
                             </div>
                             <div class="col-md-4 mb-1">
                                 <div class="">
-                                    <label for="data_types">Data Types<span class="text-danger">*</span></label>
+                                    <label for="data_types">Data Types</label>
                                     <select class="form-control text-capitalize select-search" name="data_type" id="data_types" multiple>
                                         @if(request()->get('t') && isset($dataType))
                                             <option value="{!! $dataType->id !!}" selected>{!! $dataType->voucher_type_title !!}</option>
@@ -57,13 +57,13 @@
                     </div>
                     <div class="col-md-2 mb-1">
                         <div class="">
-                            <label for="from_date">From Date<span class="text-danger">*</span></label>
+                            <label for="from_date">From Date</label>
                             <input class="form-control" type="date" name="from_date" id="from_date">
                         </div>
                     </div>
                     <div class="col-md-2 mb-1">
                         <div class="">
-                            <label for="to_date">To Date<span class="text-danger">*</span></label>
+                            <label for="to_date">To Date</label>
                             <input class="form-control" type="date" name="to_date" id="to_date">
                         </div>
                     </div>

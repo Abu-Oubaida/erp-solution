@@ -8,6 +8,7 @@ use App\Models\branch;
 use App\Models\BranchType;
 use App\Models\company_info;
 use App\Models\CompanyModulePermission;
+use App\Models\Data_archive_storage_package;
 use App\Models\department;
 use App\Models\Designation;
 use App\Models\Document_requisition_info;
@@ -131,7 +132,7 @@ trait ParentTraitCompanyWise
         }
         $otherCompanyPermissionIDs = PermissionUser::whereIn('company_id',$companyModulePermission)->where('user_id',$this->user->id)->where('permission_name',$operation_permission_name)->pluck('company_id')->unique()->toArray();
         $companyPermissionIDs = array_merge($companyPermissionIDs,$otherCompanyPermissionIDs);
-        $object = company_info::with(['createdBy','updatedBy','users','companyType','fixedAssets','permissionUsers']);
+        $object = company_info::with(['createdBy','updatedBy','users','companyType','fixedAssets','permissionUsers','archiveStorage']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;
@@ -452,8 +453,11 @@ trait ParentTraitCompanyWise
                 $voucherTypeUserPermissions = Voucher_type_permission_user::where('user_id',$this->user->id)->pluck('voucher_type_id')->toArray();
                 $permittedProjectIds = $this->getUserProjectPermissions($this->user->id, $permission)->pluck('id')->toArray();
 //                dd($permittedProjectIds);
-                $archive_type_lists = $voucherTypes->whereHas('archiveDocumentInfos', function ($query) use ($permittedProjectIds) {
-                    $query->whereIn('project_id', $permittedProjectIds);
+                $archive_type_lists = $voucherTypes->where(function ($query) use ($permittedProjectIds){
+                    $query->whereDoesntHave('archiveDocumentInfos');
+                    $query->orWhereHas('archiveDocumentInfos', function ($query) use ($permittedProjectIds) {
+                        $query->whereIn('project_id', $permittedProjectIds);
+                    });
                 })->whereIn('id',$voucherTypeUserPermissions);
                 return $archive_type_lists;
             }
@@ -477,5 +481,15 @@ trait ParentTraitCompanyWise
             $size += is_file($path) ? filesize($path) : $this->getFolderSize($path);
         }
         return $size;
+    }
+
+    protected function getStoragePackages()
+    {
+        return Data_archive_storage_package::withCount('useesCompany')
+            ->with([
+                'createdBy:id,name',
+                'updatedBy:id,name',
+                'useesCompany:id,company_name'
+            ]);
     }
 }
