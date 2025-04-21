@@ -44,6 +44,10 @@ class DataArchiveDashboardController extends Controller
                 ]);
                 extract($request->post());
                 $company = company_info::find($company_id);
+                $permittedProjectIds = $this->getUserProjectPermissions($this->user->id, $permission)
+                    ->pluck('id')
+                    ->toArray();
+
                 $path = env('APP_ARCHIVE_DATA');
                 $company_dir = $path.'/'.$company->company_code;
                 if (!is_dir($company_dir)) {
@@ -65,7 +69,9 @@ class DataArchiveDashboardController extends Controller
                     ->pluck('id')
                     ->unique()
                     ->count();
-                $accountVoucherInfosCount = Account_voucher::whereIn('voucher_type_id',$this->archiveTypeList($permission)->pluck('id')->toArray())->where('company_id',$company->id)->distinct()->count('id');
+                $accountVoucherInfosCount = Account_voucher::whereIn('voucher_type_id',$this->archiveTypeList($permission)->pluck('id')->toArray())
+                    ->whereIn('project_id',$permittedProjectIds)
+                    ->where('company_id',$company->id)->distinct()->count('id');
 
                 $today = today();
                 $today_uploaded_data_by_users = User::with(['archiveDocuments.accountVoucherInfo.VoucherType'])->whereHas('archiveDocuments', function ($query) use ($today, $company) {
