@@ -48,6 +48,11 @@
 
     </div>
 @endif
+<style>
+    #fixedDiv2 tr th input{
+        font-size: 12px!important;
+    }
+</style>
 <table class="table table-sm table-hover" @if(isset($voucherInfos) && count($voucherInfos)) id="DataTable2" @endif>
     <thead class="">
     <tr class="bg-secondary text-chl-white">
@@ -58,7 +63,7 @@
         <th>Date</th>
         <th>Company</th>
         <th>Project</th>
-        <th title="Reference Number">Ref. Number</th>
+        <th title="Reference Number" style="width: 10%">Ref. Number</th>
         <th>Type</th>
         <th style="width: 25%">Document</th>
         <th>Upload Date</th>
