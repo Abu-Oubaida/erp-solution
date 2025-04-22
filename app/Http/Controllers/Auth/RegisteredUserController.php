@@ -21,12 +21,13 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create()
     {
         try {
-            $depts = department::where('status',1)->get();
-            $branches = branch::where('status',1)->get();
-            return view('auth.register',compact('depts','branches'));
+            return back()->with('error','Page not found! Please contact to system admin.');
+//            $depts = department::where('status',1)->get();
+//            $branches = branch::where('status',1)->get();
+//            return view('auth.register',compact('depts','branches'));
         }catch (\Throwable $exception)
         {
             return back();
@@ -39,67 +40,68 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        $request->validate([
-            'name'  => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'numeric', 'unique:'.User::class],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'dept'  => ['required', 'exists:departments,id'],
-            'branch'  => ['required', 'exists:branches,id'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-        extract($request->post());
-        try {
-            $deptInfo = department::where('id',$dept)->first();
-            $branch = branch::where('id',$branch)->first();
-            $dept = department::where('id',$dept)->first();
-            $userController = new UserController();
-            $joining_date = date(now());
-            $eid = $userController->getEid($dept,$joining_date);
-//            if ($branch->branch_type == 'head office') $header = 'H'; else $header = "P";
-//            $priviusUsers = User::where('status',1)->where('dept_id',$dept)->get();
-//            $priviusUserCount = count($priviusUsers);
-////            dd($priviusUserCount >= 10 && $priviusUserCount < 100);
-//            if ($priviusUserCount < 10)
-//            {
-//                $priviusUserCount++;
-//                $empID = ($header.$deptInfo->dept_code."00").$priviusUserCount;
-//            }
-//            elseif ($priviusUserCount >= 10 && $priviusUserCount < 100)
-//            {
-//                $priviusUserCount++;
-//                $empID = ($header.$deptInfo->dept_code."0").$priviusUserCount;
-//            }
-//            else {
-//                $priviusUserCount++;
-//                $empID = $header.$deptInfo->dept_code.$priviusUserCount;
-//            }
-
-            $user = User::create([
-                'employee_id' => $eid[1],
-                'employee_id_hidden'    => $eid[0],
-                'name' => $name,
-                'phone' => $phone,
-                'email' => $email,
-                'dept_id' => $deptInfo->id,
-                'status' => 0,
-                'branch_id' => $branch->id,
-                'joining_date' => date('y-m-d',strtotime($joining_date)),
-                'password' => Hash::make($request->password),
-            ]);
-
-            $user->attachRole('user');
-            event(new Registered($user));
-            return back()->with('success','Account create successfully');
-
-//            Auth::login($user);
-
-//            return redirect(RouteServiceProvider::HOME);
-        }catch (\Throwable $exception)
-        {
-            return back()->with('error',$exception->getMessage())->withInput();
-        }
+        return back()->with('error','Page not found! Please contact to system admin.');
+//        $request->validate([
+//            'name'  => ['required', 'string', 'max:255'],
+//            'phone' => ['required', 'numeric', 'unique:'.User::class],
+//            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+//            'dept'  => ['required', 'exists:departments,id'],
+//            'branch'  => ['required', 'exists:branches,id'],
+//            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+//        ]);
+//        extract($request->post());
+//        try {
+//            $deptInfo = department::where('id',$dept)->first();
+//            $branch = branch::where('id',$branch)->first();
+//            $dept = department::where('id',$dept)->first();
+//            $userController = new UserController();
+//            $joining_date = date(now());
+//            $eid = $userController->getEid($dept,$joining_date);
+////            if ($branch->branch_type == 'head office') $header = 'H'; else $header = "P";
+////            $priviusUsers = User::where('status',1)->where('dept_id',$dept)->get();
+////            $priviusUserCount = count($priviusUsers);
+//////            dd($priviusUserCount >= 10 && $priviusUserCount < 100);
+////            if ($priviusUserCount < 10)
+////            {
+////                $priviusUserCount++;
+////                $empID = ($header.$deptInfo->dept_code."00").$priviusUserCount;
+////            }
+////            elseif ($priviusUserCount >= 10 && $priviusUserCount < 100)
+////            {
+////                $priviusUserCount++;
+////                $empID = ($header.$deptInfo->dept_code."0").$priviusUserCount;
+////            }
+////            else {
+////                $priviusUserCount++;
+////                $empID = $header.$deptInfo->dept_code.$priviusUserCount;
+////            }
+//
+//            $user = User::create([
+//                'employee_id' => $eid[1],
+//                'employee_id_hidden'    => $eid[0],
+//                'name' => $name,
+//                'phone' => $phone,
+//                'email' => $email,
+//                'dept_id' => $deptInfo->id,
+//                'status' => 0,
+//                'branch_id' => $branch->id,
+//                'joining_date' => date('y-m-d',strtotime($joining_date)),
+//                'password' => Hash::make($request->password),
+//            ]);
+//
+//            $user->attachRole('user');
+//            event(new Registered($user));
+//            return back()->with('success','Account create successfully');
+//
+////            Auth::login($user);
+//
+////            return redirect(RouteServiceProvider::HOME);
+//        }catch (\Throwable $exception)
+//        {
+//            return back()->with('error',$exception->getMessage())->withInput();
+//        }
 
     }
 

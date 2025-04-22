@@ -125,10 +125,14 @@
                                 <td>
                                     <a class="text-primary" href="#" title="Quick View" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview')"> <i class="fa-solid fa-eye"></i></a>
                                     &nbsp;
-                                    <a class="text-success" href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
+                                    <a class="text-info" href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
+                                    @if(auth()->user()->hasPermission('archive_document_download'))
+                                        &nbsp
+                                        <a class="text-success" href="{!! route('view.archive.document',['ocr'=>1,'vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View or Download" target="_blank"><i class="fa-solid fa-download"></i></a>
+                                    @endif
                                     &nbsp
                                     @if(auth()->user()->hasPermission('share_archive_data_individual'))
-                                        <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fas fa-share"></i></a>
+                                        <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fa-solid fa-envelope"></i></a>
                                     @endif
                                     &nbsp
                                     @if(auth()->user()->hasPermission('delete_archive_document_individual'))
@@ -154,7 +158,7 @@
                 <td>{!! date('d-M-y', strtotime($data->created_at)) !!}</td>
                 <td>{!! ($data->updatedBY)? $data->updatedBY->name:'-' !!}</td>
                 <td>
-                    @if(auth()->user()->hasPermission('archive_document_edit'))
+                    @if(auth()->user()->hasPermission('archive_edit'))
                     <a href="{{route('edit.archive.info',["archiveDocumentID"=>\Illuminate\Support\Facades\Crypt::encryptString($data->id)])}}" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
                     @endif
                     @if(auth()->user()->hasPermission('share_archive_data'))

@@ -820,36 +820,6 @@ class ArchiveController extends Controller
             ]);
         }
     }
-    // {
-    //     if ($this->user->isSystemSuperAdmin() || $this->user->companyWiseRoleName() == 'superadmin')
-    //     {
-    //         if ($company_id == null)
-    //         {
-    //             $userWiseVoucherTypePermissionId = VoucherType::all()->pluck('id')->toArray();
-    //         }
-    //         else {
-    //             $userWiseVoucherTypePermissionId = VoucherType::where('company_id',$company_id)->get()->pluck('id')->toArray();
-    //         }
-    //     }
-    //     else
-    //     {
-    //         if ($company_id == null)
-    //         {
-    //             $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
-    //         }
-    //         else {
-    //             $userWiseVoucherTypePermissionId = Voucher_type_permission_user::where('company_id',$company_id)->where('user_id',$this->user->id)->get()->pluck('voucher_type_id')->toArray();
-    //         }
-    //     }
-    //     if ($company_id == null)
-    //     {
-    //         return VoucherType::where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
-    //     }
-    //     else{
-    //         return VoucherType::where('company_id',$company_id)->where('status',1)->whereIn('id',$userWiseVoucherTypePermissionId)->get();
-    //     }
-
-    // }
     public function companyWiseProjectsAndDataType(Request $request)
     {
         try {
@@ -894,7 +864,7 @@ class ArchiveController extends Controller
         }
     }
 
-    public function archiveDocumentEdit(Request $request, $vID)
+    public function archiveEdit(Request $request, $vID)
     {
         try {
             $permission = $this->permissions()->edit_archive_data_type;
@@ -907,6 +877,45 @@ class ArchiveController extends Controller
             $voucherInfo = Account_voucher::with(['VoucherDocument','VoucherType','createdBY','updatedBY','voucherDocuments','company.projects'])->find($vID);
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             return view('back-end/archive/edit',compact('voucherTypes','voucherInfo','companies'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
+    public function archiveDocumentEdit(Request $request)
+    {
+        try {
+            if ($request->post())
+            {
+                $validated = $request->validate([
+                    'id' => ['required', 'integer', 'exists:voucher_documents,id'],
+                    'document' => ['required', 'file', 'max:512000'], // max in kilobytes (500 MB)
+                ]);
+                extract($validated);
+                $oldFile = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType','company'])->find($id);
+//                dd($oldFile);
+                $company_code = $oldFile->company->company_code;
+                $file_path = $oldFile->filepath;
+                $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
+                $oldFilePath = $destinationPath.'/'.$oldFile->document;
+                if ($file = $request->file('document')) {
+                    $fileName = $oldFile->accountVoucherInfo->voucher_number."_".$oldFile->accountVoucherInfo->VoucherType->voucher_type_title."_".now()->format('Ymd_His')."_".$file->getClientOriginalName();
+                    if (!$file->move($destinationPath,$fileName))
+                    {
+                        throw new \Exception('Failed to upload file ['.$file->getClientOriginalName().']');
+                    }
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+                    $oldFile->update([
+                        'document'   => $fileName,
+                        'updated_by' => $this->user->id,
+                        'updated_at' => now(),
+                    ]);
+                    return back()->with('success','Document updated successfully');
+                }
+            }
+            throw new \Exception('Request method not supported!');
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
