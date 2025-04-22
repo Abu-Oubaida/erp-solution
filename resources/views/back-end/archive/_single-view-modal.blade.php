@@ -189,11 +189,6 @@
                     });
                 });
             </script>
-
-
-            <script>
-                document.addEventListener('contextmenu', event => event.preventDefault());
-            </script>
         </div>
     @elseif ($fileExtension === ['mp4'])
         <video controls style="width: 80%">
@@ -212,3 +207,6 @@
 
     @endif
 </div>
+<script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+</script>

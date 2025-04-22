@@ -316,9 +316,12 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['post','get'],'archive-data-upload','create')->name('add.archive.info');
         });
 //        Route::middleware(['permission:voucher_document_edit'])->group(function () {
-        Route::middleware(['permission:archive_document_edit'])->group(function () {
-            Route::match(['put','get'],'edit-archive-data/{archiveDocumentID}','archiveDocumentEdit')->name('edit.archive.info');
+        Route::middleware(['permission:archive_edit'])->group(function () {
+            Route::match(['put','get'],'edit-archive-data/{archiveDocumentID}','archiveEdit')->name('edit.archive.info');
             Route::put('linked-uploaded-document','linkedUploadedDocument')->name('linked.uploaded.document');
+        });
+        Route::middleware(['permission:archive_document_edit'])->group(function () {
+            Route::match(['post'],'edit-archive-document','archiveDocumentEdit')->name('archive.document.update');
         });
 //        Route::middleware(['permission:voucher_document_delete'])->group(function () {
         Route::middleware(['permission:archive_data_delete','permission:multiple_archive_data_delete'])->group(function () {

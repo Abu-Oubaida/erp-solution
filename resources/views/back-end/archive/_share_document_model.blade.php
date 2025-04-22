@@ -6,7 +6,7 @@
     <div class="modal-body">
         <div class="row">
             <div class="col-md-12">
-                <span><i class="fa-regular fa-envelope"></i> You can share your document link via email <sup class="text-danger">*</sup></span>
+                <span><i class="fa-regular fa-envelope"></i> Email Address: <sup class="text-danger">*</sup> <small><b>Note:  Insert Space ( )/Comma (,) After Every Email Address</b></small></span>
                 <div class="form-floating mb-3">
                     <div class="tags-input" id="tags-input">
                         <input class="tag-input" type="text" list="users_email_list" placeholder="Add a people and group *" id="tag-input" onkeyup="return Obj.tagInput(this)">
@@ -42,12 +42,12 @@
             </div>
             <div class="col-md-12">
                 <br>
-                <span><i class="fa-solid fa-earth-americas"></i> Anyone on the internet of this system with the link can view</span>
+                <span><i class="fa-solid fa-earth-americas"></i> Generate Online Link</span>
             </div>
             <div class="col-md-2">
                 <div class="form-group mb-3">
                     <select class="form-control" name="voucher_type" id="voucher_type" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($result->id) !!}" onchange="return Obj.archiveShareType(this)">
-                        <option value="0">--Select Option--</option>
+                        <option value="0">--Select--</option>
                         <option value="1">Only view</option>
                         <option value="2">View/Download</option>
                     </select>
@@ -62,13 +62,13 @@
                 <button class="btn btn-success" onclick="return Obj.copyDocumentShareLink(this)" type="button"><i class="fa-regular fa-copy"></i> Copy link</button>
             </div>
             <div class="col-md-12">
-                <span><i class="fa-regular fa-envelope"></i> This document share via email list</span>
+                <span><i class="fa-regular fa-envelope"></i> This document had been shared with the following emails</span>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Share ID</th>
-                            <th>Share Emails</th>
-                            <th>Share Status</th>
+                            <th>ID</th>
+                            <th>Emails</th>
+                            <th>Status</th>
                             <th>Share By</th>
                             <th>Action</th>
                         </tr>

@@ -36,7 +36,7 @@
                 </table>
             </div>
             <div class="col-md-12">
-                <h5><i class="fa-regular fa-envelope"></i> You can share your document link via email <sup class="text-danger">*</sup></h5>
+                <span><i class="fa-regular fa-envelope"></i> Email Address: <sup class="text-danger">*</sup> <small><b>Note:  Insert Space ( )/Comma (,) After Every Email Address</b></small></span>
                 <div class="form-floating mb-3">
                     <div class="tags-input" id="tags-input">
                         <input class="tag-input" type="text" list="users_email_list" placeholder="Add a people and group *" id="tag-input" onkeyup="return Obj.tagInput(this)">
@@ -59,9 +59,9 @@
             </div>
             <div class="col-md-12">
                 <div class="form-floating mb-3 float-end">
-                    <button class="btn btn-success" id="submit-tags" 
+                    <button class="btn btn-success" id="submit-tags"
                         data-ids='@json($voucherInfos->pluck("id"))'
-                        onclick="return Obj.sendArchiveEmailMultiple(this)" 
+                        onclick="return Obj.sendArchiveEmailMultiple(this)"
                         type="button">
                         <i class="fa-solid fa-share-from-square"></i> Send Mail
                     </button>
@@ -102,9 +102,9 @@
                     <thead>
                         <tr>
                             <th>Archive Reference</th>
-                            <th>Share ID</th>
-                            <th>Share Emails</th>
-                            <th>Share Status</th>
+                            <th>ID</th>
+                            <th>Emails</th>
+                            <th>Status</th>
                             <th>Shared By</th>
                             <th>Action</th>
                         </tr>
