@@ -30,8 +30,7 @@
     <style>
         /* Scrollbar Track */
         ::-webkit-scrollbar {
-            width: 2px;   /* Change this to resize width */
-            height: 2px;  /* For horizontal scrollbars */
+            width: 4px;   /* Change this to resize width */
         }
 
         /* Scrollbar Handle */
@@ -62,7 +61,7 @@
         #dragholder{
             position:absolute;
             height: 100%;
-            width: 5px;
+            width: 4px;
             /*background: blue;*/
             right:0;
             top:55%;
@@ -72,7 +71,8 @@
 
         #dragholder:hover{
             cursor: w-resize;
-            box-shadow: 10px 0 5px -2px rgba(46, 46, 46, 0.6);
+            /*box-shadow: 10px 0 5px -2px rgba(46, 46, 46, 0.6);*/
+            background: rgba(46, 46, 46, 0.6);
         }
 
         #layoutSidenav_content{
