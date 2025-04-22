@@ -27,6 +27,59 @@
 {{--        Chart.register(ChartDataLabels);--}}
 {{--    </script>--}}
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <style>
+        /* Scrollbar Track */
+        ::-webkit-scrollbar {
+            width: 2px;   /* Change this to resize width */
+            height: 2px;  /* For horizontal scrollbars */
+        }
+
+        /* Scrollbar Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 6px;
+        }
+
+        /* Scrollbar Track background */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        body{
+            margin:0;
+            padding:0;
+        }
+        #layoutSidenav{
+            display:flex;
+        }
+
+        #layoutSidenav_nav{
+            background: lightgreen;
+            height: 100vh;
+            width: 20%;
+            position:relative;
+        }
+
+        #dragholder{
+            position:absolute;
+            height: 100%;
+            width: 5px;
+            /*background: blue;*/
+            right:0;
+            top:55%;
+            transform: translate(-50%, -50%);
+            border-radius: 80px;
+        }
+
+        #dragholder:hover{
+            cursor: w-resize;
+            box-shadow: 10px 0 5px -2px rgba(46, 46, 46, 0.6);
+        }
+
+        #layoutSidenav_content{
+            height:100vh;
+            width: 80%;
+        }
+    </style>
 </head>
 {{--<body class="sb-nav-fixed sb-sidenav-toggled">--}}
 <body class="sb-nav-fixed">
@@ -45,6 +98,7 @@
 {{--<div id="layoutSidenav" class="bg-image-dashboard" style="background-image: linear-gradient(to bottom, rgba(245, 246, 252, 0.52), rgba(117, 19, 93, 0.73)), url({{url("image/bg/chl-2.jpg")}});">--}}
 <div id="layoutSidenav" class="bg-image-dashboard">
     <div id="layoutSidenav_nav">
+        <div id="dragholder"></div>
         @include("layouts.back-end._left-sidebar")
     </div>
     <div id="layoutSidenav_content">
@@ -103,5 +157,28 @@
     </div>
 </div>
 <x-back-end._footer-script/>
+
+<script>
+    let sidebar = document.getElementById("layoutSidenav_nav");
+    let main_content = document.getElementById("layoutSidenav_content");
+    let dragholder = document.getElementById('dragholder');
+    function onMouseMove(e){
+        sidebar.style.cssText = `width: ${ e.pageX }px`;
+        main_content.style.cssText = `padding-left: ${ e.pageX }px`;
+    }
+
+    function onMouseDown(e){
+        document.addEventListener('mousemove',onMouseMove);
+    }
+
+    function onMouseUp(e){
+        document.removeEventListener('mousemove',onMouseMove);
+    }
+
+    dragholder.addEventListener('mousedown', onMouseDown);
+    dragholder.addEventListener('mouseup', onMouseUp);
+    main_content.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mouseup', onMouseUp);
+</script>
 </body>
 </html>
