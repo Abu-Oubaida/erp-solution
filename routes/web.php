@@ -16,6 +16,7 @@ use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\FixedAssetDistribution;
 use App\Http\Controllers\FixedAssetTransferController;
 use App\Http\Controllers\OpReferenceTypeController;
+use App\Http\Controllers\PreferenceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesInterfaceController;
 use App\Http\Controllers\ShareDocumentViewController;
@@ -77,6 +78,11 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['post','get'],'app-setting','appSetting')->name('app.setting');
         });
     });//3.1 End
+    Route::controller(PreferenceController::class)->group(function (){
+        // routes/web.php
+        Route::post('/save-sidebar-width', 'saveSidebarWidth');
+
+    });
 # 3.2 Send mail for document sharing
     Route::controller(ajaxRequestController::class)->group(function (){
 //        Route::middleware(['permission:share_voucher_document_individual'])->group(function (){

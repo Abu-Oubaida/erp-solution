@@ -1,6 +1,6 @@
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-chl-white">
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3 text-black" href="{{route('root')}}"><h5><img src="{{url("image/logo/default/icon/360.png")}}" alt="{{str_replace('-', '-', config('app.name'))}}" class="img-fluid" width="20%"> Smart Solution</h5></a>
+    <a class="navbar-brand ps-3 text-black" href="{{route('root')}}" id="app_logo"><h5><img src="{{url("image/logo/default/icon/360.png")}}" alt="{{str_replace('-', '-', config('app.name'))}}" class="img-fluid" style="max-width: 40px"> Smart Solution</h5></a>
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 text-chl-important" id="sidebarToggle"><i class="fas fa-bars"></i></button>
     @if(!empty(\Illuminate\Support\Facades\Auth::user()->companyInfo()->logo))
