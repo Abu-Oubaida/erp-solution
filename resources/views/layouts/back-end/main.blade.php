@@ -27,6 +27,9 @@
 {{--        Chart.register(ChartDataLabels);--}}
 {{--    </script>--}}
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    @php
+        $sidebarWidth = session('sidebar_width', 250); // default: 250px
+    @endphp
     <style>
         /* Scrollbar Track */
         ::-webkit-scrollbar {
@@ -52,7 +55,7 @@
         }
 
         #layoutSidenav_nav{
-            background: lightgreen;
+            /*background: lightgreen;*/
             height: 100vh;
             width: 20%;
             position:relative;
@@ -67,6 +70,7 @@
             top:55%;
             transform: translate(-50%, -50%);
             border-radius: 80px;
+            cursor: w-resize;
         }
 
         #dragholder:hover{
@@ -78,6 +82,15 @@
         #layoutSidenav_content{
             height:100vh;
             width: 80%;
+        }
+        #app_logo{
+            width: {{ $sidebarWidth }}px
+        }
+        .sb-nav-fixed #layoutSidenav #layoutSidenav_nav {
+            width: {{ $sidebarWidth }}px
+        }
+        .sb-nav-fixed #layoutSidenav #layoutSidenav_content {
+            padding-left: {{ $sidebarWidth }}px;
         }
     </style>
 </head>
@@ -160,11 +173,16 @@
 
 <script>
     let sidebar = document.getElementById("layoutSidenav_nav");
+    let app_logo = document.getElementById("app_logo");
     let main_content = document.getElementById("layoutSidenav_content");
     let dragholder = document.getElementById('dragholder');
     function onMouseMove(e){
-        sidebar.style.cssText = `width: ${ e.pageX }px`;
-        main_content.style.cssText = `padding-left: ${ e.pageX }px`;
+        var x = e.pageX;
+        if (x > 220 && x < 400) {
+            sidebar.style.cssText = `width: ${x}px`;
+            app_logo.style.cssText = `width: ${x}px`;
+            main_content.style.cssText = `padding-left: ${x}px`;
+        }
     }
 
     function onMouseDown(e){
@@ -173,6 +191,16 @@
 
     function onMouseUp(e){
         document.removeEventListener('mousemove',onMouseMove);
+        let sidebarWidth = sidebar.offsetWidth;
+
+        fetch('/save-sidebar-width', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+            body: JSON.stringify({ width: sidebarWidth })
+        })
     }
 
     dragholder.addEventListener('mousedown', onMouseDown);
