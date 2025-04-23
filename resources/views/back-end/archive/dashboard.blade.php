@@ -1,9 +1,9 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
-        <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="" class="text-capitalize text-chl">Dashboard</a></li>
-        </ol>
+{{--        <ol class="breadcrumb mb-4">--}}
+{{--            <li class="breadcrumb-item"><a href="" class="text-capitalize text-chl">Dashboard</a></li>--}}
+{{--        </ol>--}}
 @if(@$companies)
     @if(count($companies) > 1)
         <nav>
