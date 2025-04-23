@@ -6,7 +6,7 @@
             <div class="col-md-10">
                 <ol class="breadcrumb mb-4">
                     <li class="breadcrumb-item">
-                        <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
+                        <a href="{{route('data.archive.dashboard.interface')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
                     <li class="breadcrumb-item">
                         <a style="text-decoration: none;" href="#" class="text-capitalize">Add data type</a>
