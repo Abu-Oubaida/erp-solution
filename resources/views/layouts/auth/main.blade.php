@@ -26,9 +26,9 @@
                 <div class="row justify-content-center">
                     <div class="col-md-11">
                         @yield('content')
-                        <div id='ajax_loader' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
-                            <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
-                        </div>
+{{--                        <div id='ajax_loader' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">--}}
+{{--                            <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>--}}
+{{--                        </div>--}}
                     </div>
                 </div>
             </div>
