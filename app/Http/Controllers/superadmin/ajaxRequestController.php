@@ -57,11 +57,11 @@ class ajaxRequestController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Invalid credentials'
-                ], 401);
+                ]);
             }
             if (@$matchingUsers->first()->isSystemSuperAdmin())
             {
-                $companies = company_info::all();
+                $companies = company_info::where('status',1)->get(['id','company_name']);;
             }
             else {
                 $userComPerIDs = [];
@@ -70,20 +70,20 @@ class ajaxRequestController extends Controller
                     $userComPerIDs = $userCompanyPermissions->pluck('company_id')->unique()->toArray();
                 }
                 $userComPerIDs[] = (integer)$matchingUsers->first()->company;
-                $companies = company_info::whereIn('id',$userComPerIDs)->get();
+                $companies = company_info::where('status',1)->whereIn('id',$userComPerIDs)->get(['id','company_name']);
             }
             // Return the list of companies to the frontend
             return response()->json([
                 'status' => 'success',
                 'message' => 'Credentials are correct',
                 'companies' => $companies
-            ], 200);
+            ]);
         }catch (\Throwable $exception)
         {
             return response()->json([
                 'status'=>'error',
                 'message'=>$exception->getMessage(),
-            ],200);
+            ]);
         }
     }
     //

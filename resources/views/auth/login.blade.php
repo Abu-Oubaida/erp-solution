@@ -70,11 +70,12 @@
                                         <input class="form-control" id="email" name="email" type="text" placeholder="Enter Your Email or Phone" value="{{old('email')}}" onfocusout="return Obj.authCompany(this)"/>
                                         <label for="email">Email address/Phone Number <span class="text-danger">*</span></label>
                                     </div>
-                                    <div class="form-floating mb-3">
+                                    <div class="form-floating">
                                         <input class="form-control" id="password" type="password" placeholder="Password" name="password" value="" onfocusout="return Obj.authCompany(this)"/>
                                         <label for="password">Password <span class="text-danger">*</span></label>
                                     </div>
-                                    <div class="form-floating mb-3">
+                                    <label id="auth_error_block" class="text-danger" style="display: none"><i class="fas fa-warning"></i> <span id="auth_error"></span></label>
+                                    <div class="form-floating mt-3 mb-3">
                                         <select class="form-control" name="company_id" id="companySelect">
                                         </select>
                                         <label for="company_id">Select your company <span class="text-danger">*</span></label>
