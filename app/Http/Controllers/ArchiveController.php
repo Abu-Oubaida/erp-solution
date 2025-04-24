@@ -17,6 +17,7 @@ use App\Rules\AccountVoucherInfoStatusRule;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -665,6 +666,26 @@ class ArchiveController extends Controller
             ]);
         }
     }
+    public function typeWiseArchiveDataShowPagination(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->archive_data_list_quick;
+            $request->validate([
+                'c' => ['required', 'integer', 'exists:company_infos,id'],
+                't' => ['required', 'integer', 'exists:voucher_types,id'],
+                'l' => ['nullable','sometimes', 'integer',],
+            ]);
+            $company_id = $request->get('c');
+            $data_type = $request->get('t');
+            $perPage = request('per_page', 10);
+
+            $voucherInfos = $this->archiveListInfo($company_id, $data_type, $perPage);
+
+            return view('back-end/archive/pagination-list', compact('voucherInfos','company_id','data_type'));
+        } catch (\Throwable $exception) {
+            return back()->with('error',$exception->getMessage());
+        }
+    }
     private function archiveListInfo($company_id,$type_id,$perPage = null)
     {
         $data = Account_voucher::with([
@@ -708,7 +729,17 @@ class ArchiveController extends Controller
             ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes($company_id)->pluck('id')->toArray())
             ->where('voucher_type_id',$type_id);
         if ($perPage) {
-            $data = $data->paginate($perPage);
+            if ($perPage == 'all') {
+                $data = $data->get();
+                return new LengthAwarePaginator(
+                    $data,
+                    $data->count(),
+                    $data->count(),
+                    1,
+                    ['path' => request()->url(), 'query' => request()->query()]
+                );
+            }
+            $data = $data->paginate((int) $perPage);
         }
         else{
             $data = $data->get();

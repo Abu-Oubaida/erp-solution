@@ -1,6 +1,7 @@
 let Obj = {};
 let Archive = {};
-let AppSetting = {};
+let Sales = {};
+let SalesSetting = {};
 // Show loader immediately when the page starts loading
 (function ($) {
     //     $(document).ready(function() {
@@ -26,6 +27,8 @@ let AppSetting = {};
         const tags = [];
         const employeeDatas = [];
         const materialsTempList = [];
+        var extraMobileNumberCount = 2;
+        var extraEmailAddressCount = 2;
         $(".select-search").selectize({
             create: false,
             sortField: "text",
@@ -598,9 +601,14 @@ let AppSetting = {};
                     success: function (response) {
                         if (response.status === "error") {
                             // alert('Error:'+response.message)
-                            $("#auth_error_block").attr('style', 'display: block');
+                            $("#auth_error_block").attr(
+                                "style",
+                                "display: block"
+                            );
                             $("#auth_error").html(response.message);
-                            $("#companySelect").html("<option value='0'>Not Found</option>");
+                            $("#companySelect").html(
+                                "<option value='0'>Not Found</option>"
+                            );
                             $("#login").attr("disabled", "disabled");
                             $("#login").hide();
                         } else {
@@ -613,16 +621,21 @@ let AppSetting = {};
                                     new Option(company.company_name, company.id)
                                 );
                             });
-                            $("#auth_error_block").attr('style', 'display: none');
-                            $("#auth_error").html('');
+                            $("#auth_error_block").attr(
+                                "style",
+                                "display: none"
+                            );
+                            $("#auth_error").html("");
                             $("#login").removeAttr("disabled");
                             $("#login").show();
                         }
                     },
                     error: function (error) {
-                        $("#auth_error_block").style('display', 'block');
+                        $("#auth_error_block").style("display", "block");
                         $("#auth_error").html(response.message);
-                        $("#companySelect").html("<option value='0'>Not Found</option>");
+                        $("#companySelect").html(
+                            "<option value='0'>Not Found</option>"
+                        );
                         $("#login").attr("disabled", "disabled");
                         $("#login").hide();
                     },
@@ -3310,8 +3323,7 @@ let AppSetting = {};
                             return false;
                         } else if (response.status === "success") {
                             if (multiply) {
-                                if (action_id_projects !== null)
-                                {
+                                if (action_id_projects !== null) {
                                     updateSelectBox(
                                         response.data.projects,
                                         action_id_projects,
@@ -3319,8 +3331,7 @@ let AppSetting = {};
                                         "branch_name"
                                     );
                                 }
-                                if (action_id_types !== null)
-                                {
+                                if (action_id_types !== null) {
                                     updateSelectBox(
                                         response.data.types,
                                         action_id_types,
@@ -3328,7 +3339,6 @@ let AppSetting = {};
                                         "voucher_type_title"
                                     );
                                 }
-
                             } else {
                                 updateSelectBoxSingleOption(
                                     response.data.projects,
@@ -4173,24 +4183,33 @@ let AppSetting = {};
             },
         };
         Archive = {
-            settingSetTypePermission:function (e,type_company_id,types, users){
-                let company_id = $("#"+type_company_id).val()
-                let data_types = $("#"+types).val()
-                let permission_users = $("#"+users).val()
+            settingSetTypePermission: function (
+                e,
+                type_company_id,
+                types,
+                users
+            ) {
+                let company_id = $("#" + type_company_id).val();
+                let data_types = $("#" + types).val();
+                let permission_users = $("#" + users).val();
                 // Ensure data_types is always an array
                 if (!Array.isArray(data_types)) {
                     data_types = [data_types];
                 }
-                if (data_types.length === 0 || permission_users.length === 0 || company_id.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
+                if (
+                    data_types.length === 0 ||
+                    permission_users.length === 0 ||
+                    company_id.length === 0
+                ) {
+                    return false;
+                } else {
+                    if (!confirm("Are you sure?")) {
+                        return false;
                     }
-                    const url =window.location.origin + sourceDir + "/archive-data-type-user-permission-add";
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/archive-data-type-user-permission-add";
                     $.ajax({
                         url: url,
                         headers: {
@@ -4199,25 +4218,31 @@ let AppSetting = {};
                             ),
                         },
                         method: "POST",
-                        data: { type_company_id: company_id,data_types: data_types, permission_users: permission_users },
+                        data: {
+                            type_company_id: company_id,
+                            data_types: data_types,
+                            permission_users: permission_users,
+                        },
                         success: function (response) {
                             if (response.status === "error") {
                                 alert("Error: " + response.message);
                             } else if (response.status === "success") {
-                                alert(response.message)
+                                alert(response.message);
                             }
                             return true;
                         },
-                    })
+                    });
                 }
             },
 
-            typeWiseDataView:function (e, company_id, type_id, output_id){
-                if (company_id.length === 0 || type_id.length === 0)
-                {
-                    return false
+            typeWiseDataView: function (e, company_id, type_id, output_id) {
+                if (company_id.length === 0 || type_id.length === 0) {
+                    return false;
                 }
-                const url =window.location.origin + sourceDir + "/archive-data-type-wise-data-show";
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/archive-data-type-wise-data-show";
                 $.ajax({
                     url: url,
                     headers: {
@@ -4226,165 +4251,382 @@ let AppSetting = {};
                         ),
                     },
                     method: "POST",
-                    data: { company_id: company_id,data_type: type_id },
+                    data: { company_id: company_id, data_type: type_id },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
-                            $("#"+output_id).html(response.data)
+                            $("#" + output_id).html(response.data);
                         }
                         return true;
                     },
-                })
+                });
+            },
+        };
+        Sales = {
+            addEmailPhoneForLead: function (event, displayName, outputId) {
+                if (!displayName || !outputId) return false;
+
+                let count = null;
+                let inputType = null;
+
+                const maxAllowed = 5;
+
+                if (displayName === "mobile") {
+                    if (extraMobileNumberCount > maxAllowed) {
+                        alert(
+                            `You can add a maximum of ${maxAllowed} alternative mobile numbers.`
+                        );
+                        return false;
+                    }
+                    inputType = "number";
+                    count = extraMobileNumberCount++;
+                } else if (displayName === "email") {
+                    if (extraEmailAddressCount > maxAllowed) {
+                        alert(
+                            `You can add a maximum of ${maxAllowed} alternative email addresses.`
+                        );
+                        return false;
+                    }
+                    inputType = "email";
+                    count = extraEmailAddressCount++;
+                }
+
+                if (inputType !== null && count !== null) {
+                    const inputId = `${displayName}_${count}`;
+                    const inputPlaceholder = `Add Another ${displayName} ${count}`;
+                    const labelText = `Alternative ${displayName} ${count}`;
+
+                    const inputHtml = `
+                        <div class="col-md-3">
+                            <div class="form-floating mb-2">
+                                <input class="form-control" id="${inputId}" type="${inputType}" placeholder="${inputPlaceholder}">
+                                <label for="${inputId}">${labelText}</label>
+                            </div>
+                        </div>
+                    `;
+
+                    $(`#${outputId}`).append(inputHtml);
+                }
+
+                return false;
+            },
+        };
+
+        SalesSetting = {
+            salesSubTable: function (click_param) {
+                // Clear previous content
+                $("#sales_sub_table_content").empty();
+
+                var html = "";
+
+                switch (click_param) {
+                    case "sales_lead_apartment_type":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    case "sales_lead_apartment_size":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createInput("size", "Size");
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    case "sales_lead_source_info":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createInput(
+                            "parent_id",
+                            "Parent Id"
+                        );
+                        html += SalesSetting.createInput(
+                            "is_parent",
+                            "Is Parent"
+                        );
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    case "sales_lead_budget":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    case "sales_lead_view":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    case "sales_lead_floor":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    case "sales_lead_location_info":
+                        html += SalesSetting.createInput(
+                            "location_name",
+                            "Location Name"
+                        );
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    case "sales_lead_profession":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createInput(
+                            "parent_id",
+                            "Parent Id"
+                        );
+                        html += SalesSetting.createInput(
+                            "is_parent",
+                            "Is Parent"
+                        );
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    case "sales_lead_facing":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    case "sales_lead_status_info":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(click_param);
+                        break;
+
+                    default:
+                        html += '<p class="text-danger">Unknown parameter.</p>';
+                }
+                let title = click_param
+                    .replace(/^sales_lead_/, "") // remove prefix
+                    .replace(/_/g, " "); // replace _ with space
+
+                // Optionally capitalize first letter:
+                title = title.charAt(0).toUpperCase() + title.slice(1);
+
+                // Append inputs to modal container
+                $("#sales_sub_table_content").append(html);
+                $("#generalModalLabel").html(
+                    '<i class="fas fa-file-circle-plus"></i>' +
+                        " " +
+                        "Add" +
+                        " " +
+                        title
+                );
+                // Show the modal
+                $("#general_modal").modal("show");
+
+                return false; // Prevent default action
+            },
+
+            createInput: function (id, label) {
+                let requiredMark =
+                    label === "Title"
+                        ? '<span class="text-danger">*</span>'
+                        : "";
+                return `
+                    <div class="col-md-4 mb-2 form-group">
+                        <label for="${id}" class="form-label">${label}${requiredMark}</label>
+                        <input type="text" class="form-control" id="${id}" name="${id}" placeholder="Enter ${label}">
+                    </div>
+                `;
+            },
+            createHiddenInput: function (click_param) {
+                return `
+                    <div class="mb-2">
+                        <input type="hidden" class="form-control" name="hidden_click_param" value="${click_param}">
+                    </div>
+                `;
+            },
+            salesSubTableModal: function () {
+                var subTableData = {};
+                // Get company dropdown value
+                subTableData["company"] = $("#company").val();
+
+                // Get status dropdown value
+                subTableData["status"] = $("#status").val();
+
+                // Get all dynamic input fields
+                $("#sales_sub_table_content input").each(function () {
+                    var name = $(this).attr("name");
+                    var value = $(this).val();
+                    subTableData[name] = value;
+                });
+                if (subTableData.company === "") {
+                    alert("Comapany is required");
+                    return false;
+                } else if (subTableData.title === "") {
+                    alert("Title is required");
+                    return false;
+                } else {
+                    if (!confirm("Are you sure?")) {
+                        return false;
+                    } else {
+                        const url =
+                            window.location.origin +
+                            sourceDir +
+                            "/add_sale_sub_table_data";
+                        $.ajax({
+                            url: url,
+                            headers: {
+                                "X-CSRF-TOKEN": $(
+                                    'meta[name="csrf-token"]'
+                                ).attr("content"),
+                            },
+                            method: "POST",
+                            data: {
+                                subTableData: subTableData,
+                            },
+                            success: function (response) {
+                                console.log(response);
+                                if (response.status === "error") {
+                                    alert("Error: " + response.message);
+                                } else if (response.status === "success") {
+                                    alert(response.message);
+                                    $("#general_modal").modal("hide");
+                                    $("#" + response.output_id).html(
+                                        response.data
+                                    );
+                                }
+                            },
+                        });
+                    }
+                }
+                return false;
             },
         };
         AppSetting = {
-            addArchivePackage:function (e,output_id){
-                let package_name = $("#package_name").val()
-                let package_size = $("#package_size").val()
-                let package_status = $("#package_status").val()
-                if (package_name.length === 0 || package_size.length === 0 || package_status.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
-                    }
-                    else {
-                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-add";
+            addArchivePackage: function (e, output_id) {
+                let package_name = $("#package_name").val();
+                let package_size = $("#package_size").val();
+                let package_status = $("#package_status").val();
+                if (
+                    package_name.length === 0 ||
+                    package_size.length === 0 ||
+                    package_status.length === 0
+                ) {
+                    return false;
+                } else {
+                    if (!confirm("Are you sure?")) {
+                        return false;
+                    } else {
+                        const url =
+                            window.location.origin +
+                            sourceDir +
+                            "/system-operation/archive-package-add";
                         $.ajax({
                             url: url,
                             headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content"
-                                ),
+                                "X-CSRF-TOKEN": $(
+                                    'meta[name="csrf-token"]'
+                                ).attr("content"),
                             },
                             method: "POST",
-                            data: { package_name: package_name, package_size: package_size, package_status: package_status },
+                            data: {
+                                package_name: package_name,
+                                package_size: package_size,
+                                package_status: package_status,
+                            },
                             success: function (response) {
                                 if (response.status === "error") {
                                     alert("Error: " + response.message);
                                 } else if (response.status === "success") {
-                                    alert(response.message)
-                                    $("#"+output_id).html(response.data)
+                                    alert(response.message);
+                                    $("#" + output_id).html(response.data);
                                 }
                                 return true;
                             },
-                        })
+                        });
                     }
                 }
             },
-            editArchivePackage:function (e,output_id){
-                let edit_id = $(e).attr("ref")
-                if (edit_id.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
-                    }
-                    else {
-                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-edit";
+            editArchivePackage: function (e, output_id) {
+                let edit_id = $(e).attr("ref");
+                if (edit_id.length === 0) {
+                    return false;
+                } else {
+                    if (!confirm("Are you sure?")) {
+                        return false;
+                    } else {
+                        const url =
+                            window.location.origin +
+                            sourceDir +
+                            "/system-operation/archive-package-edit";
                         $.ajax({
                             url: url,
                             headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content"
-                                ),
+                                "X-CSRF-TOKEN": $(
+                                    'meta[name="csrf-token"]'
+                                ).attr("content"),
                             },
                             method: "POST",
-                            data: { edit_id: edit_id},
+                            data: { edit_id: edit_id },
                             success: function (response) {
                                 if (response.status === "error") {
                                     alert("Error: " + response.message);
                                 } else if (response.status === "success") {
-                                    $("#"+output_id+"_content").html(response.data)
-                                    $("#"+output_id).modal("show")
+                                    $("#" + output_id + "_content").html(
+                                        response.data
+                                    );
+                                    $("#" + output_id).modal("show");
                                 }
                                 return true;
                             },
-                        })
+                        });
                     }
                 }
             },
-            updateArchivePackage:function (e,output_id){
-                let package_name = $("#edit_package_name").val()
-                let package_size = $("#edit_package_size").val()
-                let package_status = $("#edit_package_status").val()
-                let package_id = $("#edit_package_id").val()
-                if (package_name.length === 0 || package_size.length === 0 || package_status.length === 0 || package_id.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
-                    }
-                    else {
-                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-update";
+            updateArchivePackage: function (e, output_id) {
+                let package_name = $("#edit_package_name").val();
+                let package_size = $("#edit_package_size").val();
+                let package_status = $("#edit_package_status").val();
+                let package_id = $("#edit_package_id").val();
+                if (
+                    package_name.length === 0 ||
+                    package_size.length === 0 ||
+                    package_status.length === 0 ||
+                    package_id.length === 0
+                ) {
+                    return false;
+                } else {
+                    if (!confirm("Are you sure?")) {
+                        return false;
+                    } else {
+                        const url =
+                            window.location.origin +
+                            sourceDir +
+                            "/system-operation/archive-package-update";
                         $.ajax({
                             url: url,
                             headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content"
-                                ),
+                                "X-CSRF-TOKEN": $(
+                                    'meta[name="csrf-token"]'
+                                ).attr("content"),
                             },
                             method: "POST",
-                            data: { package_name: package_name, package_size: package_size, package_status: package_status,package_id:package_id },
+                            data: {
+                                package_name: package_name,
+                                package_size: package_size,
+                                package_status: package_status,
+                                package_id: package_id,
+                            },
                             success: function (response) {
                                 if (response.status === "error") {
                                     alert("Error: " + response.message);
                                 } else if (response.status === "success") {
-                                    alert(response.message)
-                                    $("#"+output_id).html(response.data)
+                                    alert(response.message);
+                                    $("#" + output_id).html(response.data);
                                 }
                                 return true;
                             },
-                        })
+                        });
                     }
                 }
             },
-            deleteArchivePackage:function (e,output_id){
-                let delete_id = $(e).attr("ref")
-                if (delete_id.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
-                    }
-                    else {
-                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-delete";
-                        $.ajax({
-                            url: url,
-                            headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content"
-                                ),
-                            },
-                            method: "POST",
-                            data: { delete_id: delete_id},
-                            success: function (response) {
-                                if (response.status === "error") {
-                                    alert("Error: " + response.message);
-                                } else if (response.status === "success") {
-                                    alert(response.message)
-                                    $("#"+output_id).html(response.data)
-                                }
-                                return true;
-                            },
-                        })
-                    }
+            deleteArchivePackage: function (e, output_id) {
+                let delete_id = $(e).attr("ref");
+                if (delete_id.length === 0) {
+                    return false;
                 }
             },
-        }
+        };
     });
     function checkFileExists(url, callback) {
         const xhr = new XMLHttpRequest();
@@ -4409,6 +4651,7 @@ let AppSetting = {};
         }
     }
     function updateSelectBox(data, id, value, value_name) {
+        // alert('ok');
         const $select = $("#" + id);
         // Ensure Selectize is initialized
         if ($select[0] && $select[0].selectize) {

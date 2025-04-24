@@ -42,8 +42,8 @@
                                 Route::currentRouteName() == 'add.role' ||
                                 Route::currentRouteName() == 'edit.role' ||
                                 Route::currentRouteName() == 'role.list' ||
-                                Route::currentRouteName() == 'delete.role'||
-                                Route::currentRouteName() == 'user.screen.permission'||
+                                Route::currentRouteName() == 'delete.role' ||
+                                Route::currentRouteName() == 'user.screen.permission' ||
                                 Route::currentRouteName() == 'file.manager.permission')
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts"
                                 aria-expanded="true" aria-controls="userLayouts">
@@ -206,7 +206,7 @@
             <subgroup1>
                 @if (Route::currentRouteName() == 'sales.dashboard.interface' ||
                         Route::currentRouteName() == 'add.sales.lead' ||
-                        Route::currentRouteName() == 'sales.lead.list')
+                        Route::currentRouteName() == 'sales.lead.list'||Route::currentRouteName() == 'sale.settings.interface')
                     <a class="nav-link" href="#" data-bs-toggle="collapse"
                         data-bs-target="#salesInterfaceLayouts" aria-expanded="true"
                         aria-controls="salesInterfaceLayouts">
@@ -232,6 +232,20 @@
                     {{-- Sales Interface dashboard here --}}
                     @include('layouts.back-end.sidebar-components.interface.sales._dashboard')
                     @include('layouts.back-end.sidebar-components.interface.sales._lead_menu_submenu')
+                    @if (auth()->user()->hasPermission('sales_dashboard_interface'))
+                        @if (Route::currentRouteName() == 'sale.settings.interface')
+                            {{-- {{route('sale_settings_interface')}} --}}
+                            <a class="nav-link" href="{{ route('sale.settings.interface') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
+                                Settings
+                            </a>
+                        @else
+                            <a class="nav-link text-chl" href="{{ route('sale.settings.interface') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
+                                Settings
+                            </a>
+                        @endif
+                    @endif
                     {{-- Sales Interface dashboard is here --}}
                 </nav>
                 </div>
@@ -333,6 +347,7 @@
                     Route::currentRouteName() == 'uploaded.archive.list' ||
                     Route::currentRouteName() == 'view.archive.document' ||
                     Route::currentRouteName() == 'uploaded.archive.list.quick' ||
+                    Route::currentRouteName() == 'uploaded.archive.list.pagination' ||
                     Route::currentRouteName() == 'data.archive.dashboard.interface' ||
                     Route::currentRouteName() == 'data.archive.setting')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption"
@@ -356,7 +371,7 @@
             <nav class="sb-sidenav-menu-nested nav">
                 @if (auth()->user()->hasPermission('archive_dashboard'))
 
-                    @if (Route::currentRouteName() == 'data.archive.dashboard.interface')
+                    @if (Route::currentRouteName() == 'data.archive.dashboard.interface' || Route::currentRouteName() == 'uploaded.archive.list.pagination' )
                         <a class="nav-link" href="{{ route('data.archive.dashboard.interface') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard

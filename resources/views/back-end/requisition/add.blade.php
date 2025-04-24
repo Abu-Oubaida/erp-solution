@@ -70,9 +70,9 @@
                                 </div>
                                 <div class="col-md-1">
                                     @if(old('d_count'))
-                                        <button class="btn btn-outline-danger float-end mt-4" onclick="Obj.document_field_operation(this)"><i class='fa-solid fa-clock-rotate-left'></i> Reset</button>
+                                        <button class="btn btn-outline-danger float-end mt-4" onclick="Obj.document_field_operation(this,'Phone')"><i class='fa-solid fa-clock-rotate-left'></i> Reset</button>
                                     @else
-                                        <a class="btn btn-outline-primary float-end mt-4" onclick="Obj.document_field_operation(this)">Next <i class="fa-solid fa-arrow-right"></i></a>
+                                        <a class="btn btn-outline-primary float-end mt-4" onclick="Obj.document_field_operation(this,'Phone')">Next <i class="fa-solid fa-arrow-right"></i></a>
                                     @endif
                                 </div>
                             </div>

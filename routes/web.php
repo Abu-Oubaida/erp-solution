@@ -342,7 +342,8 @@ Route::group(['middleware' => ['auth']],function (){
 
         Route::middleware(['permission:archive_data_list_quick'])->group(function () {
             Route::match(['get','post'],'archive-data-list-quick','archiveListQuick')->name('uploaded.archive.list.quick');
-            Route::match(['get','post'],'archive-data-type-wise-data-show','typeWiseArchiveDataShow');
+            Route::match(['post'],'archive-data-type-wise-data-show','typeWiseArchiveDataShow');
+            Route::match(['get'],'archive-data-type-wise-data-show-pagination','typeWiseArchiveDataShowPagination')->name('uploaded.archive.list.pagination');
         });//3.7.6
 
 
@@ -488,6 +489,10 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::middleware(['permission:sales_lead_list'])->group(function (){
             Route::match(['get','post'],'list-lead','leadList')->name('sales.lead.list');
+        });
+        Route::middleware(['permission:sale_settings'])->group(function (){
+            Route::match(['get'],'sale_settings','saleSettingsInterface')->name('sale.settings.interface');
+            Route::match(['post'],'add_sale_sub_table_data','saleSubTableDataAdd')->name('sale.sub.table.data.add');
         });
     });//3.12 End
     # 3.13 Control Panel

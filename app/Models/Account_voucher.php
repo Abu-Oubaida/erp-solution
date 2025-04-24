@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Log;
 
 class Account_voucher extends Model
 {
@@ -23,6 +24,8 @@ class Account_voucher extends Model
 
     public function voucherDocuments()
     {
+        // $d = $this->belongsToMany(VoucherDocument::class,'archive_info_link_documents','voucher_info_id','document_id');
+        // Log::info(json_encode($d,JSON_PRETTY_PRINT));
         return $this->belongsToMany(VoucherDocument::class,'archive_info_link_documents','voucher_info_id','document_id');
     }
     public function company()
