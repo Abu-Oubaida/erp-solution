@@ -271,7 +271,7 @@
                 $('#DataTable2').DataTable({
                     dom: 'lBfrtip', // 'l' includes the "length changing" input
                     lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "ALL"]],
-                    pageLength: -1,
+                    pageLength: 25,
                     fixedHeader: {
                         header: true
                     },
