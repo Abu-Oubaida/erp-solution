@@ -489,6 +489,10 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:sales_lead_list'])->group(function (){
             Route::match(['get','post'],'list-lead','leadList')->name('sales.lead.list');
         });
+        Route::middleware(['permission:sale_settings'])->group(function (){
+            Route::match(['get'],'sale_settings','saleSettingsInterface')->name('sale.settings.interface');
+            Route::match(['post'],'add_sale_sub_table_data','saleSubTableDataAdd')->name('sale.sub.table.data.add');
+        });
     });//3.12 End
     # 3.13 Control Panel
     Route::controller(ControlPanelController::class)->group(function (){

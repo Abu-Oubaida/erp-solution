@@ -303,7 +303,7 @@
                                             'stack' => 'Stack 0',
                                         ];
                                     }
-                                $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
+                                                                $user_wise_labels = collect($today_uploaded_data_by_users)->pluck('user_name');
                                 @endphp
                                 <canvas id="user-wise-data-uploaded-today" width="400" height="200"></canvas>
                             @endif

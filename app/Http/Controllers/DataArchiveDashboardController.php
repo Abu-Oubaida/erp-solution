@@ -89,7 +89,6 @@ class DataArchiveDashboardController extends Controller
                             'document_counts' => $grouped->map->count()
                         ];
                     });
-
                 $dataTypes = $this->archiveTypeList($permission)->where('status',1)->where('company_id',$company->id)->get()->map(function ($item) {
                     return [
                         'id' => $item->id,
@@ -134,8 +133,7 @@ class DataArchiveDashboardController extends Controller
                     $documentCountsPerDay[$label['key']] = $count;
                 }
                 $totalDocumentCount = (max($documentCountsPerDay)+40);
-                $today_uploaded_data_by_users=$today_uploaded_data_by_users??[];
-                $view = view('back-end.archive._dashboard_content', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount','today_uploaded_data_by_users','company_id'))->render();
+                $view = view('back-end.archive._dashboard_content', compact('totalUsed','diskTotal','diskFree','dataTypeCount','archiveDocumentCount','dataTypes','archiveUsed','otherUsed','labels','documentCountsPerDay','totalDocumentCount','accountVoucherInfosCount','today_uploaded_data_by_users','company_id'))->render();
                 return response()->json([
                     'status' => 'success',
                     'data' => $view,

@@ -1,0 +1,1224 @@
+diff --cc app/Http/Controllers/DataArchiveDashboardController.php
+index e2c7378f,d5790eeb..00000000
+--- a/app/Http/Controllers/DataArchiveDashboardController.php
++++ b/app/Http/Controllers/DataArchiveDashboardController.php
+@@@ -93,7 -89,7 +93,6 @@@ class DataArchiveDashboardController ex
+                              'document_counts' => $grouped->map->count()
+                          ];
+                      });
+--
+                  $dataTypes = $this->archiveTypeList($permission)->where('status',1)->where('company_id',$company->id)->get()->map(function ($item) {
+                      return [
+                          'id' => $item->id,
+diff --git a/app/Http/Controllers/SalesInterfaceController.php b/app/Http/Controllers/SalesInterfaceController.php
+index 2cc26658..6227720d 100644
+--- a/app/Http/Controllers/SalesInterfaceController.php
++++ b/app/Http/Controllers/SalesInterfaceController.php
+@@ -24,7 +24,13 @@ public function addLead(Request $request)
+             $depts = department::where('status',1)->get();
+             $branches = branch::where('status',1)->get();
+ //            dd($depts);
+-            return view('back-end/sales/add-lead',compact('depts','branches'));
++            $leadWiseLocations = [
++                [ 'id' => 1, 'dept_name' => 'Dhaka' ],
++                [ 'id' => 2, 'dept_name' => 'Narayanganj' ],
++                [ 'id' => 3, 'dept_name' => 'Rupganj' ],
++                [ 'id' => 4, 'dept_name' => 'Dhanmondi' ],
++            ];
++            return view('back-end/sales/add-lead',compact('depts','branches','leadWiseLocations'));
+         }catch (\Throwable $exception)
+         {
+             return back()->with('error',$exception->getMessage())->withInput();
+diff --git a/app/Models/Account_voucher.php b/app/Models/Account_voucher.php
+index e1472255..88f49f80 100644
+--- a/app/Models/Account_voucher.php
++++ b/app/Models/Account_voucher.php
+@@ -4,6 +4,7 @@
+ 
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\Model;
++use Log;
+ 
+ class Account_voucher extends Model
+ {
+@@ -23,6 +24,8 @@ public function VoucherDocument()
+ 
+     public function voucherDocuments()
+     {
++        // $d = $this->belongsToMany(VoucherDocument::class,'archive_info_link_documents','voucher_info_id','document_id');
++        // Log::info(json_encode($d,JSON_PRETTY_PRINT));
+         return $this->belongsToMany(VoucherDocument::class,'archive_info_link_documents','voucher_info_id','document_id');
+     }
+     public function company()
+diff --git a/app/Models/User.php b/app/Models/User.php
+index 925c2975..7170d9a5 100644
+--- a/app/Models/User.php
++++ b/app/Models/User.php
+@@ -10,6 +10,7 @@
+ use Illuminate\Support\Facades\DB;
+ use Laravel\Sanctum\HasApiTokens;
+ use Laratrust\Traits\LaratrustUserTrait;
++use Log;
+ 
+ class User extends Authenticatable
+ {
+diff --git a/public/assets/js/custom.js b/public/assets/js/custom.js
+index e5dec573..a223aed9 100644
+--- a/public/assets/js/custom.js
++++ b/public/assets/js/custom.js
+@@ -1,5 +1,6 @@
+ let Obj = {};
+ let Archive = {};
++let Sales = {};
+ // Show loader immediately when the page starts loading
+ (function ($) {
+     //     $(document).ready(function() {
+@@ -25,6 +26,8 @@ let Archive = {};
+         const tags = [];
+         const employeeDatas = [];
+         const materialsTempList = [];
++        var extraMobileNumberCount = 2;
++        var extraEmailAddressCount = 2;
+         $(".select-search").selectize({
+             create: false,
+             sortField: "text",
+@@ -3363,8 +3366,7 @@ let Archive = {};
+                             return false;
+                         } else if (response.status === "success") {
+                             if (multiply) {
+-                                if (action_id_projects !== null)
+-                                {
++                                if (action_id_projects !== null) {
+                                     updateSelectBox(
+                                         response.data.projects,
+                                         action_id_projects,
+@@ -3372,8 +3374,7 @@ let Archive = {};
+                                         "branch_name"
+                                     );
+                                 }
+-                                if (action_id_types !== null)
+-                                {
++                                if (action_id_types !== null) {
+                                     updateSelectBox(
+                                         response.data.types,
+                                         action_id_types,
+@@ -3381,7 +3382,6 @@ let Archive = {};
+                                         "voucher_type_title"
+                                     );
+                                 }
+-
+                             } else {
+                                 updateSelectBoxSingleOption(
+                                     response.data.projects,
+@@ -4226,24 +4226,33 @@ let Archive = {};
+             },
+         };
+         Archive = {
+-            settingSetTypePermission:function (e,type_company_id,types, users){
+-                let company_id = $("#"+type_company_id).val()
+-                let data_types = $("#"+types).val()
+-                let permission_users = $("#"+users).val()
++            settingSetTypePermission: function (
++                e,
++                type_company_id,
++                types,
++                users
++            ) {
++                let company_id = $("#" + type_company_id).val();
++                let data_types = $("#" + types).val();
++                let permission_users = $("#" + users).val();
+                 // Ensure data_types is always an array
+                 if (!Array.isArray(data_types)) {
+                     data_types = [data_types];
+                 }
+-                if (data_types.length === 0 || permission_users.length === 0 || company_id.length === 0)
+-                {
+-                    return false
+-                }
+-                else {
+-                    if (!confirm('Are you sure?'))
+-                    {
+-                        return false
++                if (
++                    data_types.length === 0 ||
++                    permission_users.length === 0 ||
++                    company_id.length === 0
++                ) {
++                    return false;
++                } else {
++                    if (!confirm("Are you sure?")) {
++                        return false;
+                     }
+-                    const url =window.location.origin + sourceDir + "/archive-data-type-user-permission-add";
++                    const url =
++                        window.location.origin +
++                        sourceDir +
++                        "/archive-data-type-user-permission-add";
+                     $.ajax({
+                         url: url,
+                         headers: {
+@@ -4252,25 +4261,31 @@ let Archive = {};
+                             ),
+                         },
+                         method: "POST",
+-                        data: { type_company_id: company_id,data_types: data_types, permission_users: permission_users },
++                        data: {
++                            type_company_id: company_id,
++                            data_types: data_types,
++                            permission_users: permission_users,
++                        },
+                         success: function (response) {
+                             if (response.status === "error") {
+                                 alert("Error: " + response.message);
+                             } else if (response.status === "success") {
+-                                alert(response.message)
++                                alert(response.message);
+                             }
+                             return true;
+                         },
+-                    })
++                    });
+                 }
+             },
+ 
+-            typeWiseDataView:function (e, company_id, type_id, output_id){
+-                if (company_id.length === 0 || type_id.length === 0)
+-                {
+-                    return false
++            typeWiseDataView: function (e, company_id, type_id, output_id) {
++                if (company_id.length === 0 || type_id.length === 0) {
++                    return false;
+                 }
+-                const url =window.location.origin + sourceDir + "/archive-data-type-wise-data-show";
++                const url =
++                    window.location.origin +
++                    sourceDir +
++                    "/archive-data-type-wise-data-show";
+                 $.ajax({
+                     url: url,
+                     headers: {
+@@ -4279,18 +4294,68 @@ let Archive = {};
+                         ),
+                     },
+                     method: "POST",
+-                    data: { company_id: company_id,data_type: type_id },
++                    data: { company_id: company_id, data_type: type_id },
+                     success: function (response) {
+                         if (response.status === "error") {
+                             alert("Error: " + response.message);
+                         } else if (response.status === "success") {
+-                            $("#"+output_id).html(response.data)
++                            $("#" + output_id).html(response.data);
+                         }
+                         return true;
+                     },
+-                })
++                });
+             },
+         };
++        Sales = {
++            addEmailPhoneForLead: function (e, display_name, output) {
++                var count = null;
++                var input_type = null;
++                if (display_name.length !== 0 && output.length !== 0) {
++                    if (display_name === "mobile") {
++                        if (extraMobileNumberCount > 5) {
++                            alert(
++                                "You can add alternative " +
++                                    display_name +
++                                    " maximum 5."
++                            );
++                            return false;
++                        } else {
++                            input_type = "number";
++                            count = extraMobileNumberCount++;
++                        }
++                    } else if (display_name === "email") {
++                        if (extraEmailAddressCount > 5) {
++                            alert(
++                                "You can add alternative " +
++                                    display_name +
++                                    " maximum 5."
++                            );
++                            return false;
++                        } else {
++                            input_type = "email";
++                            count = extraEmailAddressCount++;
++                        }
++                    }
++                    if (input_type !== null && count !== null) {
++                        $("#" + output).append(`
++                            <div class="col"><div class="mt-3 form-floating">
++                                <input class="form-control" id="${
++                                    display_name + "_" + count
++                                }" type="${input_type}" placeholder="Add Another ${
++                            display_name + " " + count
++                        }">
++                                <label for="${
++                                    display_name + "_" + count
++                                }">Alternative ${
++                            display_name + " " + count
++                        }</label>
++                            </div></div>
++                        `);
++                    }
++                    return false;
++                }
++            }
++        };
+     });
+     function checkFileExists(url, callback) {
+         const xhr = new XMLHttpRequest();
+@@ -4315,6 +4380,7 @@ let Archive = {};
+         }
+     }
+     function updateSelectBox(data, id, value, value_name) {
++        // alert('ok');
+         const $select = $("#" + id);
+         // Ensure Selectize is initialized
+         if ($select[0] && $select[0].selectize) {
+diff --git a/resources/views/back-end/requisition/add.blade.php b/resources/views/back-end/requisition/add.blade.php
+index e44a9151..c947f948 100644
+--- a/resources/views/back-end/requisition/add.blade.php
++++ b/resources/views/back-end/requisition/add.blade.php
+@@ -70,9 +70,9 @@
+                                 </div>
+                                 <div class="col-md-1">
+                                     @if(old('d_count'))
+-                                        <button class="btn btn-outline-danger float-end mt-4" onclick="Obj.document_field_operation(this)"><i class='fa-solid fa-clock-rotate-left'></i> Reset</button>
++                                        <button class="btn btn-outline-danger float-end mt-4" onclick="Obj.document_field_operation(this,'Phone')"><i class='fa-solid fa-clock-rotate-left'></i> Reset</button>
+                                     @else
+-                                        <a class="btn btn-outline-primary float-end mt-4" onclick="Obj.document_field_operation(this)">Next <i class="fa-solid fa-arrow-right"></i></a>
++                                        <a class="btn btn-outline-primary float-end mt-4" onclick="Obj.document_field_operation(this,'Phone')">Next <i class="fa-solid fa-arrow-right"></i></a>
+                                     @endif
+                                 </div>
+                             </div>
+diff --git a/resources/views/back-end/sales/add-lead.blade.php b/resources/views/back-end/sales/add-lead.blade.php
+index 51e41886..1b81e3de 100644
+--- a/resources/views/back-end/sales/add-lead.blade.php
++++ b/resources/views/back-end/sales/add-lead.blade.php
+@@ -1,19 +1,28 @@
+ @extends('layouts.back-end.main')
+ @section('mainContent')
++    {{-- <script>
++        $(function {
++            $(document).ready(function() {
++                
++            })
++        })(jQuery)
++    </script> --}}
+     <div class="container-fluid px-4">
+         <div class="row">
+             <div class="col-md-10">
+                 <ol class="breadcrumb mb-4">
+                     <li class="breadcrumb-item">
+-                        <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
++                        <a href="{{ route('dashboard') }}" class="text-capitalize text-chl">Dashboard</a>
+                     </li>
+                     <li class="breadcrumb-item">
+-                        <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
++                        <a style="text-decoration: none;" href="#"
++                            class="text-capitalize">{{ str_replace('.', ' ', \Route::currentRouteName()) }}</a>
+                     </li>
+                 </ol>
+             </div>
+             <div class="col-md-2">
+-                <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
++                <a href="{{ \Illuminate\Support\Facades\URL::previous() }}" class="btn btn-danger btn-sm float-end"><i
++                        class="fas fa-chevron-left"></i> Go Back</a>
+             </div>
+         </div>
+         <div class="row">
+@@ -21,313 +30,385 @@
+                 <div class="card mb-4">
+                     <div class="card-header">
+                         <div class="row">
+-                            <h3 class="text-capitalize"><i class="fas fa-leaf"></i> {{str_replace('.', ' ', \Route::currentRouteName())}}</h3>
++                            <h3 class="text-capitalize"><i class="fas fa-leaf"></i>
++                                {{ str_replace('.', ' ', \Route::currentRouteName()) }}</h3>
+                         </div>
+                     </div>
+                     <div class="card-body">
+-                        <form action="{{ route('add.sales.lead') }}" method="POST" enctype="multipart/form-data">
+-                            @csrf
++                        <div class="row">
+                             <div class="col-md-12">
++                                <h6># Basic Information</h6>
++                                <hr>
++                            </div>
++                        </div>
++                        <div class="row">
++                            <div class="col-md-4 mb-1">
+                                 <div class="row">
+-                                    <div class="col-md-12">
+-                                        <h6># Basic Information</h6>
+-                                        <hr>
+-                                    </div>
+-                                    <div class="col-md-4">
++                                    <div class="col-12">
+                                         <div class="form-floating mb-3">
+-                                            <input class="form-control" id="name" name="name" type="text" placeholder="Enter full name" value="{{old('name')}}"/>
++                                            <input class="form-control" id="name" type="text"
++                                                placeholder="Enter full name" />
+                                             <label for="name">Full name <span class="text-danger">*</span></label>
+                                         </div>
+                                     </div>
+-                                    <div class="col-md-4">
+-                                        <div class="form-floating mb-3">
+-                                            <input class="form-control" id="phone" name="phone" type="number" placeholder="Enter phone number" value="{{old('phone')}}"/>
+-                                            <label for="phone">Mobile number <span class="text-danger">*</span></label>
+-                                        </div>
+-                                    </div>
+-                                    <div class="col-md-4">
+-                                        <div class="form-floating mb-3">
+-                                            <input class="form-control" id="email" name="email" type="email" placeholder="Enter email address" value="{{old('email')}}"/>
+-                                            <label for="email">Email address </label>
+-                                        </div>
+-                                    </div>
+-                                    <div class="col-md-4">
++                                    <div class="col-12">
+                                         <div class="form-floating mb-3">
+-                                            <input class="form-control" id="relation" name="relation" type="text" placeholder="Enter husband/wife name" value="{{old('relation')}}"/>
++                                            <input class="form-control" id="relation" type="text"
++                                                placeholder="Enter husband/wife name" />
+                                             <label for="relation">Husband/Wife </label>
+                                         </div>
+                                     </div>
+-                                    <div class="col-md-4">
++                                </div>
++                            </div>
++                            <div class="col-md-4 mb-1">
++                                <div class="row">
++                                    <div class="col-12">
+                                         <div class="form-floating mb-3">
+-                                            <input class="form-control" id="phone2" name="phone2" type="number" placeholder="Enter phone number 2" value="{{old('phone2')}}"/>
+-                                            <label for="phone">Alternative Mobile number </label>
++                                            <input class="form-control" id="primary_mobile" type="number"
++                                                placeholder="Primary Mobile" value="" />
++                                            <label for="primary_mobile">Primary Mobile <span
++                                                    class="text-danger">*</span></label>
+                                         </div>
+                                     </div>
+-                                    <div class="col-md-4">
+-                                        <div class="form-floating mb-3">
+-                                            <input class="form-control" id="email2" name="email2" type="email" placeholder="Enter alternative email address" value="{{old('email2')}}"/>
+-                                            <label for="email2">Alternative email address </label>
++                                    <div class="col-12">
++                                        <div class="form-floating">
++                                            <input class="form-control" id="phone2" type="number"
++                                                placeholder="Enter phone 1" />
++                                            <label for="phone2">Alternative Mobile 1</label>
+                                         </div>
+                                     </div>
+-                                    <div class="col-md-3">
+-                                        <div class="form-floating mb-3">
+-                                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession" placeholder="profession">
+-                                            <datalist id="profession-list">
+-                                                <option value="Business">Business</option>
+-                                                <option value="Teacher">Teacher</option>
+-                                                <option value="Solder">Solder</option>
+-                                                <option value="Doctor">Doctor</option>
+-                                                <option value="Engineer">Engineer</option>
+-                                                <option value="Bankar">Bankar</option>
+-                                                <option value="Politician">Politician</option>
+-                                                <option value="Actor">Actor</option>
+-                                            </datalist>
+-                                            <label for="branch">Profession <span class="text-danger">*</span></label>
+-                                        </div>
++                                    <div class="col-12 mt-1">
++                                        <a href="#" class="float-end text-decoration-none"
++                                            onclick="Sales.addEmailPhoneForLead(this,'mobile','add_extra_info')"><i
++                                                class="fas fa-plus small"></i> Add
++                                            Another Mobile</a>
+                                     </div>
+-                                    <div class="col-md-3">
+-                                        <div class="form-floating mb-3">
+-                                            <input type="text" class="form-control" id="company" name="company" placeholder="Company">
+-                                            <label for="company">Company</label>
+-                                        </div>
+-                                    </div>
+-                                    <div class="col-md-3">
++                                </div>
++                            </div>
++                            <div class="col-md-4 mb-1">
++                                <div class="row">
++                                    <div class="col-12">
+                                         <div class="form-floating mb-3">
+-                                            <div class="form-floating mb-3">
+-                                                <input type="text" class="form-control" id="designation" name="designation" placeholder="Designation">
+-                                                <label for="designation">Designation</label>
+-                                            </div>
++                                            <input class="form-control" id="primary_email" type="email"
++                                                placeholder="Primary Email" value="" />
++                                            <label for="primary_email">Primary Email <span
++                                                    class="text-danger">*</span></label>
+                                         </div>
+                                     </div>
+-                                    <div class="col-md-3">
+-                                        <div class="form-floating mb-3">
+-                                            <div class="form-floating mb-3">
+-                                                <textarea type="text" class="form-control" id="notes" name="notes" placeholder="Notes"></textarea>
+-                                                <label for="Designation">Notes</label>
+-                                            </div>
++                                    <div class="col-12">
++                                        <div class="form-floating">
++                                            <input class="form-control" id="alternative_email_1" type="email"
++                                                placeholder="Enter Email 2" />
++                                            <label for="alternative_email_1">Alternative Email 1</label>
+                                         </div>
+                                     </div>
+-                                    <div class="col-md-6">
+-                                        <h6># Source Information</h6>
+-                                        <hr>
+-                                        <div class="row">
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <input type="text" class="form-control" id="source" list="source-list" name="source" placeholder="Source">
+-                                                    <datalist id="source-list">
+-                                                        <option value="None">None</option>
+-                                                        <option value="Newspaper">Newspaper</option>
+-                                                        <option value="Hotline">Hotline</option>
+-                                                        <option value="Social">Social</option>
+-                                                        <option value="Reference">Reference</option>
+-                                                    </datalist>
+-                                                    <label for="branch">Source <span class="text-danger">*</span></label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <select id="team-leader" class="form-control" name="team_leader">
+-                                                        <option value="">--Select Option--</option>
+-                                                        <option value="db_leader_id">Leader 1</option>
+-                                                        <option value="db_leader_id">Leader 2</option>
+-                                                    </select>
+-                                                    <label for="team-leader">Team Leader <span class="text-danger">*</span></label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <select id="associate" class="form-control" name="associate">
+-                                                        <option value="">--Select Option--</option>
+-                                                        <option value="db_associate_id">Associate 1</option>
+-                                                        <option value="db_associate_id">Associate 2</option>
+-                                                    </select>
+-                                                    <label for="associate">Associate <span class="text-danger">*</span></label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <input type="text" name="recorded_by" id="recorded_by" class="form-control">
+-                                                    <label for="recorded_by">Recorded By</label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <select id="rating" class="form-control" name="rating">
+-                                                        <option value="">--Select Option--</option>
+-                                                        <option value="db_rating_id">Rating 1</option>
+-                                                        <option value="db_rating_id">Rating 2</option>
+-                                                    </select>
+-                                                    <label for="rating">Rating</label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <select id="industry" class="form-control" name="industry">
+-                                                        <option value="">--Select Option--</option>
+-                                                        <option value="db_industry_id">Industry 1</option>
+-                                                        <option value="db_industry_id">Industry 2</option>
+-                                                    </select>
+-                                                    <label for="industry">Industry</label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <select id="branch" class="form-control" name="branch">
+-                                                        <option value="">--Select Option--</option>
+-                                                        @if(count($branches))
+-                                                            @foreach($branches as $branch)
+-                                                                <option value="{!! $branch->id !!}">{!! $branch->branch_name !!}</option>
+-                                                            @endforeach
+-                                                        @endif
+-                                                    </select>
+-                                                    <label for="branch">Branch Name</label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <select id="lead-creat-dept" class="form-control" name="lead_create_dept">
+-                                                        <option value="">--Select Option--</option>
+-                                                        @if(count($depts))
+-                                                            @foreach($depts as $dept)
+-                                                                <option value="{!! $dept->id !!}">{!! $dept->dept_name !!}</option>
+-                                                            @endforeach
+-                                                        @endif
+-                                                    </select>
+-                                                    <label for="lead-creat-dept">Lead Create Department</label>
+-                                                </div>
+-                                            </div>
+-                                        </div>
++
++                                    <div class="col-12 mt-1">
++                                        <a href="#" class="float-end text-decoration-none"
++                                            onclick="Sales.addEmailPhoneForLead(this,'email','add_extra_info')"><i
++                                                class="fas fa-plus small"></i> Add
++                                            Another
++                                            Email</a>
+                                     </div>
+-                                    <div class="col-md-6">
+-                                        <h6># Prospect Preference</h6>
+-                                        <hr>
+-                                        <div class="row">
+-                                            <div class="col-md-12">
+-                                                <div class="form-floating mb-3">
+-                                                    <div class="form-floating mb-3">
+-                                                        <textarea type="text" class="form-control" id="preference-notes" name="p_notes" placeholder="Preference Notes"></textarea>
+-                                                        <label for="preference-notes">Preference Notes</label>
+-                                                    </div>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <select id="apartment-type" class="form-control" name="apartment_type">
+-                                                        <option value="">--Select Option--</option>
+-                                                        <option value="db_apartment_type_id">apartment type 1</option>
+-                                                        <option value="db_apartment_type_id">apartment type 1</option>
+-                                                    </select>
+-                                                    <label for="associate">Apartment Type </label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <input type="text" class="form-control" id="preferred-location" list="preferred-location-list" name="preferred_location" placeholder="Source">
+-                                                    <datalist id="preferred-location-list">
+-                                                        <option value="Gulshan">Gulshan</option>
+-                                                        <option value="Banani">Banani</option>
+-                                                        <option value="Baridhara">Baridhara</option>
+-                                                        <option value="Uttra">Uttra</option>
+-                                                        <option value="Dhanmondi">Dhanmondi</option>
+-                                                        <option value="Mohammadpur">Mohammadpur</option>
+-                                                        <option value="Lalmatia">Lalmatia</option>
+-                                                        <option value="Kalabagan">Kalabagan</option>
+-                                                    </datalist>
+-                                                    <label for="preferred-location">Preferred Location </label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <select class="form-control" id="apartment-size" name="apartment_size">
+-                                                        <option value="">--Select--</option>
+-                                                        <option value="db_size_id">1200 sft</option>
+-                                                        <option value="db_size_id">1300 sft</option>
+-                                                        <option value="db_size_id">1600 sft</option>
+-                                                    </select>
+-                                                    <label for="apartment-size">Apartment Size </label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-6">
+-                                                <div class="form-floating mb-3">
+-                                                    <select class="form-control" id="apartment-floor" name="apartment_floor">
+-                                                        <option value="">--Select--</option>
+-                                                        <option value="1">1st Floor</option>
+-                                                        <option value="2">2nd Floor</option>
+-                                                        <option value="3">3rd Floor</option>
+-                                                        <option value="4">4th Floor</option>
+-                                                    </select>
+-                                                    <label for="apartment-floor">Apartment Floor </label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-4">
+-                                                <div class="form-floating mb-3">
+-                                                    <select class="form-control" id="apartment-facing" name="apartment_facing">
+-                                                        <option value="">--Select--</option>
+-                                                        <option value="south">South</option>
+-                                                        <option value="north">North</option>
+-                                                        <option value="east">East</option>
+-                                                        <option value="west">West</option>
+-                                                    </select>
+-                                                    <label for="apartment-facing">Facing </label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-4">
+-                                                <div class="form-floating mb-3">
+-                                                    <select class="form-control" id="apartment-view" name="apartment_view">
+-                                                        <option value="">--Select--</option>
+-                                                        <option value="south">South</option>
+-                                                        <option value="north">North</option>
+-                                                        <option value="east">East</option>
+-                                                        <option value="west">West</option>
+-                                                    </select>
+-                                                    <label for="apartment-view">View </label>
+-                                                </div>
+-                                            </div>
+-                                            <div class="col-md-4">
+-                                                <div class="form-floating mb-3">
+-                                                    <input type="number" class="form-control" placeholder="budget" id="budget">
+-                                                    <label for="budget">Budget </label>
+-                                                </div>
+-                                            </div>
+-                                        </div>
++                                </div>
++                            </div>
++                            <div class="col-md-2">
++                                <div class="form-floating mb-3">
++                                    <input type="text" class="form-control" id="profession" list="profession-list"
++                                        name="profession" placeholder="profession">
++                                    <datalist id="profession-list">
++                                        <option value="Business">Business</option>
++                                        <option value="Teacher">Teacher</option>
++                                        <option value="Solder">Solder</option>
++                                        <option value="Doctor">Doctor</option>
++                                        <option value="Engineer">Engineer</option>
++                                        <option value="Bankar">Bankar</option>
++                                        <option value="Politician">Politician</option>
++                                        <option value="Actor">Actor</option>
++                                    </datalist>
++                                    <label for="branch">Main Profession <span class="text-danger">*</span></label>
++                                </div>
++                            </div>
++                            <div class="col-md-2">
++                                <div class="form-floating mb-3">
++                                    <input type="text" class="form-control" id="profession" list="profession-list"
++                                        name="profession" placeholder="profession">
++                                    <datalist id="profession-list">
++                                        <option value="Business">Business</option>
++                                        <option value="Teacher">Teacher</option>
++                                        <option value="Solder">Solder</option>
++                                        <option value="Doctor">Doctor</option>
++                                        <option value="Engineer">Engineer</option>
++                                        <option value="Bankar">Bankar</option>
++                                        <option value="Politician">Politician</option>
++                                        <option value="Actor">Actor</option>
++                                    </datalist>
++                                    <label for="branch">Profession <span class="text-danger">*</span></label>
++                                </div>
++                            </div>
++                            <div class="col-md-3">
++                                <div class="form-floating mb-3">
++                                    <input type="text" class="form-control" id="company" name="company"
++                                        placeholder="Company">
++                                    <label for="company">Company</label>
++                                </div>
++                            </div>
++                            <div class="col-md-3">
++                                <div class="form-floating mb-3">
++                                    <div class="form-floating mb-3">
++                                        <input type="text" class="form-control" id="designation" name="designation"
++                                            placeholder="Designation">
++                                        <label for="designation">Designation</label>
+                                     </div>
+-
+-                                    <div class="col-md-12">
+-                                        <div class="form-floating mb-3 float-end">
+-                                            <input type="submit" value="Insert User" class="btn btn-chl-outline" name="submit" >
+-                                        </div>
++                                </div>
++                            </div>
++                            <div class="col-md-2">
++                                <div class="form-floating mb-3">
++                                    <div class="form-floating mb-3">
++                                        <textarea type="text" class="form-control" id="notes" name="notes" placeholder="Notes"></textarea>
++                                        <label for="Designation">Notes</label>
+                                     </div>
+                                 </div>
+                             </div>
++                        </div>
++                        <div class="row" id="add_extra_info">
+ 
+-                        </form>
++                        </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
++        <div class="row">
++            <div class="col-md-6">
++                <h6># Source Information</h6>
++                <hr>
++                <div class="row">
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <input type="text" class="form-control" id="source" list="source-list" name="source"
++                                placeholder="Source">
++                            <datalist id="source-list">
++                                <option value="None">None</option>
++                                <option value="Newspaper">Newspaper</option>
++                                <option value="Hotline">Hotline</option>
++                                <option value="Social">Social</option>
++                                <option value="Reference">Reference</option>
++                            </datalist>
++                            <label for="branch">Main Source <span class="text-danger">*</span></label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <input type="text" class="form-control" id="source" list="source-list" name="source"
++                                placeholder="Source">
++                            <datalist id="source-list">
++                                <option value="None">None</option>
++                                <option value="Newspaper">Newspaper</option>
++                                <option value="Hotline">Hotline</option>
++                                <option value="Social">Social</option>
++                                <option value="Reference">Reference</option>
++                            </datalist>
++                            <label for="branch">Source <span class="text-danger">*</span></label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <select id="team-leader" class="form-control" name="team_leader">
++                                <option value="">--Select Option--</option>
++                                <option value="db_leader_id">Leader 1</option>
++                                <option value="db_leader_id">Leader 2</option>
++                            </select>
++                            <label for="team-leader">Team Leader <span class="text-danger">*</span></label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <select id="associate" class="form-control" name="associate">
++                                <option value="">--Select Option--</option>
++                                <option value="db_associate_id">Associate 1</option>
++                                <option value="db_associate_id">Associate 2</option>
++                            </select>
++                            <label for="associate">Associate <span class="text-danger">*</span></label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <input type="text" name="recorded_by" id="recorded_by" class="form-control">
++                            <label for="recorded_by">Recorded By</label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <select id="rating" class="form-control" name="rating">
++                                <option value="">--Select Option--</option>
++                                <option value="db_rating_id">Rating 1</option>
++                                <option value="db_rating_id">Rating 2</option>
++                            </select>
++                            <label for="rating">Rating</label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <select id="industry" class="form-control" name="industry">
++                                <option value="">--Select Option--</option>
++                                <option value="db_industry_id">Industry 1</option>
++                                <option value="db_industry_id">Industry 2</option>
++                            </select>
++                            <label for="industry">Industry</label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <select id="branch" class="form-control" name="branch">
++                                <option value="">--Select Option--</option>
++                                @if (count($branches))
++                                    @foreach ($branches as $branch)
++                                        <option value="{!! $branch->id !!}">{!! $branch->branch_name !!}</option>
++                                    @endforeach
++                                @endif
++                            </select>
++                            <label for="branch">Branch Name</label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <select id="lead-creat-dept" class="form-control" name="lead_create_dept">
++                                <option value="">--Select Option--</option>
++                                @if (count($depts))
++                                    @foreach ($depts as $dept)
++                                        <option value="{!! $dept->id !!}">{!! $dept->dept_name !!}</option>
++                                    @endforeach
++                                @endif
++                            </select>
++                            <label for="lead-creat-dept">Lead Create Department</label>
++                        </div>
++                    </div>
++                </div>
++            </div>
++            <div class="col-md-6">
++                <h6># Prospect Preference</h6>
++                <hr>
++                <div class="row">
++                    <div class="col-md-12">
++                        <div class="form-floating mb-3">
++                            <div class="form-floating mb-3">
++                                <textarea type="text" class="form-control" id="preference-notes" name="p_notes" placeholder="Preference Notes"></textarea>
++                                <label for="preference-notes">Preference Notes</label>
++                            </div>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <select id="apartment-type" class="form-control" name="apartment_type">
++                                <option value="">--Select Option--</option>
++                                <option value="db_apartment_type_id">apartment type 1</option>
++                                <option value="db_apartment_type_id">apartment type 1</option>
++                            </select>
++                            <label for="associate">Apartment Type </label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <span for="preferred-location">Preferred Location </span>
++                        <div class="form-floating mb-3">
++                            <select class="text-capitalize select-search" id="preferred_location" name="preferred_location[]" multiple>
++                                {{-- @if(old('company') == $c->id) selected @endif --}}
++                                <option value="">--select option--</option>
++                                @if(isset($leadWiseLocations) || (count($leadWiseLocations) > 0))
++                                    @foreach($leadWiseLocations as $c)
++                                        <option value="{{$c['id']}}"> {!! $c['dept_name'] !!}</option>
++                                    @endforeach
++                                @endif
++                            </select>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <select class="form-control" id="apartment-size" name="apartment_size">
++                                <option value="">--Select--</option>
++                                <option value="db_size_id">1200 sft</option>
++                                <option value="db_size_id">1300 sft</option>
++                                <option value="db_size_id">1600 sft</option>
++                            </select>
++                            <label for="apartment-size">Apartment Size </label>
++                        </div>
++                    </div>
++                    <div class="col-md-6">
++                        <div class="form-floating mb-3">
++                            <select class="form-control" id="apartment-floor" name="apartment_floor">
++                                <option value="">--Select--</option>
++                                <option value="1">1st Floor</option>
++                                <option value="2">2nd Floor</option>
++                                <option value="3">3rd Floor</option>
++                                <option value="4">4th Floor</option>
++                            </select>
++                            <label for="apartment-floor">Apartment Floor </label>
++                        </div>
++                    </div>
++                    <div class="col-md-4">
++                        <div class="form-floating mb-3">
++                            <select class="form-control" id="apartment-facing" name="apartment_facing">
++                                <option value="">--Select--</option>
++                                <option value="south">South</option>
++                                <option value="north">North</option>
++                                <option value="east">East</option>
++                                <option value="west">West</option>
++                            </select>
++                            <label for="apartment-facing">Facing </label>
++                        </div>
++                    </div>
++                    <div class="col-md-4">
++                        <div class="form-floating mb-3">
++                            <select class="form-control" id="apartment-view" name="apartment_view">
++                                <option value="">--Select--</option>
++                                <option value="south">South</option>
++                                <option value="north">North</option>
++                                <option value="east">East</option>
++                                <option value="west">West</option>
++                            </select>
++                            <label for="apartment-view">View </label>
++                        </div>
++                    </div>
++                    <div class="col-md-4">
++                        <div class="form-floating mb-3">
++                            <input type="number" class="form-control" placeholder="budget" id="budget">
++                            <label for="budget">Budget </label>
++                        </div>
++                    </div>
++                </div>
++            </div>
+ 
++            <div class="col-md-12">
++                <div class="form-floating mb-3 float-end">
++                    <input type="submit" value="Insert User" class="btn btn-chl-outline" name="submit">
++                </div>
++            </div>
++        </div>
+     </div>
+     <!-- Modal -->
+-    <div class="modal modal-xl fade" id="myModal" tabindex="-1" aria-labelledby="userDataModelLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
++    <div class="modal modal-xl fade" id="myModal" tabindex="-1" aria-labelledby="userDataModelLabel"
++        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+         <div class="modal-dialog modal-fullscreen-custom">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <h1 class="modal-title fs-5" id="userDataModelLabel">Title</h1>
+-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.reload()"></button>
++                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
++                        onclick="window.location.reload()"></button>
+                 </div>
+                 <div class="modal-body">
+                     <table id="data-table" class="table"></table>
+                 </div>
+                 <div class="modal-footer">
+-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.location.reload()">Close</button>
+-                    <button type="button" class="btn btn-primary" onclick="return confirm('Are you sure?'), Obj.userExcelFileSubmit(this)">Save changes</button>
++                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
++                        onclick="window.location.reload()">Close</button>
++                    <button type="button" class="btn btn-primary"
++                        onclick="return confirm('Are you sure?'), Obj.userExcelFileSubmit(this)">Save
++                        changes</button>
+                 </div>
+             </div>
+         </div>
+         <div id='ajax_loader2' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+-            <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
++            <img width="50%" src="{{ url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif') }}" />
+         </div>
+     </div>
+ 
+ @stop
+-
+diff --git a/resources/views/layouts/back-end/sidebar-components/interface/_user_menu_submenu.blade.php b/resources/views/layouts/back-end/sidebar-components/interface/_user_menu_submenu.blade.php
+index 804632f5..613d1d31 100644
+--- a/resources/views/layouts/back-end/sidebar-components/interface/_user_menu_submenu.blade.php
++++ b/resources/views/layouts/back-end/sidebar-components/interface/_user_menu_submenu.blade.php
+@@ -1,62 +1,89 @@
+-@if(auth()->user()->hasPermission('add_user') || auth()->user()->hasPermission('list_user') || auth()->user()->hasPermission('view_user') || auth()->user()->hasPermission('edit_user')|| auth()->user()->hasPermission('user_screen_permission')|| auth()->user()->hasPermission('file_manager_permission'))
+-    @if(Route::currentRouteName() == 'add.user' || Route::currentRouteName() == 'user.list' || Route::currentRouteName() == 'user.single.view' || Route::currentRouteName() == 'user.edit'|| Route::currentRouteName() == 'user.screen.permission'|| Route::currentRouteName() == 'file.manager.permission')
+-        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#users" aria-expanded="true" aria-controls="users">
++@if (auth()->user()->hasPermission('add_user') ||
++        auth()->user()->hasPermission('list_user') ||
++        auth()->user()->hasPermission('view_user') ||
++        auth()->user()->hasPermission('edit_user') ||
++        auth()->user()->hasPermission('user_screen_permission') ||
++        auth()->user()->hasPermission('file_manager_permission'))
++    @if (Route::currentRouteName() == 'add.user' ||
++            Route::currentRouteName() == 'user.list' ||
++            Route::currentRouteName() == 'user.single.view' ||
++            Route::currentRouteName() == 'user.edit' ||
++            Route::currentRouteName() == 'user.screen.permission' ||
++            Route::currentRouteName() == 'file.manager.permission')
++        <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#users" aria-expanded="true"
++            aria-controls="users">
+             <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
+             Users
+             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+         </a>
+         <div class="collapse show" id="users" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+-    @else
+-        <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#users" aria-expanded="false" aria-controls="users">
+-            <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
+-            Users
+-            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+-        </a>
+-        <div class="collapse" id="users" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
++        @else
++            <a class="nav-link collapsed text-chl" href="#" data-bs-toggle="collapse" data-bs-target="#users"
++                aria-expanded="false" aria-controls="users">
++                <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
++                Users
++                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
++            </a>
++            <div class="collapse" id="users" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+     @endif
+-            <nav class="sb-sidenav-menu-nested nav">
+-                @if(auth()->user()->hasPermission('add_user'))
+-                    @if(Route::currentRouteName() == 'add.user')
+-                        <a class="nav-link" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+-                    @else
+-                        <a class="nav-link text-chl" href="{{route('add.user')}}"><div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User</a>
+-                    @endif
+-                @endif
+-                @if(auth()->user()->hasPermission('list_user'))
+-                    @if(Route::currentRouteName() == 'user.list')
+-                        <a class="nav-link" href="{{route("user.list")}}"> <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+-                    @else
+-                        <a class="nav-link text-chl" href="{{route("user.list")}}"><div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List</a>
+-                    @endif
+-                @endif
+-
+-                @php
+-                \Log::info('User roles:', auth()->user()->roles->pluck('name')->toArray());
+-            @endphp
++    <nav class="sb-sidenav-menu-nested nav">
++        @if (auth()->user()->hasPermission('add_user'))
++            @if (Route::currentRouteName() == 'add.user')
++                <a class="nav-link" href="{{ route('add.user') }}">
++                    <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User
++                </a>
++            @else
++                <a class="nav-link text-chl" href="{{ route('add.user') }}">
++                    <div class="sb-nav-link-icon"><i class="fa-solid fa-circle-plus"></i></div> Add User
++                </a>
++            @endif
++        @endif
++        @if (auth()->user()->hasPermission('list_user'))
++            @if (Route::currentRouteName() == 'user.list')
++                <a class="nav-link" href="{{ route('user.list') }}">
++                    <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List
++                </a>
++            @else
++                <a class="nav-link text-chl" href="{{ route('user.list') }}">
++                    <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List
++                </a>
++            @endif
++        @endif
++        @if (auth()->user()->hasPermission('user_screen_permission'))
++            @if (Route::currentRouteName() == 'user.screen.permission')
++                <a class="nav-link"
++                    href="{{ route('user.screen.permission', ['userID' => \Illuminate\Support\Facades\Request::route('userID')]) }}">
++                    <div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>Screen Permission
++                </a>
++            @endif
++        @endif
+ 
+-                    @if(auth()->user()->hasPermission('user_screen_permission'))
+-                        @if(Route::currentRouteName() == 'user.screen.permission')
+-                        <a class="nav-link" href="{{route("user.screen.permission",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>Screen Permission</a>
+-                        @endif
+-                    @endif
+-               
+ 
+-                    @if(auth()->user()->hasPermission('file_manager_permission'))
+-                        @if(Route::currentRouteName() == 'file.manager.permission')
+-                        <a class="nav-link" href="{{route("file.manager.permission",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>File Permission</a>
+-                        @endif
+-                    @endif
++        @if (auth()->user()->hasPermission('file_manager_permission'))
++            @if (Route::currentRouteName() == 'file.manager.permission')
++                <a class="nav-link"
++                    href="{{ route('file.manager.permission', ['userID' => \Illuminate\Support\Facades\Request::route('userID')]) }}">
++                    <div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>File Permission
++                </a>
++            @endif
++        @endif
+ 
+-                @if(auth()->user()->hasPermission('view_user'))
+-                    @if(Route::currentRouteName() == 'user.single.view')
+-                        <a class="nav-link" href="{{route("user.single.view",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile</a>
+-                    @endif
+-                @endif
+-                @if(auth()->user()->hasPermission('edit_user'))
+-                    @if(Route::currentRouteName() == 'user.edit')
+-                        <a class="nav-link" href="{{route("user.edit",['userID'=>\Illuminate\Support\Facades\Request::route('userID')])}}"><div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> User Profile</a>
+-                    @endif
+-                @endif
+-            </nav>
+-        </div>
+-    @endif
++        @if (auth()->user()->hasPermission('view_user'))
++            @if (Route::currentRouteName() == 'user.single.view')
++                <a class="nav-link"
++                    href="{{ route('user.single.view', ['userID' => \Illuminate\Support\Facades\Request::route('userID')]) }}">
++                    <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div> User Profile
++                </a>
++            @endif
++        @endif
++        @if (auth()->user()->hasPermission('edit_user'))
++            @if (Route::currentRouteName() == 'user.edit')
++                <a class="nav-link"
++                    href="{{ route('user.edit', ['userID' => \Illuminate\Support\Facades\Request::route('userID')]) }}">
++                    <div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div> User Profile
++                </a>
++            @endif
++        @endif
++    </nav>
++    </div>
++@endif
+diff --git a/vendor/composer/autoload_classmap.php b/vendor/composer/autoload_classmap.php
+index 94eb0f0c..c13c4fdc 100644
+--- a/vendor/composer/autoload_classmap.php
++++ b/vendor/composer/autoload_classmap.php
+@@ -70,6 +70,7 @@
+     'App\\Http\\Controllers\\ControlPanelController' => $baseDir . '/app/Http/Controllers/ControlPanelController.php',
+     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
+     'App\\Http\\Controllers\\DashboardController' => $baseDir . '/app/Http/Controllers/DashboardController.php',
++    'App\\Http\\Controllers\\DataArchiveDashboardController' => $baseDir . '/app/Http/Controllers/DataArchiveDashboardController.php',
+     'App\\Http\\Controllers\\DocumentRequisitionInfoController' => $baseDir . '/app/Http/Controllers/DocumentRequisitionInfoController.php',
+     'App\\Http\\Controllers\\FixedAssetController' => $baseDir . '/app/Http/Controllers/FixedAssetController.php',
+     'App\\Http\\Controllers\\FixedAssetDistribution' => $baseDir . '/app/Http/Controllers/FixedAssetDistribution.php',
+@@ -122,6 +123,8 @@
+     'App\\Models\\Document_requisition_info' => $baseDir . '/app/Models/Document_requisition_info.php',
+     'App\\Models\\Document_requisition_receiver_user' => $baseDir . '/app/Models/Document_requisition_receiver_user.php',
+     'App\\Models\\Download_history' => $baseDir . '/app/Models/Download_history.php',
++    'App\\Models\\ExtraEmail' => $baseDir . '/app/Models/ExtraEmail.php',
++    'App\\Models\\ExtraMobile' => $baseDir . '/app/Models/ExtraMobile.php',
+     'App\\Models\\Fixed_asset' => $baseDir . '/app/Models/Fixed_asset.php',
+     'App\\Models\\Fixed_asset_delete_history' => $baseDir . '/app/Models/Fixed_asset_delete_history.php',
+     'App\\Models\\Fixed_asset_opening_balance' => $baseDir . '/app/Models/Fixed_asset_opening_balance.php',
+@@ -137,16 +140,30 @@
+     'App\\Models\\Fixed_asset_transfer_with_spec' => $baseDir . '/app/Models/Fixed_asset_transfer_with_spec.php',
+     'App\\Models\\Fixed_asset_transfer_with_spec_delete_history' => $baseDir . '/app/Models/Fixed_asset_transfer_with_spec_delete_history.php',
+     'App\\Models\\Fixed_asset_with_ref_document_delete_history' => $baseDir . '/app/Models/Fixed_asset_with_ref_document_delete_history.php',
++    'App\\Models\\Lead' => $baseDir . '/app/Models/Lead.php',
+     'App\\Models\\Material_type' => $baseDir . '/app/Models/Material_type.php',
+     'App\\Models\\Op_reference_type' => $baseDir . '/app/Models/Op_reference_type.php',
+     'App\\Models\\Permission' => $baseDir . '/app/Models/Permission.php',
+     'App\\Models\\PermissionUser' => $baseDir . '/app/Models/PermissionUser.php',
+     'App\\Models\\PermissionUserHistory' => $baseDir . '/app/Models/PermissionUserHistory.php',
+     'App\\Models\\Pest_history' => $baseDir . '/app/Models/Pest_history.php',
++    'App\\Models\\Prospect' => $baseDir . '/app/Models/Prospect.php',
+     'App\\Models\\Rename_history' => $baseDir . '/app/Models/Rename_history.php',
+     'App\\Models\\Role' => $baseDir . '/app/Models/Role.php',
+     'App\\Models\\RoleWiseDefaultPermission' => $baseDir . '/app/Models/RoleWiseDefaultPermission.php',
+     'App\\Models\\SalaryCertificateTransection' => $baseDir . '/app/Models/SalaryCertificateTransection.php',
++    'App\\Models\\SalesLeadApartmentSize' => $baseDir . '/app/Models/SalesLeadApartmentSize.php',
++    'App\\Models\\SalesLeadApartmentType' => $baseDir . '/app/Models/SalesLeadApartmentType.php',
++    'App\\Models\\SalesLeadBudget' => $baseDir . '/app/Models/SalesLeadBudget.php',
++    'App\\Models\\SalesLeadFacing' => $baseDir . '/app/Models/SalesLeadFacing.php',
++    'App\\Models\\SalesLeadFloor' => $baseDir . '/app/Models/SalesLeadFloor.php',
++    'App\\Models\\SalesLeadLocationInfo' => $baseDir . '/app/Models/SalesLeadLocationInfo.php',
++    'App\\Models\\SalesLeadPreferencesLocation' => $baseDir . '/app/Models/SalesLeadPreferencesLocation.php',
++    'App\\Models\\SalesLeadSourceInfo' => $baseDir . '/app/Models/SalesLeadSourceInfo.php',
++    'App\\Models\\SalesLeadStatusInfo' => $baseDir . '/app/Models/SalesLeadStatusInfo.php',
++    'App\\Models\\SalesLeadView' => $baseDir . '/app/Models/SalesLeadView.php',
++    'App\\Models\\SalesProfession' => $baseDir . '/app/Models/SalesProfession.php',
++    'App\\Models\\Source' => $baseDir . '/app/Models/Source.php',
+     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
+     'App\\Models\\UserBranchChangeHistory' => $baseDir . '/app/Models/UserBranchChangeHistory.php',
+     'App\\Models\\UserCompanyPermission' => $baseDir . '/app/Models/UserCompanyPermission.php',
+diff --git a/vendor/composer/autoload_static.php b/vendor/composer/autoload_static.php
+index 2cfdc03f..83511e9c 100644
+--- a/vendor/composer/autoload_static.php
++++ b/vendor/composer/autoload_static.php
+@@ -746,6 +746,7 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
+         'App\\Http\\Controllers\\ControlPanelController' => __DIR__ . '/../..' . '/app/Http/Controllers/ControlPanelController.php',
+         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
++        'App\\Http\\Controllers\\DataArchiveDashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DataArchiveDashboardController.php',
+         'App\\Http\\Controllers\\DocumentRequisitionInfoController' => __DIR__ . '/../..' . '/app/Http/Controllers/DocumentRequisitionInfoController.php',
+         'App\\Http\\Controllers\\FixedAssetController' => __DIR__ . '/../..' . '/app/Http/Controllers/FixedAssetController.php',
+         'App\\Http\\Controllers\\FixedAssetDistribution' => __DIR__ . '/../..' . '/app/Http/Controllers/FixedAssetDistribution.php',
+@@ -798,6 +799,8 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
+         'App\\Models\\Document_requisition_info' => __DIR__ . '/../..' . '/app/Models/Document_requisition_info.php',
+         'App\\Models\\Document_requisition_receiver_user' => __DIR__ . '/../..' . '/app/Models/Document_requisition_receiver_user.php',
+         'App\\Models\\Download_history' => __DIR__ . '/../..' . '/app/Models/Download_history.php',
++        'App\\Models\\ExtraEmail' => __DIR__ . '/../..' . '/app/Models/ExtraEmail.php',
++        'App\\Models\\ExtraMobile' => __DIR__ . '/../..' . '/app/Models/ExtraMobile.php',
+         'App\\Models\\Fixed_asset' => __DIR__ . '/../..' . '/app/Models/Fixed_asset.php',
+         'App\\Models\\Fixed_asset_delete_history' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_delete_history.php',
+         'App\\Models\\Fixed_asset_opening_balance' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_opening_balance.php',
+@@ -813,16 +816,30 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
+         'App\\Models\\Fixed_asset_transfer_with_spec' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_transfer_with_spec.php',
+         'App\\Models\\Fixed_asset_transfer_with_spec_delete_history' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_transfer_with_spec_delete_history.php',
+         'App\\Models\\Fixed_asset_with_ref_document_delete_history' => __DIR__ . '/../..' . '/app/Models/Fixed_asset_with_ref_document_delete_history.php',
++        'App\\Models\\Lead' => __DIR__ . '/../..' . '/app/Models/Lead.php',
+         'App\\Models\\Material_type' => __DIR__ . '/../..' . '/app/Models/Material_type.php',
+         'App\\Models\\Op_reference_type' => __DIR__ . '/../..' . '/app/Models/Op_reference_type.php',
+         'App\\Models\\Permission' => __DIR__ . '/../..' . '/app/Models/Permission.php',
+         'App\\Models\\PermissionUser' => __DIR__ . '/../..' . '/app/Models/PermissionUser.php',
+         'App\\Models\\PermissionUserHistory' => __DIR__ . '/../..' . '/app/Models/PermissionUserHistory.php',
+         'App\\Models\\Pest_history' => __DIR__ . '/../..' . '/app/Models/Pest_history.php',
++        'App\\Models\\Prospect' => __DIR__ . '/../..' . '/app/Models/Prospect.php',
+         'App\\Models\\Rename_history' => __DIR__ . '/../..' . '/app/Models/Rename_history.php',
+         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',
+         'App\\Models\\RoleWiseDefaultPermission' => __DIR__ . '/../..' . '/app/Models/RoleWiseDefaultPermission.php',
+         'App\\Models\\SalaryCertificateTransection' => __DIR__ . '/../..' . '/app/Models/SalaryCertificateTransection.php',
++        'App\\Models\\SalesLeadApartmentSize' => __DIR__ . '/../..' . '/app/Models/SalesLeadApartmentSize.php',
++        'App\\Models\\SalesLeadApartmentType' => __DIR__ . '/../..' . '/app/Models/SalesLeadApartmentType.php',
++        'App\\Models\\SalesLeadBudget' => __DIR__ . '/../..' . '/app/Models/SalesLeadBudget.php',
++        'App\\Models\\SalesLeadFacing' => __DIR__ . '/../..' . '/app/Models/SalesLeadFacing.php',
++        'App\\Models\\SalesLeadFloor' => __DIR__ . '/../..' . '/app/Models/SalesLeadFloor.php',
++        'App\\Models\\SalesLeadLocationInfo' => __DIR__ . '/../..' . '/app/Models/SalesLeadLocationInfo.php',
++        'App\\Models\\SalesLeadPreferencesLocation' => __DIR__ . '/../..' . '/app/Models/SalesLeadPreferencesLocation.php',
++        'App\\Models\\SalesLeadSourceInfo' => __DIR__ . '/../..' . '/app/Models/SalesLeadSourceInfo.php',
++        'App\\Models\\SalesLeadStatusInfo' => __DIR__ . '/../..' . '/app/Models/SalesLeadStatusInfo.php',
++        'App\\Models\\SalesLeadView' => __DIR__ . '/../..' . '/app/Models/SalesLeadView.php',
++        'App\\Models\\SalesProfession' => __DIR__ . '/../..' . '/app/Models/SalesProfession.php',
++        'App\\Models\\Source' => __DIR__ . '/../..' . '/app/Models/Source.php',
+         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
+         'App\\Models\\UserBranchChangeHistory' => __DIR__ . '/../..' . '/app/Models/UserBranchChangeHistory.php',
+         'App\\Models\\UserCompanyPermission' => __DIR__ . '/../..' . '/app/Models/UserCompanyPermission.php',

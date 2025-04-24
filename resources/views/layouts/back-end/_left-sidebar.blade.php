@@ -42,8 +42,8 @@
                                 Route::currentRouteName() == 'add.role' ||
                                 Route::currentRouteName() == 'edit.role' ||
                                 Route::currentRouteName() == 'role.list' ||
-                                Route::currentRouteName() == 'delete.role'||
-                                Route::currentRouteName() == 'user.screen.permission'||
+                                Route::currentRouteName() == 'delete.role' ||
+                                Route::currentRouteName() == 'user.screen.permission' ||
                                 Route::currentRouteName() == 'file.manager.permission')
                             <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userLayouts"
                                 aria-expanded="true" aria-controls="userLayouts">
@@ -206,7 +206,7 @@
             <subgroup1>
                 @if (Route::currentRouteName() == 'sales.dashboard.interface' ||
                         Route::currentRouteName() == 'add.sales.lead' ||
-                        Route::currentRouteName() == 'sales.lead.list')
+                        Route::currentRouteName() == 'sales.lead.list'||Route::currentRouteName() == 'sale.settings.interface')
                     <a class="nav-link" href="#" data-bs-toggle="collapse"
                         data-bs-target="#salesInterfaceLayouts" aria-expanded="true"
                         aria-controls="salesInterfaceLayouts">
@@ -232,6 +232,20 @@
                     {{-- Sales Interface dashboard here --}}
                     @include('layouts.back-end.sidebar-components.interface.sales._dashboard')
                     @include('layouts.back-end.sidebar-components.interface.sales._lead_menu_submenu')
+                    @if (auth()->user()->hasPermission('sales_dashboard_interface'))
+                        @if (Route::currentRouteName() == 'sale.settings.interface')
+                            {{-- {{route('sale_settings_interface')}} --}}
+                            <a class="nav-link" href="{{ route('sale.settings.interface') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
+                                Settings
+                            </a>
+                        @else
+                            <a class="nav-link text-chl" href="{{ route('sale.settings.interface') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
+                                Settings
+                            </a>
+                        @endif
+                    @endif
                     {{-- Sales Interface dashboard is here --}}
                 </nav>
                 </div>

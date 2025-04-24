@@ -1,6 +1,6 @@
 let Obj = {};
 let Archive = {};
-let AppSetting = {};
+let Sales = {};
 // Show loader immediately when the page starts loading
 (function ($) {
     //     $(document).ready(function() {
@@ -26,6 +26,8 @@ let AppSetting = {};
         const tags = [];
         const employeeDatas = [];
         const materialsTempList = [];
+        var extraMobileNumberCount = 2;
+        var extraEmailAddressCount = 2;
         $(".select-search").selectize({
             create: false,
             sortField: "text",
@@ -598,9 +600,7 @@ let AppSetting = {};
                     success: function (response) {
                         if (response.status === "error") {
                             // alert('Error:'+response.message)
-                            $("#auth_error_block").attr('style', 'display: block');
-                            $("#auth_error").html(response.message);
-                            $("#companySelect").html("<option value='0'>Not Found</option>");
+                            $("#companySelect").html("<option></option>");
                             $("#login").attr("disabled", "disabled");
                             $("#login").hide();
                         } else {
@@ -613,16 +613,13 @@ let AppSetting = {};
                                     new Option(company.company_name, company.id)
                                 );
                             });
-                            $("#auth_error_block").attr('style', 'display: none');
-                            $("#auth_error").html('');
                             $("#login").removeAttr("disabled");
                             $("#login").show();
                         }
                     },
                     error: function (error) {
-                        $("#auth_error_block").style('display', 'block');
-                        $("#auth_error").html(response.message);
-                        $("#companySelect").html("<option value='0'>Not Found</option>");
+                        // alert(error.responseJSON.message);
+                        $("#companySelect").html("<option></option>");
                         $("#login").attr("disabled", "disabled");
                         $("#login").hide();
                     },
@@ -1236,9 +1233,11 @@ let AppSetting = {};
                     },
                 });
             },
-            findDocument: function (e, actionID) {
-                let id = $(e).attr("ref");
-                if (id.length !== 0) {
+            findDocument: function (e, actionID, actionID2, actionID3) {
+                let path = $(e).attr("path");
+                let v_type = $(e).attr("vtype");
+                let v_no = $(e).attr("vno");
+                if (path) {
                     let url =
                         window.location.origin +
                         sourceDir +
@@ -1251,21 +1250,78 @@ let AppSetting = {};
                         },
                         url: url,
                         type: "POST",
-                        data: { id: id },
-                        success: function (response) {
-                            if (response.status === "error")
-                            {
-                                alert("Error: "+ response.message)
-                            }
-                            else if (response.status === "success") {
-                                $("#"+actionID).html(response.data)
-                                $("#staticBackdrop").modal("show");
-                            }
+                        data: { path: path },
+                        success: function (pdfPreviewUrl) {
+                            // Check if the file exists
+                            checkFileExists(pdfPreviewUrl, function (exists) {
+                                if (exists) {
+                                    const fileExtension = pdfPreviewUrl
+                                        .split(".")
+                                        .pop()
+                                        .toLowerCase();
+                                    const fileName = pdfPreviewUrl
+                                        .split("/")
+                                        .pop();
+                                    $("#v_document_name").html(fileName);
+                                    $("#" + actionID2).html(v_type);
+                                    $("#" + actionID3).html(v_no);
+                                    if (
+                                        [
+                                            "jpg",
+                                            "jpeg",
+                                            "png",
+                                            "gif",
+                                            "pdf",
+                                            "PDF",
+                                        ].includes(fileExtension)
+                                    ) {
+                                        // Preview PDF in iframe
+                                        const embedTag =
+                                            '<embed src="' +
+                                            pdfPreviewUrl +
+                                            '#toolbar=0" style="width:100%; height:700px;" />';
+                                        $("#" + actionID).html(embedTag);
+                                    } else if (
+                                        ["mp4", "webm", "ogg"].includes(
+                                            fileExtension
+                                        )
+                                    ) {
+                                        // Play video
+                                        // Modify this to fit your video display logic
+                                        const videoTag = `<video controls style="width: 100%"><source src="${pdfPreviewUrl}" type="video/mp4">Your browser does not support the video tag.</video>`;
+                                        $("#" + actionID).html(videoTag);
+                                        // $('#'+actionID).replaceWith(videoTag);
+                                        // $('#staticBackdrop').modal('show');
+                                        // $('#pdfPreviewModal').modal('show');
+                                    } else {
+                                        const btn =
+                                            '<div class="row">\n' +
+                                            '                        <div class="col-md-12 text-center">\n' +
+                                            '                            <h1 class="text-center">Sorry! This file type is not supported for preview.</h1>\n' +
+                                            '                            <a class="btn btn-success text-center" href="' +
+                                            pdfPreviewUrl +
+                                            '" download>\n' +
+                                            "                                Click To Download\n" +
+                                            "                            </a>\n" +
+                                            "                        </div>\n" +
+                                            "                    </div>";
+                                        // Provide a download link
+                                        $("#" + actionID).html(btn);
+                                        // window.location.href = pdfPreviewUrl;
+                                    }
+                                    $("#staticBackdrop").modal("show");
+                                } else {
+                                    const error =
+                                        '<div class="text-center text-danger">URL Not Found!</div>';
+                                    $("#" + actionID).html(error);
+                                    $("#staticBackdrop").modal("show");
+                                }
+                            });
+                            return true;
                         },
                     });
                 }
                 return false;
-
             },
             fileSharingModal: function (e) {
                 let id = $(e).attr("ref");
@@ -3310,8 +3366,7 @@ let AppSetting = {};
                             return false;
                         } else if (response.status === "success") {
                             if (multiply) {
-                                if (action_id_projects !== null)
-                                {
+                                if (action_id_projects !== null) {
                                     updateSelectBox(
                                         response.data.projects,
                                         action_id_projects,
@@ -3319,8 +3374,7 @@ let AppSetting = {};
                                         "branch_name"
                                     );
                                 }
-                                if (action_id_types !== null)
-                                {
+                                if (action_id_types !== null) {
                                     updateSelectBox(
                                         response.data.types,
                                         action_id_types,
@@ -3328,7 +3382,6 @@ let AppSetting = {};
                                         "voucher_type_title"
                                     );
                                 }
-
                             } else {
                                 updateSelectBoxSingleOption(
                                     response.data.projects,
@@ -4173,24 +4226,33 @@ let AppSetting = {};
             },
         };
         Archive = {
-            settingSetTypePermission:function (e,type_company_id,types, users){
-                let company_id = $("#"+type_company_id).val()
-                let data_types = $("#"+types).val()
-                let permission_users = $("#"+users).val()
+            settingSetTypePermission: function (
+                e,
+                type_company_id,
+                types,
+                users
+            ) {
+                let company_id = $("#" + type_company_id).val();
+                let data_types = $("#" + types).val();
+                let permission_users = $("#" + users).val();
                 // Ensure data_types is always an array
                 if (!Array.isArray(data_types)) {
                     data_types = [data_types];
                 }
-                if (data_types.length === 0 || permission_users.length === 0 || company_id.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
+                if (
+                    data_types.length === 0 ||
+                    permission_users.length === 0 ||
+                    company_id.length === 0
+                ) {
+                    return false;
+                } else {
+                    if (!confirm("Are you sure?")) {
+                        return false;
                     }
-                    const url =window.location.origin + sourceDir + "/archive-data-type-user-permission-add";
+                    const url =
+                        window.location.origin +
+                        sourceDir +
+                        "/archive-data-type-user-permission-add";
                     $.ajax({
                         url: url,
                         headers: {
@@ -4199,25 +4261,31 @@ let AppSetting = {};
                             ),
                         },
                         method: "POST",
-                        data: { type_company_id: company_id,data_types: data_types, permission_users: permission_users },
+                        data: {
+                            type_company_id: company_id,
+                            data_types: data_types,
+                            permission_users: permission_users,
+                        },
                         success: function (response) {
                             if (response.status === "error") {
                                 alert("Error: " + response.message);
                             } else if (response.status === "success") {
-                                alert(response.message)
+                                alert(response.message);
                             }
                             return true;
                         },
-                    })
+                    });
                 }
             },
 
-            typeWiseDataView:function (e, company_id, type_id, output_id){
-                if (company_id.length === 0 || type_id.length === 0)
-                {
-                    return false
+            typeWiseDataView: function (e, company_id, type_id, output_id) {
+                if (company_id.length === 0 || type_id.length === 0) {
+                    return false;
                 }
-                const url =window.location.origin + sourceDir + "/archive-data-type-wise-data-show";
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/archive-data-type-wise-data-show";
                 $.ajax({
                     url: url,
                     headers: {
@@ -4226,165 +4294,68 @@ let AppSetting = {};
                         ),
                     },
                     method: "POST",
-                    data: { company_id: company_id,data_type: type_id },
+                    data: { company_id: company_id, data_type: type_id },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
-                            $("#"+output_id).html(response.data)
+                            $("#" + output_id).html(response.data);
                         }
                         return true;
                     },
-                })
+                });
             },
         };
-        AppSetting = {
-            addArchivePackage:function (e,output_id){
-                let package_name = $("#package_name").val()
-                let package_size = $("#package_size").val()
-                let package_status = $("#package_status").val()
-                if (package_name.length === 0 || package_size.length === 0 || package_status.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
+        Sales = {
+            addEmailPhoneForLead: function (e, display_name, output) {
+                var count = null;
+                var input_type = null;
+                if (display_name.length !== 0 && output.length !== 0) {
+                    if (display_name === "mobile") {
+                        if (extraMobileNumberCount > 5) {
+                            alert(
+                                "You can add alternative " +
+                                    display_name +
+                                    " maximum 5."
+                            );
+                            return false;
+                        } else {
+                            input_type = "number";
+                            count = extraMobileNumberCount++;
+                        }
+                    } else if (display_name === "email") {
+                        if (extraEmailAddressCount > 5) {
+                            alert(
+                                "You can add alternative " +
+                                    display_name +
+                                    " maximum 5."
+                            );
+                            return false;
+                        } else {
+                            input_type = "email";
+                            count = extraEmailAddressCount++;
+                        }
                     }
-                    else {
-                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-add";
-                        $.ajax({
-                            url: url,
-                            headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content"
-                                ),
-                            },
-                            method: "POST",
-                            data: { package_name: package_name, package_size: package_size, package_status: package_status },
-                            success: function (response) {
-                                if (response.status === "error") {
-                                    alert("Error: " + response.message);
-                                } else if (response.status === "success") {
-                                    alert(response.message)
-                                    $("#"+output_id).html(response.data)
-                                }
-                                return true;
-                            },
-                        })
+                    if (input_type !== null && count !== null) {
+                        $("#" + output).append(`
+                            <div class="col"><div class="mt-3 form-floating">
+                                <input class="form-control" id="${
+                                    display_name + "_" + count
+                                }" type="${input_type}" placeholder="Add Another ${
+                            display_name + " " + count
+                        }">
+                                <label for="${
+                                    display_name + "_" + count
+                                }">Alternative ${
+                            display_name + " " + count
+                        }</label>
+                            </div></div>
+                        `);
                     }
+                    return false;
                 }
-            },
-            editArchivePackage:function (e,output_id){
-                let edit_id = $(e).attr("ref")
-                if (edit_id.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
-                    }
-                    else {
-                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-edit";
-                        $.ajax({
-                            url: url,
-                            headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content"
-                                ),
-                            },
-                            method: "POST",
-                            data: { edit_id: edit_id},
-                            success: function (response) {
-                                if (response.status === "error") {
-                                    alert("Error: " + response.message);
-                                } else if (response.status === "success") {
-                                    $("#"+output_id+"_content").html(response.data)
-                                    $("#"+output_id).modal("show")
-                                }
-                                return true;
-                            },
-                        })
-                    }
-                }
-            },
-            updateArchivePackage:function (e,output_id){
-                let package_name = $("#edit_package_name").val()
-                let package_size = $("#edit_package_size").val()
-                let package_status = $("#edit_package_status").val()
-                let package_id = $("#edit_package_id").val()
-                if (package_name.length === 0 || package_size.length === 0 || package_status.length === 0 || package_id.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
-                    }
-                    else {
-                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-update";
-                        $.ajax({
-                            url: url,
-                            headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content"
-                                ),
-                            },
-                            method: "POST",
-                            data: { package_name: package_name, package_size: package_size, package_status: package_status,package_id:package_id },
-                            success: function (response) {
-                                if (response.status === "error") {
-                                    alert("Error: " + response.message);
-                                } else if (response.status === "success") {
-                                    alert(response.message)
-                                    $("#"+output_id).html(response.data)
-                                }
-                                return true;
-                            },
-                        })
-                    }
-                }
-            },
-            deleteArchivePackage:function (e,output_id){
-                let delete_id = $(e).attr("ref")
-                if (delete_id.length === 0)
-                {
-                    return false
-                }
-                else {
-                    if (!confirm('Are you sure?'))
-                    {
-                        return false
-                    }
-                    else {
-                        const url =window.location.origin + sourceDir + "/system-operation/archive-package-delete";
-                        $.ajax({
-                            url: url,
-                            headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content"
-                                ),
-                            },
-                            method: "POST",
-                            data: { delete_id: delete_id},
-                            success: function (response) {
-                                if (response.status === "error") {
-                                    alert("Error: " + response.message);
-                                } else if (response.status === "success") {
-                                    alert(response.message)
-                                    $("#"+output_id).html(response.data)
-                                }
-                                return true;
-                            },
-                        })
-                    }
-                }
-            },
-        }
+            }
+        };
     });
     function checkFileExists(url, callback) {
         const xhr = new XMLHttpRequest();
@@ -4409,6 +4380,7 @@ let AppSetting = {};
         }
     }
     function updateSelectBox(data, id, value, value_name) {
+        // alert('ok');
         const $select = $("#" + id);
         // Ensure Selectize is initialized
         if ($select[0] && $select[0].selectize) {
