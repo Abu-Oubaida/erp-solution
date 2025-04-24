@@ -601,7 +601,14 @@ let SalesSetting = {};
                     success: function (response) {
                         if (response.status === "error") {
                             // alert('Error:'+response.message)
-                            $("#companySelect").html("<option></option>");
+                            $("#auth_error_block").attr(
+                                "style",
+                                "display: block"
+                            );
+                            $("#auth_error").html(response.message);
+                            $("#companySelect").html(
+                                "<option value='0'>Not Found</option>"
+                            );
                             $("#login").attr("disabled", "disabled");
                             $("#login").hide();
                         } else {
@@ -614,13 +621,21 @@ let SalesSetting = {};
                                     new Option(company.company_name, company.id)
                                 );
                             });
+                            $("#auth_error_block").attr(
+                                "style",
+                                "display: none"
+                            );
+                            $("#auth_error").html("");
                             $("#login").removeAttr("disabled");
                             $("#login").show();
                         }
                     },
                     error: function (error) {
-                        // alert(error.responseJSON.message);
-                        $("#companySelect").html("<option></option>");
+                        $("#auth_error_block").style("display", "block");
+                        $("#auth_error").html(response.message);
+                        $("#companySelect").html(
+                            "<option value='0'>Not Found</option>"
+                        );
                         $("#login").attr("disabled", "disabled");
                         $("#login").hide();
                     },
@@ -4669,7 +4684,7 @@ let SalesSetting = {};
                 if (delete_id.length === 0) {
                     return false;
                 }
-            }
+            },
         };
     });
     function checkFileExists(url, callback) {
