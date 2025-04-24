@@ -650,7 +650,7 @@ class ArchiveController extends Controller
 //                $dataType = $this->archiveTypeList($permission)->where('company_id',$companyID->id)->where('id',$data_type)->where('status',1)->select('id','voucher_type_title')->first();
 
                 $voucherInfos = $this->archiveListInfo($company_id, $data_type);
-                $view = view('back-end/archive/_archive_quick_list', compact('voucherInfos'))->render();
+                $view = view('back-end/archive/_archive_quick_list', compact('voucherInfos','company_id','data_type'))->render();
                 return response()->json([
                     'status' => 'success',
                     'data' => $view,
@@ -665,9 +665,9 @@ class ArchiveController extends Controller
             ]);
         }
     }
-    private function archiveListInfo($company_id,$type_id)
+    private function archiveListInfo($company_id,$type_id,$perPage = null)
     {
-        return Account_voucher::with([
+        $data = Account_voucher::with([
             'VoucherDocument',
             'voucherDocuments',
             'VoucherType',
@@ -706,7 +706,14 @@ class ArchiveController extends Controller
             ->where('company_id', $company_id)
             ->whereIn('project_id', $this->getUserProjectPermissions($this->user->id, $this->permissions()->archive_data_list_quick)->pluck('id')->toArray())
             ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes($company_id)->pluck('id')->toArray())
-            ->where('voucher_type_id',$type_id)->get();
+            ->where('voucher_type_id',$type_id);
+        if ($perPage) {
+            $data = $data->paginate($perPage);
+        }
+        else{
+            $data = $data->get();
+        }
+        return $data;
     }
     private function archiveListQuickSearch(Request $request)
     {

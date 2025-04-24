@@ -270,8 +270,8 @@
             if (!$.fn.DataTable.isDataTable('#DataTable2')) {
                 $('#DataTable2').DataTable({
                     dom: 'lBfrtip', // 'l' includes the "length changing" input
-                    lengthMenu: [[5, 10, 15, 25, 50, 100, -1], [5, 10, 15, 25, 50, 100, "ALL"]],
-                    pageLength: 15,
+                    lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "ALL"]],
+                    pageLength: -1,
                     fixedHeader: {
                         header: true
                     },

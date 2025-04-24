@@ -7,87 +7,91 @@
 @if (auth()->user()->hasPermission('archive_storage_view') || auth()->user()->hasPermission('archive_uploaded_last_week_view'))
     <div class="row">
     @if (auth()->user()->hasPermission('archive_storage_view'))
-        <div class="col mb-2">
+        <div class="col-sm-12 col-md-12 col-xl-6 mb-2">
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fa-solid fa-hard-drive"></i> Storage Information Details</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col">
-                            <table class="table table-bordered mt-3" style="width: 100%">
-                                <tr>
-                                    <th>Module Name</th>
-                                    <th>:</th>
-                                    <td>Data Archive</td>
-                                </tr>
-                                <tr>
-                                    <th>Total Disk Space</th>
-                                    <th>:</th>
-                                    <td>{{ @$diskTotal }} GB</td>
-                                </tr>
-                                <tr>
-                                    <th>Total Free Space</th>
-                                    <th>:</th>
-                                    <td>{{ @$diskFree }} GB</td>
-                                </tr>
-                                <tr>
-                                    <th>Total Used Space</th>
-                                    <th>:</th>
-                                    <td>{{ @$totalUsed }} GB</td>
-                                </tr>
-                                <tr>
-                                    <th>Archived</th>
-                                    <th>:</th>
-                                    <td>{{ @$archiveUsed }} GB</td>
-                                </tr>
-                                <tr>
-                                    <th>Other</th>
-                                    <th>:</th>
-                                    <td>{{ @$otherUsed }} GB</td>
-                                </tr>
-                                <tr>
-                                    <th>Total Data Type</th>
-                                    <th>:</th>
-                                    <td>{{ @$dataTypeCount }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Total Document</th>
-                                    <th>:</th>
-                                    <td>{{ @$archiveDocumentCount }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Total Unique Reference</th>
-                                    <th>:</th>
-                                    <td>{{ @$accountVoucherInfosCount }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col">
-                            <div class="align-items-center">
-                                <div id="chart-container" style="width: 95%; float:right">
-                                    <canvas id="levelChart"></canvas>
+                        <table>
+                            <tr>
+                                <td style="width: 50%" class="mobile-none">
+                                    <table class="table table-bordered mt-3" style="width: 100%; font-size: 13px">
+                                        <tr>
+                                            <th>Module Name</th>
+                                            <th>:</th>
+                                            <td>Data Archive</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Disk Space</th>
+                                            <th>:</th>
+                                            <td>{{ @$diskTotal }} GB</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Free Space</th>
+                                            <th>:</th>
+                                            <td>{{ @$diskFree }} GB</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Used Space</th>
+                                            <th>:</th>
+                                            <td>{{ @$totalUsed }} GB</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Archived</th>
+                                            <th>:</th>
+                                            <td>{{ @$archiveUsed }} GB</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Other</th>
+                                            <th>:</th>
+                                            <td>{{ @$otherUsed }} GB</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Data Type</th>
+                                            <th>:</th>
+                                            <td>{{ @$dataTypeCount }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Document</th>
+                                            <th>:</th>
+                                            <td>{{ @$archiveDocumentCount }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Unique Reference</th>
+                                            <th>:</th>
+                                            <td>{{ @$accountVoucherInfosCount }}</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="width: 50%">
+                                    <div class="align-items-center">
+                                        <div id="chart-container" style="width: 80%; float:right">
+                                            <canvas id="levelChart"></canvas>
 
-                                    <div class="progress" title="Total: {{ $diskTotal }} GB">
-                                        <div class="progress-bar" role="progressbar"
-                                            style="width: {!! $totalUsed !!}%; background: rgb(255, 99, 132)"
-                                            aria-valuenow="{!! $totalUsed !!}" aria-valuemin="0"
-                                            aria-valuemax="{{ $diskTotal }}"
-                                            title="Total Used ({!! $totalUsed !!}) GB">
-                                            Used ( {!! $totalUsed !!} GB )</div>
-                                        <div class="progress-bar" role="progressbar"
-                                            style="width: {!! $diskFree !!}%; background: rgb(54, 162, 235)"
-                                            aria-valuenow="{!! $diskFree !!}" aria-valuemin="0"
-                                            aria-valuemax="{{ $diskTotal }}"
-                                            title="Free Spase ({!! $diskFree !!}) GB">Free (
-                                            {!! $diskFree !!} GB )
+                                            <div class="progress" title="Total: {{ $diskTotal }} GB">
+                                                <div class="progress-bar" role="progressbar"
+                                                     style="width: {!! $totalUsed !!}%; background: rgb(255, 99, 132)"
+                                                     aria-valuenow="{!! $totalUsed !!}" aria-valuemin="0"
+                                                     aria-valuemax="{{ $diskTotal }}"
+                                                     title="Total Used ({!! $totalUsed !!}) GB">
+                                                    Used ( {!! $totalUsed !!} GB )</div>
+                                                <div class="progress-bar" role="progressbar"
+                                                     style="width: {!! $diskFree !!}%; background: rgb(54, 162, 235)"
+                                                     aria-valuenow="{!! $diskFree !!}" aria-valuemin="0"
+                                                     aria-valuemax="{{ $diskTotal }}"
+                                                     title="Free Spase ({!! $diskFree !!}) GB">Free (
+                                                    {!! $diskFree !!} GB )
+                                                </div>
+                                            </div>
+                                            <p class="text-center"><strong>Total Storage:</strong> {{ $diskTotal }} GB
+                                            </p>
                                         </div>
                                     </div>
-                                    <p class="text-center"><strong>Total Storage:</strong> {{ $diskTotal }} GB
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -129,14 +133,14 @@
         </script>
     @endif
     @if (auth()->user()->hasPermission('archive_uploaded_last_week_view'))
-        <div class="col">
+        <div class="col-sm-12 col-md-12 col-xl-6 mb-2">
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fa-solid fa-chart-column"></i> Last 7 Days Uploaded Documents</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div style="width: 100%">
+                        <div style="width: 95%">
                             <canvas id="documentTypeChart" width="600" class="mt-4"></canvas>
                         </div>
                     </div>

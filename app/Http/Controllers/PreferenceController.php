@@ -10,7 +10,7 @@ class PreferenceController extends Controller
     public function saveSidebarWidth(Request $request)
     {
         $request->validate([
-            'width' => 'required|integer|min:100|max:1000',
+            'width' => 'required|integer|min:230|max:400',
         ]);
 
         session(['sidebar_width' => $request->input('width')]);

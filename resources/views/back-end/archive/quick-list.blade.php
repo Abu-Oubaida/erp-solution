@@ -96,13 +96,18 @@
             $request = request()
             @endphp
             @if ($request->get('c') && $request->get('t'))
-                <script>
-                    (function ($) {
-                        $(document).ready(function () {
-                            Archive.typeWiseDataView(this,{!! $request->get('c') !!},{!! $request->get('t') !!},'quick-list')
-                        });
-                    }(jQuery))
-                </script>
+                @if($request->get('page'))
+                    @include('back-end.archive._archive_quick_list')
+                @else
+                    <script>
+                        (function ($) {
+                            $(document).ready(function () {
+                                Archive.typeWiseDataView(this,{!! $request->get('c') !!},{!! $request->get('t') !!},'quick-list')
+                            });
+                        }(jQuery))
+                    </script>
+                @endif
+
             @endif
             <div class="card-body" id="quick-list">
 {{--                @if(isset($voucherInfos))--}}

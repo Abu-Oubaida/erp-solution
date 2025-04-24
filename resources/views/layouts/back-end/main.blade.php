@@ -83,14 +83,14 @@
             height:100vh;
             width: 80%;
         }
-        #app_logo{
-            width: {{ $sidebarWidth }}px
-        }
         .sb-nav-fixed #layoutSidenav #layoutSidenav_nav {
-            width: {{ $sidebarWidth }}px
+            width: {{ $sidebarWidth }}px;
         }
         .sb-nav-fixed #layoutSidenav #layoutSidenav_content {
             padding-left: {{ $sidebarWidth }}px;
+        }
+        #app_logo {
+            width: {{ $sidebarWidth }}px;
         }
     </style>
 </head>
@@ -176,37 +176,116 @@
     let app_logo = document.getElementById("app_logo");
     let main_content = document.getElementById("layoutSidenav_content");
     let dragholder = document.getElementById('dragholder');
-    function onMouseMove(e){
-        var x = e.pageX;
+    let currentSidebarWidth = {!! $sidebarWidth !!}; // Server-defined default width
+
+    function updateSidebarWidth(width) {
+        sidebar.style.width = `${width}px`;
+        app_logo.style.width = `${width}px`;
+        main_content.style.paddingLeft = `${width}px`;
+    }
+
+    function onMouseMove(e) {
+        const x = e.pageX;
         if (x > 220 && x < 400) {
-            sidebar.style.cssText = `width: ${x}px`;
-            app_logo.style.cssText = `width: ${x}px`;
-            main_content.style.cssText = `padding-left: ${x}px`;
+            currentSidebarWidth = x;
+            updateSidebarWidth(x);
+            localStorage.setItem('sidebarWidth', x);
+            const sidebarWidth = x;
+
+            // Save to server
+            fetch('/save-sidebar-width', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({ width: sidebarWidth })
+            });
         }
     }
 
-    function onMouseDown(e){
-        document.addEventListener('mousemove',onMouseMove);
+    function onMouseDown() {
+        document.addEventListener('mousemove', onMouseMove);
     }
 
-    function onMouseUp(e){
-        document.removeEventListener('mousemove',onMouseMove);
-        let sidebarWidth = sidebar.offsetWidth;
-
-        fetch('/save-sidebar-width', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
-            body: JSON.stringify({ width: sidebarWidth })
-        })
+    function onMouseUp() {
+        document.removeEventListener('mousemove', onMouseMove);
     }
 
-    dragholder.addEventListener('mousedown', onMouseDown);
-    dragholder.addEventListener('mouseup', onMouseUp);
-    main_content.addEventListener('mouseup', onMouseUp);
-    document.addEventListener('mouseup', onMouseUp);
+    // Restore saved width on load
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedWidth = parseInt(localStorage.getItem('sidebarWidth'));
+        if (savedWidth && savedWidth > 230 && savedWidth < 400) {
+            currentSidebarWidth = savedWidth;
+        }
+        updateSidebarWidth(currentSidebarWidth);
+
+        // Setup drag events
+        dragholder.addEventListener('mousedown', onMouseDown);
+        document.addEventListener('mouseup', onMouseUp);
+    });
+
+    $(document).ready(function () {
+        let isCollapsed = false;
+
+        $('#sidebarToggle').on('click', function () {
+            if (!isCollapsed) {
+                // Collapse sidebar
+                $('#layoutSidenav_nav').css('display', 'none');
+                $('#layoutSidenav_content').css('padding-left', '220px');
+            } else {
+                // Expand sidebar to previously saved or default width
+                const width = localStorage.getItem('sidebarWidth') || currentSidebarWidth || 250;
+                $('#layoutSidenav_nav').css('display', 'block');
+                $('#layoutSidenav_content').css('padding-left', `${width}px`);
+            }
+
+            isCollapsed = !isCollapsed;
+        });
+    });
 </script>
+
+{{--<script>--}}
+{{--    let sidebar = document.getElementById("layoutSidenav_nav");--}}
+{{--    let main_content = document.getElementById("layoutSidenav_content");--}}
+{{--    let dragholder = document.getElementById('dragholder');--}}
+{{--    let dragholder = document.getElementById('dragholder');--}}
+{{--    function onMouseMove(e){--}}
+{{--        var x = e.pageX;--}}
+{{--        if (x > 220 && x < 400) {--}}
+{{--            sidebar.style.cssText = `width: ${x}px`;--}}
+{{--            main_content.style.cssText = `padding-left: ${x}px`;--}}
+{{--            let sidebarWidth = x;--}}
+
+{{--            fetch('/save-sidebar-width', {--}}
+{{--                method: 'POST',--}}
+{{--                headers: {--}}
+{{--                    'Content-Type': 'application/json',--}}
+{{--                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),--}}
+{{--                },--}}
+{{--                body: JSON.stringify({ width: sidebarWidth })--}}
+{{--            }).then(response => {--}}
+{{--                if (response.ok) {--}}
+{{--                    console.log('Sidebar width saved to session');--}}
+{{--                }--}}
+{{--            });--}}
+{{--        }--}}
+{{--    }--}}
+
+{{--    function onMouseDown(e){--}}
+{{--        document.addEventListener('mousemove',onMouseMove);--}}
+{{--    }--}}
+
+{{--    function onMouseUp(e){--}}
+{{--        document.removeEventListener('mousemove',onMouseMove);--}}
+{{--    }--}}
+
+{{--    dragholder.addEventListener('mousedown', onMouseDown);--}}
+{{--    dragholder.addEventListener('mouseup', onMouseUp);--}}
+{{--    main_content.addEventListener('mouseup', onMouseUp);--}}
+{{--    document.addEventListener('mouseup', onMouseUp);--}}
+{{--</script>--}}
+
+
 </body>
 </html>
