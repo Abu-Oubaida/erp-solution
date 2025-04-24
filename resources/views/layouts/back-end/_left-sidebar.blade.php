@@ -347,6 +347,7 @@
                     Route::currentRouteName() == 'uploaded.archive.list' ||
                     Route::currentRouteName() == 'view.archive.document' ||
                     Route::currentRouteName() == 'uploaded.archive.list.quick' ||
+                    Route::currentRouteName() == 'uploaded.archive.list.pagination' ||
                     Route::currentRouteName() == 'data.archive.dashboard.interface' ||
                     Route::currentRouteName() == 'data.archive.setting')
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption"
@@ -370,7 +371,7 @@
             <nav class="sb-sidenav-menu-nested nav">
                 @if (auth()->user()->hasPermission('archive_dashboard'))
 
-                    @if (Route::currentRouteName() == 'data.archive.dashboard.interface')
+                    @if (Route::currentRouteName() == 'data.archive.dashboard.interface' || Route::currentRouteName() == 'uploaded.archive.list.pagination' )
                         <a class="nav-link" href="{{ route('data.archive.dashboard.interface') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
