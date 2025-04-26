@@ -140,7 +140,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div style="width: 95%">
+                        <div style="width: 91%">
                             <canvas id="documentTypeChart" width="600" class="mt-4"></canvas>
                         </div>
                     </div>
