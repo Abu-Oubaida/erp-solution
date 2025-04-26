@@ -270,7 +270,7 @@
                         <div class="col-md-6 mb-2">
                             <div class="form-group">
                                 <label for="company">Company Name<span class="text-danger">*</span></label>
-                                <select class="text-capitalize select-search" id="company" name="company">
+                                <select class="text-capitalize select-search" id="company" name="company" onchange="return SalesSetting.salesProfessionParentIdDropdown(this)">
                                     <option value="">Pick options...</option>
                                     @if (isset($companies) || count($companies) > 0)
                                         @foreach ($companies as $c)
