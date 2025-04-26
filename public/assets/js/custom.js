@@ -4384,14 +4384,8 @@ let SalesSetting = {};
 
                     case "sales_lead_source_info":
                         html += SalesSetting.createInput("title", "Title");
-                        html += SalesSetting.createInput(
-                            "parent_id",
-                            "Parent Id"
-                        );
-                        html += SalesSetting.createInput(
-                            "is_parent",
-                            "Is Parent"
-                        );
+                        html += SalesSetting.createSelectInput("parent_id","Parent Id");
+                        html += SalesSetting.createCheckboxInput("is_parent", "Is Parent ?");
                         html += SalesSetting.createHiddenInput(click_param);
                         break;
 
@@ -4420,14 +4414,8 @@ let SalesSetting = {};
 
                     case "sales_lead_profession":
                         html += SalesSetting.createInput("title", "Title");
-                        html += SalesSetting.createInput(
-                            "parent_id",
-                            "Parent Id"
-                        );
-                        html += SalesSetting.createInput(
-                            "is_parent",
-                            "Is Parent"
-                        );
+                        html += SalesSetting.createSelectInput("profession_parent_id","Parent Id");
+                        html += SalesSetting.createCheckboxInput("is_parent", "Is Parent ?");
                         html += SalesSetting.createHiddenInput(click_param);
                         break;
 
@@ -4482,6 +4470,25 @@ let SalesSetting = {};
                 return `
                     <div class="mb-2">
                         <input type="hidden" class="form-control" name="hidden_click_param" value="${click_param}">
+                    </div>
+                `;
+            },
+            createCheckboxInput: function (id, label) {
+                return `
+                    <div class="col-md-4 mb-2 form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="${id}" name="${id}">
+                        <label class="form-check-label" for="${id}">${label}</label>
+                    </div>
+                `;
+            },
+            createSelectInput: function (id,label) {
+                return `
+                    <div class="col-md-4 mb-2 form-group">
+                        <label for="${id}" class="form-label">${label}</label>
+                        <select class="form-select" id="${id}" name="${id}">
+                            <option for="pick" class="form-label">--Pick a option--</option>
+                            <!-- Options will be added dynamically -->
+                        </select>
                     </div>
                 `;
             },
@@ -4541,6 +4548,37 @@ let SalesSetting = {};
                 }
                 return false;
             },
+            salesProfessionParentIdDropdown: function (e) {
+                let selectedId = $(e).val();
+                console.log(selectedId);
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/get_sale_profession_title_id";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "GET",
+                    data:{selectedId:selectedId},
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            const select = $('#profession_parent_id');
+                            select.empty();
+                            select.append('<option value="">--Pick a Option--</option>');
+                            $.each(response.salesProfessionData,function(index,item){
+                                select.append(`<option value="${item.id}">${item.title}</option>`);
+                            })
+                        }
+                    },
+                });
+            }, 
         };
         AppSetting = {
             addArchivePackage: function (e, output_id) {

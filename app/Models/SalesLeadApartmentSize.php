@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class SalesLeadApartmentSize extends Model
 {
     use HasFactory;
-    protected $fillable = ['title','status','created_by','updated_by','company_id'];
+    protected $fillable = ['title','status','size','created_by','updated_by','company_id'];
 }

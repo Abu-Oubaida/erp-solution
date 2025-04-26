@@ -93,6 +93,7 @@ class SalesInterfaceController extends Controller
             $salesLeadFloor = SalesLeadFloor::latest()->whereIn('company_id',$company_ids)->get();
             $salesLeadStatusInfo = SalesLeadStatusInfo::latest()->whereIn('company_id',$company_ids)->get();
             $salesLeadFacing = SalesLeadFacing::latest()->whereIn('company_id',$company_ids)->get();
+            
             return view('back-end/sales/sell-setting',compact('companies','salesLeadApartmentType','salesLeadApartmentSize','salesLeadView','salesLeadBudget','salesLeadSourceInfo','salesProfession','salesLeadLocationInfo','salesLeadFloor','salesLeadStatusInfo','salesLeadFacing'));
         }catch (\Throwable $exception)
         {
@@ -198,5 +199,25 @@ class SalesInterfaceController extends Controller
     }
 
     return $query->latest()->get();
+}
+public function getSaleProfessionTitleId(Request $request){
+   try{
+    $selectedId=$request->selectedId;
+    $salesProfessionData = SalesProfession::where('company_id',$selectedId)->get();
+    Log::info(json_encode($salesProfessionData,JSON_PRETTY_PRINT));
+    if (!$salesProfessionData->isEmpty() ) {
+         return response()->json([
+             'status' => 'success',
+             'salesProfessionData'=>$salesProfessionData
+         ]);
+     } else {
+         return response()->json([
+             'status' => 'error',
+             'message' => 'Operation failed'
+         ]);
+     }
+   }catch (\Throwable $exception){
+        return back()->with('error',$exception->getMessage())->withInput();
+    }
 }
 }

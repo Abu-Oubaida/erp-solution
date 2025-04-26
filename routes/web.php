@@ -498,6 +498,7 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:sale_settings'])->group(function (){
             Route::match(['get'],'sale_settings','saleSettingsInterface')->name('sale.settings.interface');
             Route::match(['post'],'add_sale_sub_table_data','saleSubTableDataAdd')->name('sale.sub.table.data.add');
+            Route::match(['get'],'get_sale_profession_title_id','getSaleProfessionTitleId')->name('get.sale.profession.title.id');
         });
     });//3.12 End
     # 3.13 Control Panel
