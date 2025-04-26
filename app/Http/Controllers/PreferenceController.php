@@ -17,4 +17,15 @@ class PreferenceController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+    public function saveSidebarToggled(Request $request)
+    {
+        $request->validate([
+            'value' => 'required|integer|in:0,1',
+        ]);
+
+        $value = $request->post('value'); // correct way to get value
+        session(['sidebar_toggled' => (int) $value]);
+
+        return response()->json(['status' => 'success']);
+    }
 }

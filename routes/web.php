@@ -81,6 +81,7 @@ Route::group(['middleware' => ['auth']],function (){
     Route::controller(PreferenceController::class)->group(function (){
         // routes/web.php
         Route::post('/save-sidebar-width', 'saveSidebarWidth');
+        Route::post('/save-sidebar-toggle', 'saveSidebarToggled');
 
     });
 # 3.2 Send mail for document sharing
