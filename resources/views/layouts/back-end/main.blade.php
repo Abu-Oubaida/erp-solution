@@ -187,13 +187,13 @@
     let dragholder = document.getElementById('dragholder');
     let currentSidebarWidth = {!! $sidebarWidth !!}; // Server-defined default width
 
-    // Create a dynamic style element for toggled sidebar styles
     let dynamicStyle = document.createElement('style');
     document.head.appendChild(dynamicStyle);
 
-    // Only run everything if screen is large (desktop)
+    let saveTimeout = null; // for debouncing
+
     function isDesktop() {
-        return window.innerWidth > 768; // or 992 if you want stricter desktop definition
+        return window.innerWidth > 768;
     }
 
     function updateSidebarWidth(width) {
@@ -213,28 +213,36 @@
         }
     }
 
-    function onMouseMove(e) {
-        if (!isDesktop()) return; // stop if not desktop
-        const x = e.pageX;
-        if (x > 220 && x < 400) {
-            currentSidebarWidth = x;
-            updateSidebarWidth(x);
-            localStorage.setItem('sidebarWidth', x);
-
-            // Save to server
+    // Debounced server save function
+    function saveSidebarWidth(width) {
+        if (saveTimeout) {
+            clearTimeout(saveTimeout);
+        }
+        saveTimeout = setTimeout(() => {
             fetch('/save-sidebar-width', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 },
-                body: JSON.stringify({ width: x })
+                body: JSON.stringify({ width: width })
             });
+        }, 500); // send to server only after 500ms of no dragging
+    }
+
+    function onMouseMove(e) {
+        if (!isDesktop()) return;
+        const x = e.pageX;
+        if (x > 220 && x < 400) {
+            currentSidebarWidth = x;
+            updateSidebarWidth(x);
+            localStorage.setItem('sidebarWidth', x);
+            saveSidebarWidth(x); // debounced save
         }
     }
 
     function onMouseDown() {
-        if (!isDesktop()) return; // only allow dragging on desktop
+        if (!isDesktop()) return;
         document.addEventListener('mousemove', onMouseMove);
     }
 
@@ -243,22 +251,17 @@
         document.removeEventListener('mousemove', onMouseMove);
     }
 
-    // Restore saved width on load
     document.addEventListener("DOMContentLoaded", () => {
-        if (!isDesktop()) return; // don't run anything if not desktop
-
+        if (!isDesktop()) return;
         const savedWidth = parseInt(localStorage.getItem('sidebarWidth'));
         if (savedWidth && savedWidth > 230 && savedWidth < 400) {
             currentSidebarWidth = savedWidth;
         }
         updateSidebarWidth(currentSidebarWidth);
-
-        // Setup drag events
         dragholder.addEventListener('mousedown', onMouseDown);
         document.addEventListener('mouseup', onMouseUp);
     });
 
-    // Also re-check if window resized (example: rotate tablet to desktop mode)
     window.addEventListener('resize', () => {
         if (!isDesktop()) return;
         updateSidebarWidth(currentSidebarWidth);
