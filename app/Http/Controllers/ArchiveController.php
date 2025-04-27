@@ -731,7 +731,8 @@ class ArchiveController extends Controller
             ->where('company_id', $company_id)
             ->whereIn('project_id', $this->getUserProjectPermissions($this->user->id, $this->permissions()->archive_data_list_quick)->pluck('id')->toArray())
             ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes($company_id)->pluck('id')->toArray())
-            ->where('voucher_type_id',$type_id);
+            ->where('voucher_type_id',$type_id)
+            ->orderBy('id', 'desc');
         if ($perPage) {
             if ($perPage == 'all') {
                 $data = $data->get();
@@ -899,7 +900,24 @@ class ArchiveController extends Controller
         try {
             $id = Crypt::decryptString($vID);
             $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-            return view('back-end/archive/single-view',compact('document'))->render();
+            $relatedDocument_ids = $document->accountVoucherInfo->voucherDocuments()->get()->pluck('id')->toArray();
+            $this_document_index = array_search($id,$relatedDocument_ids);
+            $array_count = count($relatedDocument_ids);
+            $previous_document_id = null;
+            $next_document_id = null;
+            if ($array_count > 0 && $this_document_index > 0)
+            {
+                $previous_document_id = $relatedDocument_ids[$this_document_index-1];
+                if ($this_document_index < $array_count-1)
+                {
+                    $next_document_id = $relatedDocument_ids[$this_document_index+1];
+                }
+            }
+            elseif ($array_count > 0 && $this_document_index == 0)
+            {
+                $next_document_id = $relatedDocument_ids[$this_document_index+1];
+            }
+            return view('back-end/archive/single-view',compact('document','previous_document_id','next_document_id'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

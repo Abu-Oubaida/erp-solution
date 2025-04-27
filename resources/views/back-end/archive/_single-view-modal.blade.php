@@ -1,5 +1,13 @@
 <div class="row">
     <div id="" class="">
+        <div class="col-md-12 mb-2">
+            @if($previous_document_id)
+                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($previous_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview')" class="btn btn-sm btn-outline-danger float-left"><i class="fas fa-angle-left"></i> Previous <i class="fas fa-file-lines"></i></a>
+            @endif
+            @if($next_document_id)
+                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($next_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview')" class="btn btn-sm btn-outline-primary float-end"> <i class="fas fa-file-lines"></i> Next <i class="fas fa-angle-right"></i></a>
+            @endif
+        </div>
         <div class="col-md-12">
             <h1 class="modal-title fs-5 d-inline-block" id="v_document_name"><b>File Name</b>: {!! $document->document !!}</h1>
         </div>

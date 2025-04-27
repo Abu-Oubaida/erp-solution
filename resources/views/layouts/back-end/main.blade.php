@@ -254,7 +254,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         if (!isDesktop()) return;
         const savedWidth = parseInt(localStorage.getItem('sidebarWidth'));
-        if (savedWidth && savedWidth > 230 && savedWidth < 400) {
+        if (savedWidth && savedWidth > 220 && savedWidth < 400) {
             currentSidebarWidth = savedWidth;
         }
         updateSidebarWidth(currentSidebarWidth);
