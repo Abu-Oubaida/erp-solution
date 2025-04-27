@@ -2,10 +2,10 @@
     <div id="" class="">
         <div class="col-md-12 mb-2">
             @if($previous_document_id)
-                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($previous_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview', {!! $root_ref !!})" class="btn btn-sm btn-outline-danger float-left"><i class="fas fa-angle-left"></i> Previous <i class="fas fa-file-lines"></i></a>
+                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($previous_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview', '{!! $root_ref !!}')" class="btn btn-sm btn-outline-danger float-left"><i class="fas fa-angle-left"></i> Previous <i class="fas fa-file-lines"></i></a>
             @endif
             @if($next_document_id)
-                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($next_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview', {!! $root_ref !!})" class="btn btn-sm btn-outline-primary float-end"> <i class="fas fa-file-lines"></i> Next <i class="fas fa-angle-right"></i></a>
+                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($next_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview', '{!! $root_ref !!}')" class="btn btn-sm btn-outline-primary float-end"> <i class="fas fa-file-lines"></i> Next <i class="fas fa-angle-right"></i></a>
             @endif
         </div>
         <div class="col-md-12">
