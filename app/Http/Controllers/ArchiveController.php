@@ -846,7 +846,7 @@ class ArchiveController extends Controller
                 $archiveInfos->where('voucher_number','LIKE', "%$reference%");
             }
 
-            $archiveInfos = $archiveInfos->get();
+            $archiveInfos = $archiveInfos->orderBy('id','desc')->get();
             $voucherInfos = $archiveInfos;
             $view = view('back-end.archive._archive_quick_list', compact('voucherInfos'))->render();
             return response()->json([
