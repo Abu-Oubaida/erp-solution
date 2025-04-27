@@ -128,7 +128,7 @@
                                     <a class="text-info" href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id),'ref'=> $data->id]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
                                     @if(auth()->user()->hasPermission('archive_document_download'))
                                         &nbsp;
-                                        <a class="text-success" href="{!! route('view.archive.document',['ocr'=>1,'vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View or Download" target="_blank"><i class="fa-solid fa-download"></i></a>
+                                        <a class="text-success" href="{!! route('view.archive.document',['ocr'=>1,'vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id),'ref'=> $data->id]) !!}" title="View or Download" target="_blank"><i class="fa-solid fa-download"></i></a>
                                     @endif
                                     &nbsp;
                                     @if(auth()->user()->hasPermission('share_archive_data_individual'))
