@@ -27,7 +27,7 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col-md-12">
-                        <h4 class="text-capitalize d-inline-block"><i class="fa-solid fa-book"></i> Uploaded{!! $d->VoucherType->voucher_type_title !!} Document List (Company: {!! $d->company->company_code !!})</h4>
+                        <h4 class="text-capitalize d-inline-block"><i class="fa-solid fa-book"></i> Uploaded <b>{!! $d->VoucherType->voucher_type_title !!}</b> Document List (Company: {!! $d->company->company_code !!})</h4>
                         <a href="{!! route('uploaded.archive.list.quick') !!}" class="btn btn-sm btn-outline-primary float-end"><i class="fa-solid fa-bolt"></i> Quick List</a>
                     </div>
                 </div>
