@@ -15,14 +15,14 @@
             <div class="row">
                 @if($document->accountVoucherInfo->voucher_number == $root_ref)
                     <div class="col">
-                        <span><strong>Reference</strong>:{!! $document->accountVoucherInfo->voucher_number !!}</span>
+                        <span><strong>Reference</strong>: {!! $document->accountVoucherInfo->voucher_number !!}</span>
                     </div>
                 @else
                     <div class="col">
-                        <span><strong>Original Reference</strong>:{!! $document->accountVoucherInfo->voucher_number !!}</span>
+                        <span><strong>Original Reference</strong>: {!! $document->accountVoucherInfo->voucher_number !!}</span>
                     </div>
                     <div class="col">
-                        <span><strong>Linked Reference</strong>:{!! $root_ref !!}</span>
+                        <span><strong>Linked Reference</strong>: {!! $root_ref !!}</span>
                     </div>
                 @endif
             </div>
