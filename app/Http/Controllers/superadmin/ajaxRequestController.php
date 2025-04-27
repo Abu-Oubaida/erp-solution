@@ -200,11 +200,12 @@ class ajaxRequestController extends Controller
             if (request()->ajax()) {
                 $validateData = $request->validate([
                     'id'=> ['required','string'],
+                    'root_ref'=> ['required','string'],
                 ]);
                 extract($validateData);
                 $id = Crypt::decryptString($id);
                 $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-                $relatedDocument_ids = $document->accountVoucherInfo->voucherDocuments()->get()->pluck('id')->toArray();
+                $relatedDocument_ids = Account_voucher::with(['voucherDocuments'])->where('voucher_number',$root_ref)->first()->voucherDocuments->pluck('id')->toArray();
                 $this_document_index = array_search($id,$relatedDocument_ids);
                 $array_count = count($relatedDocument_ids);
                 $previous_document_id = null;
@@ -221,7 +222,7 @@ class ajaxRequestController extends Controller
                 {
                     $next_document_id = $relatedDocument_ids[$this_document_index+1];
                 }
-                $view = view('back-end.archive._single-view-modal',compact('document','previous_document_id','next_document_id'))->render();
+                $view = view('back-end.archive._single-view-modal',compact('document','previous_document_id','next_document_id','root_ref'))->render();
                 return response()->json([
                     'status' => 'success',
                     'data' => $view,

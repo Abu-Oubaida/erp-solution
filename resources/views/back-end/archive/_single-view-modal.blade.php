@@ -2,17 +2,30 @@
     <div id="" class="">
         <div class="col-md-12 mb-2">
             @if($previous_document_id)
-                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($previous_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview')" class="btn btn-sm btn-outline-danger float-left"><i class="fas fa-angle-left"></i> Previous <i class="fas fa-file-lines"></i></a>
+                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($previous_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview', {!! $root_ref !!})" class="btn btn-sm btn-outline-danger float-left"><i class="fas fa-angle-left"></i> Previous <i class="fas fa-file-lines"></i></a>
             @endif
             @if($next_document_id)
-                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($next_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview')" class="btn btn-sm btn-outline-primary float-end"> <i class="fas fa-file-lines"></i> Next <i class="fas fa-angle-right"></i></a>
+                <a ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($next_document_id) !!}" onclick="return Obj.findDocument(this,'documentPreview', {!! $root_ref !!})" class="btn btn-sm btn-outline-primary float-end"> <i class="fas fa-file-lines"></i> Next <i class="fas fa-angle-right"></i></a>
             @endif
         </div>
         <div class="col-md-12">
             <h1 class="modal-title fs-5 d-inline-block" id="v_document_name"><b>File Name</b>: {!! $document->document !!}</h1>
         </div>
         <div class="col">
-            <span><strong>Reference Number</strong>:{!! $document->accountVoucherInfo->voucher_number !!}</span>
+            <div class="row">
+                @if($document->accountVoucherInfo->voucher_number == $root_ref)
+                    <div class="col">
+                        <span><strong>Reference</strong>:{!! $document->accountVoucherInfo->voucher_number !!}</span>
+                    </div>
+                @else
+                    <div class="col">
+                        <span><strong>Original Reference</strong>:{!! $document->accountVoucherInfo->voucher_number !!}</span>
+                    </div>
+                    <div class="col">
+                        <span><strong>Linked Reference</strong>:{!! $root_ref !!}</span>
+                    </div>
+                @endif
+            </div>
         </div>
         <div class="col">
             <span class="float-end"><strong>Type</strong>:{!! $document->accountVoucherInfo->VoucherType->voucher_type_title !!}</span>
@@ -218,3 +231,6 @@
 <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
 </script>
+<div id='ajax_loader' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+    <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+</div>
