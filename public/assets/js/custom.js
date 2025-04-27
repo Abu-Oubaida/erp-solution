@@ -1249,9 +1249,9 @@ let SalesSetting = {};
                     },
                 });
             },
-            findDocument: function (e, actionID) {
+            findDocument: function (e, actionID, root_ref) {
                 let id = $(e).attr("ref");
-                if (id.length !== 0) {
+                if (id.length !== 0 && root_ref.length !== 0) {
                     let url =
                         window.location.origin +
                         sourceDir +
@@ -1264,7 +1264,7 @@ let SalesSetting = {};
                         },
                         url: url,
                         type: "POST",
-                        data: { id: id },
+                        data: { id: id,ref_id: root_ref },
                         success: function (response) {
                             if (response.status === "error")
                             {

@@ -120,18 +120,18 @@
                                     <strong>{!! $x++ !!}.</strong>
                                     {!! preg_replace('/^.*_/', '', pathinfo($d->document, PATHINFO_FILENAME)) . '.' . pathinfo($d->document, PATHINFO_EXTENSION) !!}
                                 <td>
-                                    <a href="" class="text-primary cursor-pointer" title="Quick View" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview')"> <i class="fa-solid fa-eye"></i></a>
-                                    &nbsp
-                                    <a class="text-info" href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
+                                    <a href="" class="text-primary cursor-pointer" title="Quick View" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview', '{!! $data->id !!}')"> <i class="fa-solid fa-eye"></i></a>
+                                    &nbsp;
+                                    <a class="text-info" href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id),'ref'=> $data->id]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
                                     @if(auth()->user()->hasPermission('archive_document_download'))
-                                        &nbsp
-                                        <a class="text-success" href="{!! route('view.archive.document',['ocr'=>1,'vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View or Download" target="_blank"><i class="fa-solid fa-download"></i></a>
+                                        &nbsp;
+                                        <a class="text-success" href="{!! route('view.archive.document',['ocr'=>1,'vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id), 'ref'=> $data->id]) !!}" title="View or Download" target="_blank"><i class="fa-solid fa-download"></i></a>
                                     @endif
                                     @if(auth()->user()->hasPermission('share_archive_data_individual'))
-                                        &nbsp
+                                        &nbsp;
                                         <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fa-solid fa-envelope"></i></a>
                                     @endif
-                                    &nbsp
+                                    &nbsp;
                                     @if(auth()->user()->hasPermission('delete_archive_document_individual'))
                                         <form action="{{route('delete.archive.document.individual')}}" class="display-inline" method="post">
                                             @method('delete')

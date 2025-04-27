@@ -8,23 +8,33 @@ use App\Models\company_info;
 use App\Models\User;
 use App\Models\VoucherType;
 use App\Models\VoucherDocument;
+use App\Traits\DataArchiveTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Database\Seeders\CompanyInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Log;
 use Carbon\Carbon;
 
 class DataArchiveDashboardController extends Controller
 {
-    use ParentTraitCompanyWise;
+    use ParentTraitCompanyWise, DataArchiveTrait;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
             $this->setUser();
             return $next($request);
         });
+    }
+
+    public function clearCache($companyID)
+    {
+        $company_id = Crypt::decryptString($companyID);
+        $this->clearArchiveDashboardCache($company_id);
+        return redirect()->back()->with('success', 'Cache cleared successfully!');
     }
 
     function index(Request $request){
@@ -34,7 +44,7 @@ class DataArchiveDashboardController extends Controller
     }
 
 
-    public function companyWiseArchiveDashboard(Request $request)
+    public function companyWiseArchiveDashboardInstant(Request $request)// Instant Report Max Loading Time
     {
         $permission = $this->permissions()->data_archive;
         try {
@@ -58,6 +68,8 @@ class DataArchiveDashboardController extends Controller
                 $diskFree = round(disk_free_space($path) / (1024 * 1024 * 1024), 2);       // free space in bytes
                 $totalUsed = $diskTotal - $diskFree;
                 $otherUsed = $totalUsed - $archiveUsed;
+
+
                 $dataTypeCount = $this->archiveTypeList($permission)->where('company_id',$company->id)->distinct()->count('id');
                 $archiveDocumentCount = $this->getArchiveList($permission)
                     ->where('company_id', $company->id)
@@ -142,6 +154,156 @@ class DataArchiveDashboardController extends Controller
             }
             throw new \Exception('Requested method not allowed!');
         }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+
+
+    public function companyWiseArchiveDashboard(Request $request) // Cache disk/folder size info for 10 minutes, Cache archive-related counts for 5 minutes
+    {
+        $permission = $this->permissions()->data_archive;
+        try {
+            if ($request->ajax()) {
+                $request->validate([
+                    'company_id' => ['required', 'integer', 'exists:company_infos,id'],
+                ]);
+                extract($request->post());
+                $company = company_info::find($company_id);
+                $permittedProjectIds = $this->getUserProjectPermissions($this->user->id, $permission)
+                    ->pluck('id')
+                    ->toArray();
+
+                $path = env('APP_ARCHIVE_DATA');
+                $company_dir = $path . '/' . $company->company_code;
+                if (!is_dir($company_dir)) {
+                    mkdir($company_dir, 0777, true);
+                }
+
+                // Cache disk/folder size info for 10 minutes
+                $diskInfo = Cache::remember("company_disk_info_{$company->id}_{$this->user->id}", 600, function () use ($path, $company_dir) {
+                    $diskTotal = round(disk_total_space($path) / (1024 * 1024 * 1024), 2);
+                    $archiveUsed = round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2);
+                    $diskFree = round(disk_free_space($path) / (1024 * 1024 * 1024), 2);
+                    $totalUsed = $diskTotal - $diskFree;
+                    $otherUsed = $totalUsed - $archiveUsed;
+
+                    return compact('diskTotal', 'archiveUsed', 'diskFree', 'totalUsed', 'otherUsed');
+                });
+
+                // Cache archive-related counts for 5 minutes
+                $archiveStats = Cache::remember("company_archive_stats_{$company->id}_{$this->user->id}", 300, function () use ($permission, $company, $permittedProjectIds) {
+                    $dataTypeCount = $this->archiveTypeList($permission)->where('company_id', $company->id)->distinct()->count('id');
+
+                    $archiveDocumentCount = $this->getArchiveList($permission)
+                        ->where('company_id', $company->id)
+                        ->with('voucherDocuments')
+                        ->get()
+                        ->flatMap(function ($voucher) {
+                            return $voucher->voucherDocuments;
+                        })
+                        ->pluck('id')
+                        ->unique()
+                        ->count();
+
+                    $accountVoucherInfosCount = Account_voucher::whereIn('voucher_type_id', $this->archiveTypeList($permission)->pluck('id')->toArray())
+                        ->whereIn('project_id', $permittedProjectIds)
+                        ->where('company_id', $company->id)
+                        ->distinct()
+                        ->count('id');
+
+                    $dataTypes = $this->archiveTypeList($permission)
+                        ->where('status', 1)
+                        ->where('company_id', $company->id)
+                        ->get()
+                        ->map(function ($item) {
+                            return [
+                                'id' => $item->id,
+                                'company_id' => $item->company_id,
+                                'company_name' => $item->company->company_code,
+                                'voucher_type_title' => $item->voucher_type_title,
+                                'archive_documents_count' => $item->archive_documents_count,
+                                'archive_document_infos_count' => $item->archive_document_infos_count,
+                            ];
+                        });
+
+                    return compact('dataTypeCount', 'archiveDocumentCount', 'accountVoucherInfosCount', 'dataTypes');
+                });
+
+                // Recent uploads by users (today) — maybe don't cache, because today's uploads are dynamic
+                $today = today();
+                $today_uploaded_data_by_users = User::with(['archiveDocuments.accountVoucherInfo.VoucherType'])
+                    ->whereHas('archiveDocuments', function ($query) use ($today, $company) {
+                        $query->whereDate('created_at', $today)->where('company_id', $company->id);
+                    })
+                    ->get()
+                    ->map(function ($user) use ($today, $company) {
+                        $grouped = $user->archiveDocuments
+                            ->where('created_at', '>=', $today)
+                            ->where('company_id', $company->id)
+                            ->groupBy(fn($doc) => optional($doc->accountVoucherInfo->VoucherType)->voucher_type_title ?? 'Unknown');
+
+                        return [
+                            'user_id' => $user->id,
+                            'user_name' => $user->name,
+                            'document_counts' => $grouped->map->count()
+                        ];
+                    });
+
+                // Daily document counts for last 7 days
+                $startDate = Carbon::now()->copy()->subDays(6)->startOfDay();
+                $endDate = Carbon::now()->endOfDay();
+
+                $dailyCounts = Cache::remember("company_daily_counts_{$company->id}_{$this->user->id}", 300, function () use ($startDate, $endDate, $company) {
+                    return VoucherDocument::whereBetween('created_at', [$startDate, $endDate])
+                        ->where('company_id', $company->id)
+                        ->select(
+                            DB::raw("DATE(created_at) as date"),
+                            DB::raw("DAYNAME(created_at) as day"),
+                            DB::raw("COUNT(id) as count")
+                        )
+                        ->groupBy(DB::raw("DATE(created_at)"), DB::raw("DAYNAME(created_at)"))
+                        ->orderBy("date")
+                        ->get();
+                });
+
+                $labels = [];
+                $period = Carbon::parse($startDate)->daysUntil($endDate);
+                foreach ($period as $date) {
+                    $labels[] = [
+                        'key' => $date->format('D (M-d)'),
+                        'date' => $date->toDateString(),
+                        'day' => $date->format('l'),
+                    ];
+                }
+
+                $rawCounts = $dailyCounts->keyBy('date');
+
+                $documentCountsPerDay = [];
+                foreach ($labels as $label) {
+                    $count = $rawCounts[$label['date']]->count ?? 0;
+                    $documentCountsPerDay[$label['key']] = $count;
+                }
+
+                $totalDocumentCount = (max($documentCountsPerDay) + 40);
+
+                // Render view
+                $view = view('back-end.archive._dashboard_content', array_merge(
+                    $diskInfo,
+                    $archiveStats,
+                    compact('today_uploaded_data_by_users', 'labels', 'documentCountsPerDay', 'totalDocumentCount', 'company_id')
+                ))->render();
+
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $view,
+                    'message' => 'Request processed successfully!'
+                ]);
+            }
+            throw new \Exception('Requested method not allowed!');
+        } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
                 'message' => $exception->getMessage()

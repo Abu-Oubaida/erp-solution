@@ -6,6 +6,23 @@
         $encodedUrl = urlencode($pdfUrl); // full encoding
     @endphp
     <div class="row">
+        <div class="col-md-12 mb-2">
+            @php
+                if(\Illuminate\Support\Facades\Request::get('ocr'))
+                {
+                    $ocr = 1;
+                }
+                else{
+                    $ocr = null;
+                }
+            @endphp
+            @if($previous_document_id)
+                <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($previous_document_id),'ref'=>$ref_id,'ocr'=>$ocr]) !!}" class="btn btn-sm btn-outline-danger float-left"><i class="fas fa-angle-left"></i> Previous <i class="fas fa-file-lines"></i></a>
+            @endif
+            @if($next_document_id)
+                <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($next_document_id), 'ref'=>$ref_id,'ocr'=>$ocr]) !!}" class="btn btn-sm btn-outline-primary float-end"> <i class="fas fa-file-lines"></i> Next <i class="fas fa-angle-right"></i></a>
+            @endif
+        </div>
         <div id="" class="">
             @if(auth()->user()->hasPermission('share_archive_data_individual'))
                 <button class="btn btn-outline-success float-end m-1" href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($document->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fa-solid fa-envelope"></i> Email Document</button>
@@ -47,9 +64,18 @@
             <div class="col-md-12">
                 <h1 class="modal-title fs-5 d-inline-block" id="v_document_name"><b>File Name</b>: {!! $document->document !!}</h1>
             </div>
+        @if($document->accountVoucherInfo->voucher_number == $ref)
             <div class="col">
-                <span><strong>Reference Number</strong>:{!! $document->accountVoucherInfo->voucher_number !!}</span>
+                <span><strong>Reference</strong>: {!! $document->accountVoucherInfo->voucher_number !!}</span>
             </div>
+        @else
+            <div class="col">
+                <span><strong>Original Reference</strong>: {!! $document->accountVoucherInfo->voucher_number !!}</span>
+            </div>
+            <div class="col">
+                <span><strong>Linked Reference</strong>: {!! $ref !!}</span>
+            </div>
+        @endif
             <div class="col">
                 <span class="float-end"><strong>Type</strong>:{!! $document->accountVoucherInfo->VoucherType->voucher_type_title !!}</span>
             </div>

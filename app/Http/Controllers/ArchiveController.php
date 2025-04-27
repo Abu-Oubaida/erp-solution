@@ -14,6 +14,7 @@ use App\Models\VoucherDocumentDeleteHistory;
 use App\Models\VoucherDocumentIndividualDeletedHistory;
 use App\Models\VoucherType;
 use App\Rules\AccountVoucherInfoStatusRule;
+use App\Traits\DataArchiveTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ use function PHPUnit\Framework\directoryExists;
 
 class ArchiveController extends Controller
 {
-    use ParentTraitCompanyWise;
+    use ParentTraitCompanyWise,DataArchiveTrait;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -102,6 +103,7 @@ class ArchiveController extends Controller
                 }
             }
             DB::commit();
+            $this->clearArchiveDashboardCache($company);
             return back()->with('success','Data insert successfully');
         }catch (\Throwable $exception)
         {
@@ -480,6 +482,7 @@ class ArchiveController extends Controller
                 }
             }
             DB::commit();
+            $this->clearArchiveDashboardCache($company);
             return back()->with('success', 'Data save successful.');
 
         }catch (\Throwable $exception)
@@ -573,6 +576,7 @@ class ArchiveController extends Controller
                     }
                 }
                 DB::commit();
+                $this->clearArchiveDashboardCache($voucherInfo->company_id);
                 return back()->with('success','Data upload successfully on Voucher No:'.$voucherInfo->voucher_number);
             }
             return back()->with('error', "request method {$request->method()} not supported")->withInput();
@@ -727,7 +731,8 @@ class ArchiveController extends Controller
             ->where('company_id', $company_id)
             ->whereIn('project_id', $this->getUserProjectPermissions($this->user->id, $this->permissions()->archive_data_list_quick)->pluck('id')->toArray())
             ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes($company_id)->pluck('id')->toArray())
-            ->where('voucher_type_id',$type_id);
+            ->where('voucher_type_id',$type_id)
+            ->orderBy('id', 'desc');
         if ($perPage) {
             if ($perPage == 'all') {
                 $data = $data->get();
@@ -841,7 +846,7 @@ class ArchiveController extends Controller
                 $archiveInfos->where('voucher_number','LIKE', "%$reference%");
             }
 
-            $archiveInfos = $archiveInfos->get();
+            $archiveInfos = $archiveInfos->orderBy('id','desc')->get();
             $voucherInfos = $archiveInfos;
             $view = view('back-end.archive._archive_quick_list', compact('voucherInfos'))->render();
             return response()->json([
@@ -893,9 +898,30 @@ class ArchiveController extends Controller
     public function archiveDocumentView($vID)
     {
         try {
+            $ref_id = request()->get('ref');
             $id = Crypt::decryptString($vID);
             $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-            return view('back-end/archive/single-view',compact('document'))->render();
+            $relatedDocument = Account_voucher::with(['voucherDocuments'])->where('id',$ref_id)->first();
+            $ref = $relatedDocument->voucher_number;
+            $relatedDocument_ids = $relatedDocument->voucherDocuments->pluck('id')->toArray();
+            $this_document_index = array_search($id,$relatedDocument_ids);
+            $array_count = count($relatedDocument_ids);
+            $previous_document_id = null;
+            $next_document_id = null;
+            if ($array_count > 0 && $this_document_index > 0)
+            {
+                $previous_document_id = $relatedDocument_ids[$this_document_index-1];
+                if ($this_document_index < $array_count-1)
+                {
+                    $next_document_id = $relatedDocument_ids[$this_document_index+1];
+                }
+            }
+            elseif ($array_count > 0 && $this_document_index == 0)
+            {
+                if ($array_count !== 1)
+                    $next_document_id = $relatedDocument_ids[$this_document_index+1];
+            }
+            return view('back-end/archive/single-view',compact('document','previous_document_id','next_document_id','ref','ref_id'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -1088,17 +1114,6 @@ class ArchiveController extends Controller
                 if ($v_d)
                 {
                     $this->deleteArchiveDocumentIndividualWithHistory($v_d,Auth::id());
-//                    VoucherDocumentIndividualDeletedHistory::create([
-//                        'company_id'        =>  $v_d->company_id,
-//                        'voucher_info_id'   =>  $v_d->voucher_info_id,
-//                        'document'          =>  $v_d->document,
-//                        'filepath'          =>  $v_d->filepath,
-//                        'created_by'        =>  $v_d->created_by,
-//                        'updated_by'        =>  $v_d->updated_by,
-//                        'deleted_by'        =>  $user->id,
-//                        'created_at'        =>  now(),
-//                    ]);
-//                    VoucherDocument::where('id',$id)->delete();
                     return back()->with('success','Data delete successfully');
                 }
                 return back()->with('error','Data not found on database!');
@@ -1134,6 +1149,7 @@ class ArchiveController extends Controller
             ]);
             VoucherDocument::where('id',$v_d->id)->delete();
             $old_link_data->delete();
+            $this->clearArchiveDashboardCache($v_d->company_id);
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

@@ -190,9 +190,9 @@
                                     <td>{!! $d->document !!}</td>
                                     <td>{!! $d->createdBy->name !!}</td>
                                     <td>
-                                        <a href="" title="Quick View" vtype="{!! $voucherInfo->VoucherType->voucher_type_title !!}" vno="{!! $voucherInfo->voucher_number !!}" path="{!! \Illuminate\Support\Facades\Crypt::encryptString(asset('storage/archive_data/'.$d->filepath.$d->document)) !!}" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','v_type','v_no')"> <i class="fa-solid fa-eye"></i></a>
+                                        <a href="" title="Quick View" vtype="{!! $voucherInfo->VoucherType->voucher_type_title !!}" vno="{!! $voucherInfo->voucher_number !!}" path="{!! \Illuminate\Support\Facades\Crypt::encryptString(asset('storage/archive_data/'.$d->filepath.$d->document)) !!}" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','{!! $voucherInfo->id !!}')"> <i class="fa-solid fa-eye"></i></a>
                                         &nbsp;
-                                        <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id)]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
+                                        <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id),'ref'=> $voucherInfo->id]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
                                         &nbsp
                                         @if(auth()->user()->hasPermission('share_archive_data_individual'))
                                             <a href="" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.fileSharingModal(this)" title="Share Document"><i class="fas fa-share"></i></a>

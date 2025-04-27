@@ -27,8 +27,8 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col-md-12">
-                        <h4 class="text-capitalize d-inline-block"><i class="fas fa-list"></i> Data Type {!! $d->VoucherType->voucher_type_title !!} Uploaded Document List (Company: {!! $d->company->company_code !!})</h4>
-                        <a href="{!! route('uploaded.archive.list.quick') !!}" class="btn btn-sm btn-outline-primary float-end"><i class="fa-solid fa-truck-fast"></i> Quick List</a>
+                        <h4 class="text-capitalize d-inline-block"><i class="fa-solid fa-book"></i> Uploaded <b>{!! $d->VoucherType->voucher_type_title !!}</b> Document List (Company: {!! $d->company->company_code !!})</h4>
+                        <a href="{!! route('uploaded.archive.list.quick') !!}" class="btn btn-sm btn-outline-primary float-end"><i class="fa-solid fa-bolt"></i> Quick List</a>
                     </div>
                 </div>
             </div>
@@ -53,7 +53,7 @@
                                 @endforeach
                                 <label class="me-2 mb-0">Items per page:</label>
                                 <select name="per_page" onchange="this.form.submit()" class="form-select form-select-sm w-auto">
-                                    @foreach([10, 25, 50, 100, 'all'] as $size)
+                                    @foreach([10, 25, 50, 100, 300, 500, 1000] as $size)
                                         <option value="{{ $size }}" {{ request('per_page', 10) == $size ? 'selected' : '' }}>
                                             {{ $size === 'all' ? 'All' : $size }}
                                         </option>

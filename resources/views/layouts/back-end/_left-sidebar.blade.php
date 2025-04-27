@@ -452,11 +452,11 @@
                 @if (auth()->user()->hasPermission('archive_data_list_quick'))
                     @if (Route::currentRouteName() == 'uploaded.archive.list.quick')
                         <a class="nav-link" href="{{ route('uploaded.archive.list.quick') }}">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-truck-fast"></i></div> Quick List
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-bolt"></i></div> Quick List
                         </a>
                     @else
                         <a class="nav-link text-chl" href="{{ route('uploaded.archive.list.quick') }}">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-truck-fast"></i></div> Quick List
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-bolt"></i></div> Quick List
                         </a>
                     @endif
                 @endif

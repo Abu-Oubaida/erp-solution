@@ -200,11 +200,32 @@ class ajaxRequestController extends Controller
             if (request()->ajax()) {
                 $validateData = $request->validate([
                     'id'=> ['required','string'],
+                    'ref_id'=> ['required','string'],
                 ]);
                 extract($validateData);
                 $id = Crypt::decryptString($id);
                 $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-                $view = view('back-end.archive._single-view-modal',compact('document'))->render();
+                $relatedDocument = Account_voucher::with(['voucherDocuments'])->where('id',$ref_id)->first();
+                $root_ref = $relatedDocument->voucher_number;
+                $relatedDocument_ids = $relatedDocument->voucherDocuments->pluck('id')->toArray();
+                $this_document_index = array_search($id,$relatedDocument_ids);
+                $array_count = count($relatedDocument_ids);
+                $previous_document_id = null;
+                $next_document_id = null;
+                if ($array_count > 0 && $this_document_index > 0)
+                {
+                    $previous_document_id = $relatedDocument_ids[$this_document_index-1];
+                    if ($this_document_index < $array_count-1)
+                    {
+                        $next_document_id = $relatedDocument_ids[$this_document_index+1];
+                    }
+                }
+                elseif ($array_count > 0 && $this_document_index == 0)
+                {
+                    if ($array_count !== 1)
+                        $next_document_id = $relatedDocument_ids[$this_document_index+1];
+                }
+                $view = view('back-end.archive._single-view-modal',compact('document','previous_document_id','next_document_id','root_ref','ref_id'))->render();
                 return response()->json([
                     'status' => 'success',
                     'data' => $view,
