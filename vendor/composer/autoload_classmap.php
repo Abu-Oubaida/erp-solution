@@ -170,7 +170,6 @@ return array(
     'App\\Models\\SalesLeadSourceInfo' => $baseDir . '/app/Models/SalesLeadSourceInfo.php',
     'App\\Models\\SalesLeadStatusInfo' => $baseDir . '/app/Models/SalesLeadStatusInfo.php',
     'App\\Models\\SalesLeadView' => $baseDir . '/app/Models/SalesLeadView.php',
-    'App\\Models\\SalesProfession' => $baseDir . '/app/Models/SalesProfession.php',
     'App\\Models\\Source' => $baseDir . '/app/Models/Source.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
     'App\\Models\\UserBranchChangeHistory' => $baseDir . '/app/Models/UserBranchChangeHistory.php',

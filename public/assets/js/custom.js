@@ -4367,7 +4367,7 @@ let SalesSetting = {};
             salesSubTable: function (click_param) {
                 // Clear previous content
                 $("#sales_sub_table_content").empty();
-
+                
                 var html = "";
 
                 switch (click_param) {
@@ -4384,8 +4384,14 @@ let SalesSetting = {};
 
                     case "sales_lead_source_info":
                         html += SalesSetting.createInput("title", "Title");
-                        html += SalesSetting.createSelectInput("parent_id","Parent Id");
-                        html += SalesSetting.createCheckboxInput("is_parent", "Is Parent ?");
+                        html += SalesSetting.createSelectInput(
+                            "parent_id",
+                            "Parent Id"
+                        );
+                        html += SalesSetting.createCheckboxInput(
+                            "is_parent",
+                            "Is Parent ?"
+                        );
                         html += SalesSetting.createHiddenInput(click_param);
                         break;
 
@@ -4414,8 +4420,14 @@ let SalesSetting = {};
 
                     case "sales_lead_profession":
                         html += SalesSetting.createInput("title", "Title");
-                        html += SalesSetting.createSelectInput("profession_parent_id","Parent Id");
-                        html += SalesSetting.createCheckboxInput("is_parent", "Is Parent ?");
+                        html += SalesSetting.createSelectInput(
+                            "parent_id",
+                            "Parent Id"
+                        );
+                        html += SalesSetting.createCheckboxInput(
+                            "is_parent",
+                            "Is Parent ?"
+                        );
                         html += SalesSetting.createHiddenInput(click_param);
                         break;
 
@@ -4448,9 +4460,19 @@ let SalesSetting = {};
                         " " +
                         title
                 );
+                $('#general_modal')
+                .off('shown.bs.modal') // Remove any previous event listener
+                .on('shown.bs.modal', function () {
+                    // Reset the company dropdown with Selectize
+                    $('.company_dropdown').val('0');
+                    $('.company_dropdown')[0].selectize.setValue('0'); // Reset the Selectize value for company
+
+                    // Reset the status dropdown with Selectize
+                    $('.status_dropdown').val('');
+                    $('.status_dropdown')[0].selectize.setValue(''); // Reset the Selectize value for status
+                });
                 // Show the modal
                 $("#general_modal").modal("show");
-
                 return false; // Prevent default action
             },
 
@@ -4481,7 +4503,7 @@ let SalesSetting = {};
                     </div>
                 `;
             },
-            createSelectInput: function (id,label) {
+            createSelectInput: function (id, label) {
                 return `
                     <div class="col-md-4 mb-2 form-group">
                         <label for="${id}" class="form-label">${label}</label>
@@ -4492,7 +4514,7 @@ let SalesSetting = {};
                     </div>
                 `;
             },
-            salesSubTableModal: function () {
+            salesSubTableModal: function (element) {
                 var subTableData = {};
                 // Get company dropdown value
                 subTableData["company"] = $("#company").val();
@@ -4500,11 +4522,21 @@ let SalesSetting = {};
                 // Get status dropdown value
                 subTableData["status"] = $("#status").val();
 
-                // Get all dynamic input fields
+                // Get all input fields (including hidden and text)
                 $("#sales_sub_table_content input").each(function () {
                     var name = $(this).attr("name");
-                    var value = $(this).val();
-                    subTableData[name] = value;
+                    var type = $(this).attr("type");
+
+                    if (type === "checkbox") {
+                        subTableData[name] = $(this).is(":checked") ? 1 : 0;
+                    } else {
+                        subTableData[name] = $(this).val();
+                    }
+                });
+                // Get all select fields
+                $("#sales_sub_table_content select").each(function () {
+                    var name = $(this).attr("name");
+                    subTableData[name] = $(this).val();
                 });
                 if (subTableData.company === "") {
                     alert("Comapany is required");
@@ -4537,10 +4569,13 @@ let SalesSetting = {};
                                     alert("Error: " + response.message);
                                 } else if (response.status === "success") {
                                     alert(response.message);
+
                                     $("#general_modal").modal("hide");
                                     $("#" + response.output_id).html(
                                         response.data
                                     );
+                                    $("#company").val("").trigger("change");
+                                    $("#status").val("").trigger("change");
                                 }
                             },
                         });
@@ -4550,7 +4585,7 @@ let SalesSetting = {};
             },
             salesProfessionParentIdDropdown: function (e) {
                 let selectedId = $(e).val();
-                console.log(selectedId);
+                let isChecked = $("#is_parent").is(":checked");
                 const url =
                     window.location.origin +
                     sourceDir +
@@ -4563,22 +4598,76 @@ let SalesSetting = {};
                         ),
                     },
                     method: "GET",
-                    data:{selectedId:selectedId},
+                    data: {
+                        is_parent: isChecked ? 1 : 0,
+                        selectedId: selectedId,
+                    },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                             return false;
                         } else if (response.status === "success") {
-                            const select = $('#profession_parent_id');
+                            const select = $("#parent_id");
                             select.empty();
-                            select.append('<option value="">--Pick a Option--</option>');
-                            $.each(response.salesProfessionData,function(index,item){
-                                select.append(`<option value="${item.id}">${item.title}</option>`);
-                            })
+                            select.append(
+                                '<option value="">--Pick a Option--</option>'
+                            );
+                            $.each(
+                                response.salesProfessionData,
+                                function (index, item) {
+                                    select.append(
+                                        `<option value="${item.id}">${item.title}</option>`
+                                    );
+                                }
+                            );
                         }
                     },
                 });
-            }, 
+            },
+            AddLead: function () {
+                let form = $("#addProfessionForm")[0]; // get the form DOM element
+                let formData = new FormData(form); // create FormData from form
+
+                const url =
+                    window.location.origin + sourceDir + "/profession/store"; // update API endpoint
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: formData,
+                    contentType: false, // Important for FormData
+                    processData: false, // Important for FormData
+                    success: function (response) {
+                        console.log(response);
+
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            $("#general_modal").modal("hide"); // close modal if needed
+
+                            // Refresh some area if needed
+                            if (response.output_id && response.data) {
+                                $("#" + response.output_id).html(response.data);
+                            }
+
+                            // Reset the form after success
+                            $("#addProfessionForm")[0].reset();
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error(xhr.responseText);
+                        alert("Something went wrong.");
+                    },
+                });
+
+                return false; // prevent form default behavior
+            },
         };
         AppSetting = {
             addArchivePackage: function (e, output_id) {

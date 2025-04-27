@@ -846,7 +846,6 @@ class ComposerStaticInit7de6d22a6aff1e1a20de8d3471d7364c
         'App\\Models\\SalesLeadSourceInfo' => __DIR__ . '/../..' . '/app/Models/SalesLeadSourceInfo.php',
         'App\\Models\\SalesLeadStatusInfo' => __DIR__ . '/../..' . '/app/Models/SalesLeadStatusInfo.php',
         'App\\Models\\SalesLeadView' => __DIR__ . '/../..' . '/app/Models/SalesLeadView.php',
-        'App\\Models\\SalesProfession' => __DIR__ . '/../..' . '/app/Models/SalesProfession.php',
         'App\\Models\\Source' => __DIR__ . '/../..' . '/app/Models/Source.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\UserBranchChangeHistory' => __DIR__ . '/../..' . '/app/Models/UserBranchChangeHistory.php',

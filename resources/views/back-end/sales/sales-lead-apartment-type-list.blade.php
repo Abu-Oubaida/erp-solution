@@ -19,7 +19,7 @@
                     <td>{{ $key + 1 }}</td>
                     <td>{{ $row->title ?? '-' }}</td>
                     <td>{{ $row->status ? 'Active' : 'Inactive' }}</td>
-                    <td>{{ $row->created_by ?? '-' }}</td>
+                    <td>{{ $row->createdByUser->name ?? '-' }}</td>
                     <td>{{ $row->updated_by ?? '-' }}</td>
                     <td>
                         {{-- {{route('edit.archive.type',["archiveTypeID"=>\Illuminate\Support\Facades\Crypt::encryptString($vt->id)])}} --}}
