@@ -222,9 +222,10 @@ class ajaxRequestController extends Controller
                 }
                 elseif ($array_count > 0 && $this_document_index == 0)
                 {
-                    $next_document_id = $relatedDocument_ids[$this_document_index+1];
+                    if ($array_count !== 1)
+                        $next_document_id = $relatedDocument_ids[$this_document_index+1];
                 }
-                $view = view('back-end.archive._single-view-modal',compact('document','previous_document_id','next_document_id','root_ref'))->render();
+                $view = view('back-end.archive._single-view-modal',compact('document','previous_document_id','next_document_id','root_ref','ref_id'))->render();
                 return response()->json([
                     'status' => 'success',
                     'data' => $view,

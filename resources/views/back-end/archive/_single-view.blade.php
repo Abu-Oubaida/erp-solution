@@ -8,10 +8,10 @@
     <div class="row">
         <div class="col-md-12 mb-2">
             @if($previous_document_id)
-                <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($previous_document_id),'ref'=>$ref]) !!}" class="btn btn-sm btn-outline-danger float-left"><i class="fas fa-angle-left"></i> Previous <i class="fas fa-file-lines"></i></a>
+                <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($previous_document_id),'ref'=>$ref_id]) !!}" class="btn btn-sm btn-outline-danger float-left"><i class="fas fa-angle-left"></i> Previous <i class="fas fa-file-lines"></i></a>
             @endif
             @if($next_document_id)
-                <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($next_document_id), 'ref'=>$ref]) !!}" class="btn btn-sm btn-outline-primary float-end"> <i class="fas fa-file-lines"></i> Next <i class="fas fa-angle-right"></i></a>
+                <a href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($next_document_id), 'ref'=>$ref_id]) !!}" class="btn btn-sm btn-outline-primary float-end"> <i class="fas fa-file-lines"></i> Next <i class="fas fa-angle-right"></i></a>
             @endif
         </div>
         <div id="" class="">

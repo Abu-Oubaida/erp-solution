@@ -918,9 +918,10 @@ class ArchiveController extends Controller
             }
             elseif ($array_count > 0 && $this_document_index == 0)
             {
-                $next_document_id = $relatedDocument_ids[$this_document_index+1];
+                if ($array_count !== 1)
+                    $next_document_id = $relatedDocument_ids[$this_document_index+1];
             }
-            return view('back-end/archive/single-view',compact('document','previous_document_id','next_document_id','ref'))->render();
+            return view('back-end/archive/single-view',compact('document','previous_document_id','next_document_id','ref','ref_id'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
