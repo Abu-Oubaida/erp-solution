@@ -183,7 +183,7 @@ class DataArchiveDashboardController extends Controller
                 }
 
                 // Cache disk/folder size info for 10 minutes
-                $diskInfo = Cache::remember("company_disk_info_{$company->id}", 600, function () use ($path, $company_dir) {
+                $diskInfo = Cache::remember("company_disk_info_{$company->id}_{$this->user->id}", 600, function () use ($path, $company_dir) {
                     $diskTotal = round(disk_total_space($path) / (1024 * 1024 * 1024), 2);
                     $archiveUsed = round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2);
                     $diskFree = round(disk_free_space($path) / (1024 * 1024 * 1024), 2);
@@ -194,7 +194,7 @@ class DataArchiveDashboardController extends Controller
                 });
 
                 // Cache archive-related counts for 5 minutes
-                $archiveStats = Cache::remember("company_archive_stats_{$company->id}", 300, function () use ($permission, $company, $permittedProjectIds) {
+                $archiveStats = Cache::remember("company_archive_stats_{$company->id}_{$this->user->id}", 300, function () use ($permission, $company, $permittedProjectIds) {
                     $dataTypeCount = $this->archiveTypeList($permission)->where('company_id', $company->id)->distinct()->count('id');
 
                     $archiveDocumentCount = $this->getArchiveList($permission)
@@ -256,7 +256,7 @@ class DataArchiveDashboardController extends Controller
                 $startDate = Carbon::now()->copy()->subDays(6)->startOfDay();
                 $endDate = Carbon::now()->endOfDay();
 
-                $dailyCounts = Cache::remember("company_daily_counts_{$company->id}", 300, function () use ($startDate, $endDate, $company) {
+                $dailyCounts = Cache::remember("company_daily_counts_{$company->id}_{$this->user->id}", 300, function () use ($startDate, $endDate, $company) {
                     return VoucherDocument::whereBetween('created_at', [$startDate, $endDate])
                         ->where('company_id', $company->id)
                         ->select(
