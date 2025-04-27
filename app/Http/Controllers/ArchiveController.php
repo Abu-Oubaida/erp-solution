@@ -14,6 +14,7 @@ use App\Models\VoucherDocumentDeleteHistory;
 use App\Models\VoucherDocumentIndividualDeletedHistory;
 use App\Models\VoucherType;
 use App\Rules\AccountVoucherInfoStatusRule;
+use App\Traits\DataArchiveTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ use function PHPUnit\Framework\directoryExists;
 
 class ArchiveController extends Controller
 {
-    use ParentTraitCompanyWise;
+    use ParentTraitCompanyWise,DataArchiveTrait;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -102,6 +103,7 @@ class ArchiveController extends Controller
                 }
             }
             DB::commit();
+            $this->clearArchiveDashboardCache($company);
             return back()->with('success','Data insert successfully');
         }catch (\Throwable $exception)
         {
@@ -480,6 +482,7 @@ class ArchiveController extends Controller
                 }
             }
             DB::commit();
+            $this->clearArchiveDashboardCache($company);
             return back()->with('success', 'Data save successful.');
 
         }catch (\Throwable $exception)
@@ -573,6 +576,7 @@ class ArchiveController extends Controller
                     }
                 }
                 DB::commit();
+                $this->clearArchiveDashboardCache($voucherInfo->company_id);
                 return back()->with('success','Data upload successfully on Voucher No:'.$voucherInfo->voucher_number);
             }
             return back()->with('error', "request method {$request->method()} not supported")->withInput();
@@ -1088,17 +1092,6 @@ class ArchiveController extends Controller
                 if ($v_d)
                 {
                     $this->deleteArchiveDocumentIndividualWithHistory($v_d,Auth::id());
-//                    VoucherDocumentIndividualDeletedHistory::create([
-//                        'company_id'        =>  $v_d->company_id,
-//                        'voucher_info_id'   =>  $v_d->voucher_info_id,
-//                        'document'          =>  $v_d->document,
-//                        'filepath'          =>  $v_d->filepath,
-//                        'created_by'        =>  $v_d->created_by,
-//                        'updated_by'        =>  $v_d->updated_by,
-//                        'deleted_by'        =>  $user->id,
-//                        'created_at'        =>  now(),
-//                    ]);
-//                    VoucherDocument::where('id',$id)->delete();
                     return back()->with('success','Data delete successfully');
                 }
                 return back()->with('error','Data not found on database!');
@@ -1134,6 +1127,7 @@ class ArchiveController extends Controller
             ]);
             VoucherDocument::where('id',$v_d->id)->delete();
             $old_link_data->delete();
+            $this->clearArchiveDashboardCache($v_d->company_id);
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());

@@ -284,6 +284,7 @@ Route::group(['middleware' => ['auth']],function (){
 # 3.7 Data Archive Controller
     Route::controller(DataArchiveDashboardController::class)->group(function(){
         Route::middleware(['permission:archive_dashboard'])->group(function (){
+            Route::get('clear-cache/{companyID}','clearCache')->name('clear.archive.dashboard.cache');;
             Route::match(['get'],'data-archive-dashboard','index')->name('data.archive.dashboard.interface');
             Route::post('company-wise-archive-dashboard','companyWiseArchiveDashboard');
             Route::post('company-wise-archive-dashboard-date-wise','companyWiseArchiveDashboardDateWise');
