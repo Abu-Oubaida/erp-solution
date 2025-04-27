@@ -1264,7 +1264,7 @@ let SalesSetting = {};
                         },
                         url: url,
                         type: "POST",
-                        data: { id: id,root_ref: root_ref },
+                        data: { id: id,ref_id: root_ref },
                         success: function (response) {
                             if (response.status === "error")
                             {

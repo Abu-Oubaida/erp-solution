@@ -200,12 +200,14 @@ class ajaxRequestController extends Controller
             if (request()->ajax()) {
                 $validateData = $request->validate([
                     'id'=> ['required','string'],
-                    'root_ref'=> ['required','string'],
+                    'ref_id'=> ['required','string'],
                 ]);
                 extract($validateData);
                 $id = Crypt::decryptString($id);
                 $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-                $relatedDocument_ids = Account_voucher::with(['voucherDocuments'])->where('voucher_number',$root_ref)->first()->voucherDocuments->pluck('id')->toArray();
+                $relatedDocument = Account_voucher::with(['voucherDocuments'])->where('id',$ref_id)->first();
+                $root_ref = $relatedDocument->voucher_number;
+                $relatedDocument_ids = $relatedDocument->voucherDocuments->pluck('id')->toArray();
                 $this_document_index = array_search($id,$relatedDocument_ids);
                 $array_count = count($relatedDocument_ids);
                 $previous_document_id = null;

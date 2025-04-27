@@ -898,10 +898,12 @@ class ArchiveController extends Controller
     public function archiveDocumentView($vID)
     {
         try {
-            $ref = request()->get('ref');
+            $ref_id = request()->get('ref');
             $id = Crypt::decryptString($vID);
             $document = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType'])->find($id);
-            $relatedDocument_ids = Account_voucher::with(['voucherDocuments'])->where('voucher_number',$ref)->first()->voucherDocuments->pluck('id')->toArray();
+            $relatedDocument = Account_voucher::with(['voucherDocuments'])->where('id',$ref_id)->first();
+            $ref = $relatedDocument->voucher_number;
+            $relatedDocument_ids = $relatedDocument->voucherDocuments->pluck('id')->toArray();
             $this_document_index = array_search($id,$relatedDocument_ids);
             $array_count = count($relatedDocument_ids);
             $previous_document_id = null;
