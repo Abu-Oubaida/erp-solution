@@ -123,7 +123,7 @@
                                     <strong>{!! $x++ !!}.</strong>
                                 {!! preg_replace('/^.*_/', '', pathinfo($d->document, PATHINFO_FILENAME)) . '.' . pathinfo($d->document, PATHINFO_EXTENSION) !!}
                                 <td>
-                                    <a class="text-primary" href="#" title="Quick View" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview',{!! $data->voucher_number !!})"> <i class="fa-solid fa-eye"></i></a>
+                                    <a class="text-primary" href="#" title="Quick View" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','{!! $data->voucher_number !!}')"> <i class="fa-solid fa-eye"></i></a>
                                     &nbsp;
                                     <a class="text-info" href="{!! route('view.archive.document',['vID'=>\Illuminate\Support\Facades\Crypt::encryptString($d->id),'ref'=> $data->voucher_number]) !!}" title="View on new window" target="_blank"><i class="fa-solid fa-up-right-from-square"></i></a>
                                     @if(auth()->user()->hasPermission('archive_document_download'))
