@@ -55,22 +55,18 @@
             <div class="col-md-12">
                 <h1 class="modal-title fs-5 d-inline-block" id="v_document_name"><b>File Name</b>: {!! $document->document !!}</h1>
             </div>
+        @if($document->accountVoucherInfo->voucher_number == $ref)
             <div class="col">
-                <div class="row">
-                    @if($document->accountVoucherInfo->voucher_number == $ref)
-                        <div class="col">
-                            <span><strong>Reference</strong>: {!! $document->accountVoucherInfo->voucher_number !!}</span>
-                        </div>
-                    @else
-                        <div class="col">
-                            <span><strong>Original Reference</strong>: {!! $document->accountVoucherInfo->voucher_number !!}</span>
-                        </div>
-                        <div class="col">
-                            <span><strong>Linked Reference</strong>: {!! $ref !!}</span>
-                        </div>
-                    @endif
-                </div>
+                <span><strong>Reference</strong>: {!! $document->accountVoucherInfo->voucher_number !!}</span>
             </div>
+        @else
+            <div class="col">
+                <span><strong>Original Reference</strong>: {!! $document->accountVoucherInfo->voucher_number !!}</span>
+            </div>
+            <div class="col">
+                <span><strong>Linked Reference</strong>: {!! $ref !!}</span>
+            </div>
+        @endif
             <div class="col">
                 <span class="float-end"><strong>Type</strong>:{!! $document->accountVoucherInfo->VoucherType->voucher_type_title !!}</span>
             </div>
