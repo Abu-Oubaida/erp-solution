@@ -28,7 +28,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-building" style="color:#4e73df; font-size: 20px;"></i> Apartment Type List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-building"
+                                        style="color:#4e73df; font-size: 20px;"></i> Apartment Type List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -51,7 +52,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-ruler-combined" style="color:#4e73df; font-size: 20px;"></i> Apartment Size List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-ruler-combined"
+                                        style="color:#4e73df; font-size: 20px;"></i> Apartment Size List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -75,7 +77,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-list" style="color:#4e73df; font-size: 20px;"></i> View List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-list"
+                                        style="color:#4e73df; font-size: 20px;"></i> View List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -99,7 +102,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-money-bill-wave" style="color:#4e73df; font-size: 20px;"></i> Budget List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-money-bill-wave"
+                                        style="color:#4e73df; font-size: 20px;"></i> Budget List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -122,7 +126,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-share-nodes" style="color:#4e73df; font-size: 20px;"></i> Source List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-share-nodes"
+                                        style="color:#4e73df; font-size: 20px;"></i> Source List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -145,7 +150,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-user-tie" style="color:#4e73df; font-size: 20px;"></i> Profession List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-user-tie"
+                                        style="color:#4e73df; font-size: 20px;"></i> Profession List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -168,7 +174,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-map-marker-alt" style="color:#4e73df; font-size: 20px;"></i> Location Info List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-map-marker-alt"
+                                        style="color:#4e73df; font-size: 20px;"></i> Location Info List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -191,7 +198,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-layer-group" style="color:#4e73df; font-size: 20px;"></i> Floor List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-layer-group"
+                                        style="color:#4e73df; font-size: 20px;"></i> Floor List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -214,7 +222,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-check-circle" style="color:#4e73df; font-size: 20px;"></i> Status Info List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-check-circle"
+                                        style="color:#4e73df; font-size: 20px;"></i> Status Info List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -237,7 +246,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h6 style="font-size: 21px"><i class="fas fa-compass" style="color:#4e73df; font-size: 20px;"></i> Facing List</h6>
+                                <h6 style="font-size: 21px"><i class="fas fa-compass"
+                                        style="color:#4e73df; font-size: 20px;"></i> Facing List</h6>
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
@@ -270,8 +280,9 @@
                         <div class="col-md-6 mb-2">
                             <div class="form-group">
                                 <label for="company">Company Name<span class="text-danger">*</span></label>
-                                <select class="text-capitalize select-search" id="company" name="company" onchange="return SalesSetting.salesProfessionParentIdDropdown(this)">
-                                    <option value="">Pick options...</option>
+                                <select class="text-capitalize select-search company_dropdown" id="company" name="company"
+                                    onchange="return SalesSetting.salesProfessionParentIdDropdown(this)">
+                                    <option value="0">Pick options...</option>
                                     @if (isset($companies) || count($companies) > 0)
                                         @foreach ($companies as $c)
                                             <option value="{{ $c->id }}">{{ $c->company_name }}
@@ -285,7 +296,7 @@
                         <div class="col-md-6 mb-2">
                             <div class="form-group">
                                 <label for="company">Status</label>
-                                <select class="text-capitalize select-search" id="status" name="status">
+                                <select class="text-capitalize select-search status_dropdown" id="status" name="status">
                                     <option value="">Pick options...</option>
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
@@ -293,12 +304,12 @@
                             </div>
                         </div>
                         <div class="row" id="sales_sub_table_content">
-                            
+
                         </div>
 
                         <div class="col-md-12">
                             <button
-                                class="btn btn-chl-outline float-end"onclick="return SalesSetting.salesSubTableModal()">
+                                class="btn btn-chl-outline float-end"onclick="return SalesSetting.salesSubTableModal(this)">
                                 <i class="fas fa-save"></i> Save
                             </button>
                         </div>

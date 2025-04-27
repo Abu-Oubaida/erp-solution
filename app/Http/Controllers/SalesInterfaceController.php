@@ -14,6 +14,7 @@ use App\Models\SalesLeadSourceInfo;
 use App\Models\SalesLeadStatusInfo;
 use App\Models\SalesLeadView;
 use App\Models\SalesProfession;
+use Exception;
 use Illuminate\Http\Request;
 use App\Traits\ParentTraitCompanyWise;
 use Log;
@@ -83,16 +84,16 @@ class SalesInterfaceController extends Controller
             $permission = $this->permissions()->sale_settings;
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
             $company_ids = $this->getCompanyModulePermissionWise($permission)->get()->pluck('id')->toArray();
-            $salesLeadApartmentType=SalesLeadApartmentType::latest()->whereIn('company_id',$company_ids)->get();
-            $salesLeadApartmentSize = SalesLeadApartmentSize::latest()->whereIn('company_id',$company_ids)->get();
-            $salesLeadView = SalesLeadView::latest()->whereIn('company_id',$company_ids)->get();
-            $salesLeadBudget = SalesLeadBudget::latest()->whereIn('company_id',$company_ids)->get();
-            $salesLeadSourceInfo = SalesLeadSourceInfo::latest()->whereIn('company_id',$company_ids)->get();
-            $salesProfession = SalesProfession::latest()->whereIn('company_id',$company_ids)->get();
-            $salesLeadLocationInfo = SalesLeadLocationInfo::latest()->whereIn('company_id',$company_ids)->get();
-            $salesLeadFloor = SalesLeadFloor::latest()->whereIn('company_id',$company_ids)->get();
-            $salesLeadStatusInfo = SalesLeadStatusInfo::latest()->whereIn('company_id',$company_ids)->get();
-            $salesLeadFacing = SalesLeadFacing::latest()->whereIn('company_id',$company_ids)->get();
+            $salesLeadApartmentType=SalesLeadApartmentType::with('createdByUser')->latest()->whereIn('company_id',$company_ids)->get();
+            $salesLeadApartmentSize = SalesLeadApartmentSize::with('createdByUser')->latest()->whereIn('company_id',$company_ids)->get();
+            $salesLeadView = SalesLeadView::with('createdByUser')->latest()->whereIn('company_id',$company_ids)->get();
+            $salesLeadBudget = SalesLeadBudget::with('createdByUser')->latest()->whereIn('company_id',$company_ids)->get();
+            $salesLeadSourceInfo = SalesLeadSourceInfo::with(['parentTitle','createdByUser'])->latest()->whereIn('company_id',$company_ids)->get();
+            $salesProfession = SalesProfession::with(['parentTitle','createdByUser'])->latest()->whereIn('company_id',$company_ids)->get();
+            $salesLeadLocationInfo = SalesLeadLocationInfo::with('createdByUser')->latest()->whereIn('company_id',$company_ids)->get();
+            $salesLeadFloor = SalesLeadFloor::with('createdByUser')->latest()->whereIn('company_id',$company_ids)->get();
+            $salesLeadStatusInfo = SalesLeadStatusInfo::with('createdByUser')->latest()->whereIn('company_id',$company_ids)->get();
+            $salesLeadFacing = SalesLeadFacing::with('createdByUser')->latest()->whereIn('company_id',$company_ids)->get();
             
             return view('back-end/sales/sell-setting',compact('companies','salesLeadApartmentType','salesLeadApartmentSize','salesLeadView','salesLeadBudget','salesLeadSourceInfo','salesProfession','salesLeadLocationInfo','salesLeadFloor','salesLeadStatusInfo','salesLeadFacing'));
         }catch (\Throwable $exception)
@@ -102,7 +103,7 @@ class SalesInterfaceController extends Controller
     }
 
     public function saleSubTableDataAdd(Request $request){
-        try {
+        // try {
         $subTableData = (object) $request->subTableData;
         $commonFields = [
             'company_id' => $subTableData->company,
@@ -167,7 +168,12 @@ class SalesInterfaceController extends Controller
         foreach ($fields as $field) {
             $dataToInsert[$field] = $subTableData->$field ?? null;
         }
-
+        if(isset($dataToInsert['parent_id']) && isset($dataToInsert['is_parent'])){
+            if($dataToInsert['parent_id']==1 && $dataToInsert['is_parent']==1){
+                $dataToInsert['parent_id'] = null;
+            }
+        }
+        
         $record = $modelClass::create($dataToInsert);
         $viewPath = 'back-end.sales.'.str_replace('_','-',$param).'-list';
         $getSaleSubTableData = $this->getSaleSubTableData($modelClass);
@@ -185,9 +191,12 @@ class SalesInterfaceController extends Controller
                 'message' => 'Operation failed'
             ]);
         }
-    } catch (\Throwable $exception){
-        return back()->with('error',$exception->getMessage())->withInput();
-    }
+    // } catch (\Throwable $exception){
+    //     return response()->json([
+    //         'status' => 'error',
+    //         'message' => 'Operation failed'.$exception->getMessage()
+    //     ]);
+    // }
  }
  public function getSaleSubTableData($modelClass)
 {
@@ -195,29 +204,36 @@ class SalesInterfaceController extends Controller
     $query = $modelClass::query();
     $company_ids = $this->getCompanyModulePermissionWise($permission)->get()->pluck('id')->toArray();
     if ($company_ids) {
-        $query->whereIn('company_id', $company_ids);
+        $query->whereIn('company_id', $company_ids)->with('createdByUser');
     }
-
+    $modelInstance = new $modelClass;
+    $fillableFields = $modelInstance->getFillable();
+    
+    if (in_array('parent_id', $fillableFields) && in_array('is_parent', $fillableFields)) {
+        $query->with('parentTitle');
+    }
     return $query->latest()->get();
 }
 public function getSaleProfessionTitleId(Request $request){
    try{
     $selectedId=$request->selectedId;
-    $salesProfessionData = SalesProfession::where('company_id',$selectedId)->get();
-    Log::info(json_encode($salesProfessionData,JSON_PRETTY_PRINT));
+    $salesProfessionData = SalesProfession::query()->where(function($query) use ($selectedId){
+         $query->where('company_id',$selectedId)
+                ->where('status',1);
+    })->orWhere('company_id',0)->get();
     if (!$salesProfessionData->isEmpty() ) {
          return response()->json([
              'status' => 'success',
              'salesProfessionData'=>$salesProfessionData
          ]);
      } else {
-         return response()->json([
-             'status' => 'error',
-             'message' => 'Operation failed'
-         ]);
+         throw new Exception('Data Not Found');
      }
    }catch (\Throwable $exception){
-        return back()->with('error',$exception->getMessage())->withInput();
+    return response()->json([
+        'status' => 'error',
+        'message' => 'Operation failed'.$exception->getMessage()
+    ]);
     }
 }
 }

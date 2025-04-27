@@ -9,4 +9,7 @@ class SalesLeadFacing extends Model
 {
     use HasFactory;
     protected $fillable = ['title','status','created_by','updated_by','company_id'];
+    public function createdByUser(){
+        return $this->belongsTo(User::class,'created_by');
+    }
 }
