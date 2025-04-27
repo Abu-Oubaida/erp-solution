@@ -8,12 +8,12 @@
     use Illuminate\Support\Facades\Cache;
 @endphp
 @if(auth()->user()->isSystemSuperAdmin() || auth()->user()->companyWiseRoleName() == 'superadmin')
-    @if (Cache::has('company_disk_info_' . $company_id) || Cache::has('company_archive_stats_' . $company_id) || Cache::has('company_daily_counts_' . $company_id))
+{{--    @if (Cache::has('company_disk_info_' . $company_id.'_'.auth()->user()->id) || Cache::has('company_archive_stats_' . $company_id.'_'.auth()->user()->id) || Cache::has('company_daily_counts_' . $company_id.'_'.auth()->user()->id))--}}
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
             Dashboard data is being fetched from cache. <a href="{!! route('clear.archive.dashboard.cache',['companyID'=>\Illuminate\Support\Facades\Crypt::encryptString($company_id)]) !!}">Clear Cache</a>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif
+{{--    @endif--}}
 @endif
 
 @if (auth()->user()->hasPermission('archive_storage_view') || auth()->user()->hasPermission('archive_uploaded_last_week_view'))
