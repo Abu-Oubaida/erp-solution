@@ -29,7 +29,7 @@
                         <table>
                             <tr>
                                 <td style="width: 50%" class="mobile-none">
-                                    <table class="table table-bordered mt-3" style="width: 100%; font-size: 13px">
+                                    <table class="table table-bordered mt-3" style="width: 100%;">
                                         <tr>
                                             <th>Module Name</th>
                                             <th>:</th>
