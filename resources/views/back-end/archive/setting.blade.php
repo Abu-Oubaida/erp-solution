@@ -117,7 +117,9 @@
                                 <th>Total Storage</th>
                                 <th>Used Storage</th>
                                 <th>Free Storage</th>
+                                @if(auth()->user()->isSystemSuperAdmin())
                                 <th>Action</th>
+                                @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -135,6 +137,7 @@
                                         <td>{!! $c['company_storage_package'] != null?($c['company_storage_package']['package_name'])?$c['company_storage_package']['package_name']. " ({$c['company_storage_package']['package_size']} GB)":"Unlimited": "Unlimited" !!}</td>
                                         <td>{!! $c['company_used_storage']. " GB" !!}</td>
                                         <td>{!! $c['company_storage_package'] != null ?($c['company_storage_package']['package_size'])?($c['company_storage_package']['package_size'] - $c['company_used_storage'])." GB": "Unlimited": "Unlimited" !!}</td>
+                                        @if(auth()->user()->isSystemSuperAdmin())
                                         <td>
                                             <a href="#"
                                                class="btn btn-sm text-success"
@@ -143,6 +146,7 @@
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                         </td>
+                                        @endif
                                     </tr>
                                 @endforeach
                             @endif
@@ -168,6 +172,7 @@
         </script>
         @endif
     </div>
+    @if(auth()->user()->isSystemSuperAdmin())
     <!-- Modal for details -->
     <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog modal-xl">
@@ -218,5 +223,6 @@
             </div>
         </div>
     </div>
+    @endif
 @stop
 
