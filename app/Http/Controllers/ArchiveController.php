@@ -421,8 +421,13 @@ class ArchiveController extends Controller
             }
             $company_code = $company_info->company_code;
             $v_type = VoucherType::where('id',$data_type)->first();
-            $file_path = $company_code.'/'.$v_type->voucher_type_title.'/';
-            $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
+
+            $company_path = env('APP_ARCHIVE_DATA').'/'.$company_code.'/';
+            $file_path = $v_type->voucher_type_title.'/';
+            $destinationPath = $company_path.$file_path;
+
+
+            $this->extracted($company_info, $company_path);
 
 //            $firstInsert = archive infos
             $firstInsert = DB::table('account_voucher_infos')->insertGetId([
@@ -551,8 +556,14 @@ class ArchiveController extends Controller
                     throw new \Exception('Selected company has not any storage package. Please contact system administrator');
                 }
                 $company_code = $company_info->company_code;
-                $file_path = $company_code.'/'.$voucherInfo->VoucherType->voucher_type_title.'/';
-                $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
+                $company_path = env('APP_ARCHIVE_DATA').'/'.$company_code.'/';
+
+
+                $this->extracted($company_info, $company_path);
+
+
+                $file_path = $voucherInfo->VoucherType->voucher_type_title.'/';
+                $destinationPath = $company_path.$file_path;
                 $uploadedFiles = []; // Track successfully uploaded files
 
                 foreach ($request->file('voucher_file') as $file) {
@@ -1415,5 +1426,24 @@ class ArchiveController extends Controller
 //        {
 //            return back()->with('error',$exception->getMessage());
 //        }
+    }
+
+    /**
+     * @param mixed $company_info
+     * @param string $company_path
+     * @return void
+     * @throws \Exception
+     */
+    private function extracted(mixed $company_info, string $company_path): void
+    {
+        $company_used_storage = Cache::remember("company_{$company_info->id}_used_storage}", 600, function () use ($company_path) {
+            return round($this->getFolderSize($company_path) / (1024 * 1024 * 1024), 2);
+        });
+        $company_package_size = Cache::remember("company_package_size_{$company_info->id}", 86400, function () use ($company_info) {
+            return $company_info->archiveStorage->package->package_size;
+        });
+        if (($company_package_size - $company_used_storage) <= 0) {
+            throw new \Exception('Selected company storage full. Please contact system administrator');
+        }
     }
 }
