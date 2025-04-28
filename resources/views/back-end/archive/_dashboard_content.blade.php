@@ -38,12 +38,12 @@
                                         <tr>
                                             <th>Total Disk Space</th>
                                             <th>:</th>
-                                            <td>{{ @$diskTotal }} GB</td>
+                                            <td>{{ @$diskTotal }} @if($diskTotal != 'Unlimited') GB @endif</td>
                                         </tr>
                                         <tr>
                                             <th>Total Free Space</th>
                                             <th>:</th>
-                                            <td>{{ @$diskFree }} GB</td>
+                                            <td>{{ @$diskFree }} @if($diskTotal != 'Unlimited') GB @endif</td>
                                         </tr>
                                         <tr>
                                             <th>Total Used Space</th>
@@ -67,37 +67,40 @@
                                         </tr>
                                     </table>
                                 </td>
-                                <td style="width: 50%">
-                                    <div class="align-items-center">
-                                        <div id="chart-container" style="width: 80%; float:right">
-                                            <canvas id="levelChart"></canvas>
+                                @if($diskTotal != 'Unlimited')
+                                    <td style="width: 50%">
+                                        <div class="align-items-center">
+                                            <div id="chart-container" style="width: 80%; float:right">
+                                                <canvas id="levelChart"></canvas>
 
-                                            <div class="progress" title="Total: {{ $diskTotal }} GB">
-                                                <div class="progress-bar" role="progressbar"
-                                                     style="width: {!! $totalUsed !!}%; background: rgb(255, 99, 132)"
-                                                     aria-valuenow="{!! $totalUsed !!}" aria-valuemin="0"
-                                                     aria-valuemax="{{ $diskTotal }}"
-                                                     title="Total Used ({!! $totalUsed !!}) GB">
-                                                    Used ( {!! $totalUsed !!} GB )</div>
-                                                <div class="progress-bar" role="progressbar"
-                                                     style="width: {!! $diskFree !!}%; background: rgb(54, 162, 235)"
-                                                     aria-valuenow="{!! $diskFree !!}" aria-valuemin="0"
-                                                     aria-valuemax="{{ $diskTotal }}"
-                                                     title="Free Spase ({!! $diskFree !!}) GB">Free (
-                                                    {!! $diskFree !!} GB )
+                                                <div class="progress" title="Total: {{ $diskTotal }} GB">
+                                                    <div class="progress-bar" role="progressbar"
+                                                         style="width: {!! $totalUsed !!}%; background: rgb(255, 99, 132)"
+                                                         aria-valuenow="{!! $totalUsed !!}" aria-valuemin="0"
+                                                         aria-valuemax="{{ $diskTotal }}"
+                                                         title="Total Used ({!! $totalUsed !!}) GB">
+                                                        Used ( {!! $totalUsed !!} GB )</div>
+                                                    <div class="progress-bar" role="progressbar"
+                                                         style="width: {!! $diskFree !!}%; background: rgb(54, 162, 235)"
+                                                         aria-valuenow="{!! $diskFree !!}" aria-valuemin="0"
+                                                         aria-valuemax="{{ $diskTotal }}"
+                                                         title="Free Spase ({!! $diskFree !!}) GB">Free (
+                                                        {!! $diskFree !!} GB )
+                                                    </div>
                                                 </div>
+                                                <p class="text-center"><strong>Total Storage:</strong> {{ $diskTotal }} GB
+                                                </p>
                                             </div>
-                                            <p class="text-center"><strong>Total Storage:</strong> {{ $diskTotal }} GB
-                                            </p>
                                         </div>
-                                    </div>
-                                </td>
+                                    </td>
+                                @endif
                             </tr>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
+        @if($diskTotal != 'Unlimited')
         <script>
             var ctx = document.getElementById('levelChart').getContext('2d');
             var levelChart = new Chart(ctx, {
@@ -131,6 +134,7 @@
                 }
             })
         </script>
+        @endif
     @endif
     @if (auth()->user()->hasPermission('archive_uploaded_last_week_view'))
         <div class="col-sm-12 col-md-12 col-xl-6 mb-2">

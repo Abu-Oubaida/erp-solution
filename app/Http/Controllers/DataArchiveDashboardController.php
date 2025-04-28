@@ -178,11 +178,14 @@ class DataArchiveDashboardController extends Controller
 
                 // Cache disk/folder size info for 10 minutes
                 $diskInfo = Cache::remember("company_disk_info_{$company->id}_{$this->user->id}", 600, function () use ($path, $company_dir,$company) {
+//                    $diskTotal = ($company->archiveStorage && $company->archiveStorage->storage_package_id)
+//                        ? $company->archiveStorage->package->package_size
+//                        : round(disk_total_space($path) / (1024 * 1024 * 1024), 2);
                     $diskTotal = ($company->archiveStorage && $company->archiveStorage->storage_package_id)
                         ? $company->archiveStorage->package->package_size
-                        : round(disk_total_space($path) / (1024 * 1024 * 1024), 2);
+                        : 'Unlimited';
                     $archiveUsed = round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2);
-                    $diskFree = $diskTotal-$archiveUsed;
+                    $diskFree = ($diskTotal != 'Unlimited')?$diskTotal-$archiveUsed:'Unknown';
                     $totalUsed = $archiveUsed;
 
                     return compact('diskTotal', 'archiveUsed', 'diskFree', 'totalUsed',);

@@ -414,7 +414,12 @@ class ArchiveController extends Controller
             extract($request->post());
             $user = Auth::user();
             $documentIds = array();
-            $company_code = company_info::find($company)->company_code;
+            $company_info = company_info::find($company);
+            if(!($company_info->archiveStorage && $company_info->archiveStorage->storage_package_id))
+            {
+                throw new \Exception('Selected company has not any storage package. Please contact system administrator');
+            }
+            $company_code = $company_info->company_code;
             $v_type = VoucherType::where('id',$data_type)->first();
             $file_path = $company_code.'/'.$v_type->voucher_type_title.'/';
             $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
@@ -540,7 +545,12 @@ class ArchiveController extends Controller
                 extract($request->post());
                 $user = Auth::user();
                 $voucherInfo = Account_voucher::with(['VoucherType','company'])->where('id',Crypt::decryptString($id))->first();
-                $company_code = $voucherInfo->company->company_code;
+                $company_info = $voucherInfo->company;
+                if(!($company_info->archiveStorage && $company_info->archiveStorage->storage_package_id))
+                {
+                    throw new \Exception('Selected company has not any storage package. Please contact system administrator');
+                }
+                $company_code = $company_info->company_code;
                 $file_path = $company_code.'/'.$voucherInfo->VoucherType->voucher_type_title.'/';
                 $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
                 $uploadedFiles = []; // Track successfully uploaded files
@@ -585,11 +595,13 @@ class ArchiveController extends Controller
         }catch (\Throwable $exception)
         {
             DB::rollBack();
-
-            // Delete uploaded files if transaction fails
-            foreach ($uploadedFiles as $file) {
-                if (file_exists($file)) {
-                    unlink($file);
+            if (isset($uploadedFiles))
+            {
+                // Delete uploaded files if transaction fails
+                foreach ($uploadedFiles as $file) {
+                    if (file_exists($file)) {
+                        unlink($file);
+                    }
                 }
             }
             return back()->with('error',$exception->getMessage());
