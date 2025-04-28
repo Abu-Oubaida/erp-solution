@@ -86,6 +86,7 @@ class ajaxRequestController extends Controller
             ]);
         }
     }
+
     //
     public function findPermissionChild(Request $request)
     {

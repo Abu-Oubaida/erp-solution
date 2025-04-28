@@ -4262,6 +4262,51 @@ let SalesSetting = {};
                     },
                 });
             },
+            companyPackageEdit:function (e){
+                let data = $(e).data('info')
+                console.log((data))
+                $("#editModalLabel").html("Edit Company Storage Package of"+data.company)
+                $("#edit_company_name").html(`<option value="${data.company_id}" selected>${data.company}</option>`)
+                $("#edit_company_package").val(data.package_id)
+                if (data.status !== '')
+                {
+                    $("#edit_company_status").val(data.status)
+                }
+                $("#editModal").modal('show')
+                return false
+            },
+            companyPackageUpdate:function ()
+            {
+                let company_id = $("#edit_company_name").val();
+                let selected_package = parseInt($("#edit_company_package").val());
+                let status = parseInt($("#edit_company_status").val());
+
+                selected_package = (isNaN(selected_package) || selected_package === 0) ? null : selected_package;
+                status = (isNaN(status) || status === -1) ? 0 : status;
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/company-storage-package-update";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { company_id: company_id, selected_package: selected_package, status: status },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message)
+                            window.location.reload()
+                        }
+                        return true;
+                    },
+                });
+            }
         };
         Sales = {
             addEmailPhoneForLead: function (event, displayName, outputId) {

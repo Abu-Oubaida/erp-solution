@@ -34,12 +34,13 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 # 0.0 Clear
 Route::get('/clear', function() {
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('config:cache');
-    Artisan::call('view:clear');
-    return "Cleared!";
-});
+//    Artisan::call('cache:clear');
+//    Artisan::call('config:clear');
+//    Artisan::call('config:cache');
+//    Artisan::call('view:clear');
+    Artisan::call('optimize:clear');
+    return redirect()->route('root')->with('success', 'Cache cleared successfully!');
+})->name('clear');
 # 1.0 Welcome
 Route::get('/', function () {
     return view('welcome');
@@ -82,6 +83,7 @@ Route::group(['middleware' => ['auth']],function (){
         // routes/web.php
         Route::post('/save-sidebar-width', 'saveSidebarWidth');
         Route::post('/save-sidebar-toggle', 'saveSidebarToggled');
+        Route::get('clear-cache','clearCacheAll')->name('clear.cache');
 
     });
 # 3.2 Send mail for document sharing
@@ -143,6 +145,8 @@ Route::group(['middleware' => ['auth']],function (){
                 });
 
                 Route::post('company-wise-users-company-permission','companyWiseUsersCompanyPermission');
+
+                Route::post('company-storage-package-update','companyStoragePackageUpdate');
             });
             # 3.2.1.3 Operation Reference Type
             Route::controller(OpReferenceTypeController::class)->group(function (){
@@ -284,7 +288,6 @@ Route::group(['middleware' => ['auth']],function (){
 # 3.7 Data Archive Controller
     Route::controller(DataArchiveDashboardController::class)->group(function(){
         Route::middleware(['permission:archive_dashboard'])->group(function (){
-            Route::get('clear-cache/{companyID}','clearCache')->name('clear.archive.dashboard.cache');;
             Route::match(['get'],'data-archive-dashboard','index')->name('data.archive.dashboard.interface');
             Route::post('company-wise-archive-dashboard','companyWiseArchiveDashboard');
             Route::post('company-wise-archive-dashboard-date-wise','companyWiseArchiveDashboardDateWise');

@@ -48,6 +48,6 @@ class company_info extends Model
 
     public function archiveStorage()
     {
-        return $this->hasMany(Company_wise_archive_storage_info::class,'company_id');
+        return $this->hasOne(Company_wise_archive_storage_info::class,'company_id');
     }
 }

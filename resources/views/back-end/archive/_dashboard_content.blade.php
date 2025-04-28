@@ -10,7 +10,7 @@
 @if(auth()->user()->isSystemSuperAdmin() || auth()->user()->companyWiseRoleName() == 'superadmin')
 {{--    @if (Cache::has('company_disk_info_' . $company_id.'_'.auth()->user()->id) || Cache::has('company_archive_stats_' . $company_id.'_'.auth()->user()->id) || Cache::has('company_daily_counts_' . $company_id.'_'.auth()->user()->id))--}}
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
-            Dashboard data is being fetched from cache. <a href="{!! route('clear.archive.dashboard.cache',['companyID'=>\Illuminate\Support\Facades\Crypt::encryptString($company_id)]) !!}">Clear Cache</a>
+            Dashboard data is being fetched from cache. <a href="{!! route('clear.cache') !!}">Clear Cache</a>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 {{--    @endif--}}
@@ -49,16 +49,6 @@
                                             <th>Total Used Space</th>
                                             <th>:</th>
                                             <td>{{ @$totalUsed }} GB</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Archived</th>
-                                            <th>:</th>
-                                            <td>{{ @$archiveUsed }} GB</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Other</th>
-                                            <th>:</th>
-                                            <td>{{ @$otherUsed }} GB</td>
                                         </tr>
                                         <tr>
                                             <th>Total Data Type</th>
@@ -113,19 +103,17 @@
             var levelChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ["Free", 'Archive', 'Other', ],
+                    labels: ["Free", 'Archive', ],
                     datasets: [{
                         label: 'Disk Usage',
-                        data: [{!! @$diskFree !!}, {!! @$archiveUsed !!}, {!! @$otherUsed !!}, ],
+                        data: [{!! @$diskFree !!}, {!! @$totalUsed !!}, ],
                         backgroundColor: [
                             'rgb(54, 162, 235)', // Free - Blue
                             'rgb(255, 99, 132)', // Archive Used
-                            'rgb(255, 205, 86)' // Other Used
                         ],
                         borderColor: [
                             'rgb(54, 162, 235)', // Free - Blue
                             'rgb(255, 99, 132)', // Archive Used
-                            'rgb(255, 205, 86)' // Other Used
                         ],
                         borderWidth: 1
                     }]

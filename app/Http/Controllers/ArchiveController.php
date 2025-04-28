@@ -7,6 +7,7 @@ use App\Models\ArchiveInfoLinkDocument;
 use App\Models\ArchiveLinkDocumentDeleteHistory;
 use App\Models\branch;
 use App\Models\company_info;
+use App\Models\Data_archive_storage_package;
 use App\Models\User;
 use App\Models\Voucher_type_permission_user_delete_history;
 use App\Models\VoucherDocument;
@@ -20,6 +21,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -103,7 +105,7 @@ class ArchiveController extends Controller
                 }
             }
             DB::commit();
-            $this->clearArchiveDashboardCache($company);
+            $this->clearCache();
             return back()->with('success','Data insert successfully');
         }catch (\Throwable $exception)
         {
@@ -482,7 +484,7 @@ class ArchiveController extends Controller
                 }
             }
             DB::commit();
-            $this->clearArchiveDashboardCache($company);
+            $this->clearCache();
             return back()->with('success', 'Data save successful.');
 
         }catch (\Throwable $exception)
@@ -576,7 +578,7 @@ class ArchiveController extends Controller
                     }
                 }
                 DB::commit();
-                $this->clearArchiveDashboardCache($voucherInfo->company_id);
+                $this->clearCache();
                 return back()->with('success','Data upload successfully on Voucher No:'.$voucherInfo->voucher_number);
             }
             return back()->with('error', "request method {$request->method()} not supported")->withInput();
@@ -1149,7 +1151,7 @@ class ArchiveController extends Controller
             ]);
             VoucherDocument::where('id',$v_d->id)->delete();
             $old_link_data->delete();
-            $this->clearArchiveDashboardCache($v_d->company_id);
+            $this->clearCache();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -1367,25 +1369,39 @@ class ArchiveController extends Controller
 
     public function setting()
     {
-        try {
+//        try {
             $permission = $this->permissions()->archive_setting;
             $companies = $this->getCompanyModulePermissionWise($permission)->get(['id','company_name','company_code']);
             $path = env('APP_ARCHIVE_DATA');
-            $base_dir = round(disk_total_space($path) / (1024 * 1024 * 1024),2);
-            $company_wise_storage = $companies->map(function ($company) use ($path) {
-                $company_dir = $path.'/'.$company->company_code;
-                return [
-                    'company_id' => $company->id,
-                    'company_name' => $company->company_name,
-                    'company_code' => $company->company_code,
-                    'company_storage_package' => $company->archiveStorage,
-                    'company_used_storage' => round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2),
-                ];
+            $storage_packages = Cache::remember('storage_packages', 86400, function () {
+                return Data_archive_storage_package::where('status', 1)->get(['id','package_name','package_size']);
             });
-            return view('back-end.archive.setting',compact('companies','base_dir','company_wise_storage'))->render();
-        }catch (\Throwable $exception)
-        {
-            return back()->with('error',$exception->getMessage());
-        }
+            $total_storage = Cache::remember('total_storage', 600, function () use ($path) {
+                return round(disk_total_space($path) / (1024 * 1024 * 1024),2);
+            });
+            $company_wise_storage = Cache::remember('company_wise_storage', 600, function () use ($companies,$path) {
+                return $companies->map(function ($company) use ($path) {
+                    $company_dir = $path.'/'.$company->company_code;
+                    return [
+                        'company_id' => $company->id,
+                        'company_name' => $company->company_name,
+                        'company_code' => $company->company_code,
+                        'company_storage_package' => ($company->archiveStorage != null)?
+                            [
+                                'package_id'=>($company->archiveStorage->storage_package_id)??null,
+                                'package_name'=>($company->archiveStorage->package->package_name)??null,
+                                'package_size'=>($company->archiveStorage->package->package_size)??null,
+                                'status'=>$company->archiveStorage->status
+                            ]:null,
+                        'company_used_storage' => round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2),
+                    ];
+                });
+            });
+//            dd($company_wise_storage);
+            return view('back-end.archive.setting',compact('companies','total_storage','company_wise_storage','storage_packages'))->render();
+//        }catch (\Throwable $exception)
+//        {
+//            return back()->with('error',$exception->getMessage());
+//        }
     }
 }

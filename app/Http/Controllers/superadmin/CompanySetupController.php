@@ -5,12 +5,14 @@ namespace App\Http\Controllers\superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\company_info;
 use App\Models\company_type;
+use App\Models\Company_wise_archive_storage_info;
 use App\Models\CompanyModulePermission;
 use App\Models\CompanyModulePermissionDeleteHistory;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
+use App\Traits\DataArchiveTrait;
 use App\Traits\DeleteFileTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
@@ -22,7 +24,7 @@ use Illuminate\Support\Facades\File;
 
 class CompanySetupController extends Controller
 {
-    use DeleteFileTrait, ParentTraitCompanyWise;
+    use DeleteFileTrait, ParentTraitCompanyWise, DataArchiveTrait;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -723,6 +725,50 @@ class CompanySetupController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message'=>$exception->getMessage()
+            ]);
+        }
+    }
+
+    public function companyStoragePackageUpdate(Request $request)
+    {
+        try {
+            if ($request->ajax()) {
+                $validateData = $request->validate([
+                    'company_id' => ['required', 'numeric', 'exists:company_infos,id'],
+                    'selected_package' => ['sometimes','nullable', 'numeric', ],
+                    'status' => ['required', 'numeric','in:0,1'],
+                ]);
+                extract($validateData);
+
+                $updated_data = [
+                    'company_id' => $company_id,
+                    'storage_package_id' => $selected_package??null,
+                    'status' => $status,
+                ];
+
+                $companyWiseData = Company_wise_archive_storage_info::where('company_id', $company_id)->first();
+
+                if ($companyWiseData) {
+                    // Update
+                    $updated_data['updated_at'] = now();
+                    $updated_data['updated_by'] = $this->user->id;
+                    $companyWiseData->update($updated_data);
+                } else {
+                    // Insert
+                    $updated_data['created_at'] = now();
+                    $updated_data['created_by'] = $this->user->id;
+                    Company_wise_archive_storage_info::create($updated_data);
+                }
+                $this->clearCache();
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
             ]);
         }
     }
