@@ -134,9 +134,9 @@
                                         <td>
                                             {!! $c['company_storage_package'] != null?$c['company_storage_package']['status']?"<span class='badge bg-success'>Active</span>":"<span class='badge bg-danger'>Inactive</span>":"<span class='badge bg-secondary'>Default</span>" !!}
                                         </td>
-                                        <td>{!! $c['company_storage_package'] != null?($c['company_storage_package']['package_name'])?$c['company_storage_package']['package_name']. " ({$c['company_storage_package']['package_size']} GB)":"Unlimited": "Unlimited" !!}</td>
+                                        <td>{!! $c['company_storage_package'] != null?($c['company_storage_package']['package_name'])?$c['company_storage_package']['package_name']. " ({$c['company_storage_package']['package_size']} GB)":"N/A": "N/A" !!}</td>
                                         <td>{!! $c['company_used_storage']. " GB" !!}</td>
-                                        <td>{!! $c['company_storage_package'] != null ?($c['company_storage_package']['package_size'])?($c['company_storage_package']['package_size'] - $c['company_used_storage'])." GB": "Unlimited": "Unlimited" !!}</td>
+                                        <td>{!! $c['company_storage_package'] != null ?($c['company_storage_package']['package_size'])?($c['company_storage_package']['package_size'] - $c['company_used_storage'])." GB": "N/A": "N/A" !!}</td>
                                         @if(auth()->user()->isSystemSuperAdmin())
                                         <td>
                                             <a href="#"
