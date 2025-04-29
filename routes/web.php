@@ -499,6 +499,22 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get'],'sale_settings','saleSettingsInterface')->name('sale.settings.interface');
             Route::match(['post'],'add_sale_sub_table_data','saleSubTableDataAdd')->name('sale.sub.table.data.add');
             Route::match(['get'],'get_sale_profession_title_id','getSaleProfessionTitleId')->name('get.sale.profession.title.id');
+            Route::match(['get'],'get_sale_source_title_id','getSaleSourceTitleId')->name('get.sale.source.title.id');
+        });
+        Route::middleware(['permission:sale_settings_edit'])->group(function (){
+            Route::match(['get','post'],'get-sales-lead-apartment-type-edit','getSalesLeadApartmentTypeEdit')->name('get.sales.lead.apartment.type.edit');
+            Route::match(['get','post'],'get-sales-lead-apartment-size-edit','getSalesLeadApartmentSizeEdit')->name('get.sales.lead.apartment.size.edit');
+            Route::match(['get','post'],'get-sales-lead-source-info-edit','getSalesLeadSourceInfoEdit')->name('get.sales.lead.source.info.edit');
+            Route::match(['get','post'],'get-sales-lead-budget-edit','getSalesLeadBudgetEdit')->name('get.sales.lead.budget.edit');
+            Route::match(['get','post'],'get-sales-lead-view-edit','getSalesLeadViewEdit')->name('get-sales-lead-view-edit');
+            Route::match(['get','post'],'get-sales-lead-floor-edit','getSalesLeadFloorEdit')->name('get-sales-lead-floor-edit');
+            Route::match(['get','post'],'get-sales-lead-location-info-edit','getSalesLeadLocationInfoEdit')->name('get.sales.lead.location.info.edit');
+            Route::match(['get','post'],'get-sales-lead-profession-edit','getSalesLeadProfessionEdit')->name('get.sales.lead.profession.edit');
+            Route::match(['get','post'],'get-sales-lead-facing-edit','getSalesLeadFacingEdit')->name('get-sales-lead-facing-edit');
+            Route::match(['get','post'],'get-sales-lead-status-info-edit','getSalesLeadStatusInfoEdit')->name('get-sales-lead-status-info-edit');
+        });
+        Route::middleware(['permission:sale_settings_delete'])->group(function (){
+            Route::post('delete-type-multiple','deleteTypeMultiple')->name('delete.type.multiple');
         });
     });//3.12 End
     # 3.13 Control Panel

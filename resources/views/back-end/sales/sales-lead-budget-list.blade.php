@@ -2,10 +2,11 @@
     $rows = $getSaleSubTableData ?? $salesLeadBudget ?? [];
 @endphp
 
-<table class="table table-hover table-sm {{$rows?'dataTable':''}}">
+<table class="table table-hover table-sm dataTable">
     <thead>
         <tr>
             <th>SL</th>
+            <th>Company Name</th>
             <th>Title</th>
             <th>Status</th>
             <th>Created By</th>
@@ -18,21 +19,22 @@
             @foreach($rows as $key => $row)
                 <tr>
                     <td>{{ $key + 1 }}</td>
+                    <td>{{ $row->getCompanyName->company_name ?? '-' }}</td>
                     <td>{{ $row->title ?? '-' }}</td>
-                    <td>{{ $row->status ? 'Active' : 'Inactive' }}</td>
+                    <td>
+                        <span
+                            class="{{ $row->status ? 'badge bg-success' : 'badge bg-danger' }}">{{ $row->status ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
                     <td>{{ $row->createdByUser->name ?? '-' }}</td>
                     <td>{{ $row->updated_by ?? '-' }}</td>
                     <td>
                         {{-- {{route('edit.archive.type',["archiveTypeID"=>\Illuminate\Support\Facades\Crypt::encryptString($vt->id)])}} --}}
-                        <a href="#" class="text-success" title="Edit"><i class='fas fa-edit'></i></a>
+                        <button href="#" class="text-success" title="Edit" onclick="return SalesSetting.salesSubTableEdit('sales_lead_budget','',{{ $row->id}})"><i class='fas fa-edit'></i></button>
                         <a href="#" class="text-danger" title="Delete"><i class="fas fa-trash"></i></a>
                     </td>
                 </tr>
             @endforeach
-        @else
-        <tr>
-            <td colspan="7" class="text-center">No Data Found</td>
-         </tr>
         @endif
     </tbody>
 </table>
@@ -42,13 +44,14 @@
             $(".check-box").prop("checked", this.checked);
         });
         $(document).ready(function () {
-            if (!$.fn.DataTable.isDataTable('.dataTable')) {
-                $('.dataTable').DataTable({
-                    dom: 'lfrtip',
-                    lengthMenu: [[15, 25, 50, 100, -1], [15, 25, 50, 100, "ALL"]],
-                    pageLength: 15,
-                })
-            }
-        })
+        $('.dataTable').each(function () {
+            $(this).DataTable({
+                destroy: true,  // Allow reinitialization
+                dom: 'lfrtip',
+                lengthMenu: [[15, 25, 50, 100, -1], [15, 25, 50, 100, "ALL"]],
+                pageLength: 15,
+            });
+        });
+    });
     }(jQuery))
 </script> 
