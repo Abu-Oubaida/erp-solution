@@ -14,6 +14,7 @@ class EmployeeListPrototypeDataExport implements FromCollection
     {
         $data = [
             [
+                'Company Code*',
                 'Employee Name*',
                 'Department',
                 'Department Code*',

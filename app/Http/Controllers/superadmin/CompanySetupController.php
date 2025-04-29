@@ -12,7 +12,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserCompanyPermission;
-use App\Traits\DataArchiveTrait;
+use App\Traits\CacheTrait;
 use App\Traits\DeleteFileTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\File;
 
 class CompanySetupController extends Controller
 {
-    use DeleteFileTrait, ParentTraitCompanyWise, DataArchiveTrait;
+    use DeleteFileTrait, ParentTraitCompanyWise, CacheTrait;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {

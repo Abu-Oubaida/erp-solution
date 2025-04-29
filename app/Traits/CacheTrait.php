@@ -4,7 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\Cache;
 
-trait DataArchiveTrait
+trait CacheTrait
 {
     private function clearCache()
     {

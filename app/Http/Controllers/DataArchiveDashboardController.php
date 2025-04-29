@@ -8,7 +8,7 @@ use App\Models\company_info;
 use App\Models\User;
 use App\Models\VoucherType;
 use App\Models\VoucherDocument;
-use App\Traits\DataArchiveTrait;
+use App\Traits\CacheTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Database\Seeders\CompanyInfo;
 use Illuminate\Http\Request;

@@ -17,20 +17,36 @@
                 </ol>
             </div>
         </div>
+        @php
+            use Illuminate\Support\Facades\Cache;
+        @endphp
+        @if(auth()->user()->isSystemSuperAdmin() || auth()->user()->companyWiseRoleName() == 'superadmin')
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                This page data is being fetched from cache. <a href="{!! route('clear.cache') !!}">Clear Cache</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
         <div class="card mb-4">
             <div class="card-header text-capitalize">
                 <div class="row">
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                         <h3>
                             <i class="fa-solid fa-users"></i>
                             {{ str_replace('.', ' ', \Route::currentRouteName()) }}
                         </h3>
                     </div>
-                    <div class="col-md-2">
-                        <div class="float-end mt-2">
-                            <a class="btn btn-success btn-sm" href="{{ route('add.user') }}"><i
-                                    class="fa-solid fa-circle-plus"></i> Add User</a>
+                    <div class="col-md-4">
+                        @if(auth()->user()->hasPermission('add_user'))
+                            <div class="float-end m-1 mt-2">
+                                <a class="btn btn-success btn-sm" href="{{ route('add.user') }}" target="_blank"><i
+                                        class="fa-solid fa-circle-plus"></i> Add User</a>
+                            </div>
+                        @endif
+                        @if (auth()->user()->hasPermission('add_user_project_permission'))
+                        <div class="float-end m-1 mt-2">
+                            <a class="btn btn-info btn-sm" target="_blank" href="{{ route('user.project.permission') }}"><i class="fa-solid fa-users-gear"></i> Project Permission</a>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -41,7 +57,7 @@
                             <th>No</th>
                             <th>Employee ID</th>
                             <th>Name</th>
-                            <th>Companies (Role)</th>
+                            <th>Company (Role)</th>
                             <th>Branch</th>
                             <th>Joining Date</th>
                             <th>Phone</th>
@@ -58,7 +74,7 @@
                             <th>No</th>
                             <th>Employee ID</th>
                             <th>Name</th>
-                            <th>Companies (Role)</th>
+                            <th>Company (Role)</th>
                             <th>Branch</th>
                             <th>Joining Date</th>
                             <th>Phone</th>
@@ -84,7 +100,7 @@
                                         <span class="badge bg-success" title="Mother Company">{!! isset($u->getCompany->company_name) ? @$u->getCompany->company_name : 'N/A' !!}
                                             ({!! @$u->roles->first()->display_name !!})</span>
                                         @foreach (@$u->companyPermissions as $cp)
-                                            <span class="badge bg-info" title="Permission Company">{!! $cp->company->company_name !!}
+                                            <span class="badge bg-info" title="Permission Company">{!! $cp->company->company_code !!}
                                                 ({!! $cp->userRole->display_name !!})</span>
                                         @endforeach
                                     </td>

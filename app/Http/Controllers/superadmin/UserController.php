@@ -25,11 +25,13 @@ use App\Rules\DesignationStatusRule;
 use App\Rules\RoleStatusRule;
 use App\Rules\UserStatusCheck;
 use App\Traits\BranchParent;
+use App\Traits\CacheTrait;
 use App\Traits\ParentTraitCompanyWise;
 use http\Exception\BadConversionException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -42,7 +44,7 @@ use Log;
 
 class UserController extends Controller
 {
-    use ParentTraitCompanyWise;
+    use ParentTraitCompanyWise, CacheTrait;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -137,6 +139,7 @@ class UserController extends Controller
                 ]);
                 $user->attachRole($roles->name,'App\Models\User');
                 event(new Registered($user));
+                $this->clearCache();
                 return back()->with('success','Account create successfully');
             }
         }catch (\Throwable $exception)
@@ -250,6 +253,7 @@ class UserController extends Controller
                     'alreadyHasMessage' => $alreadyHave? $alreadyHave:null,
                 ];
             }
+            $this->clearCache();
             return response()->json($response, 200);
         }catch (\Throwable $exception)
         {
@@ -268,12 +272,15 @@ class UserController extends Controller
             $permission = $this->permissions()->list_user;
             if ($this->user->isSystemSuperAdmin())
             {
-                $users = $this->getUser($permission)->orderBy('dept_id','asc')->get();
+                $users = Cache::remember("users_list_of_{$this->user->id}", 600, function () use ($permission) {
+                    return $this->getUser($permission)->orderBy('dept_id','asc')->get();
+                });
             }
             else {
-                $users = $this->getUser($permission)->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
+                $users = Cache::remember("users_list_of_{$this->user->id}", 600, function () use ($permission) {
+                    $this->getUser($permission)->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
+                });
             }
-            Log::info(json_encode($users, JSON_PRETTY_PRINT));
             return view('back-end.user.list',compact('users'))->render();
         }catch (\Throwable $exception)
         {

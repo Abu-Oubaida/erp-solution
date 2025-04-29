@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Traits\DataArchiveTrait;
+use App\Traits\CacheTrait;
 use Illuminate\Http\Request;
 
 class PreferenceController extends Controller
 {
     //
-    use DataArchiveTrait;
+    use CacheTrait;
     public function saveSidebarWidth(Request $request)
     {
         $request->validate([

@@ -15,7 +15,7 @@ use App\Models\VoucherDocumentDeleteHistory;
 use App\Models\VoucherDocumentIndividualDeletedHistory;
 use App\Models\VoucherType;
 use App\Rules\AccountVoucherInfoStatusRule;
-use App\Traits\DataArchiveTrait;
+use App\Traits\CacheTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,7 +33,7 @@ use function PHPUnit\Framework\directoryExists;
 
 class ArchiveController extends Controller
 {
-    use ParentTraitCompanyWise,DataArchiveTrait;
+    use ParentTraitCompanyWise,CacheTrait;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
