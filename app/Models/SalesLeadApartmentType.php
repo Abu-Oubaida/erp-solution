@@ -12,4 +12,7 @@ class SalesLeadApartmentType extends Model
     public function createdByUser(){
         return $this->belongsTo(User::class,'created_by');
     }
+    public function getCompanyName(){
+        return $this->belongsTo(company_info::class,'company_id');
+    }
 }

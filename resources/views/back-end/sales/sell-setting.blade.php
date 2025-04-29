@@ -131,7 +131,7 @@
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
-                                    onclick="return SalesSetting.salesSubTable('sales_lead_source_info')">
+                                    onclick="return SalesSetting.salesSubTable('sales_lead_source_info','sourceList')">
                                     <i class="fas fa-plus"></i> Add Source
                                 </button>
                             </div>
@@ -155,7 +155,7 @@
                             </div>
                             <div class="col">
                                 <button class="btn btn-sm btn-success float-end mt-1 ms-2"
-                                    onclick="return SalesSetting.salesSubTable('sales_lead_profession')">
+                                    onclick="return SalesSetting.salesSubTable('sales_lead_profession','professionList')">
                                     <i class="fas fa-plus"></i> Add Profession
                                 </button>
                             </div>
@@ -280,9 +280,8 @@
                         <div class="col-md-6 mb-2">
                             <div class="form-group">
                                 <label for="company">Company Name<span class="text-danger">*</span></label>
-                                <select class="text-capitalize select-search company_dropdown" id="company" name="company"
-                                    onchange="return SalesSetting.salesProfessionParentIdDropdown(this)">
-                                    <option value="0">Pick options...</option>
+                                <select class="text-capitalize form-control company_dropdown" id="company" name="company" onclick="return SalesSetting.companyIdDropdownForEdit('sales_lead_location_info')">
+                                    <option value="">Pick options...</option>
                                     @if (isset($companies) || count($companies) > 0)
                                         @foreach ($companies as $c)
                                             <option value="{{ $c->id }}">{{ $c->company_name }}
@@ -296,7 +295,7 @@
                         <div class="col-md-6 mb-2">
                             <div class="form-group">
                                 <label for="company">Status</label>
-                                <select class="text-capitalize select-search status_dropdown" id="status" name="status">
+                                <select class="text-capitalize form-control status_dropdown" id="status" name="status">
                                     <option value="">Pick options...</option>
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
@@ -309,7 +308,7 @@
 
                         <div class="col-md-12">
                             <button
-                                class="btn btn-chl-outline float-end"onclick="return SalesSetting.salesSubTableModal(this)">
+                                class="btn btn-chl-outline float-end" id="perform_store" onclick="return SalesSetting.salesSubTableModal(this)">
                                 <i class="fas fa-save"></i> Save
                             </button>
                         </div>
