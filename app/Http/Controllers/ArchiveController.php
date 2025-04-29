@@ -62,8 +62,9 @@ class ArchiveController extends Controller
     }
     public function listArchiveDataType(Request $request){
         $permission = $this->permissions()->archive_data_type_list;
+        $companies = $this->getCompanyModulePermissionWise($permission)->get();
         $voucherTypes = $this->getArchiveTypeList($permission);
-            return view('back-end/archive/type/list',compact('voucherTypes'))->render();
+            return view('back-end/archive/type/list',compact('voucherTypes','companies'))->render();
     }
     private function storeArchiveType(Request $request,$voucherTypeID=null):RedirectResponse
     {
@@ -982,7 +983,6 @@ class ArchiveController extends Controller
                 ]);
                 extract($validated);
                 $oldFile = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType','company'])->find($id);
-//                dd($oldFile);
                 $company_code = $oldFile->company->company_code;
                 $file_path = $oldFile->filepath;
                 $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
@@ -1027,10 +1027,8 @@ class ArchiveController extends Controller
                 if (!empty($previous_files)) {
                     $finalInsertData = $this->linkDocumentInfoArray($previous_files,$update_archive_info_id,$thisArchiveDocumentIDs,$company_id_link);
                     if (!empty($finalInsertData)) {
-//            $thirdInsert = archive infos and documents link
                         $thirdInsert = ArchiveInfoLinkDocument::insert($finalInsertData); // Bulk insert
                         if (!$thirdInsert) {
-                            // Rollback the transaction if the second insert for any item failed
                             DB::rollBack();
                             return redirect()->back()->with('error', 'Failed to execute the second insert.');
                         }
@@ -1064,18 +1062,6 @@ class ArchiveController extends Controller
 
         $previous_document_single = $previous_documents->first();
         $existingLinks2 = ArchiveInfoLinkDocument::where('voucher_info_id', $previous_document_single->voucher_info_id)->whereIn('document_id', $documentIds)->where('company_id', $company_id)->get()->pluck('document_id')->toArray();
-
-//        $parentLinkData = collect($documentIds)->reject(function ($documentId) use ($existingLinks2){
-//            return in_array($documentId, $existingLinks2);
-//        })->map(function ($documentId) use ($previous_document_single,$company_id) {
-//            return [
-//                'company_id'      => $company_id,
-//                'voucher_info_id' => $previous_document_single->voucher_info_id,
-//                'document_id'        => $documentId,
-//                'created_at'        => now(),
-//            ];
-//        })->toArray();
-
         $parentLinkData = collect($documentIds)
             ->reject(fn($documentId) => in_array($documentId, $existingLinks2))
             ->map(fn($documentId) => [
@@ -1382,17 +1368,11 @@ class ArchiveController extends Controller
                 'message'=> $exception->getMessage()
                 ]);
         }
-
-
-        // $departments = department::with(['get_users' => function($query) {
-        //     $query->whereColumn('company_id', 'company'); // Compare company_id with company directly
-        // }])
-        // ->get();
     }
 
     public function setting()
     {
-//        try {
+        try {
             $permission = $this->permissions()->archive_setting;
             $companies = $this->getCompanyModulePermissionWise($permission)->get(['id','company_name','company_code']);
             $path = env('APP_ARCHIVE_DATA');
@@ -1420,12 +1400,11 @@ class ArchiveController extends Controller
                     ];
                 });
             });
-//            dd($company_wise_storage);
             return view('back-end.archive.setting',compact('companies','total_storage','company_wise_storage','storage_packages'))->render();
-//        }catch (\Throwable $exception)
-//        {
-//            return back()->with('error',$exception->getMessage());
-//        }
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
     }
 
     /**
