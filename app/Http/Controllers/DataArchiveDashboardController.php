@@ -183,9 +183,9 @@ class DataArchiveDashboardController extends Controller
 //                        : round(disk_total_space($path) / (1024 * 1024 * 1024), 2);
                     $diskTotal = ($company->archiveStorage && $company->archiveStorage->storage_package_id)
                         ? $company->archiveStorage->package->package_size
-                        : 'Unlimited';
+                        : 'N/A';
                     $archiveUsed = round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2);
-                    $diskFree = ($diskTotal != 'Unlimited')?$diskTotal-$archiveUsed:'Unknown';
+                    $diskFree = ($diskTotal != 'N/A')?$diskTotal-$archiveUsed:'N/A';
                     $totalUsed = $archiveUsed;
 
                     return compact('diskTotal', 'archiveUsed', 'diskFree', 'totalUsed',);

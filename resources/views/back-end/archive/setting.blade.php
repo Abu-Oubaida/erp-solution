@@ -193,7 +193,7 @@
                             <div class="form-floating">
                                 <select class="form-control" id="edit_company_package">
                                 @if(count($storage_packages))
-                                    <option value="0">Unlimited</option>
+                                    <option value="0">N/A</option>
                                 @foreach($storage_packages as $sp)
                                     <option value="{!! $sp->id !!}">{!! $sp->package_name !!} ({!! $sp->package_size !!} GB)</option>
                                 @endforeach

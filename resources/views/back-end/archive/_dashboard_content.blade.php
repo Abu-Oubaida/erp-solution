@@ -38,12 +38,12 @@
                                         <tr>
                                             <th>Total Disk Space</th>
                                             <th>:</th>
-                                            <td>{{ @$diskTotal }} @if($diskTotal != 'Unlimited') GB @endif</td>
+                                            <td>{{ @$diskTotal }} @if($diskTotal != 'N/A') GB @endif</td>
                                         </tr>
                                         <tr>
                                             <th>Total Free Space</th>
                                             <th>:</th>
-                                            <td>{{ @$diskFree }} @if($diskTotal != 'Unlimited') GB @endif</td>
+                                            <td>{{ @$diskFree }} @if($diskTotal != 'N/A') GB @endif</td>
                                         </tr>
                                         <tr>
                                             <th>Total Used Space</th>
@@ -67,7 +67,7 @@
                                         </tr>
                                     </table>
                                 </td>
-                                @if($diskTotal != 'Unlimited')
+                                @if($diskTotal != 'N/A')
                                     <td style="width: 50%">
                                         <div class="align-items-center">
                                             <div id="chart-container" style="width: 80%; float:right">
