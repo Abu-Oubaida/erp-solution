@@ -1,5 +1,10 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
+    <style>
+        #userTable tr th input{
+            font-size: 12px!important;
+        }
+    </style>
     <div class="container-fluid px-4">
         <a href="{{ \Illuminate\Support\Facades\URL::previous() }}" class="btn btn-danger btn-sm float-end"><i
                 class="fas fa-chevron-left"></i> Go Back</a>
@@ -20,12 +25,48 @@
         @php
             use Illuminate\Support\Facades\Cache;
         @endphp
-        @if(auth()->user()->isSystemSuperAdmin() || auth()->user()->companyWiseRoleName() == 'superadmin')
-            <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                This page data is being fetched from cache. <a href="{!! route('clear.cache') !!}">Clear Cache</a>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+        <div class="row">
+            @if(auth()->user()->hasPermission('add_user'))
+                <div class="col">
+                    <div class="float-start">
+                        <strong>For uploading your employee.xlsx use this section. <a href="{!! route('export.employee.data.prototype') !!}">Prototype is here</a> Please flowing the exact format</strong>
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" id="employee_file_upload">
+                            <label class="input-group-text" for="employee_file_upload"><i class="fa-solid fa-cloud-arrow-up"></i> &nbsp; Upload</label>
+                        </div>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal modal-xl fade" id="myModal" tabindex="-1" aria-labelledby="userDataModelLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog modal-fullscreen-custom">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="userDataModelLabel">Title</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.reload()"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <table id="data-table" class="table"></table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.location.reload()">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="return confirm('Are you sure?'), Obj.userExcelFileSubmit(this)">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id='ajax_loader2' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+                            <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            @if(auth()->user()->isSystemSuperAdmin() || auth()->user()->companyWiseRoleName() == 'superadmin')
+                <div class="col">
+                    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                        This page data is being fetched from cache. <a href="{!! route('clear.cache') !!}">Clear Cache</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            @endif
+        </div>
         <div class="card mb-4">
             <div class="card-header text-capitalize">
                 <div class="row">
@@ -51,7 +92,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <table id="userTable" class="display" style="width: 100%">
+                <table id="userTable" class="display" style="width: 100%; font-size: 12px;">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -136,11 +177,11 @@
                                                 @csrf
                                                 <input type="hidden" name="id" value="{!! \Illuminate\Support\Facades\Crypt::encryptString($u->id) !!}">
                                                 <button class="text-danger border-0 inline-block bg-none"
-                                                    onclick="return confirm('Are you sure delete the user?')"><i
+                                                    onclick="@if ($u->status == 5) return confirm('Attention! ⚠️⚠️⚠️⚠️⚠️⚠️ Are you sure permanently delete the user?') @else return confirm('Are you sure delete the user?') @endif"><i
                                                         class="fas fa-trash"></i></button>
                                             </form>
                                         @endif
-                                        <div class="dropdown">
+                                            <div class="dropdown">
                                             <button class="border-0 inline-block bg-none dropdown-toggle" type="button"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
                                                 More
@@ -153,7 +194,7 @@
                                                             User</a></li>
                                                 @endif
 
-                                                @if ($u->roles()->first()->name !== 'systemsuperadmin')
+                                                @if (@$u->roles()->first()->name !== 'systemsuperadmin')
                                                     <li><a href="" class="dropdown-item" type="button"
                                                             target="_blank"><i class="fa-solid fa-shield-halved"></i>
                                                             Company Permission</a></li>

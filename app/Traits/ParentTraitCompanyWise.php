@@ -39,7 +39,7 @@ trait ParentTraitCompanyWise
     }
     public function getUser($operation_permission_name)
     {
-        $object = User::with(['permissions','department','designation','branch','getCompany','companyPermissions'])->where('status',1);
+        $object = User::with(['permissions','department','designation','branch','getCompany','companyPermissions']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;

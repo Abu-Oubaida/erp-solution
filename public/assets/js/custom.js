@@ -164,7 +164,7 @@ let SalesSetting = {};
                     const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
                         header: 1,
                     });
-                    if (jsonData[0].length !== 10) {
+                    if (jsonData[0].length !== 13) {
                         alert(
                             "Invalid input data! Please flowing the prototype of data format!"
                         );
@@ -176,7 +176,7 @@ let SalesSetting = {};
                                 jsonData[0][0] === "Company Code") &&
                             (jsonData[0][1] === "Employee Name*" ||
                                 jsonData[0][1] === "Employee Name") &&
-                            (jsonData[0][2] === "Employee ID*" ||
+                            (jsonData[0][2] === "Employee Id*" ||
                                 jsonData[0][2] === "Employee Id") &&
                             jsonData[0][3] === "Department" &&
                             (jsonData[0][4] === "Department Code*" ||
@@ -1002,7 +1002,7 @@ let SalesSetting = {};
                                     "Error! This Data Are Added not Possible:\n";
                                 for (let key in data.errorMessage) {
                                     let employee = data.errorMessage[key];
-                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
+                                    alertMessage += `Employee name: ${employee["EmployeeName"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
                                 }
                             }
                             if (data.successMessage) {
@@ -1011,7 +1011,7 @@ let SalesSetting = {};
                                     "This Data Are Added Successfully:\n";
                                 for (let key in data.successMessage) {
                                     let employee = data.successMessage[key];
-                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
+                                    alertMessage += `Employee name: ${employee["EmployeeName"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
                                 }
                             }
                             if (data.alreadyHasMessage) {
@@ -1020,7 +1020,7 @@ let SalesSetting = {};
                                     "This Data are Already Exists in DB:\n";
                                 for (let key in data.alreadyHasMessage) {
                                     let employee = data.alreadyHasMessage[key];
-                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
+                                    alertMessage += `Employee name: ${employee["EmployeeName"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
                                 }
                             }
                             alert(alertMessage);
