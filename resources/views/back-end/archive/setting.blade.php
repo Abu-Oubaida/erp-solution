@@ -21,7 +21,7 @@
         @endphp
         @if(auth()->user()->isSystemSuperAdmin() || auth()->user()->companyWiseRoleName() == 'superadmin')
             <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                Dashboard data is being fetched from cache. <a href="{!! route('clear.cache') !!}">Clear Cache</a>
+                This page data is being fetched from cache. <a href="{!! route('clear.cache') !!}">Clear Cache</a>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
