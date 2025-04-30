@@ -87,8 +87,7 @@ class SalesInterfaceController extends Controller
             return back()->with('error', $exception->getMessage())->withInput();
         }
     }
-    public function saleSettingsInterface()
-    {
+    public function saleSettingsInterface(){
         try {
             $permission = $this->permissions()->sale_settings;
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
