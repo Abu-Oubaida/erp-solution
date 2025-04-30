@@ -4474,27 +4474,18 @@ let SalesSetting = {};
                         " " +
                         title
                 );
-                $("#general_modal")
-                    .off("shown.bs.modal") // Remove any previous event listener
-                    .on("shown.bs.modal", function () {
-                        // Reset the company dropdown
-                        $(".company_dropdown").val(""); // Reset the value of the company dropdown
 
-                        // Reset the status dropdown
-                        $(".status_dropdown").val(""); // Reset the value of the status dropdown
-                    });
-                // Show the modal
+                $(".company_dropdown").val("");
+
+                $(".status_dropdown").val("");
                 $("#general_modal").modal("show");
-                return false; // Prevent default action
+                return false;
             },
             salesSubTableEdit: function (
                 click_param,
                 desn_var = null,
                 record_id = null
             ) {
-                // alert(record_id);
-                // return;
-                // Clear previous content
                 $("#sales_sub_table_content").empty();
 
                 // Handle the change event for specific dropdowns based on desn_var
@@ -4523,14 +4514,20 @@ let SalesSetting = {};
                     case "sales_lead_apartment_type":
                         html += SalesSetting.createInput("title", "Title");
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-apartment-type-edit";
                         break;
                     case "sales_lead_apartment_size":
                         html += SalesSetting.createInput("title", "Title");
                         html += SalesSetting.createInput("size", "Size");
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-apartment-size-edit";
                         break;
                     case "sales_lead_source_info":
@@ -4540,25 +4537,37 @@ let SalesSetting = {};
                             "Parent Id"
                         );
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-source-info-edit";
                         break;
                     case "sales_lead_budget":
                         html += SalesSetting.createInput("title", "Title");
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-budget-edit";
                         break;
                     case "sales_lead_view":
                         html += SalesSetting.createInput("title", "Title");
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-view-edit";
                         break;
                     case "sales_lead_floor":
                         html += SalesSetting.createInput("title", "Title");
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-floor-edit";
                         break;
                     case "sales_lead_location_info":
@@ -4567,7 +4576,10 @@ let SalesSetting = {};
                             "Location Name"
                         );
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-location-info-edit";
                         break;
                     case "sales_lead_profession":
@@ -4577,38 +4589,41 @@ let SalesSetting = {};
                             "Parent Id"
                         );
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-profession-edit";
                         break;
                     case "sales_lead_facing":
                         html += SalesSetting.createInput("title", "Title");
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-facing-edit";
                         break;
                     case "sales_lead_status_info":
                         html += SalesSetting.createInput("title", "Title");
                         html += SalesSetting.createHiddenInput(record_id);
-                        html += SalesSetting.createHiddenInputForOutput(click_param);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
                         url = "/get-sales-lead-status-info-edit";
                         break;
                     default:
                         html += '<p class="text-danger">Unknown</p>';
                 }
 
-                // Append generated HTML to the modal content
                 $("#sales_sub_table_content").html(html);
                 const desired_url = window.location.origin + sourceDir + url;
-                // Send AJAX request to fetch data for the specific case
                 $.ajax({
                     url: desired_url,
                     method: "GET",
                     data: { record_id: record_id },
                     success: function (response) {
-                        // alert('You are ok to go');
-                        $("#title").val("");
-                        $("#company").val("");
-
                         if (response && response.data) {
                             if (click_param === "sales_lead_apartment_type") {
                                 $("#title").val(response.data.title);
@@ -4678,16 +4693,19 @@ let SalesSetting = {};
                         alert("Error fetching data: " + error);
                     },
                 });
-                $("#perform_store").attr("onclick",`return SalesSetting.editedDataStore('this','${click_param}')`);
+                $("#perform_store").attr(
+                    "onclick",
+                    `return SalesSetting.editedDataStore('this','${click_param}')`
+                );
                 // Show the modal
                 $("#general_modal").modal("show");
 
                 return false; // Prevent default action
             },
-            editedDataStore:function(e,click_param){
+            editedDataStore: function (e, click_param) {
                 let subTableData = {};
                 // Get company dropdown value
-                let company_id=SalesSetting.companyIdDropdownForEdit();
+                let company_id = SalesSetting.companyIdDropdownForEdit();
                 subTableData["company_id"] = company_id;
                 // Get status dropdown value
                 subTableData["status"] = $("#status").val();
@@ -4699,10 +4717,9 @@ let SalesSetting = {};
 
                     if (type === "checkbox") {
                         subTableData[name] = $(this).is(":checked") ? 1 : 0;
-                    } else if(type === "hidden"){
+                    } else if (type === "hidden") {
                         subTableData[name] = $(this).val();
-                    }
-                    else {
+                    } else {
                         subTableData[name] = $(this).val();
                     }
                 });
@@ -4711,7 +4728,7 @@ let SalesSetting = {};
                     var name = $(this).attr("name");
                     subTableData[name] = $(this).val();
                 });
-                let url="";
+                let url = "";
                 if (click_param === "sales_lead_apartment_type") {
                     url = "/get-sales-lead-apartment-type-edit";
                 } else if (click_param === "sales_lead_apartment_size") {
@@ -4733,37 +4750,34 @@ let SalesSetting = {};
                 } else if (click_param === "sales_lead_status_info") {
                     url = "/get-sales-lead-status-info-edit";
                 }
-                
-                const desired_url =
-                            window.location.origin +
-                            sourceDir +
-                            url;
-                        $.ajax({
-                            url: desired_url,
-                            headers: {
-                                "X-CSRF-TOKEN": $(
-                                    'meta[name="csrf-token"]'
-                                ).attr("content"),
-                            },
-                            method: "POST",
-                            data: {
-                                subTableData: subTableData,
-                            },
-                            success: function (response) {
-                                if (response.original.status === "error") {
-                                    alert("Error: " + response.original.message);
-                                } else if (response.original.status === "success") {
-                                    alert(response.original.message);
 
-                                    $("#general_modal").modal("hide");
-                                    $("#" + response.original.output_id).html(
-                                        response.original.data
-                                    );
-                                    $("#company").val("").trigger("change");
-                                    $("#status").val("").trigger("change");
-                                }
-                            },
-                        });
+                const desired_url = window.location.origin + sourceDir + url;
+                $.ajax({
+                    url: desired_url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: {
+                        subTableData: subTableData,
+                    },
+                    success: function (response) {
+                        if (response.original.status === "error") {
+                            alert("Error: " + response.original.message);
+                        } else if (response.original.status === "success") {
+                            alert(response.original.message);
+
+                            $("#general_modal").modal("hide");
+                            $("#" + response.original.output_id).html(
+                                response.original.data
+                            );
+                            $("#company").val("").trigger("change");
+                            $("#status").val("").trigger("change");
+                        }
+                    },
+                });
             },
 
             createInput: function (id, label) {
@@ -4923,7 +4937,6 @@ let SalesSetting = {};
             },
             salesSourceParentIdDropdown: function (e, selected = null) {
                 let selectedId = $(e).val();
-                // let isChecked = $("#is_parent").is(":checked");
                 const url =
                     window.location.origin +
                     sourceDir +
@@ -4937,7 +4950,6 @@ let SalesSetting = {};
                     },
                     method: "GET",
                     data: {
-                        // is_parent: isChecked ? 1 : 0,
                         selectedId: selectedId,
                     },
                     success: function (response) {
@@ -4945,7 +4957,6 @@ let SalesSetting = {};
                             alert("Error: " + response.message);
                             return false;
                         } else if (response.status === "success") {
-                            // console.log(response.salesSourceData);
                             const select = $("#parent_id");
                             select.empty();
                             select.append(
@@ -4966,14 +4977,14 @@ let SalesSetting = {};
                     },
                 });
             },
-            companyIdDropdownForEdit:function(){
+            companyIdDropdownForEdit: function () {
                 let companyIdDropdownValue = $("#company").val();
-                $("#company").on("change",function(){
+                $("#company").on("change", function () {
                     companyIdDropdownValue = $("#company").val();
-                })
+                });
                 return companyIdDropdownValue;
             },
-            deleteTypeMultiple:function(){
+            deleteSalesSettingMultiple: function (get_url) {
                 let selected = [];
                 $(".check-box:checked").each(function () {
                     selected.push($(this).val());
@@ -4989,7 +5000,7 @@ let SalesSetting = {};
                     let url =
                         window.location.origin +
                         sourceDir +
-                        "/delete-type-multiple";
+                        get_url;
                     $.ajax({
                         url: url,
                         headers: {
@@ -4997,14 +5008,16 @@ let SalesSetting = {};
                                 "content"
                             ),
                         },
-                        method: "POST",
+                        method: "DELETE",
                         data: {
                             selected: selected,
                         },
                         success: function (response) {
                             if (response.original.status == "success") {
                                 alert(response.original.message);
-                                $("#"+response.original.output).html(response.original.data)
+                                $("#" + response.original.output).html(
+                                    response.original.data
+                                );
                             } else if (response.original.status == "error") {
                                 alert(response.original.message);
                             }

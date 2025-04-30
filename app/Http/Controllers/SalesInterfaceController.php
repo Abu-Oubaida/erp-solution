@@ -4,6 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\branch;
+use App\Models\DeleteSalesApartmentSizeMultipleHistory;
+use App\Models\DeleteSalesLeadBudgetMultipleHistory;
+use App\Models\DeleteSalesLeadFacingMultipleHistory;
+use App\Models\DeleteSalesLeadFloorMultipleHistory;
+use App\Models\DeleteSalesLeadLocationMultipleHistory;
+use App\Models\DeleteSalesLeadProfessionMultipleHistory;
+use App\Models\DeleteSalesLeadSourceMultipleHistory;
+use App\Models\DeleteSalesLeadStatusMultipleHistory;
+use App\Models\DeleteSalesLeadViewMultipleHistory;
 use App\Models\DeleteTypeMultipleHistory;
 use App\Models\department;
 use App\Models\SalesLeadApartmentSize;
@@ -218,9 +227,12 @@ class SalesInterfaceController extends Controller
     {
         try {
             $selectedId = $request->selectedId;
+            // Log::info(json_encode($selectedId,JSON_PRETTY_PRINT));
+            // return;
             $salesProfessionData = SalesProfession::query()->where(function ($query) use ($selectedId) {
                 $query->where('company_id', $selectedId)
-                    ->where('status', 1);
+                    ->where('status', 1)
+                    ->where('is_parent',1);
             })->orWhere('company_id', 0)->get();
             if (!$salesProfessionData->isEmpty()) {
                 return response()->json([
@@ -243,7 +255,8 @@ class SalesInterfaceController extends Controller
             $selectedId = $request->selectedId;
             $salesSourceData = SalesLeadSourceInfo::query()->where(function ($query) use ($selectedId) {
                 $query->where('company_id', $selectedId)
-                    ->where('status', 1);
+                    ->where('status', 1)
+                    ->where('is_parent',1);
             })->orWhere('company_id', 0)->get();
             if (!$salesSourceData->isEmpty()) {
                 return response()->json([
@@ -518,11 +531,66 @@ class SalesInterfaceController extends Controller
         $result=$this->deleteMultiple(SalesLeadApartmentType::class, DeleteTypeMultipleHistory::class, $ids,'back-end.sales.sales-lead-apartment-type-list','output_sales_lead_apartment_type');
         return response()->json($result);
     }
+    public function deleteSalesLeadApartmentSizeMultiple(Request $request)
+    {
+        $ids = $request->selected;
+        $result=$this->deleteMultiple(SalesLeadApartmentSize::class, DeleteSalesApartmentSizeMultipleHistory::class, $ids,'back-end.sales.sales-lead-apartment-size-list','output_sales_lead_apartment_size');
+        return response()->json($result);
+    }
+    public function deleteSalesLeadViewMultiple(Request $request)
+    {
+        $ids = $request->selected;
+        $result=$this->deleteMultiple(SalesLeadView::class, DeleteSalesLeadViewMultipleHistory::class, $ids,'back-end.sales.sales-lead-view-list','output_sales_lead_view');
+        return response()->json($result);
+    }
+    public function deleteSalesLeadBudgetMultiple(Request $request)
+    {
+        $ids = $request->selected;
+        $result=$this->deleteMultiple(SalesLeadBudget::class, DeleteSalesLeadBudgetMultipleHistory::class, $ids,'back-end.sales.sales-lead-budget-list','output_sales_lead_budget');
+        return response()->json($result);
+    }
+    public function deleteSalesLeadSourceMultiple(Request $request)
+    {
+        $ids = $request->selected;
+        $result=$this->deleteMultiple(SalesLeadSourceInfo::class, DeleteSalesLeadSourceMultipleHistory::class, $ids,'back-end.sales.sales-lead-source-info-list','output_sales_lead_source_info');
+        return response()->json($result);
+    }
+    public function deleteSalesLeadProfessionMultiple(Request $request)
+    {
+        $ids = $request->selected;
+        $result=$this->deleteMultiple(SalesProfession::class, DeleteSalesLeadProfessionMultipleHistory::class, $ids,'back-end.sales.sales-lead-profession-list','output_sales_lead_profession');
+        return response()->json($result);
+    }
+    public function deleteSalesLeadLocationMultiple(Request $request)
+    {
+        $ids = $request->selected;
+        $result=$this->deleteMultiple(SalesLeadLocationInfo::class, DeleteSalesLeadLocationMultipleHistory::class, $ids,'back-end.sales.sales-lead-location-info-list','output_sales_lead_location_info');
+        return response()->json($result);
+    }
+    public function deleteSalesLeadFloorMultiple(Request $request)
+    {
+        $ids = $request->selected;
+        $result=$this->deleteMultiple(SalesLeadFloor::class, DeleteSalesLeadFloorMultipleHistory::class, $ids,'back-end.sales.sales-lead-floor-list','output_sales_lead_floor');
+        return response()->json($result);
+    }
+    public function deleteSalesLeadStatusMultiple(Request $request)
+    {
+        $ids = $request->selected;
+        $result=$this->deleteMultiple(SalesLeadStatusInfo::class, DeleteSalesLeadStatusMultipleHistory::class, $ids,'back-end.sales.sales-lead-status-info-list','output_sales_lead_status_info');
+        return response()->json($result);
+    }
+    public function deleteSalesLeadFacingMultiple(Request $request)
+    {
+        $ids = $request->selected;
+        $result=$this->deleteMultiple(SalesLeadFacing::class, DeleteSalesLeadFacingMultipleHistory::class, $ids,'back-end.sales.sales-lead-facing-list','output_sales_lead_facing');
+        return response()->json($result);
+    }
     private function deleteMultiple($modal, $modalHistory, $ids,$blade,$output)
     {
         try {
             DB::beginTransaction();
             $modalHistoryData = $modal::whereIn('id', $ids)->get();
+            // Log::info(json_encode($modalHistoryData,JSON_PRETTY_PRINT));
             $historyProcess = $modalHistoryData->map(function ($item) {
                 $commonData = [
                     'old_id' => $item->id,
@@ -544,17 +612,20 @@ class SalesInterfaceController extends Controller
                 if (!empty($item->location_name)) {
                     $commonData['location_name'] = $item->location_name;
                 }
-                if (!empty($item->parent_id)) {
-                    $commonData['parent_id'] = $item->parent_id;
-                }
                 if (!empty($item->is_parent)) {
                     $commonData['is_parent'] = $item->is_parent;
+                }
+                if (property_exists($item,'parent_id')) {
+                    $commonData['parent_id'] = $item->parent_id ?? null;
+                }
+                
+                if (isset($item->is_parent) && $item->is_parent==0) {
+                    $commonData['is_parent'] = 0;
                 }
                 return $commonData;
             })->toArray();
             $historyCreate = $modalHistory::insert($historyProcess);
             $multipleDelete = $modal::whereIn('id', $ids)->delete();
-            Log::info(json_encode([$historyCreate,$multipleDelete],JSON_PRETTY_PRINT));
             if($historyCreate && $multipleDelete ){
                 $getSaleSubTableData = $this->getDataOfApartment($modal);
                 $view = view($blade, compact('getSaleSubTableData'))->render();
