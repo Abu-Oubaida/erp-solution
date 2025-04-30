@@ -208,8 +208,7 @@
             <subgroup1>
                 @if (Route::currentRouteName() == 'sales.dashboard.interface' ||
                         Route::currentRouteName() == 'add.sales.lead' ||
-                        Route::currentRouteName() == 'sales.lead.list' ||
-                        Route::currentRouteName() == 'sale.settings.interface')
+                        Route::currentRouteName() == 'sales.lead.list'||Route::currentRouteName() == 'sale.settings.interface')
                     <a class="nav-link" href="#" data-bs-toggle="collapse"
                         data-bs-target="#salesInterfaceLayouts" aria-expanded="true"
                         aria-controls="salesInterfaceLayouts">
