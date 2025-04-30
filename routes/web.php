@@ -514,7 +514,16 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get','post'],'get-sales-lead-status-info-edit','getSalesLeadStatusInfoEdit')->name('get-sales-lead-status-info-edit');
         });
         Route::middleware(['permission:sale_settings_delete'])->group(function (){
-            Route::post('delete-type-multiple','deleteTypeMultiple')->name('delete.type.multiple');
+            Route::delete('delete-type-multiple','deleteTypeMultiple')->name('delete.type.multiple');
+            Route::delete('delete-sales-lead-apartment-size-multiple','deleteSalesLeadApartmentSizeMultiple')->name('delete.sales.lead.apartment.size.multiple');
+            Route::delete('delete-sales-lead-view-multiple','deleteSalesLeadViewMultiple')->name('delete.sales.lead.view.multiple');
+            Route::delete('delete-sales-lead-budget-multiple','deleteSalesLeadBudgetMultiple')->name('delete.sales.lead.budget.multiple');
+            Route::delete('delete-sales-lead-source-multiple','deleteSalesLeadSourceMultiple')->name('delete.sales.lead.source.multiple');
+            Route::delete('delete-sales-lead-profession-multiple','deleteSalesLeadProfessionMultiple')->name('delete.sales.lead.profession.multiple');
+            Route::delete('delete-sales-lead-location-multiple','deleteSalesLeadLocationMultiple')->name('delete.sales.lead.location.multiple');
+            Route::delete('delete-sales-lead-floor-multiple','deleteSalesLeadFloorMultiple')->name('delete.sales.lead.floor.multiple');
+            Route::delete('delete-sales-lead-status-multiple','deleteSalesLeadStatusMultiple')->name('delete.sales.lead.status.multiple');
+            Route::delete('delete-sales-lead-facing-multiple','deleteSalesLeadFacingMultiple')->name('delete.sales.lead.facing.multiple');
         });
     });//3.12 End
     # 3.13 Control Panel
