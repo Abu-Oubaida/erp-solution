@@ -423,10 +423,10 @@ class ArchiveController extends Controller
             $company_code = $company_info->company_code;
             $v_type = VoucherType::where('id',$data_type)->first();
 
-            $company_path = env('APP_ARCHIVE_DATA').'/'.$company_code.'/';
-            $file_path = $v_type->voucher_type_title.'/';
-            $destinationPath = $company_path.$file_path;
-
+            $root_path = env('APP_ARCHIVE_DATA').'/';
+            $company_path = $root_path.$company_code.'/';
+            $file_path = $company_code.'/'.$v_type->voucher_type_title.'/';
+            $destinationPath = $root_path.$file_path;
 
             $this->extracted($company_info, $company_path);
 
@@ -556,15 +556,16 @@ class ArchiveController extends Controller
                 {
                     throw new \Exception('Selected company has not any storage package. Please contact system administrator');
                 }
+                $root_path = env('APP_ARCHIVE_DATA').'/';
                 $company_code = $company_info->company_code;
-                $company_path = env('APP_ARCHIVE_DATA').'/'.$company_code.'/';
+                $company_path = $root_path.$company_code.'/';
 
 
                 $this->extracted($company_info, $company_path);
 
 
-                $file_path = $voucherInfo->VoucherType->voucher_type_title.'/';
-                $destinationPath = $company_path.$file_path;
+                $file_path = $company_code.'/'.$voucherInfo->VoucherType->voucher_type_title.'/';
+                $destinationPath = $root_path.$file_path;
                 $uploadedFiles = []; // Track successfully uploaded files
 
                 foreach ($request->file('voucher_file') as $file) {

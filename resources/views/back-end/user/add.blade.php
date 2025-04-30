@@ -21,9 +21,6 @@
                         <input type="file" class="form-control" id="employee_file_upload">
                         <label class="input-group-text" for="employee_file_upload"><i class="fa-solid fa-cloud-arrow-up"></i> &nbsp; Upload</label>
                     </div>
-                    {{--                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">--}}
-                    {{--                        Launch demo modal--}}
-                    {{--                    </button>--}}
                 </div>
             </div>
         </div>
