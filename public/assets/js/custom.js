@@ -4361,6 +4361,35 @@ let SalesSetting = {};
 
                 return false;
             },
+            addLeadStep1:function(){
+                const url =
+                    window.location.origin + sourceDir + "/add-lead-step1"; // update API endpoint
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: $("#leadForm").serialize(),
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            let form=Sales.addLeadStep2Form()
+                            $("#commonSlot_for_multiple_step").html(form)
+                        }
+                    },
+                });
+
+                return false; 
+            },
+            addLeadStep2Form:function(){
+
+            },
         };
 
         SalesSetting = {

@@ -491,6 +491,7 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::middleware(['permission:add_sales_lead'])->group(function (){
             Route::match(['get','post'],'add-lead','addLead')->name('add.sales.lead');
+            Route::match(['post'],'add-lead-step1','addLeadStep1')->name('add.sales.step1');
         });
         Route::middleware(['permission:sales_lead_list'])->group(function (){
             Route::match(['get','post'],'list-lead','leadList')->name('sales.lead.list');
@@ -500,6 +501,9 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['post'],'add_sale_sub_table_data','saleSubTableDataAdd')->name('sale.sub.table.data.add');
             Route::match(['get'],'get_sale_profession_title_id','getSaleProfessionTitleId')->name('get.sale.profession.title.id');
             Route::match(['get'],'get_sale_source_title_id','getSaleSourceTitleId')->name('get.sale.source.title.id');
+        });
+        Route::middleware(['permission:sale_employee_entry'])->group(function (){
+            Route::match(['get'],'get_sale_employee_entry','getSaleEmployeeEntry')->name('get.sale.employee.entry');
         });
         Route::middleware(['permission:sale_settings_edit'])->group(function (){
             Route::match(['get','post'],'get-sales-lead-apartment-type-edit','getSalesLeadApartmentTypeEdit')->name('get.sales.lead.apartment.type.edit');

@@ -227,8 +227,6 @@ class SalesInterfaceController extends Controller
     {
         try {
             $selectedId = $request->selectedId;
-            // Log::info(json_encode($selectedId,JSON_PRETTY_PRINT));
-            // return;
             $salesProfessionData = SalesProfession::query()->where(function ($query) use ($selectedId) {
                 $query->where('company_id', $selectedId)
                     ->where('status', 1)
@@ -299,7 +297,20 @@ class SalesInterfaceController extends Controller
     public function setDataOfApartment($modal, $param_for_edit, $blade, $filteredSubTableData, $show_output)
     {
         try {
+            $company_id_title_duplicate_check = $modal::where('company_id',$filteredSubTableData['company_id'])
+                                                        ->where('title',$filteredSubTableData['title'])
+                                                        ->when($param_for_edit,function($query,$param_for_edit){
+                                                            $query->where('id','!=',$param_for_edit);
+                                                        })
+                                                        ->exists();
+            if($company_id_title_duplicate_check){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Company and Title Already Exists'
+                ]);
+            }
             $salesLeadModalDataFind = $modal::find($param_for_edit);
+            Log::info(json_encode($filteredSubTableData,JSON_PRETTY_PRINT));
             if ($salesLeadModalDataFind) {
                 $updated = $salesLeadModalDataFind->update($filteredSubTableData);
                 $getSaleSubTableData = $this->getDataOfApartment($modal);
@@ -649,6 +660,9 @@ class SalesInterfaceController extends Controller
                 'message' => 'Error Occured ' . $exception->getMessage()
             ]);
         }
+    }
+    public function getSaleEmployeeEntry(Request $request){
+            return view('back-end.sales.sell-employee-entry');
     }
 
 }
