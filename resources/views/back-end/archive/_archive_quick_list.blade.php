@@ -187,7 +187,7 @@
     @method('post')
 {{--</form>--}}
 <!-- Modal For Preview -->
-<div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -205,7 +205,7 @@
 </div>
 <!-- Modal-2 For Share -->
 
-<div class="modal modal-xl fade" id="shareModel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="shareModelLabel" aria-hidden="true">
+<div class="modal modal-xl fade" id="shareModel" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="shareModelLabel" aria-hidden="true">
     <div class="modal-dialog" id="model_dialog">
 
     </div>
@@ -215,7 +215,7 @@
 </div>
 
 <!-- Modal for details -->
-<div class="modal fade" id="remarksShowModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="remarksShowModalLabel" aria-hidden="true">
+<div class="modal fade" id="remarksShowModal" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="remarksShowModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">

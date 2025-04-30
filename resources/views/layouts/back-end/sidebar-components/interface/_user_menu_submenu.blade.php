@@ -3,13 +3,17 @@
         auth()->user()->hasPermission('view_user') ||
         auth()->user()->hasPermission('edit_user') ||
         auth()->user()->hasPermission('user_screen_permission') ||
-        auth()->user()->hasPermission('file_manager_permission'))
+        auth()->user()->hasPermission('file_manager_permission')||
+        auth()->user()->hasPermission('get_sale_employee_entry')
+        )
     @if (Route::currentRouteName() == 'add.user' ||
             Route::currentRouteName() == 'user.list' ||
             Route::currentRouteName() == 'user.single.view' ||
             Route::currentRouteName() == 'user.edit' ||
             Route::currentRouteName() == 'user.screen.permission' ||
-            Route::currentRouteName() == 'file.manager.permission')
+            Route::currentRouteName() == 'file.manager.permission'||
+            Route::currentRouteName() == 'get.sale.employee.entry'
+            )
         <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#users" aria-expanded="true"
             aria-controls="users">
             <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
@@ -46,6 +50,17 @@
             @else
                 <a class="nav-link text-chl" href="{{ route('user.list') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> User List
+                </a>
+            @endif
+        @endif
+        @if (auth()->user()->hasPermission('sale_employee_entry'))
+            @if (Route::currentRouteName() == 'get.sale.employee.entry')
+                <a class="nav-link" href="{{ route('get.sale.employee.entry') }}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> Sales Employee Entry
+                </a>
+            @else
+                <a class="nav-link text-chl" href="{{ route('get.sale.employee.entry') }}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-list-check"></i></div> Sales Employee Entry
                 </a>
             @endif
         @endif

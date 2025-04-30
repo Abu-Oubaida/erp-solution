@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\CacheTrait;
 use Illuminate\Http\Request;
 
 class PreferenceController extends Controller
 {
     //
+    use CacheTrait;
     public function saveSidebarWidth(Request $request)
     {
         $request->validate([
@@ -27,5 +29,10 @@ class PreferenceController extends Controller
         session(['sidebar_toggled' => (int) $value]);
 
         return response()->json(['status' => 'success']);
+    }
+    public function clearCacheAll()
+    {
+        $this->clearCache();
+        return back()->with('success', 'Cache cleared successfully!');
     }
 }
