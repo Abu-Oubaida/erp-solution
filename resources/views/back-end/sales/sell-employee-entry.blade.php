@@ -1,30 +1,79 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
     <div class="container-fluid px-4">
-        {{--    <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1> --}}
+        <a href="{{ \Illuminate\Support\Facades\URL::previous() }}" class="btn btn-danger btn-sm float-end"><i
+                class="fas fa-chevron-left"></i> Go Back</a>
         <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-capitalize text-chl">Dashboard</a>
+            <li class="breadcrumb-item">
+                <a href="{{ route('control.panel') }}" class="text-capitalize text-chl">Control Panel</a>
             </li>
-            <li class="breadcrumb-item"><a
-                    class="text-capitalize text-decoration-none">{{ str_replace('.', ' ', \Route::currentRouteName()) }}</a>
-            </li>
+            <li class="breadcrumb-item"><a style="text-decoration: none;" href="#"
+                    class="text-capitalize">{{ str_replace('.', ' ', \Route::currentRouteName()) }}</a></li>
         </ol>
-        <div class="row">
-            <div class="col-md-12 mb-2">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h3 class="text-capitalize"><i class="fas fa-cog" style="color:#4e73df"></i>
-                            {{ str_replace('.', ' ', \Route::currentRouteName()) }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mt-3">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                        <div class="col-md-2 mb-1">
+                            <label for="company">Company<span class="text-danger">*</span></label>
+                            <select id="company" name="company" class="select-search"
+                                onchange="return Obj.companyWiseUsersForSalesEmployeeEntry(this,'user')">
+                                <option value="">Pick options...</option>
+                                @if (count($companies))
+                                    @foreach ($companies as $c)
+                                        <option @if (Request::get('c') !== null && Request::get('c') == $c->id) selected @endif
+                                            value="{!! $c->id !!}">{!! $c->company_name !!} </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-1">
+                            <label for="action_id">User Name<span class="text-danger">*</span></label>
+                            <select class="text-capitalize select-search selectized" id="action_id" name="user[]"
+                                multiple="multiple">
+                                <option value="">Pick options...</option>
+    
+                            </select>
+                        </div>
+                        <div class="col-md-1 mb-1">
+                            <button class="btn btn-primary btn-sm mt-4" type="button" onclick="return Sales.salesEmployeeEntry()">Add</button>
+                        </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="card">
+            <div class="card-header">
+                <h4>Sales Employee List</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row" id="partial_sell_employee_entry">
+                            @include('back-end.sales._sell-employee-entry')
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        (function($) {
+            $(document).ready(function() {
+                $('.dataTable').each(function() {
+                    $(this).DataTable({
+                        destroy: true, // Allow reinitialization
+                        dom: 'lfrtip',
+                        lengthMenu: [
+                            [15, 25, 50, 100, -1],
+                            [15, 25, 50, 100, "ALL"]
+                        ],
+                        pageLength: 15,
+                    });
+                });
+            });
+        }(jQuery))
+    </script>
+
     {{-- <div class="modal fade" id="general_modal" tabindex="-1" aria-labelledby="archive_package_modalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-xl">

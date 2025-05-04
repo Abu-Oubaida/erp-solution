@@ -3,9 +3,9 @@
 @endphp
 <div class="row">
     <div class="col-md-6 mb-2">
-        <input type="checkbox" name="" id="select_all">
+        <input type="checkbox" name="" id="select_all_type">
         <label for="select_all">Select All</label>
-        <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete" onclick="return SalesSetting.deleteSalesSettingMultiple('/delete-type-multiple')"> <i class="fas fa-trash"></i> Delete Selected</button>
+        <button class="btn btn-outline-danger btn-sm" name="submit_selected" type="submit" value="delete" onclick="return SalesSetting.deleteSalesSettingMultiple('/delete-type-multiple','check-box-type')"> <i class="fas fa-trash"></i> Delete Selected</button>
     </div>
 </div>
 <table class="table table-hover table-sm dataTable" style="font-size:12px">
@@ -25,7 +25,7 @@
         @if (!empty($rows) && count($rows) > 0)
             @foreach ($rows as $key => $row)
                 <tr>
-                    <td class="mobile-none"><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $row->id !!}" value="{!! $row->id !!}"></td>
+                    <td class="mobile-none"><input class="check-box-type" type="checkbox" name="selected[]" id="select_{!! $row->id !!}" value="{!! $row->id !!}"></td>
                     <td>{{ $key + 1 }}</td>
                     <td>{{ $row->getCompanyName->company_name ?? '-' }}</td>
                     <td>{{ $row->title ?? '-' }}</td>
@@ -46,8 +46,8 @@
 </table>
 <script>
     (function($) {
-        $("#select_all").change(function() {
-            $(".check-box").prop("checked", this.checked);
+        $("#select_all_type").change(function() {
+            $(".check-box-type").prop("checked", this.checked);
         });
         $(document).ready(function() {
             $('.dataTable').each(function() {

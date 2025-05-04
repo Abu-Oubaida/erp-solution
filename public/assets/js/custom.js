@@ -1269,21 +1269,18 @@ let SalesSetting = {};
                         },
                         url: url,
                         type: "POST",
-                        data: { id: id,ref_id: root_ref },
+                        data: { id: id, ref_id: root_ref },
                         success: function (response) {
-                            if (response.status === "error")
-                            {
-                                alert("Error: "+ response.message)
-                            }
-                            else if (response.status === "success") {
-                                $("#"+actionID).html(response.data)
+                            if (response.status === "error") {
+                                alert("Error: " + response.message);
+                            } else if (response.status === "success") {
+                                $("#" + actionID).html(response.data);
                                 $("#staticBackdrop").modal("show");
                             }
                         },
                     });
                 }
                 return false;
-
             },
             fileSharingModal: function (e) {
                 let id = $(e).attr("ref");
@@ -3137,6 +3134,40 @@ let SalesSetting = {};
                     },
                 });
             },
+            companyWiseUsersForSalesEmployeeEntry: function (e) {
+                let id = $(e).val();
+                if (id.length === 0) {
+                    return false;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/control-panel/company-wise-user";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { company_id: id },
+                    success: function (response) {
+                        // console.log(response)
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            updateSelectBox(
+                                response.data,
+                                "action_id",
+                                "id",
+                                "name"
+                            );
+                        }
+                    },
+                });
+            },
             companyWiseUsersForReq: function (
                 e,
                 action_id //only able to requisition
@@ -4267,27 +4298,34 @@ let SalesSetting = {};
                     },
                 });
             },
-            companyPackageEdit:function (e){
-                let data = $(e).data('info')
-                console.log((data))
-                $("#editModalLabel").html("Edit Company Storage Package of"+data.company)
-                $("#edit_company_name").html(`<option value="${data.company_id}" selected>${data.company}</option>`)
-                $("#edit_company_package").val(data.package_id)
-                if (data.status !== '')
-                {
-                    $("#edit_company_status").val(data.status)
+            companyPackageEdit: function (e) {
+                let data = $(e).data("info");
+                console.log(data);
+                $("#editModalLabel").html(
+                    "Edit Company Storage Package of" + data.company
+                );
+                $("#edit_company_name").html(
+                    `<option value="${data.company_id}" selected>${data.company}</option>`
+                );
+                $("#edit_company_package").val(data.package_id);
+                if (data.status !== "") {
+                    $("#edit_company_status").val(data.status);
                 }
-                $("#editModal").modal('show')
-                return false
+                $("#editModal").modal("show");
+                return false;
             },
-            companyPackageUpdate:function ()
-            {
+            companyPackageUpdate: function () {
                 let company_id = $("#edit_company_name").val();
-                let selected_package = parseInt($("#edit_company_package").val());
+                let selected_package = parseInt(
+                    $("#edit_company_package").val()
+                );
                 let status = parseInt($("#edit_company_status").val());
 
-                selected_package = (isNaN(selected_package) || selected_package === 0) ? null : selected_package;
-                status = (isNaN(status) || status === -1) ? 0 : status;
+                selected_package =
+                    isNaN(selected_package) || selected_package === 0
+                        ? null
+                        : selected_package;
+                status = isNaN(status) || status === -1 ? 0 : status;
                 const url =
                     window.location.origin +
                     sourceDir +
@@ -4300,18 +4338,22 @@ let SalesSetting = {};
                         ),
                     },
                     method: "POST",
-                    data: { company_id: company_id, selected_package: selected_package, status: status },
+                    data: {
+                        company_id: company_id,
+                        selected_package: selected_package,
+                        status: status,
+                    },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
-                            alert(response.message)
-                            window.location.reload()
+                            alert(response.message);
+                            window.location.reload();
                         }
                         return true;
                     },
                 });
-            }
+            },
         };
         Sales = {
             addEmailPhoneForLead: function (event, displayName, outputId) {
@@ -4361,9 +4403,17 @@ let SalesSetting = {};
 
                 return false;
             },
-            addLeadStep1:function(){
+            addLeadStep1: function () {
+                let add_lead_step1_data = {
+                    company_id: $("#company_id").val(),
+                    full_name: $("#full_name").val(),
+                    spouse: $("#spouse").val(),
+                    primary_mobile: $("#primary_mobile").val(),
+                    primary_email: $("#primary_email").val(),
+                    notes: $("#notes").val(),
+                };
                 const url =
-                    window.location.origin + sourceDir + "/add-lead-step1"; // update API endpoint
+                    window.location.origin + sourceDir + "/add-lead-step1";
 
                 $.ajax({
                     url: url,
@@ -4373,22 +4423,436 @@ let SalesSetting = {};
                         ),
                     },
                     method: "POST",
-                    data: $("#leadForm").serialize(),
+                    data: { add_lead_step1_data },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             alert(response.message);
-                            let form=Sales.addLeadStep2Form()
-                            $("#commonSlot_for_multiple_step").html(form)
+                            let form = Sales.addLeadStep2Form(
+                                response.company_id
+                            );
+                            $("#commonSlot_for_multiple_step").html(form);
                         }
                     },
                 });
 
-                return false; 
+                return false;
             },
-            addLeadStep2Form:function(){
+            addLeadStep2: function () {
+                // let add_lead_step1_data = {
+                //     company_id: $("#company_id").val(),
+                //     full_name: $("#full_name").val(),
+                //     spouse: $("#spouse").val(),
+                //     primary_mobile: $("#primary_mobile").val(),
+                //     primary_email: $("#primary_email").val(),
+                //     notes: $("#notes").val(),
+                // };
+                const url =
+                    window.location.origin + sourceDir + "/add-lead-step2";
 
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    // data: { add_lead_step1_data },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            let form = Sales.addLeadStep3Form(
+                                // response.company_id
+                            );
+                            $("#commonSlot_for_multiple_step").html(form);
+                        }
+                    },
+                });
+
+                return false;
+            },
+            addLeadStep3: function () {
+                // let add_lead_step1_data = {
+                //     company_id: $("#company_id").val(),
+                //     full_name: $("#full_name").val(),
+                //     spouse: $("#spouse").val(),
+                //     primary_mobile: $("#primary_mobile").val(),
+                //     primary_email: $("#primary_email").val(),
+                //     notes: $("#notes").val(),
+                // };
+                const url =
+                    window.location.origin + sourceDir + "/add-lead-step3";
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    // data: { add_lead_step1_data },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            let form = Sales.addLeadStep4Form(
+                                // response.company_id
+                            );
+                            $("#commonSlot_for_multiple_step").html(form);
+                        }
+                    },
+                });
+
+                return false;
+            },
+            addLeadStep4: function () {
+                // let add_lead_step1_data = {
+                //     company_id: $("#company_id").val(),
+                //     full_name: $("#full_name").val(),
+                //     spouse: $("#spouse").val(),
+                //     primary_mobile: $("#primary_mobile").val(),
+                //     primary_email: $("#primary_email").val(),
+                //     notes: $("#notes").val(),
+                // };
+                const url =
+                    window.location.origin + sourceDir + "/add-lead-step4";
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    // data: { add_lead_step1_data },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            
+                        }
+                    },
+                });
+
+                return false;
+            },
+            addLeadStep2Form: function (company_id) {
+                return `
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                                <input type="hidden" value="${company_id}">
+                        </div>
+                    </div>
+                    <div class="col-md-6"></div>
+                    <div class="col-md-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession"
+                                placeholder="profession">
+                            <datalist id="profession-list">
+                                <option value="Business">Business</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Solder">Solder</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Engineer">Engineer</option>
+                                <option value="Bankar">Bankar</option>
+                                <option value="Politician">Politician</option>
+                                <option value="Actor">Actor</option>
+                            </datalist>
+                            <label for="branch">Main Profession <span class="text-danger">*</span></label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession"
+                                placeholder="profession">
+                            <datalist id="profession-list">
+                                <option value="Business">Business</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Solder">Solder</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Engineer">Engineer</option>
+                                <option value="Bankar">Bankar</option>
+                                <option value="Politician">Politician</option>
+                                <option value="Actor">Actor</option>
+                            </datalist>
+                            <label for="branch">Profession <span class="text-danger">*</span></label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="company" name="company" placeholder="Company">
+                            <label for="company">Company</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-5">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="designation" name="designation"
+                                    placeholder="Designation">
+                                <label for="designation">Designation</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep2()"><i class="fa-solid fa-arrow-right"></i>
+                            Next</button>
+                    </div>
+            </div>
+                `;
+            },
+            addLeadStep3Form: function () {
+                return `
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="source" list="source-list" name="source"
+                                        placeholder="Source">
+                                    <datalist id="source-list">
+                                        <option value="None">None</option>
+                                        <option value="Newspaper">Newspaper</option>
+                                        <option value="Hotline">Hotline</option>
+                                        <option value="Social">Social</option>
+                                        <option value="Reference">Reference</option>
+                                    </datalist>
+                                    <label for="branch">Main Source <span class="text-danger">*</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="source" list="source-list" name="source"
+                                        placeholder="Source">
+                                    <datalist id="source-list">
+                                        <option value="None">None</option>
+                                        <option value="Newspaper">Newspaper</option>
+                                        <option value="Hotline">Hotline</option>
+                                        <option value="Social">Social</option>
+                                        <option value="Reference">Reference</option>
+                                    </datalist>
+                                    <label for="branch">Source <span class="text-danger">*</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <select id="team-leader" class="form-control" name="team_leader">
+                                        <option value="">--Select Option--</option>
+                                        <option value="db_leader_id">Leader 1</option>
+                                        <option value="db_leader_id">Leader 2</option>
+                                    </select>
+                                    <label for="team-leader">Team Leader <span class="text-danger">*</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <select id="associate" class="form-control" name="associate">
+                                        <option value="">--Select Option--</option>
+                                        <option value="db_associate_id">Associate 1</option>
+                                        <option value="db_associate_id">Associate 2</option>
+                                    </select>
+                                    <label for="associate">Associate <span class="text-danger">*</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <input type="text" name="recorded_by" id="recorded_by" class="form-control">
+                                    <label for="recorded_by">Recorded By</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <select id="rating" class="form-control" name="rating">
+                                        <option value="">--Select Option--</option>
+                                        <option value="db_rating_id">Rating 1</option>
+                                        <option value="db_rating_id">Rating 2</option>
+                                    </select>
+                                    <label for="rating">Rating</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <select id="industry" class="form-control" name="industry">
+                                        <option value="">--Select Option--</option>
+                                        <option value="db_industry_id">Industry 1</option>
+                                        <option value="db_industry_id">Industry 2</option>
+                                    </select>
+                                    <label for="industry">Industry</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <select id="branch" class="form-control" name="branch">
+                                        <option value="">--Select Option--</option>
+                                        @if (count($branches))
+                                            @foreach ($branches as $branch)
+                                                <option value="{!! $branch->id !!}">{!! $branch->branch_name !!}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    <label for="branch">Branch Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <select id="lead-creat-dept" class="form-control" name="lead_create_dept">
+                                        <option value="">--Select Option--</option>
+                                        @if (count($depts))
+                                            @foreach ($depts as $dept)
+                                                <option value="{!! $dept->id !!}">{!! $dept->dept_name !!}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    <label for="lead-creat-dept">Lead Create Department</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep3()"><i class="fa-solid fa-arrow-right"></i>
+                                    Next</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+            addLeadStep4Form: function (
+                // company_id
+            ) {
+                return `
+                    <div class="col-md-6">
+                        <h6># Prospect Preference</h6>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3">
+                                    <div class="form-floating mb-3">
+                                        <textarea type="text" class="form-control" id="preference-notes" name="p_notes" placeholder="Preference Notes"></textarea>
+                                        <label for="preference-notes">Preference Notes</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select id="apartment-type" class="form-control" name="apartment_type">
+                                        <option value="">--Select Option--</option>
+                                        <option value="db_apartment_type_id">apartment type 1</option>
+                                        <option value="db_apartment_type_id">apartment type 1</option>
+                                    </select>
+                                    <label for="associate">Apartment Type </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <span for="preferred-location">Preferred Location </span>
+                                <div class="form-floating mb-3">
+                                    <select class="text-capitalize select-search" id="preferred_location"
+                                        name="preferred_location[]" multiple>
+                                        {{-- @if (old('company') == $c->id) selected @endif --}}
+                                        <option value="">--select option--</option>
+                                        @if (isset($leadWiseLocations) || count($leadWiseLocations) > 0)
+                                            @foreach ($leadWiseLocations as $c)
+                                                <option value="{{ $c['id'] }}"> {!! $c['dept_name'] !!}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-control" id="apartment-size" name="apartment_size">
+                                        <option value="">--Select--</option>
+                                        <option value="db_size_id">1200 sft</option>
+                                        <option value="db_size_id">1300 sft</option>
+                                        <option value="db_size_id">1600 sft</option>
+                                    </select>
+                                    <label for="apartment-size">Apartment Size </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-control" id="apartment-floor" name="apartment_floor">
+                                        <option value="">--Select--</option>
+                                        <option value="1">1st Floor</option>
+                                        <option value="2">2nd Floor</option>
+                                        <option value="3">3rd Floor</option>
+                                        <option value="4">4th Floor</option>
+                                    </select>
+                                    <label for="apartment-floor">Apartment Floor </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <select class="form-control" id="apartment-facing" name="apartment_facing">
+                                        <option value="">--Select--</option>
+                                        <option value="south">South</option>
+                                        <option value="north">North</option>
+                                        <option value="east">East</option>
+                                        <option value="west">West</option>
+                                    </select>
+                                    <label for="apartment-facing">Facing </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <select class="form-control" id="apartment-view" name="apartment_view">
+                                        <option value="">--Select--</option>
+                                        <option value="south">South</option>
+                                        <option value="north">North</option>
+                                        <option value="east">East</option>
+                                        <option value="west">West</option>
+                                    </select>
+                                    <label for="apartment-view">View </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control" placeholder="budget" id="budget">
+                                    <label for="budget">Budget </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep4()"><i class="fa-solid fa-arrow-right"></i>
+                                    Next</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+            salesEmployeeEntry: function () {
+                let sales_employee_entry_data = {
+                    company_id: $("#company").val(),
+                    user: $("#action_id").val(),
+                };
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/get_sale_employee_entry";
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { sales_employee_entry_data },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            $("#partial_sell_employee_entry").html(
+                                response.data
+                            );
+                        }
+                    },
+                });
             },
         };
 
@@ -5013,9 +5477,9 @@ let SalesSetting = {};
                 });
                 return companyIdDropdownValue;
             },
-            deleteSalesSettingMultiple: function (get_url) {
+            deleteSalesSettingMultiple: function (get_url, param_for_delete) {
                 let selected = [];
-                $(".check-box:checked").each(function () {
+                $("." + param_for_delete + ":checked").each(function () {
                     selected.push($(this).val());
                 });
                 if (selected.length === 0) {
@@ -5026,10 +5490,7 @@ let SalesSetting = {};
                 if (
                     confirm("Are you sure you want to delete selected records?")
                 ) {
-                    let url =
-                        window.location.origin +
-                        sourceDir +
-                        get_url;
+                    let url = window.location.origin + sourceDir + get_url;
                     $.ajax({
                         url: url,
                         headers: {
@@ -5310,6 +5771,7 @@ let SalesSetting = {};
     function updateSelectBoxSingleOption(data, id, value, value_name) {
         try {
             const $select = $("#" + id);
+            console.log(id);
             // Ensure Selectize is initialized
             if ($select[0] && $select[0].selectize) {
                 const selectize = $select[0].selectize;

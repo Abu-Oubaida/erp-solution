@@ -15,6 +15,8 @@ use App\Models\DeleteSalesLeadStatusMultipleHistory;
 use App\Models\DeleteSalesLeadViewMultipleHistory;
 use App\Models\DeleteTypeMultipleHistory;
 use App\Models\department;
+use App\Models\Lead;
+use App\Models\SalesEmployeeEntry;
 use App\Models\SalesLeadApartmentSize;
 use App\Models\SalesLeadBudget;
 use App\Models\SalesLeadFacing;
@@ -57,19 +59,80 @@ class SalesInterfaceController extends Controller
             }
             $depts = department::where('status', 1)->get();
             $branches = branch::where('status', 1)->get();
-            //            dd($depts);
+            $companies = $this->getCompany()->get();
+            //dd($depts);
             $leadWiseLocations = [
                 ['id' => 1, 'dept_name' => 'Dhaka'],
                 ['id' => 2, 'dept_name' => 'Narayanganj'],
                 ['id' => 3, 'dept_name' => 'Rupganj'],
                 ['id' => 4, 'dept_name' => 'Dhanmondi'],
             ];
-            return view('back-end/sales/add-lead', compact('depts', 'branches', 'leadWiseLocations'));
+            return view('back-end/sales/add-lead', compact('depts', 'branches', 'leadWiseLocations','companies'));
         } catch (\Throwable $exception) {
             return back()->with('error', $exception->getMessage())->withInput();
         }
     }
-
+    public function addLeadStep1(Request $request){
+        $lead = Lead::create($request->add_lead_step1_data);
+        if($lead){
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Lead Creation Step 1 Completed.',
+                'company_id'=>$lead->company_id
+            ]);
+        }else{
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed.'
+            ]);
+        }
+    }
+    public function addLeadStep2(Request $request){
+        $lead = 1;
+        if($lead){
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Lead Creation Step 2 Completed.',
+                // 'company_id'=>$lead->company_id
+            ]);
+        }else{
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed.'
+            ]);
+        }
+    }
+    public function addLeadStep3(Request $request){
+        $lead = 1;
+        if($lead){
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Lead Creation Step 3 Completed.',
+                // 'company_id'=>$lead->company_id
+            ]);
+        }else{
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed.'
+            ]);
+        }
+    }
+    public function addLeadStep4(Request $request){
+        $lead = 1;
+        if($lead){
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Lead Creation
+                 Completed.',
+                // 'company_id'=>$lead->company_id
+            ]);
+        }else{
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed.'
+            ]);
+        }
+    }
     private function storeLead(Request $request)
     {
         try {
@@ -309,7 +372,6 @@ class SalesInterfaceController extends Controller
                 ]);
             }
             $salesLeadModalDataFind = $modal::find($param_for_edit);
-            Log::info(json_encode($filteredSubTableData,JSON_PRETTY_PRINT));
             if ($salesLeadModalDataFind) {
                 $updated = $salesLeadModalDataFind->update($filteredSubTableData);
                 $getSaleSubTableData = $this->getDataOfApartment($modal);
@@ -661,7 +723,62 @@ class SalesInterfaceController extends Controller
         }
     }
     public function getSaleEmployeeEntry(Request $request){
-            return view('back-end.sales.sell-employee-entry');
+                if($request->isMethod('post')){
+                    try{
+                        $data = $request->input('sales_employee_entry_data');
+                        $company_id = $data['company_id'];
+                        $users = $data['user'];
+                        if($company_id=='' || $users==''){
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'Operation Failed',
+                            ]);
+                        }
+                        $now = now();
+                        $processed_sales_employee_entry_data=collect($users)->map(function($user_id) use($company_id,$now){
+                            return[
+                                'company_id'=>$company_id,
+                                'employee_id'=>$user_id,
+                                'created_by'=>auth()->user()->id,
+                                'created_at' => $now,
+                                'updated_at' => $now
+                            ];
+                        })->toArray();
+                        $sales_employee_entry = SalesEmployeeEntry::insert($processed_sales_employee_entry_data);
+                        $fetchedSaleEmployeeEntryData = $this->fetchSaleEmployeeEntry();
+                        $view = view('back-end.sales._sell-employee-entry',compact('fetchedSaleEmployeeEntryData'))->render();
+                        if($sales_employee_entry && $fetchedSaleEmployeeEntryData){
+                            return response()->json([
+                                'status' => 'success',
+                                'message' => 'Sales Employee Entry Added Successfully ',
+                                'data'=>$view
+                            ]);
+                        }else{
+                            throw new Exception('Operation Failed');
+                        }
+                    }catch(\Throwable $exception){
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Operation Failed ' . $exception->getMessage()
+                        ]);
+                    }
+                }else if($request->isMethod('get')){
+                    try{
+                        $companies = $this->getCompany()->get();
+                        $fetchedSaleEmployeeEntryData= SalesEmployeeEntry::with(['company','user'])->get();
+                        if($companies && $fetchedSaleEmployeeEntryData){
+                            return view('back-end.sales.sell-employee-entry',compact('companies','fetchedSaleEmployeeEntryData'));
+                        }else{
+                            throw new Exception('Operation Failed');
+                        } 
+                    }catch(\Throwable $exception){
+                        return back()->with('error', $exception->getMessage())->withInput();
+                    }
+                    
+                }
+    }
+    private function fetchSaleEmployeeEntry(){
+       return SalesEmployeeEntry::with(['company','user'])->get();
     }
 
 }
