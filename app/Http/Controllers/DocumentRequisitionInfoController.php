@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\branch;
 use App\Models\Document_requisition_attested_document_info;
 use App\Models\Document_requisition_info;
 use App\Models\Document_requisition_receiver_user;
@@ -20,7 +21,7 @@ class DocumentRequisitionInfoController extends Controller
             return $next($request);
         });
     }
-    public function companyWiseUser(Request $request)
+    public function companyWiseRequiredData(Request $request)
     {
         try {
             $permision = $this->permissions()->requisition;
@@ -30,10 +31,12 @@ class DocumentRequisitionInfoController extends Controller
                     'company_id' => ['required','string','exists:company_infos,id'],
                 ]);
                 extract($request->post());
-                $users = $this->companyWisePermissionUsers($company_id,$permision)->get();
+                $projects = $this->getUserProjectPermissions($this->user->id,$permision)->without('getUsers','company')->where('status',1)->where('company_id',$company_id)->select('id','branch_name','address')->get();
+                $types = $this->archiveTypeList($company_id)->without('voucherWithUsers','createdBY','updatedBY','company','archiveDocumentInfos','archiveDocuments')->where('status',1)->where('company_id',$company_id)->select('id','voucher_type_title','code')->get();
+                $departments = $this->getDepartment($permision)->without('createdBy','updatedBy','getUsers','company')->where('company_id',$company_id)->where('status',1)->where('company_id',$company_id)->select('id','dept_code','dept_name')->get();
                 return response()->json([
                     'status' => 'success',
-                    'data' => $users,
+                    'data' => ['projects'=>$projects,'types'=>$types,'departments'=>$departments],
                     'message' => 'Request processed successfully.'
                 ]);
             }

@@ -2,6 +2,7 @@ let Obj = {};
 let Archive = {};
 let Sales = {};
 let SalesSetting = {};
+let Requsition  = {};
 // Show loader immediately when the page starts loading
 (function ($) {
     //     $(document).ready(function() {
@@ -3137,69 +3138,6 @@ let SalesSetting = {};
                     },
                 });
             },
-            companyWiseUsersForReq: function (
-                e,
-                action_id //only able to requisition
-            ) {
-                let id = $(e).val();
-                if (id.length === 0) {
-                    return false;
-                }
-                const url =
-                    window.location.origin +
-                    sourceDir +
-                    "/requisition/company-wise-user";
-                $.ajax({
-                    url: url,
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                            "content"
-                        ),
-                    },
-                    method: "POST",
-                    data: { company_id: id },
-                    success: function (response) {
-                        if (response.status === "error") {
-                            alert("Error: " + response.message);
-                            return false;
-                        } else if (response.status === "success") {
-                            // updateSelectBoxSingleOption(response.data, action_id, 'id', 'name');
-                            const $select = $("#" + action_id);
-                            // Ensure Selectize is initialized
-                            if ($select[0] && $select[0].selectize) {
-                                const selectize = $select[0].selectize;
-
-                                selectize.clear();
-                                selectize.clearOptions(); // Clear existing options
-                                response.data.forEach(function (item) {
-                                    const companyName = item.get_company
-                                        ? item.get_company.company_name
-                                        : "N/A"; // Fallback if get_company is null
-                                    const designationTitle = item.designation
-                                        ? item.designation.title
-                                        : "N/A"; // Fallback if get_designation is null
-                                    const departmentTitle = item.department
-                                        ? item.department.dept_name
-                                        : "N/A"; // Fallback if get_department is null
-                                    const optionText = `${item.name} (${item.employee_id}, ${designationTitle},  ${departmentTitle}, ${companyName})`;
-
-                                    selectize.addOption({
-                                        value: item.id,
-                                        text: optionText,
-                                    });
-                                });
-                                selectize.refreshOptions(true); // Refresh the options in the select box
-                                $("#user-project-permission-add-list").html("");
-                            } else {
-                                console.error(
-                                    "Selectize is not initialized for #" +
-                                        action_id
-                                );
-                            }
-                        }
-                    },
-                });
-            },
             companyWiseUsersCompanyPermission: function (
                 e,
                 action_id // only able to system super admin permission
@@ -4385,7 +4323,7 @@ let SalesSetting = {};
                     },
                 });
 
-                return false; 
+                return false;
             },
             addLeadStep2Form:function(){
 
@@ -5238,6 +5176,38 @@ let SalesSetting = {};
                     return false;
                 }
             },
+        };
+        Requsition = {
+            companyWiseUsersForReq: function (e) {
+            let id = $(e).val();
+            if (id.length === 0) {
+                return false;
+            }
+            const url =
+                window.location.origin +
+                sourceDir +
+                "/requisition/company-wise-required-data";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+                method: "POST",
+                data: { company_id: id },
+                success: function (response) {
+                    if (response.status === "error") {
+                        alert("Error: " + response.message);
+                        return false;
+                    } else if (response.status === "success") {
+                        updateSelectBox(response.data.projects, 'projects','id','branch_name');
+                        updateSelectBox(response.data.types, 'data_types','id','voucher_type_title');
+                        updateSelectBox(response.data.departments, 'res_dept','id','dept_name');
+                    }
+                },
+            });
+        }
         };
     });
     function checkFileExists(url, callback) {

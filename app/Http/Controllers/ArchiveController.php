@@ -901,7 +901,6 @@ class ArchiveController extends Controller
                 ]);
                 extract($request->post());
                 $projects = branch::where('company_id',$company_id)->whereIn('id',$this->getUserProjectPermissions(Auth::user()->id,$permission)->pluck('id')->toArray())->where('status',1)->get();
-                $userWiseVoucherTypePermissionId = null;
                 $types = $this->getCompanyWiseDataTypes($company_id);
                 return response()->json([
                     'status' => 'success',
