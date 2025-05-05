@@ -368,74 +368,84 @@ let Requsition  = {};
             const modal = document.getElementById("myModal");
             const modelTitle = document.getElementById("userDataModelLabel");
             const dataTable = document.getElementById("data-table");
+
+            // Clear previous content
             while (dataTable.firstChild) {
                 dataTable.removeChild(dataTable.firstChild);
             }
 
-            // Create a table from the data
             const table = document.createElement("table");
             table.className = "table";
-            let t = 0;
-            let action;
-            let row_o = 1;
 
-            let col = 0;
-            const row = document.createElement("tr");
-            cell = document.createElement("td");
-            while (col < data[0][0].length + 2) {
-                cell = document.createElement("td");
-                cell.textContent = col++;
-                row.appendChild(cell);
+            // === First Row: Column indices ===
+            const indexRow = document.createElement("tr");
+            let cell = document.createElement("th");
+            cell.textContent = "#";
+            indexRow.appendChild(cell);
+
+            for (let i = 0; i < data[0][0].length; i++) {
+                cell = document.createElement("th");
+                cell.textContent = i;
+                indexRow.appendChild(cell);
             }
-            table.appendChild(row);
 
-            data[0].forEach((rowData) => {
-                const row = document.createElement("tr");
-                let cell;
-                if (t === 0) {
-                    action = "Action";
-                    cell = document.createElement("th");
-                    cell.textContent = "SL";
-                    row.appendChild(cell);
-                    rowData.forEach((cellData) => {
-                        cell = document.createElement("th");
-                        cell.textContent = cellData;
-                        row.appendChild(cell);
-                    });
-                    cell = document.createElement("th");
-                    cell.innerHTML = action;
-                    row.appendChild(cell);
-                    table.appendChild(row);
-                    t++;
-                } else {
-                    action =
-                        '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,' +
-                        t +
-                        ",`" +
-                        fileName +
-                        '`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>';
-                    cell = document.createElement("td");
-                    cell.textContent = row_o;
-                    row_o++;
-                    row.appendChild(cell);
-                    rowData.forEach((cellData) => {
-                        cell = document.createElement("td");
-                        cell.textContent = cellData;
-                        row.appendChild(cell);
-                    });
-                    cell = document.createElement("td");
-                    cell.innerHTML = action;
-                    row.appendChild(cell);
-                    table.appendChild(row);
-                    t++;
-                }
+            cell = document.createElement("th");
+            cell.textContent = "Action";
+            indexRow.appendChild(cell);
+
+            table.appendChild(indexRow);
+
+            // === Second Row: Actual Table Headers ===
+            const headerRow = document.createElement("tr");
+            cell = document.createElement("th");
+            cell.textContent = "SL";
+            headerRow.appendChild(cell);
+
+            data[0][0].forEach(headerText => {
+                cell = document.createElement("th");
+                cell.textContent = headerText;
+                headerRow.appendChild(cell);
             });
 
-            // Append the table to the modal
+            cell = document.createElement("th");
+            cell.textContent = "Action";
+            headerRow.appendChild(cell);
+
+            table.appendChild(headerRow);
+
+            // === Data Rows ===
+            data[0].slice(1).forEach((rowData, index) => {
+                const row = document.createElement("tr");
+
+                // SL number
+                cell = document.createElement("td");
+                cell.textContent = index + 1;
+                row.appendChild(cell);
+
+                rowData.forEach(cellData => {
+                    cell = document.createElement("td");
+                    cell.textContent = cellData;
+                    row.appendChild(cell);
+                });
+
+                // Action button
+                cell = document.createElement("td");
+                cell.innerHTML = `
+            <a style="cursor: pointer" class="text-danger"
+               onclick="return confirm('Are you sure?') ? Obj.removeElementOfEmployeeData(this, ${index + 1}, '${fileName}') : false">
+               <i class="fa fa-trash" aria-hidden="true"></i>
+            </a>`;
+                row.appendChild(cell);
+
+                table.appendChild(row);
+            });
+
             dataTable.appendChild(table);
             modelTitle.innerText = fileName;
             $("#myModal").modal("show");
         }
+
+
         function ExcelDateToJSDate(serial) {
             const dateToString = (d) =>
                 `${("00" + d.getDate()).slice(-2)}-${(

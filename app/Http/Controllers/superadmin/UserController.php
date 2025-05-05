@@ -150,6 +150,13 @@ class UserController extends Controller
         try {
             $permission = $this->permissions()->add_user;
             $input = $request->post()['input'];
+            foreach ($input as $index => $row) {
+                if (isset($row['12'])) {
+                    $input[$index]['12'] = (string) $row['12'];
+                }
+            }
+
+            $request->merge(['input' => $input]);
             unset($input[0]);
             $rules = [
                 '*.0'   =>  ['required','string', 'exists:company_infos,company_code'],//Company code
@@ -164,7 +171,7 @@ class UserController extends Controller
                 '*.9'   =>  ['sometimes','nullable', 'email', 'max:255', Rule::unique('users','email')], // User Email
                 '*.10'   =>  ['sometimes','nullable','numeric','in:0,1'],// Status
                 '*.11'   =>  ['sometimes','nullable','exists:blood_groups,blood_type'], // Blood Group
-                '*.12' => ['required', Rules\Password::defaults()], // Password
+                '*.12' => ['required','string', Rules\Password::defaults()], // Password
             ];
             $customMessages = [
                 '*.0.exists' => 'This company code does not exist in the Database.',
