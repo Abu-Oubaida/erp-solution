@@ -86,35 +86,7 @@
                                         <input class="form-control" name="subject" id="subject" type="text" value="{!! old('subject') !!}" required>
                                     </div>
                                 </div>
-{{--                                <div class="col-md-2">--}}
-{{--                                    <div class="mb-3">--}}
-{{--                                        <label for="d_count">Number of Need Document</label>--}}
-{{--                                        <input class="form-control" value="{!! old('d_count') !!}" name="d_count" id="d_count" type="number">--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-md-1">--}}
-{{--                                    @if(old('d_count'))--}}
-{{--                                        <button class="btn btn-outline-danger float-end mt-4" onclick="Obj.document_field_operation(this,'Phone')"><i class='fa-solid fa-clock-rotate-left'></i> Reset</button>--}}
-{{--                                    @else--}}
-{{--                                        <a class="btn btn-outline-primary float-end mt-4" onclick="Obj.document_field_operation(this,'Phone')">Next <i class="fa-solid fa-arrow-right"></i></a>--}}
-{{--                                    @endif--}}
-{{--                                </div>--}}
                             </div>
-{{--                            <div class="row" id="document_field">--}}
-{{--                                @if($d_count=old('d_count'))--}}
-{{--                                    @php($counter = 1)--}}
-{{--                                    @while($d_count >= $counter)--}}
-{{--                                        <div class="col">--}}
-{{--                                            <div class="mb-3">--}}
-{{--                                                <label for="d_title_{!! $counter !!}">Document {!! $counter !!} Title</label>--}}
-{{--                                                <input class="form-control" name="d_title_{!! $counter !!}" id="d_title_{!! $counter !!}" type="text" value="{!! old("d_title_".$counter) !!}">--}}
-{{--                                            </div>--}}
-{{--                                        </div>--}}
-{{--                                        @php($counter++)--}}
-{{--                                    @endwhile--}}
-
-{{--                                @endif--}}
-{{--                            </div>--}}
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-floating mb-3">
@@ -123,16 +95,53 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <button type="submit" class="btn btn-chl-outline float-end"><i class="fas fa-save"></i> Submit</button>
+                                    <button type="submit" class="btn btn-chl-outline float-end" onclick="return ProjectDocumentRequisitionSubmit(this)"><i class="fas fa-save"></i> Submit</button>
                                 </div>
                             </div>
                     </div>
                 </div>
             </div>
-
-
         </div>
-
     </div>
+    <script>
+        function ProjectDocumentRequisitionSubmit(e)
+        {
+            let company = $("#company").val();
+            let projects = $("#projects").val();
+            let data_types = $("#data_types").val();
+            let res_users = $("#res_users").val();
+            let deadline = $("#deadline").val();
+            let subject = $("#subject").val();
+            let details = $("#details").val();
+            if(company.length === 0 || projects.length === 0 || data_types.length === 0 || res_users.length === 0 || deadline.length === 0)
+            {
+                return false
+            }
+            const url = window.location.origin + sourceDir +"/requisition/project-document-requisition-entry";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                method: "POST",
+                data: { company_id: company, projects: projects, data_types: data_types, users: res_users, deadline: deadline, subject: subject, details:details },
+                success: function (response) {
+                    alert(response.status + " " + response.message)
+                },
+                error: function (xhr, status, error) {
+                    let message = "An error occurred. Please try again.";
+                    // If server returns a specific error message
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        message = xhr.responseText;
+                    }
+
+                    alert("Error: " + message);
+                }
+            })
+            // alert(url)
+        }
+    </script>
 @stop
 

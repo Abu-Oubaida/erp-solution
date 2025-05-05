@@ -676,7 +676,10 @@ Route::group(['middleware' => ['auth']],function (){
         Route::controller(DocumentRequisitionInfoController::class)->middleware(['permission:document_requisition'])->group(function (){
             Route::post('company-wise-required-data','companyWiseRequiredData');
             Route::middleware(['permission:project_document_requisition_entry'])->group(function (){
-                Route::match(['post','get'],'project-document-requisition-entry','index')->name('project.document.requisition.entry');
+                Route::match(['get','post'],'project-document-requisition-entry','create')->name('project.document.requisition.entry');
+            });
+            Route::middleware(['permission:project_document_requisition_report'])->group(function (){
+                Route::match(['get','post'],'project-document-requisition-report','index')->name('project.document.requisition.report');
             });
         });
     });

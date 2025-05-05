@@ -19,8 +19,8 @@ return new class extends Migration
             $table->unsignedBigInteger('project_id');
             $table->text('message_subject')->nullable();
             $table->text('message_body')->nullable();
-            $table->unsignedBigInteger('created_by');
-            $table->unsignedBigInteger('updated_by');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
         });
     }

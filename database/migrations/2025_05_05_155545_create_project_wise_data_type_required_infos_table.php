@@ -20,8 +20,8 @@ return new class extends Migration
             $table->unsignedBigInteger('data_type_id');
             $table->timestamp('deadline')->nullable();
             $table->integer('status')->default(1)->comment('0-Optional, 1-Required');
-            $table->unsignedBigInteger('created_by');
-            $table->unsignedBigInteger('updated_by');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
         });
     }
