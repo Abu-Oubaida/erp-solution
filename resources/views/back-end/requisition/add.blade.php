@@ -25,10 +25,6 @@
                             <div class="col">
                                 <h3 class="text-capitalize"> <i class="fa-solid fa-file-circle-plus"></i> {{str_replace('add','create',str_replace('.', ' ', \Route::currentRouteName()))}}</h3>
                             </div>
-                            <div class="col">
-                                <a class="btn btn-primary btn-sm float-end mt-1 mb-1" style="margin-left: 10px" href=""><i class="fa-solid fa-paper-plane"></i>  Sent List</a>
-                                <a class="btn btn-success btn-sm float-end mt-1 mb-1 mr-1" href=""><i class="fa-solid fa-inbox"></i>  Received List</a>
-                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -36,7 +32,7 @@
                                 <div class="col-md-2">
                                     <div class="mb-2">
                                         <label for="company">Company Name <span class="text-danger">*</span></label>
-                                        <select class="text-capitalize select-search" id="company" name="company" onchange="return Requsition.companyWiseUsersForReq(this,'user')">
+                                        <select class="text-capitalize select-search" id="company" name="company" onchange="return Requsition.companyWiseRequiredData(this,'user')">
                                             <option value="">--select a option--</option>
                                             @if(isset($companies) || (count($companies) > 0))
                                                 @foreach($companies as $c)
@@ -46,28 +42,28 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3 mb-1">
+                                <div class="col-md-4 mb-1">
                                     <label for="projects">Projects<span class="text-danger">*</span></label>
                                     <select id="projects" name="projects[]" class="select-search cursor-pointer" onchange="return Obj.selectAllOption(this)" multiple>
                                         <option value="">Pick options...</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3 mb-1">
+                                <div class="col-md-6 mb-1">
                                     <label for="data_types">Data Types<span class="text-danger">*</span></label>
                                     <select id="data_types" name="data_types[]" class="select-search cursor-pointer" onchange="return Obj.selectAllOption(this)" multiple>
                                         <option value="">Pick options...</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-1">
+                                <div class="col-md-5 mb-1">
                                     <div class="row">
-                                        <div class="col-md-9">
-                                            <label for="res_dept">Responsible Dept.<span class="text-danger">*</span></label>
+                                        <div class="col-md-10">
+                                            <label for="res_dept">Responsible Departments<span class="text-danger">*</span></label>
                                             <select id="res_dept" name="res_dept[]" class="select-search cursor-pointer" onchange="return Obj.selectAllOption(this)" multiple>
                                                 <option value="">Pick options...</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
-                                            <button class="btn btn-outline-secondary btn-sm mt-4 float-end" onclick="return Obj.searchCompanyDepartmentUsers('company','res_dept','res_users')"><i class="fas fa-search"></i> Search</button>
+                                        <div class="col-md-2">
+                                                <button class="btn btn-outline-secondary btn-sm mt-4 float-start" onclick="return Obj.searchCompanyDepartmentUsers('company','res_dept','res_users')"><i class="fas fa-search"></i> Search</button>
                                         </div>
                                     </div>
                                 </div>
@@ -84,7 +80,7 @@
                                         <input class="form-control" name="deadline" id="deadline" type="date" value="{!! old("deadline") !!}" required>
                                     </div>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-12">
                                     <div class="mb-3">
                                         <label for="subject">Subject (If any message to email)</label>
                                         <input class="form-control" name="subject" id="subject" type="text" value="{!! old('subject') !!}" required>
@@ -133,14 +129,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h3> <i class="fas fa-list"></i> My Requisition List</h3>
-                    </div>
-                    @include("back-end.requisition._list")
-                </div>
-            </div>
+
 
         </div>
 
