@@ -15,6 +15,13 @@ return new class extends Migration
     {
         Schema::create('project_wise_data_type_required_infos', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('pdri_id')->comment('Project Document Requisition Id');
+            $table->unsignedBigInteger('data_type_id');
+            $table->timestamp('deadline')->nullable();
+            $table->integer('status')->default(1)->comment('0-Optional, 1-Required');
+            $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('updated_by');
             $table->timestamps();
         });
     }

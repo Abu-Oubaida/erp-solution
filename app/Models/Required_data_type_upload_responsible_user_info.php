@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Required_data_type_upload_responsible_user_info extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['company_id','pwdtr_id','user_id','created_by','updated_by'];
 }

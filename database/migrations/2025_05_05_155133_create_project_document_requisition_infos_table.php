@@ -13,11 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('required_data_type_upload_responsible_user_infos', function (Blueprint $table) {
+        Schema::create('project_document_requisition_infos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('pwdtr_id')->comment('Project wise data type required id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('project_id');
+            $table->text('message_subject')->nullable();
+            $table->text('message_body')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('updated_by');
             $table->timestamps();
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('required_data_type_upload_responsible_user_infos');
+        Schema::dropIfExists('project_document_requisition_infos');
     }
 };
