@@ -253,7 +253,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::delete('user-delete','UserDelete')->name('user.delete');
         });//3.3.5 End
 
-        Route::middleware(['permission:salary_certificate_input'])->group(function () {
+        Route::middleware(['permission:add_user'])->group(function () {
             Route::get('export-employee-prototype','exportEmployeeDataPrototype')->name('export.employee.data.prototype');
         });
 

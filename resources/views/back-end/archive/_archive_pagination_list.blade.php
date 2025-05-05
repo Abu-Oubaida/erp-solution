@@ -106,7 +106,7 @@
             @endif
                 <td>{!! $no++ !!}</td>
                 <td>{!! date('d-M-y', strtotime($data->voucher_date)) !!}</td>
-                <td>{!! $data->company->company_code !!}</td>
+                <td>{!! @$data->company->company_code !!}</td>
                 <td>{!! @$data->project->branch_name !!}</td>
                 <td>{!! $data->voucher_number !!}</td>
                 <td>{!! $data->VoucherType->voucher_type_title !!}</td>
