@@ -4,13 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\company_info;
-use App\Models\User;
 
-class SalesEmployeeEntry extends Model
+class SalesLeaderEntry extends Model
 {
     use HasFactory;
-    protected $fillable = ['employee_id','created_by','updated_by','company_id','leader_id'];
+    protected $fillable = ['employee_id','created_by','updated_by','company_id'];
     public function company(){
         return $this->belongsTo(company_info::class,'company_id','id');
     }
@@ -19,8 +17,5 @@ class SalesEmployeeEntry extends Model
     }
     public function createdByUser(){
         return $this->belongsTo(User::class,'created_by');
-    }
-    public function leader(){
-        return $this->belongsTo(User::class,'leader_id','id');
     }
 }

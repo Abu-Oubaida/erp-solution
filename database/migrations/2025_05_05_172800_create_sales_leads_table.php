@@ -16,15 +16,11 @@ return new class extends Migration
         Schema::create('sales_leads', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id');
-            $table->integer('status')->default('1')->comment('1= active otherwise inactive');
+            $table->integer('status')->default('5')->comment('5 = pending');
             $table->string('full_name');
             $table->string('spouse')->nullable();
             $table->string('primary_mobile');
             $table->string('primary_email')->nullable();
-            $table->unsignedBigInteger('lead_main_profession_id')->nullable();
-            $table->unsignedBigInteger('lead_sub_profession_id')->nullable();
-            $table->string('lead_company')->nullable();
-            $table->string('lead_designation')->nullable();
             $table->text('notes')->nullable();
             $table->unsignedBigInteger('lead_status_id')->nullable();
             $table->integer('sell_status')->default(0)->comment("1=sold, other wise unsold")->nullable();

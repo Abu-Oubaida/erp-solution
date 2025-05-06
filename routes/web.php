@@ -507,6 +507,12 @@ Route::group(['middleware' => ['auth']],function (){
         });
         Route::middleware(['permission:sale_employee_entry'])->group(function (){
             Route::match(['get','post'],'get_sale_employee_entry','getSaleEmployeeEntry')->name('get.sale.employee.entry');
+            Route::match(['post'],'get-sale-leader-entry','getSaleLeaderEntry')->name('get.sale.leader.entry');
+            Route::match(['get'],'sales-company-wise-leader','getSaleCompanyWiseLeader')->name('sales.company.wise.leader');
+            Route::match(['get'],'get-sale-employee-entry-edit','getSaleEmployeeEntryEdit')->name('get.sale.employee.entry.edit');
+            Route::match(['post'],'get-sale-employee-entry-leader-update','getSaleEmployeeEntryLeaderUpdate')->name('get.sale.employee.entry.leader.update');
+            Route::match(['delete'],'delete-sales-employee-entry-multiple','deleteSalesEmployeeEntryMultiple')->name('delete.sales.employee.entry.multiple');
+            Route::match(['delete'],'delete-sales-leader-entry-multiple','deleteSalesLeaderEntryMultiple')->name('delete.sales.leader.entry.multiple');
         });
         Route::middleware(['permission:sale_settings_edit'])->group(function (){
             Route::match(['get','post'],'get-sales-lead-apartment-type-edit','getSalesLeadApartmentTypeEdit')->name('get.sales.lead.apartment.type.edit');
@@ -672,33 +678,7 @@ Route::group(['middleware' => ['auth']],function (){
         Route::middleware(['permission:delete_role'])->group(function (){
             Route::match(['delete'],'delete-role','destroy')->name('delete.role');
         });
-    });
-
-    #3.16 Requisition Management
-    Route::middleware(['permission:requisition'])->prefix('requisition')->group(function (){
-        Route::controller(DocumentRequisitionInfoController::class)->middleware(['permission:document_requisition'])->group(function (){
-            Route::post('company-wise-user','companyWiseUser');
-            Route::post('req-document-receiver','reqDocumentReceiver');//ajax request
-            Route::post('requested-document','requestedDocument');//ajax request
-            Route::middleware(['permission:add_document_requisition'])->group(function (){
-                Route::match(['post','get'],'document-requisition-add','createDocumentRequisition')->name('document.requisition.add');
-                Route::match(['get'],'document-requisition-view-self/{requisitionDocumentId}','viewDocumentRequisitionSelf')->name('document.requisition.view.self');
-                Route::match(['get','put'],'document-requisition-edit-self/{requisitionDocumentId}','editDocumentRequisitionSelf')->name('document.requisition.edit.self');
-                Route::match(['delete'],'document-requisition-delete-self/{requisitionDocumentId}','deleteDocumentRequisitionSelf')->name('document.requisition.delete.self');
-            });
-            Route::middleware(['permission:list_document_requisition'])->group(function (){
-                Route::match(['post','get'],'document-requisition-list','indexDocument')->name('document.requisition.list');
-            });
-            Route::middleware(['permission:document_requisition_list'])->prefix('document-report')->group(function (){
-                Route::middleware(['permission:document_requisition_received_list'])->group(function (){
-                    Route::match(['get'],'received-list','documentRequisitionReceivedList')->name("document.requisition.received.list");
-                });
-                Route::middleware(['permission:document_requisition_sent_list'])->group(function (){
-                    Route::match(['get'],'sent-list','documentRequisitionSentList')->name("document.requisition.sent.list");
-                });
-            });
-        });
-    });
+    });    
 });//3.0 End
 # 4.0 Share Document View
 Route::controller(ShareDocumentViewController::class)->group(function (){

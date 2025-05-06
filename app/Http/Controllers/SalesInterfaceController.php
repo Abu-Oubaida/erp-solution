@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\branch;
 use App\Models\DeleteSalesApartmentSizeMultipleHistory;
+use App\Models\DeleteSalesEmployeeEntryMultipleHistory;
 use App\Models\DeleteSalesLeadBudgetMultipleHistory;
+use App\Models\DeleteSalesLeaderEntryMultipleHistory;
 use App\Models\DeleteSalesLeadFacingMultipleHistory;
 use App\Models\DeleteSalesLeadFloorMultipleHistory;
 use App\Models\DeleteSalesLeadLocationMultipleHistory;
@@ -15,10 +17,14 @@ use App\Models\DeleteSalesLeadStatusMultipleHistory;
 use App\Models\DeleteSalesLeadViewMultipleHistory;
 use App\Models\DeleteTypeMultipleHistory;
 use App\Models\department;
+use App\Models\ExtraEmail;
+use App\Models\ExtraMobile;
 use App\Models\Lead;
 use App\Models\SalesEmployeeEntry;
+use App\Models\SalesEmployeeEntryLeaderEditHistory;
 use App\Models\SalesLeadApartmentSize;
 use App\Models\SalesLeadBudget;
+use App\Models\SalesLeaderEntry;
 use App\Models\SalesLeadFacing;
 use App\Models\SalesLeadFloor;
 use App\Models\SalesLeadLocationInfo;
@@ -67,66 +73,126 @@ class SalesInterfaceController extends Controller
                 ['id' => 3, 'dept_name' => 'Rupganj'],
                 ['id' => 4, 'dept_name' => 'Dhanmondi'],
             ];
-            return view('back-end/sales/add-lead', compact('depts', 'branches', 'leadWiseLocations','companies'));
+            return view('back-end/sales/add-lead', compact('depts', 'branches', 'leadWiseLocations', 'companies'));
         } catch (\Throwable $exception) {
             return back()->with('error', $exception->getMessage())->withInput();
         }
     }
-    public function addLeadStep1(Request $request){
-        $lead = Lead::create($request->add_lead_step1_data);
-        if($lead){
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Lead Creation Step 1 Completed.',
-                'company_id'=>$lead->company_id
-            ]);
-        }else{
+    public function addLeadStep1(Request $request)
+    {
+        try{
+            $addLeadStep1Data = $request->add_lead_step1_data;
+            $addLeadStep1Data['created_by']=Auth::id();
+            $alternateMobiles=$request->alternate_mobiles;
+            $alternateEmails=$request->alternate_emails;
+            $lead = Lead::create($addLeadStep1Data );
+            if(!empty($alternateMobiles)){
+                $mobileToInsert=[];
+                $now = now();
+                foreach($alternateMobiles as $differentMobile){
+                    $mobileToInsert[]=[
+                        'lead_id'=>$lead->id,
+                        'company_id'=>$lead->company_id,
+                        'status'=>'1',
+                        'mobile'=>$differentMobile,
+                        'created_by'=>Auth::id(),
+                        'created_at'=>$now,
+                        'updated_at'=>$now
+                    ];
+                }
+                $extraMobile = ExtraMobile::insert($mobileToInsert);
+                if(!$extraMobile){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Unable To Add Extra Mobile Number.',
+                    ]);
+                }
+            }
+            if(!empty($alternateEmails)){
+                $emailToInsert=[];
+                $now = now();
+                foreach($alternateEmails as $differentEmail){
+                    $emailToInsert[]=[
+                        'lead_id'=>$lead->id,
+                        'company_id'=>$lead->company_id,
+                        'status'=>'1',
+                        'email'=>$differentEmail,
+                        'created_by'=>Auth::id(),
+                        'created_at'=>$now,
+                        'updated_at'=>$now
+                    ];
+                }
+                $extraEmail = ExtraEmail::insert($emailToInsert);
+                if(!$extraEmail){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Unable To Add Extra Email.',
+                    ]);
+                }
+            }
+            if ($lead) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Lead Creation Step 1 Completed.',
+                    'company_id' => $lead->company_id,
+                    'lead_id'=>$lead->id
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unable to Create Lead Step 1.'
+                ]);
+            }
+        }catch(\Throwable $exception){
             return response()->json([
                 'status' => 'error',
-                'message' => 'Operation Failed.'
+                'message' => 'Error'
             ]);
         }
     }
-    public function addLeadStep2(Request $request){
+    public function addLeadStep2(Request $request)
+    {
         $lead = 1;
-        if($lead){
+        if ($lead) {
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lead Creation Step 2 Completed.',
                 // 'company_id'=>$lead->company_id
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Operation Failed.'
             ]);
         }
     }
-    public function addLeadStep3(Request $request){
+    public function addLeadStep3(Request $request)
+    {
         $lead = 1;
-        if($lead){
+        if ($lead) {
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lead Creation Step 3 Completed.',
                 // 'company_id'=>$lead->company_id
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Operation Failed.'
             ]);
         }
     }
-    public function addLeadStep4(Request $request){
+    public function addLeadStep4(Request $request)
+    {
         $lead = 1;
-        if($lead){
+        if ($lead) {
             return response()->json([
                 'status' => 'success',
                 'message' => 'Lead Creation
                  Completed.',
                 // 'company_id'=>$lead->company_id
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Operation Failed.'
@@ -150,7 +216,8 @@ class SalesInterfaceController extends Controller
             return back()->with('error', $exception->getMessage())->withInput();
         }
     }
-    public function saleSettingsInterface(){
+    public function saleSettingsInterface()
+    {
         try {
             $permission = $this->permissions()->sale_settings;
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
@@ -292,7 +359,7 @@ class SalesInterfaceController extends Controller
             $salesProfessionData = SalesProfession::query()->where(function ($query) use ($selectedId) {
                 $query->where('company_id', $selectedId)
                     ->where('status', 1)
-                    ->where('is_parent',1);
+                    ->where('is_parent', 1);
             })->orWhere('company_id', 0)->get();
             if (!$salesProfessionData->isEmpty()) {
                 return response()->json([
@@ -316,7 +383,7 @@ class SalesInterfaceController extends Controller
             $salesSourceData = SalesLeadSourceInfo::query()->where(function ($query) use ($selectedId) {
                 $query->where('company_id', $selectedId)
                     ->where('status', 1)
-                    ->where('is_parent',1);
+                    ->where('is_parent', 1);
             })->orWhere('company_id', 0)->get();
             if (!$salesSourceData->isEmpty()) {
                 return response()->json([
@@ -359,13 +426,13 @@ class SalesInterfaceController extends Controller
     public function setDataOfApartment($modal, $param_for_edit, $blade, $filteredSubTableData, $show_output)
     {
         try {
-            $company_id_title_duplicate_check = $modal::where('company_id',$filteredSubTableData['company_id'])
-                                                        ->where('title',$filteredSubTableData['title'])
-                                                        ->when($param_for_edit,function($query,$param_for_edit){
-                                                            $query->where('id','!=',$param_for_edit);
-                                                        })
-                                                        ->exists();
-            if($company_id_title_duplicate_check){
+            $company_id_title_duplicate_check = $modal::where('company_id', $filteredSubTableData['company_id'])
+                ->where('title', $filteredSubTableData['title'])
+                ->when($param_for_edit, function ($query, $param_for_edit) {
+                    $query->where('id', '!=', $param_for_edit);
+                })
+                ->exists();
+            if ($company_id_title_duplicate_check) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Company and Title Already Exists'
@@ -600,69 +667,68 @@ class SalesInterfaceController extends Controller
     public function deleteTypeMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesLeadApartmentType::class, DeleteTypeMultipleHistory::class, $ids,'back-end.sales.sales-lead-apartment-type-list','output_sales_lead_apartment_type');
+        $result = $this->deleteMultiple(SalesLeadApartmentType::class, DeleteTypeMultipleHistory::class, $ids, 'back-end.sales.sales-lead-apartment-type-list', 'output_sales_lead_apartment_type');
         return response()->json($result);
     }
     public function deleteSalesLeadApartmentSizeMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesLeadApartmentSize::class, DeleteSalesApartmentSizeMultipleHistory::class, $ids,'back-end.sales.sales-lead-apartment-size-list','output_sales_lead_apartment_size');
+        $result = $this->deleteMultiple(SalesLeadApartmentSize::class, DeleteSalesApartmentSizeMultipleHistory::class, $ids, 'back-end.sales.sales-lead-apartment-size-list', 'output_sales_lead_apartment_size');
         return response()->json($result);
     }
     public function deleteSalesLeadViewMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesLeadView::class, DeleteSalesLeadViewMultipleHistory::class, $ids,'back-end.sales.sales-lead-view-list','output_sales_lead_view');
+        $result = $this->deleteMultiple(SalesLeadView::class, DeleteSalesLeadViewMultipleHistory::class, $ids, 'back-end.sales.sales-lead-view-list', 'output_sales_lead_view');
         return response()->json($result);
     }
     public function deleteSalesLeadBudgetMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesLeadBudget::class, DeleteSalesLeadBudgetMultipleHistory::class, $ids,'back-end.sales.sales-lead-budget-list','output_sales_lead_budget');
+        $result = $this->deleteMultiple(SalesLeadBudget::class, DeleteSalesLeadBudgetMultipleHistory::class, $ids, 'back-end.sales.sales-lead-budget-list', 'output_sales_lead_budget');
         return response()->json($result);
     }
     public function deleteSalesLeadSourceMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesLeadSourceInfo::class, DeleteSalesLeadSourceMultipleHistory::class, $ids,'back-end.sales.sales-lead-source-info-list','output_sales_lead_source_info');
+        $result = $this->deleteMultiple(SalesLeadSourceInfo::class, DeleteSalesLeadSourceMultipleHistory::class, $ids, 'back-end.sales.sales-lead-source-info-list', 'output_sales_lead_source_info');
         return response()->json($result);
     }
     public function deleteSalesLeadProfessionMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesProfession::class, DeleteSalesLeadProfessionMultipleHistory::class, $ids,'back-end.sales.sales-lead-profession-list','output_sales_lead_profession');
+        $result = $this->deleteMultiple(SalesProfession::class, DeleteSalesLeadProfessionMultipleHistory::class, $ids, 'back-end.sales.sales-lead-profession-list', 'output_sales_lead_profession');
         return response()->json($result);
     }
     public function deleteSalesLeadLocationMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesLeadLocationInfo::class, DeleteSalesLeadLocationMultipleHistory::class, $ids,'back-end.sales.sales-lead-location-info-list','output_sales_lead_location_info');
+        $result = $this->deleteMultiple(SalesLeadLocationInfo::class, DeleteSalesLeadLocationMultipleHistory::class, $ids, 'back-end.sales.sales-lead-location-info-list', 'output_sales_lead_location_info');
         return response()->json($result);
     }
     public function deleteSalesLeadFloorMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesLeadFloor::class, DeleteSalesLeadFloorMultipleHistory::class, $ids,'back-end.sales.sales-lead-floor-list','output_sales_lead_floor');
+        $result = $this->deleteMultiple(SalesLeadFloor::class, DeleteSalesLeadFloorMultipleHistory::class, $ids, 'back-end.sales.sales-lead-floor-list', 'output_sales_lead_floor');
         return response()->json($result);
     }
     public function deleteSalesLeadStatusMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesLeadStatusInfo::class, DeleteSalesLeadStatusMultipleHistory::class, $ids,'back-end.sales.sales-lead-status-info-list','output_sales_lead_status_info');
+        $result = $this->deleteMultiple(SalesLeadStatusInfo::class, DeleteSalesLeadStatusMultipleHistory::class, $ids, 'back-end.sales.sales-lead-status-info-list', 'output_sales_lead_status_info');
         return response()->json($result);
     }
     public function deleteSalesLeadFacingMultiple(Request $request)
     {
         $ids = $request->selected;
-        $result=$this->deleteMultiple(SalesLeadFacing::class, DeleteSalesLeadFacingMultipleHistory::class, $ids,'back-end.sales.sales-lead-facing-list','output_sales_lead_facing');
+        $result = $this->deleteMultiple(SalesLeadFacing::class, DeleteSalesLeadFacingMultipleHistory::class, $ids, 'back-end.sales.sales-lead-facing-list', 'output_sales_lead_facing');
         return response()->json($result);
     }
-    private function deleteMultiple($modal, $modalHistory, $ids,$blade,$output)
+    private function deleteMultiple($modal, $modalHistory, $ids, $blade, $output)
     {
         try {
             DB::beginTransaction();
             $modalHistoryData = $modal::whereIn('id', $ids)->get();
-            // Log::info(json_encode($modalHistoryData,JSON_PRETTY_PRINT));
             $historyProcess = $modalHistoryData->map(function ($item) {
                 $commonData = [
                     'old_id' => $item->id,
@@ -687,28 +753,28 @@ class SalesInterfaceController extends Controller
                 if (!empty($item->is_parent)) {
                     $commonData['is_parent'] = $item->is_parent;
                 }
-                if (property_exists($item,'parent_id')) {
+                if (property_exists($item, 'parent_id')) {
                     $commonData['parent_id'] = $item->parent_id ?? null;
                 }
-                
-                if (isset($item->is_parent) && $item->is_parent==0) {
+
+                if (isset($item->is_parent) && $item->is_parent == 0) {
                     $commonData['is_parent'] = 0;
                 }
                 return $commonData;
             })->toArray();
             $historyCreate = $modalHistory::insert($historyProcess);
             $multipleDelete = $modal::whereIn('id', $ids)->delete();
-            if($historyCreate && $multipleDelete ){
+            if ($historyCreate && $multipleDelete) {
                 $getSaleSubTableData = $this->getDataOfApartment($modal);
                 $view = view($blade, compact('getSaleSubTableData'))->render();
                 DB::commit();
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Data Deleted Successfully',
-                    'data'=>$view,
-                    'output'=>$output
+                    'data' => $view,
+                    'output' => $output
                 ]);
-            }else{
+            } else {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Data Delation Fail',
@@ -722,63 +788,308 @@ class SalesInterfaceController extends Controller
             ]);
         }
     }
-    public function getSaleEmployeeEntry(Request $request){
-                if($request->isMethod('post')){
-                    try{
-                        $data = $request->input('sales_employee_entry_data');
-                        $company_id = $data['company_id'];
-                        $users = $data['user'];
-                        if($company_id=='' || $users==''){
-                            return response()->json([
-                                'status' => 'error',
-                                'message' => 'Operation Failed',
-                            ]);
-                        }
-                        $now = now();
-                        $processed_sales_employee_entry_data=collect($users)->map(function($user_id) use($company_id,$now){
-                            return[
-                                'company_id'=>$company_id,
-                                'employee_id'=>$user_id,
-                                'created_by'=>auth()->user()->id,
-                                'created_at' => $now,
-                                'updated_at' => $now
-                            ];
-                        })->toArray();
-                        $sales_employee_entry = SalesEmployeeEntry::insert($processed_sales_employee_entry_data);
-                        $fetchedSaleEmployeeEntryData = $this->fetchSaleEmployeeEntry();
-                        $view = view('back-end.sales._sell-employee-entry',compact('fetchedSaleEmployeeEntryData'))->render();
-                        if($sales_employee_entry && $fetchedSaleEmployeeEntryData){
-                            return response()->json([
-                                'status' => 'success',
-                                'message' => 'Sales Employee Entry Added Successfully ',
-                                'data'=>$view
-                            ]);
-                        }else{
-                            throw new Exception('Operation Failed');
-                        }
-                    }catch(\Throwable $exception){
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'Operation Failed ' . $exception->getMessage()
-                        ]);
-                    }
-                }else if($request->isMethod('get')){
-                    try{
-                        $companies = $this->getCompany()->get();
-                        $fetchedSaleEmployeeEntryData= SalesEmployeeEntry::with(['company','user'])->get();
-                        if($companies && $fetchedSaleEmployeeEntryData){
-                            return view('back-end.sales.sell-employee-entry',compact('companies','fetchedSaleEmployeeEntryData'));
-                        }else{
-                            throw new Exception('Operation Failed');
-                        } 
-                    }catch(\Throwable $exception){
-                        return back()->with('error', $exception->getMessage())->withInput();
-                    }
-                    
+    public function getSaleEmployeeEntry(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            try {
+                $data = $request->input('sales_employee_entry_data');
+                $company_id = $data['company_id'];
+                $users = $data['user'];
+                $leader_id_of_specific_company = $data['leader_id_of_specific_company'];
+                if (empty($company_id) || empty($users) || empty($leader_id_of_specific_company)) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Please Fill Required Field',
+                    ]);
                 }
+                $sales_lead_employee_duplicate_check = SalesEmployeeEntry::where('company_id', $company_id)
+                    ->whereIn('employee_id', $users)
+                    ->where('leader_id', $leader_id_of_specific_company)
+                    ->exists();
+                if ($sales_lead_employee_duplicate_check) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Company and User Already Exists'
+                    ]);
+                }
+                $now = now();
+                $processed_sales_employee_entry_data = collect($users)->map(function ($user_id) use ($company_id, $now, $leader_id_of_specific_company) {
+                    return [
+                        'company_id' => $company_id,
+                        'employee_id' => $user_id,
+                        'leader_id' => $leader_id_of_specific_company,
+                        'created_by' => auth()->user()->id,
+                        'created_at' => $now,
+                        'updated_at' => $now
+                    ];
+                })->toArray();
+                $sales_employee_entry = SalesEmployeeEntry::insert($processed_sales_employee_entry_data);
+                $fetchedSaleEmployeeEntryData = $this->fetchSaleEmployeeEntry();
+                // $fetchedSaleLeaderEntryData = $this->fetchSaleLeaderEntry();
+                $view = view('back-end.sales._sell-employee-entry', compact('fetchedSaleEmployeeEntryData'))->render();
+                if ($sales_employee_entry && $fetchedSaleEmployeeEntryData) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Sales Employee Entry Added Successfully ',
+                        'data' => $view
+                    ]);
+                } else {
+                    throw new Exception('Operation Failed');
+                }
+            } catch (\Throwable $exception) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Operation Failed ' . $exception->getMessage()
+                ]);
+            }
+        } else if ($request->isMethod('get')) {
+            try {
+                $companies = $this->getCompany()->get();
+                $fetchedSaleEmployeeEntryData = SalesEmployeeEntry::with(['company', 'user', 'createdByUser', 'leader'])->get();
+                $fetchedSaleLeaderEntryData = SalesLeaderEntry::with(['company', 'user', 'createdByUser'])->get();
+                if ($companies && $fetchedSaleEmployeeEntryData && $fetchedSaleLeaderEntryData) {
+                    return view('back-end.sales.sell-employee-entry', compact('companies', 'fetchedSaleEmployeeEntryData', 'fetchedSaleLeaderEntryData'));
+                } else {
+                    throw new Exception('Operation Failed');
+                }
+            } catch (\Throwable $exception) {
+                return back()->with('error', $exception->getMessage())->withInput();
+            }
+
+        }
     }
-    private function fetchSaleEmployeeEntry(){
-       return SalesEmployeeEntry::with(['company','user'])->get();
+    private function fetchSaleEmployeeEntry()
+    {
+        return SalesEmployeeEntry::with(['company', 'user', 'createdByUser', 'leader'])->get();
     }
+    private function fetchSaleLeaderEntry()
+    {
+        return SalesLeaderEntry::with(['company', 'user', 'createdByUser'])->get();
+    }
+    public function getSaleLeaderEntry(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            try {
+                $data = $request->input('sales_leader_entry_data');
+                $company_id = $data['company_id'];
+                $leaders = $data['leader'];
+                if (empty($company_id) || empty($leaders)) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Please Fill Required Field',
+                    ]);
+                }
+                $sales_lead_entry_duplicate_check = SalesLeaderEntry::where('company_id', $company_id)
+                    ->whereIn('employee_id', $leaders)
+                    ->exists();
+                if ($sales_lead_entry_duplicate_check) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Company and User Already Exists'
+                    ]);
+                }
+                $now = now();
+                $processed_sales_leader_entry_data = collect($leaders)->map(function ($leader_id) use ($company_id, $now) {
+                    return [
+                        'company_id' => $company_id,
+                        'employee_id' => $leader_id,
+                        'created_by' => auth()->user()->id,
+                        'created_at' => $now,
+                        'updated_at' => $now
+                    ];
+                })->toArray();
+                $sales_leader_entry = SalesLeaderEntry::insert($processed_sales_leader_entry_data);
+                $fetchedSaleLeaderEntryData = $this->fetchSaleLeaderEntry();
+                $view = view('back-end.sales._sell-leader-entry', compact('fetchedSaleLeaderEntryData'))->render();
+                if ($sales_leader_entry && $fetchedSaleLeaderEntryData) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Sales Leader Entry Added Successfully ',
+                        'data' => $view
+                    ]);
+                } else {
+                    throw new Exception('Operation Failed');
+                }
+            } catch (\Throwable $exception) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Operation Failed ' . $exception->getMessage()
+                ]);
+            }
+        }
+    }
+    public function getSaleCompanyWiseLeader(Request $request)
+    {
+        $get_sales_leader = SalesLeaderEntry::with(['company', 'user', 'createdByUser'])->where('company_id', $request->company_id)->get();
+        if ($get_sales_leader) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Successfull',
+                'get_sales_leader' => $get_sales_leader
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed '
+            ]);
+        }
+    }
+    public function getSaleEmployeeEntryEdit(Request $request)
+    {
+        $sales_employee_entry_edit = SalesLeaderEntry::with('user')->select('id', 'employee_id')->get();
+        if ($sales_employee_entry_edit) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Successfull',
+                'sales_employee_entry_edit' => $sales_employee_entry_edit
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed '
+            ]);
+        }
+    }
+    public function getSaleEmployeeEntryLeaderUpdate(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $update_id = $request->update_id;
+            $sales_employee_entry_leader_update = SalesEmployeeEntry::where('id', $request->update_id)->update([
+                'leader_id' => $request->update_leader
+            ]);
+            $fetchedSaleEmployeeEntryData = $this->fetchSaleEmployeeEntry();
+            $salesEmployeeLeaderHistory = $fetchedSaleEmployeeEntryData->where('id', $request->update_id)->first();
+            $sales_employee_entry_leader_history = SalesEmployeeEntryLeaderEditHistory::create([
+                'company_id' => $salesEmployeeLeaderHistory->company_id,
+                'employee_id' => $salesEmployeeLeaderHistory->employee_id,
+                'leader_id' => $salesEmployeeLeaderHistory->leader_id,
+                'previous_leader_created_time' => $salesEmployeeLeaderHistory->created_at,
+                'current_leader_created_time' => now(),
+                'created_by' => auth()->user()->id
+            ]);
+            $view = view('back-end.sales._sell-employee-entry', compact('fetchedSaleEmployeeEntryData'))->render();
+            if ($sales_employee_entry_leader_update && $sales_employee_entry_leader_history) {
+                DB::commit();
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data Updated Successfully',
+                    'data' => $view
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Operation Failed '
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed ' . $exception->getMessage()
+            ]);
+        }
+    }
+    public function deleteSalesEmployeeEntryMultiple(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $ids = $request->selected;
+            $salesEmployeeEntries = SalesEmployeeEntry::whereIn('id', $ids)->get();
+            Log::info(json_encode($salesEmployeeEntries,JSON_PRETTY_PRINT));
+            $now = now();
+            $historyProcess = $salesEmployeeEntries->map(function ($item) use($now) {
+                $data = [
+                    'old_id' => $item->id,
+                    'old_created_by' => $item->created_by,
+                    'old_updated_by' => $item->updated_by,
+                    'old_created_at' => $item->created_at,
+                    'old_updated_at' => $item->updated_at,
+                    'created_by' => Auth::id(),
+                    'updated_by' => null,
+                    'company_id' => $item->company_id,
+                    'employee_id' => $item->employee_id,
+                    'leader_id' => $item->leader_id,
+                    'created_at'=>$now,
+                    'updated_at'=>$now
+                ];
+                return $data;
+            })->toArray();
+            $historyCreate = DeleteSalesEmployeeEntryMultipleHistory::insert($historyProcess);
+            $multipleDelete = SalesEmployeeEntry::whereIn('id', $ids)->delete();
+            if ($historyCreate && $multipleDelete) {
+                $fetchedSaleEmployeeEntryData = $this->fetchSaleEmployeeEntry();
+                $view = view('back-end.sales._sell-employee-entry', compact('fetchedSaleEmployeeEntryData'))->render();
+                DB::commit();
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data Deleted Successfully',
+                    'data' => $view,
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Data Delation Fail',
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed ' . $exception->getMessage()
+            ]);
+        }
+
+    }
+    public function deleteSalesLeaderEntryMultiple(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $ids = $request->selected;
+            $salesLeaderEntries = SalesLeaderEntry::whereIn('id', $ids)->get();
+            $now = now();
+            $historyProcess = $salesLeaderEntries->map(function ($item) use($now) {
+                $data = [
+                    'old_id' => $item->id,
+                    'old_created_by' => $item->created_by,
+                    'old_updated_by' => $item->updated_by,
+                    'old_created_at' => $item->created_at,
+                    'old_updated_at' => $item->updated_at,
+                    'created_by' => Auth::id(),
+                    'updated_by' => null,
+                    'company_id' => $item->company_id,
+                    'employee_id' => $item->employee_id,
+                    'created_at'=>$now,
+                    'updated_at'=>$now
+                ];
+                return $data;
+            })->toArray();
+            $historyCreate = DeleteSalesLeaderEntryMultipleHistory::insert($historyProcess);
+            $multipleDelete = SalesLeaderEntry::whereIn('id', $ids)->delete();
+            if ($historyCreate && $multipleDelete) {
+                $fetchedSaleLeaderEntryData = $this->fetchSaleLeaderEntry();
+                $view = view('back-end.sales._sell-leader-entry', compact('fetchedSaleLeaderEntryData'))->render();
+                DB::commit();
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data Deleted Successfully',
+                    'data' => $view,
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Data Delation Fail',
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed ' . $exception->getMessage()
+            ]);
+        }
+
+    }
+    
 
 }

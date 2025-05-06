@@ -3134,7 +3134,7 @@ let SalesSetting = {};
                     },
                 });
             },
-            companyWiseUsersForSalesEmployeeEntry: function (e) {
+            companyWiseUsersForSalesEmployeeEntry: function (e,output) {
                 let id = $(e).val();
                 if (id.length === 0) {
                     return false;
@@ -3160,10 +3160,12 @@ let SalesSetting = {};
                         } else if (response.status === "success") {
                             updateSelectBox(
                                 response.data,
-                                "action_id",
+                                output,
                                 "id",
                                 "name"
                             );
+                            Sales.salesCompanyWiseLeader(id)
+                            return;
                         }
                     },
                 });
@@ -4412,6 +4414,42 @@ let SalesSetting = {};
                     primary_email: $("#primary_email").val(),
                     notes: $("#notes").val(),
                 };
+                if(!add_lead_step1_data.full_name || !add_lead_step1_data.full_name || !add_lead_step1_data.company_id || !add_lead_step1_data.primary_email){
+                    alert("Comapany, Full Name, Primary Mobile and Primary Email is Required.")
+                    return false;
+                }
+                let alternate_mobiles={};
+                if($("#mobile_1").length && $("#mobile_1").val().trim()!==''){
+                    alternate_mobiles.mobile_1=$("#mobile_1").val().trim();
+                }
+                if($("#mobile_2").length && $("#mobile_2").val().trim()!==''){
+                    alternate_mobiles.mobile_2=$("#mobile_2").val().trim();
+                }
+                if($("#mobile_3").length && $("#mobile_3").val().trim()!==''){
+                    alternate_mobiles.mobile_3=$("#mobile_3").val().trim();
+                }
+                if($("#mobile_4").length && $("#mobile_4").val().trim()!==''){
+                    alternate_mobiles.mobile_4=$("#mobile_4").val().trim();
+                }
+                if($("#mobile_5").length && $("#mobile_5").val().trim()!==''){
+                    alternate_mobiles.mobile_5=$("#mobile_5").val().trim();
+                }
+                let alternate_emails={};
+                if($("#email_1").length && $("#email_1").val().trim()!==''){
+                    alternate_emails.email_1=$("#email_1").val().trim();
+                }
+                if($("#email_2").length && $("#email_2").val().trim()!==''){
+                    alternate_emails.email_2=$("#email_2").val().trim();
+                }
+                if($("#email_3").length && $("#email_3").val().trim()!==''){
+                    alternate_emails.email_3=$("#email_3").val().trim();
+                }
+                if($("#email_4").length && $("#email_4").val().trim()!==''){
+                    alternate_emails.email_4=$("#email_4").val().trim();
+                }
+                if($("#email_5").length && $("#email_5").val().trim()!==''){
+                    alternate_emails.email_5=$("#email_5").val().trim();
+                }
                 const url =
                     window.location.origin + sourceDir + "/add-lead-step1";
 
@@ -4423,21 +4461,117 @@ let SalesSetting = {};
                         ),
                     },
                     method: "POST",
-                    data: { add_lead_step1_data },
+                    data: { add_lead_step1_data,alternate_mobiles,alternate_emails },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             alert(response.message);
                             let form = Sales.addLeadStep2Form(
-                                response.company_id
+                                response.lead_id,response.company_id
                             );
                             $("#commonSlot_for_multiple_step").html(form);
+                            Sales.getSalesProfessionMainProfession(response.company_id)
                         }
                     },
                 });
 
                 return false;
+            },
+            getSalesProfessionMainProfession:function(company_id){
+                const url =
+                window.location.origin + sourceDir + "/add-lead-step1";
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "GET",
+                    data: { add_lead_step1_data,alternate_mobiles,alternate_emails },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            let form = Sales.addLeadStep2Form(
+                                response.lead_id,response.company_id
+                            );
+                            $("#commonSlot_for_multiple_step").html(form);
+                        }
+                    },
+                });
+            },
+            addLeadStep2Form: function (lead_id,company_id) {
+                return `
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                                <input type="hidden" value="${company_id}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                                <input type="hidden" value="${lead_id}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession"
+                                placeholder="profession">
+                            <datalist id="profession-list">
+                                <option value="Business">Business</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Solder">Solder</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Engineer">Engineer</option>
+                                <option value="Bankar">Bankar</option>
+                                <option value="Politician">Politician</option>
+                                <option value="Actor">Actor</option>
+                            </datalist>
+                            <label for="branch">Main Profession <span class="text-danger">*</span></label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession"
+                                placeholder="profession">
+                            <datalist id="profession-list">
+                                <option value="Business">Business</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Solder">Solder</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Engineer">Engineer</option>
+                                <option value="Bankar">Bankar</option>
+                                <option value="Politician">Politician</option>
+                                <option value="Actor">Actor</option>
+                            </datalist>
+                            <label for="branch">Profession <span class="text-danger">*</span></label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="company" name="company" placeholder="Company Of Lead">
+                            <label for="company">Company Of Lead</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-5">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="designation" name="designation"
+                                    placeholder="Designation Of Lead">
+                                <label for="designation">Designation Of Lead</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep2()"><i class="fa-solid fa-arrow-right"></i>
+                            Next</button>
+                    </div>
+            </div>
+                `;
             },
             addLeadStep2: function () {
                 // let add_lead_step1_data = {
@@ -4543,71 +4677,6 @@ let SalesSetting = {};
                 });
 
                 return false;
-            },
-            addLeadStep2Form: function (company_id) {
-                return `
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="form-group">
-                                <input type="hidden" value="${company_id}">
-                        </div>
-                    </div>
-                    <div class="col-md-6"></div>
-                    <div class="col-md-2">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession"
-                                placeholder="profession">
-                            <datalist id="profession-list">
-                                <option value="Business">Business</option>
-                                <option value="Teacher">Teacher</option>
-                                <option value="Solder">Solder</option>
-                                <option value="Doctor">Doctor</option>
-                                <option value="Engineer">Engineer</option>
-                                <option value="Bankar">Bankar</option>
-                                <option value="Politician">Politician</option>
-                                <option value="Actor">Actor</option>
-                            </datalist>
-                            <label for="branch">Main Profession <span class="text-danger">*</span></label>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession"
-                                placeholder="profession">
-                            <datalist id="profession-list">
-                                <option value="Business">Business</option>
-                                <option value="Teacher">Teacher</option>
-                                <option value="Solder">Solder</option>
-                                <option value="Doctor">Doctor</option>
-                                <option value="Engineer">Engineer</option>
-                                <option value="Bankar">Bankar</option>
-                                <option value="Politician">Politician</option>
-                                <option value="Actor">Actor</option>
-                            </datalist>
-                            <label for="branch">Profession <span class="text-danger">*</span></label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="company" name="company" placeholder="Company">
-                            <label for="company">Company</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-5">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="designation" name="designation"
-                                    placeholder="Designation">
-                                <label for="designation">Designation</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep2()"><i class="fa-solid fa-arrow-right"></i>
-                            Next</button>
-                    </div>
-            </div>
-                `;
             },
             addLeadStep3Form: function () {
                 return `
@@ -4826,8 +4895,13 @@ let SalesSetting = {};
             salesEmployeeEntry: function () {
                 let sales_employee_entry_data = {
                     company_id: $("#company").val(),
-                    user: $("#action_id").val(),
+                    user: $("#user").val(),
+                    leader_id_of_specific_company:$("#leader_id_of_specific_company").val()
                 };
+                if(!sales_employee_entry_data.company_id || !sales_employee_entry_data.user || !sales_employee_entry_data.leader_id_of_specific_company){
+                    alert('Company,User or Leader is required')
+                    return;
+                }
                 const url =
                     window.location.origin +
                     sourceDir +
@@ -4850,6 +4924,223 @@ let SalesSetting = {};
                             $("#partial_sell_employee_entry").html(
                                 response.data
                             );
+                        }
+                    },
+                });
+            },
+            saleEmployeeEntryEdit:function(update_id,employee_id){
+                const url =
+                window.location.origin +
+                sourceDir +
+                "/get-sale-employee-entry-edit";
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "GET",
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            let $select = $("#update_leader");
+                            $select.empty();
+                            $.each(response.sales_employee_entry_edit,function(index,item){
+                                let $option=$("<option></option>")
+                                            .attr("value",item.employee_id)
+                                            .text(item.user.name);
+                                $select.append($option)
+                            });
+                            $select.val(employee_id)
+                            $("#leader_update_btn").attr("onclick",`Sales.saleEmployeeEntryLeaderUpdate(${update_id})`);
+                            $("#modal_to_update_leader_of_employee").modal('show');
+                        }
+                    },
+                });
+            },
+            saleEmployeeEntryLeaderUpdate:function(update_id){
+                const url =
+                window.location.origin +
+                sourceDir +
+                "/get-sale-employee-entry-leader-update";
+                let update_leader=$("#update_leader").val();
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data:{update_id,update_leader},
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message)
+                            $("#modal_to_update_leader_of_employee").modal('hide');
+                            $("#partial_sell_employee_entry").html(response.data)
+                        }
+                    },
+                });
+            },
+            deleteSalesEmployeeEntryMultiple:function(){
+                let selected=[];
+                $("."+"check-box-employee"+":checked").each(function () {
+                    selected.push($(this).val());
+                });
+                if (selected.length === 0) {
+                    alert("Please select at least one record to delete.");
+                    return;
+                }
+
+                if (
+                    confirm("Are you sure you want to delete selected records?")
+                ) {
+                    let url = window.location.origin + sourceDir + '/delete-sales-employee-entry-multiple';
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "DELETE",
+                        data: {
+                            selected: selected,
+                        },
+                        success: function (response) {
+                            if (response.status == "success") {
+                                alert(response.message);
+                                $("#partial_sell_employee_entry").html(
+                                    response.data
+                                );
+                            } else if (response.status == "error") {
+                                alert(response.message);
+                            }
+
+                            //location.reload();
+                        },
+                        error: function (error) {
+                            alert("An error occurred while deleting records.");
+                        },
+                    });
+                }
+            },
+            deleteSalesLeaderEntryMultiple:function(){
+                let selected=[];
+                $("."+"check-box-leader"+":checked").each(function () {
+                    selected.push($(this).val());
+                });
+                if (selected.length === 0) {
+                    alert("Please select at least one record to delete.");
+                    return;
+                }
+
+                if (
+                    confirm("Are you sure you want to delete selected records?")
+                ) {
+                    let url = window.location.origin + sourceDir + '/delete-sales-leader-entry-multiple';
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "DELETE",
+                        data: {
+                            selected: selected,
+                        },
+                        success: function (response) {
+                            if (response.status == "success") {
+                                alert(response.message);
+                                $("#partial_sell_leader_entry").html(
+                                    response.data
+                                );
+                            } else if (response.status == "error") {
+                                alert(response.message);
+                            }
+
+                            //location.reload();
+                        },
+                        error: function (error) {
+                            alert("An error occurred while deleting records.");
+                        },
+                    });
+                }
+            },
+            salesLeaderEntry: function () {
+                let sales_leader_entry_data = {
+                    company_id: $("#company_leader").val(),
+                    leader: $("#leader").val(),
+                };
+                if(!sales_leader_entry_data.company_id || !sales_leader_entry_data.leader){
+                    alert('Company or Leader is required')
+                    return;
+                }
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/get-sale-leader-entry";
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { sales_leader_entry_data },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            $("#partial_sell_leader_entry").html(
+                                response.data
+                            );
+                        }
+                    },
+                });
+            },
+            salesCompanyWiseLeader:function(company_id){
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/sales-company-wise-leader";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "GET",
+                    data:{company_id:company_id},
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            let res = response.get_sales_leader;
+                            console.log(res);
+                            let $select = $("#leader_id_of_specific_company");
+                            $select.empty();
+                            $select.append('<option value="">Select One...</option>')
+                            $.each(res,function(index,item){
+                                if(item.user){
+                                    let option= $("<option></option>")
+                                    .attr("value",item.user.id)
+                                    .text(item.user.name)
+                                     $select.append(option)
+                                }
+                            });
+                            
                         }
                     },
                 });

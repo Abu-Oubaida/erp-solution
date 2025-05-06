@@ -80,7 +80,7 @@
                                     </div>
                                     <div class="col-12">
                                         <div class="form-floating">
-                                            <input class="form-control" id="phone2" type="number" placeholder="Enter phone 1" />
+                                            <input class="form-control" id="mobile_1" type="number" placeholder="Enter phone 1" />
                                             <label for="phone2">Alternative Mobile 1</label>
                                         </div>
                                     </div>
@@ -103,7 +103,7 @@
                                     </div>
                                     <div class="col-12">
                                         <div class="form-floating">
-                                            <input class="form-control" id="alternative_email_1" type="email"
+                                            <input class="form-control" id="email_1" type="email"
                                                 placeholder="Enter Email 2" />
                                             <label for="alternative_email_1">Alternative Email 1</label>
                                         </div>
