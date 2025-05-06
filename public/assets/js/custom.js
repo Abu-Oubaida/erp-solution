@@ -30,9 +30,70 @@ let Requsition  = {};
         const materialsTempList = [];
         var extraMobileNumberCount = 2;
         var extraEmailAddressCount = 2;
-        $(".select-search").selectize({
-            create: false,
-            sortField: "text",
+        $("select.select-search").each(function () {
+            const isMultiple = $(this).prop("multiple");
+
+            const selectizeInstance = $(this).selectize({
+                plugins: isMultiple ? ['remove_button'] : [],
+                create: false,
+                closeAfterSelect: false,
+                sortField: 'text',
+                render: {
+                    option: function(item, escape) {
+                        if (item.value === '__select_all__') {
+                            return '<div class="selectize-dropdown-header"><strong>Select all matching: "' + escape(item.text) + '"</strong></div>';
+                        }
+                        return '<div>' + escape(item.text) + '</div>';
+                    }
+                },
+                onType: function(search) {
+                    const selectize = this;
+
+                    // Skip if not multiple
+                    if (!isMultiple) return;
+
+                    selectize.lastQueryTyped = search;
+                    selectize.removeOption('__select_all__');
+
+                    const results = selectize.search(search).items;
+
+                    if (search.length && results.length > 1) {
+                        selectize.addOption({
+                            value: '__select_all__',
+                            text: search
+                        });
+                        selectize.refreshOptions(false);
+                    }
+                },
+                onItemAdd: function(value) {
+                    const selectize = this;
+
+                    if (value === '__select_all__') {
+                        // Skip if not multiple
+                        if (!isMultiple) return;
+
+                        selectize.removeItem('__select_all__');
+                        selectize.removeOption('__select_all__');
+
+                        const matches = selectize.search(selectize.lastQueryTyped).items;
+                        matches.forEach(item => {
+                            if (!selectize.items.includes(item.id)) {
+                                selectize.addItem(item.id);
+                            }
+                        });
+
+                        setTimeout(() => {
+                            selectize.$control_input.val(selectize.lastQueryTyped).trigger('keyup');
+                            selectize.focus();
+                        }, 0);
+                    } else {
+                        setTimeout(() => {
+                            selectize.$control_input.val(selectize.lastQueryTyped).trigger('keyup');
+                            selectize.focus();
+                        }, 0);
+                    }
+                }
+            });
         });
         $(".select-search-with-create").selectize({
             create: true,
@@ -3214,7 +3275,7 @@ let Requsition  = {};
                     },
                 });
             },
-            companyWiseProjects: function (e, action_id) {
+            companyWiseProjects: function (e, action_id,multiple=null) {
                 let id = $(e).val();
                 if (id.length === 0) {
                     return false;
@@ -3237,12 +3298,12 @@ let Requsition  = {};
                             alert("Error: " + response.message);
                             return false;
                         } else if (response.status === "success") {
-                            updateSelectBoxSingleOption(
-                                response.data,
-                                action_id,
-                                "id",
-                                "branch_name"
-                            );
+                            if (multiple)
+                            {
+                                updateSelectBox(response.data,action_id,"id","branch_name")
+                            }else {
+                                updateSelectBoxSingleOption(response.data,action_id,"id","branch_name");
+                            }
                         }
                     },
                 });
