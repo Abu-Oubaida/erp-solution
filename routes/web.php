@@ -680,6 +680,7 @@ Route::group(['middleware' => ['auth']],function (){
             });
             Route::middleware(['permission:project_document_requisition_report'])->group(function (){
                 Route::match(['get','post'],'project-document-requisition-report','index')->name('project.document.requisition.report');
+                Route::post('project-wise-data-type-report-details','projectWiseDataTypeReportDetails');
             });
         });
     });

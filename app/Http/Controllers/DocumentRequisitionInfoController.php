@@ -8,6 +8,7 @@ use App\Models\Required_data_type_upload_responsible_user_info;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class DocumentRequisitionInfoController extends Controller
 {
@@ -19,11 +20,120 @@ class DocumentRequisitionInfoController extends Controller
             return $next($request);
         });
     }
-    public function index()
+    public function index(Request $request)
     {
-
+        try {
+            $permission = $this->permissions()->project_document_requisition_report;
+            if ($request->ajax()) {
+                return $this->report($request,$permission);
+            }
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            return view('back-end.requisition.report',compact('companies'))->render();
+        }catch (\Throwable $exception)
+        {
+            return back()->with('error',$exception->getMessage());
+        }
     }
 
+    private function report(Request $request, $permission)
+    {
+        try {
+            if ($request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'company' => ['required', 'string', 'exists:company_infos,id'],
+                    'projects' => ['required', 'array'],
+                    'projects.*' => ['required', 'string', 'exists:branches,id'],
+                ]);
+                extract($validatedData);
+                $branches = $this->getUserProjectPermissions($this->user->id,$permission)->where('status',1)->where('company_id',$company)->whereIn('id',$projects)->get();
+                $data = (object) $branches->map(function($branch) {
+                    return (object) [
+                        'project_id' => $branch->id,
+                        'company_id' => $branch->company_id,
+                        'company_name' => $branch->company->company_name,
+                        'project_name' => $branch->branch_name,
+                        'project_address' => $branch->address,
+                        'pdri_id' => $branch->documentRequiredInfo->id ?? null,
+                        'pdri_subject' => $branch->documentRequiredInfo->message_subject ?? null,
+                        'pdri_details' => $branch->documentRequiredInfo->message_body ?? null,
+                        'created_by' => $branch->documentRequiredInfo->createdBy->name ?? null,
+                        'updated_by' => $branch->documentRequiredInfo->updatedBy->name ?? null,
+                        'created_at' => date('d-F-y H:i:s A',strtotime(@$branch->documentRequiredInfo->created_at)) ?? null,
+                        'updated_at' => date('d-F-y H:i:s A',strtotime(@$branch->documentRequiredInfo->updated_at)) ?? null,
+                        'data_type_required_count' => $branch->documentRequiredInfo?->dataTypeRequired->count() ?? 0,
+                    ];
+                });
+                if ($data->isEmpty())
+                {
+                    throw new \Exception('No data found!');
+                }
+                $view = view('back-end.requisition._project_wise_data_type_report',compact('data'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view'=>$view],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            throw new \Exception('Request method not allowed');
+        }catch (\Throwable $exception)
+        {
+           return response()->json([
+               'status'=>'error',
+               'message'=>$exception->getMessage()
+           ]);
+        }
+    }
+
+    public function projectWiseDataTypeReportDetails(Request $request)
+    {
+        try {
+            if ($request->ajax())
+            {
+                $validatedData = $request->validate([
+                    'id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                ]);
+                extract($validatedData);
+                $data = Project_document_requisition_info::with(['project','company','dataTypeRequired'])->find($id);
+                if (!$data)
+                {
+                    throw new \Exception('No data found!');
+                }
+                $result = (object) [
+                    'pdri_id' => $data->id,
+                    'company_name' => $data->company->company_name,
+                    'project_name' => $data->project->branch_name,
+                    'data_types' => $data->dataTypeRequired->collect()->map(function($dataTypeRequired) {
+                        return (object) [
+                            'data_type_id' => $dataTypeRequired->id,
+                            'data_type_name' => $dataTypeRequired->archiveDataType->voucher_type_title,
+                            'necessity' => $dataTypeRequired->status,
+                            'documents' => $dataTypeRequired->archiveDataType->archiveDocuments->count() ?? null,
+                            'responsible_by' => $dataTypeRequired->responsibleBy->collect()->map(function($responsibleBy) {
+                                return (object) [
+                                    'id' => $responsibleBy->user->id,
+                                    'name' => $responsibleBy->user->name,
+                                    'employee_id' => $responsibleBy->user->employee_id,
+                                ];
+                            }),
+                        ];
+                    }),
+                ];
+                $view = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details',compact('result'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view'=>$view],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            throw new \Exception('Request method not allowed');
+        }catch (\Throwable $exception)
+        {
+            return response()->json([
+                'status'=>'error',
+                'message'=>$exception->getMessage()
+            ]);
+        }
+    }
     public function create(Request $request)
     {
         try {

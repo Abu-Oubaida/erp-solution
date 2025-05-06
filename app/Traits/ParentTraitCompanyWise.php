@@ -180,7 +180,7 @@ trait ParentTraitCompanyWise
     }
     public function getUserProjectPermissions($user_id,$permission)
     {
-        $object = branch::with(['getUsers','company']);
+        $object = branch::with(['getUsers','company','documentRequiredInfo']);
         if ($this->user->isSystemSuperAdmin())
         {
             return $object;

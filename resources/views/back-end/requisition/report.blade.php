@@ -1,0 +1,140 @@
+@extends('layouts.back-end.main')
+@section('mainContent')
+    <div class="container-fluid px-4">
+{{--        <h1 class="mt-4">{{str_replace('-', ' ', config('app.name'))}}</h1>--}}
+        <div class="row">
+            <div class="col-md-10">
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item">
+                        <a href="{{route('dashboard')}}" class="text-capitalize text-chl">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a style="text-decoration: none;" href="#" class="text-capitalize">{{str_replace('.', ' ', \Route::currentRouteName())}}</a>
+                    </li>
+                </ol>
+            </div>
+            <div class="col-md-2">
+                <a href="{{\Illuminate\Support\Facades\URL::previous()}}" class="btn btn-danger btn-sm float-end"><i class="fas fa-chevron-left"></i> Go Back</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="mb-2">
+                    <label for="company">Company Name <span class="text-danger">*</span></label>
+                    <select class="text-capitalize select-search" id="company" name="company" onchange="return Obj.companyWiseProjects(this,'projects',true)">
+                        <option value="">--select a option--</option>
+                        @if(isset($companies) || (count($companies) > 0))
+                            @foreach($companies as $c)
+                                <option value="{{$c->id}}">{{$c->company_name}} ({!! $c->company_code !!})</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-8 mb-1">
+                <label for="projects">Projects<span class="text-danger">*</span></label>
+                <select id="projects" name="projects[]" class="select-search cursor-pointer" onchange="return Obj.selectAllOption(this)" multiple>
+                    <option value="">Pick options...</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-outline-secondary float-end mt-4 btn-sm" onclick="return ProjectWiseRequiredDataTypeReport(this)"><i class="fas fa-search"></i> Search</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col">
+                                <h3 class="text-capitalize"> <i class="fa-solid fa-file-lines"></i> {{str_replace('add','create',str_replace('.', ' ', \Route::currentRouteName()))}}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="report-info">
+                        <h6 class="text-center text-danger">Nothing for show!</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for details -->
+    <div class="modal fade modal-xl" id="dataTypesDetailsModal" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="dataTypesDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-custom">
+            <div class="modal-content">
+                <div id="dataTypesDetailsContent"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Understood</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function ProjectWiseRequiredDataTypeReport(e)
+        {
+            let company = $("#company").val()
+            let projects = $("#projects").val()
+            if(company.length === 0 || projects.length === 0)
+            {
+                return false
+            }
+            const url = window.location.origin + sourceDir +"/requisition/project-document-requisition-report";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    company: company,
+                    projects: projects,
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        // alert("Success: "+response.message)
+                        $("#report-info").html(response.data.view)
+                    }
+                },
+            })
+        }
+
+        function ProjectWiseDataTypesReportDetails(e,id)
+        {
+            if(id.length === 0)
+            {
+                return false
+            }
+            const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-report-details";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    id: id,
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        // alert("Success: "+response.message)
+                        $("#dataTypesDetailsContent").html(response.data.view)
+                        $("#dataTypesDetailsModal").modal('show')
+                    }
+                },
+            })
+        }
+    </script>
+@stop
+
