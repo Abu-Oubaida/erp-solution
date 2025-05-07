@@ -37,6 +37,8 @@ use App\Models\Source;
 use Exception;
 use Illuminate\Http\Request;
 use App\Traits\ParentTraitCompanyWise;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Log;
 use App\Models\SalesLeadApartmentType;
 use Illuminate\Validation\ValidationException;
@@ -83,63 +85,158 @@ class SalesInterfaceController extends Controller
     public function addLeadStep1(Request $request)
     {
         try {
-            $addLeadStep1Data = $request->add_lead_step1_data;
-            $addLeadStep1Data['created_by'] = Auth::id();
-            $alternateMobiles = $request->alternate_mobiles;
-            $alternateEmails = $request->alternate_emails;
-            $lead = Lead::create($addLeadStep1Data);
-            if (!empty($alternateMobiles)) {
-                $mobileToInsert = [];
-                $now = now();
-                foreach ($alternateMobiles as $differentMobile) {
-                    $mobileToInsert[] = [
-                        'lead_id' => $lead->id,
-                        'company_id' => $lead->company_id,
-                        'status' => '1',
-                        'mobile' => $differentMobile,
-                        'created_by' => Auth::id(),
-                        'created_at' => $now,
-                        'updated_at' => $now
-                    ];
-                }
-                $extraMobile = ExtraMobile::insert($mobileToInsert);
-                if (!$extraMobile) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Unable To Add Extra Mobile Number.',
-                    ]);
-                }
+            $input = array_merge(
+                $request->add_lead_step1_data,
+                $request->only('alternate_mobiles_value'),
+                $request->only('alternate_emails_value'),
+            );
+
+            $rules = [
+                "company_id" => ['required', 'integer', 'exists:company_infos,id'],
+                "full_name" => ['required', 'string', 'max:255'],
+                'primary_mobile' => [
+                    'required',
+                    'regex:/^\+?[0-9]{9,13}$/',
+                    Rule::unique('sales_leads', 'primary_mobile')->where('company_id', $request->add_lead_step1_data['company_id']),
+                    Rule::unique('sales_lead_extra_mobiles', 'mobile')->where('company_id', $request->add_lead_step1_data['company_id']),
+                ],
+                'primary_email' => [
+                    'required',
+                    Rule::unique('sales_leads', 'primary_email')->where('company_id', $request->add_lead_step1_data['company_id']),
+                    Rule::unique('sales_lead_extra_emails', 'email')->where('company_id', $request->add_lead_step1_data['company_id']),
+                ],
+                'alternate_mobiles_value' => ['array'],
+                'alternate_mobiles_value.*' => [
+                    'required',
+                    'regex:/^\+?[0-9]{9,13}$/',
+                    Rule::unique('sales_leads', 'primary_mobile')->where('company_id', $request->add_lead_step1_data['company_id']),
+                    Rule::unique('sales_lead_extra_mobiles', 'mobile')->where('company_id', $request->add_lead_step1_data['company_id']),
+                ],
+                'alternate_emails_value' => ['array'],
+                'alternate_emails_value.*' => [
+                    'required',
+                    Rule::unique('sales_leads', 'primary_email')->where('company_id', $request->add_lead_step1_data['company_id']),
+                    Rule::unique('sales_lead_extra_emails', 'email')->where('company_id', $request->add_lead_step1_data['company_id']),
+                ]
+            ];
+            $messages=[
+                'primary_mobile.required'=>'Primary Mobile is Required',
+                'primary_mobile.unique'=>'Primary Mobile already exist for this company',
+
+                'primary_email.required'=>'Primary Email is Required',
+                'primary_email.unique'=>'Primary Email already exist for this company',
+
+                'alternate_mobiles_value.0.required'=>'Alternate Mobile 1 is required.',
+                'alternate_mobiles_value.0.regex'=>'Alternate Mobile 1 must be a valid number (9–13 digits)',
+                'alternate_mobiles_value.0.unique'=>'Alternate Mobile 1 already exist for this company.',
+
+                'alternate_mobiles_value.1.required'=>'Alternate Mobile 2 is required.',
+                'alternate_mobiles_value.1.regex'=>'Alternate Mobile 2 must be a valid number (9–13 digits)',
+                'alternate_mobiles_value.1.unique'=>'Alternate Mobile 2 already exist for this company.',
+
+                'alternate_mobiles_value.2.required'=>'Alternate Mobile 3 is required.',
+                'alternate_mobiles_value.2.regex'=>'Alternate Mobile 3 must be a valid number (9–13 digits)',
+                'alternate_mobiles_value.2.unique'=>'Alternate Mobile 3 already exist for this company.',
+
+                'alternate_mobiles_value.3.required'=>'Alternate Mobile 4 is required.',
+                'alternate_mobiles_value.3.regex'=>'Alternate Mobile 4 must be a valid number (9–13 digits)',
+                'alternate_mobiles_value.3.unique'=>'Alternate Mobile 4 already exist for this company.',
+
+                'alternate_mobiles_value.4.required'=>'Alternate Mobile 5 is required.',
+                'alternate_mobiles_value.4.regex'=>'Alternate Mobile 5 must be a valid number (9–13 digits)',
+                'alternate_mobiles_value.4.unique'=>'Alternate Mobile 5 already exist for this company.',
+
+                'alternate_emails_value.0.required'=>'Alternate Email 1 is required.',
+                'alternate_emails_value.0.unique'=>'Alternate Email 1 already exist for this company.',
+
+                'alternate_emails_value.1.required'=>'Alternate Email 2 is required.',
+                'alternate_emails_value.1.unique'=>'Alternate Email 2 already exist for this company.',
+
+                'alternate_emails_value.2.required'=>'Alternate Email 3 is required.',
+                'alternate_emails_value.2.unique'=>'Alternate Email 3 already exist for this company.',
+
+                'alternate_emails_value.3.required'=>'Alternate Email 4 is required.',
+                'alternate_emails_value.3.unique'=>'Alternate Email 4 already exist for this company.',
+
+                'alternate_emails_value.4.required'=>'Alternate Email 5 is required.',
+                'alternate_emails_value.4.unique'=>'Alternate Email 5 already exist for this company.',         
+            ];
+
+            $validator = Validator::make($input, $rules,$messages);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $validator->errors(),
+                ]);
             }
-            if (!empty($alternateEmails)) {
-                $emailToInsert = [];
-                $now = now();
-                foreach ($alternateEmails as $differentEmail) {
-                    $emailToInsert[] = [
-                        'lead_id' => $lead->id,
-                        'company_id' => $lead->company_id,
-                        'status' => '1',
-                        'email' => $differentEmail,
-                        'created_by' => Auth::id(),
-                        'created_at' => $now,
-                        'updated_at' => $now
-                    ];
+            $validatedData = $validator->validate();
+            $alternateMobiles = $validatedData['alternate_mobiles_value'] ?? '';
+            $alternateEmails = $validatedData['alternate_emails_value'] ?? '';
+            unset($validatedData['alternate_mobiles_value'], $validatedData['alternate_emails_value']);
+            
+
+            $lead = Lead::create([
+                "company_id" => $validatedData['company_id'],
+                "full_name" => $validatedData['full_name'],
+                "primary_mobile" => $validatedData['primary_mobile'],
+                "primary_email" => $validatedData['primary_email'],
+                "created_by" => $this->user->id,
+            ]);
+
+            if($lead){
+                if (!empty($alternateMobiles)) {
+                    $mobileToInsert = [];
+                    $now = now();
+    
+                    foreach ($alternateMobiles as $differentMobile) {
+                        $mobileToInsert[] = [
+                            'lead_id' => $lead->id,
+                            'company_id' => $lead->company_id,
+                            'status' => '1',
+                            'mobile' => $differentMobile,
+                            'created_by' => Auth::id(),
+                            'created_at' => $now,
+                            'updated_at' => $now
+                        ];
+                    }
+    
+                    $extraMobile = ExtraMobile::insert($mobileToInsert);
+                    if (!$extraMobile) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Unable To Add Extra Mobile Number.',
+                        ]);
+                    }
                 }
-                $extraEmail = ExtraEmail::insert($emailToInsert);
-                if (!$extraEmail) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Unable To Add Extra Email.',
-                    ]);
+                if (!empty($alternateEmails)) {
+                    $emailToInsert = [];
+                    $now = now();
+                    foreach ($alternateEmails as $differentEmail) {
+                        $emailToInsert[] = [
+                            'lead_id' => $lead->id,
+                            'company_id' => $lead->company_id,
+                            'status' => '1',
+                            'email' => $differentEmail,
+                            'created_by' => Auth::id(),
+                            'created_at' => $now,
+                            'updated_at' => $now
+                        ];
+                    }
+                    $extraEmail = ExtraEmail::insert($emailToInsert);
+                    if (!$extraEmail) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Unable To Add Extra Email.',
+                        ]);
+                    }
                 }
-            }
-            if ($lead) {
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Lead Creation Step 1 Completed.',
                     'company_id' => $lead->company_id,
-                    'lead_id' => $lead->id
+                    'lead_id' => $lead->id,
                 ]);
-            } else {
+            }else{
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unable to Create Lead Step 1.'
@@ -148,24 +245,24 @@ class SalesInterfaceController extends Controller
         } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error'
+                'message' => 'Error ' . $exception->getMessage().$exception->getLine()
             ]);
         }
     }
     public function addLeadStep2(Request $request)
     {
         try {
-            $addLeadStep2Data = (object)$request->add_lead_step2_data;
-            $hiddenCompanyLead = (object)$request->hidden_company_lead;
+            $addLeadStep2Data = (object) $request->add_lead_step2_data;
+            $hiddenCompanyLead = (object) $request->hidden_company_lead;
             $request->validate([
-                'add_lead_step2_data.lead_main_profession_id'=>'required',
-                'add_lead_step2_data.lead_sub_profession_id'=>'required'
+                'add_lead_step2_data.lead_main_profession_id' => 'required',
+                'add_lead_step2_data.lead_sub_profession_id' => 'required'
             ]);
-            $lead = Lead::where('id',$hiddenCompanyLead->lead_id)->update([
-                'lead_main_profession_id'=>$addLeadStep2Data->lead_main_profession_id,
-                'lead_sub_profession_id'=>$addLeadStep2Data->lead_sub_profession_id,
-                'lead_company'=>$addLeadStep2Data->lead_company,
-                'lead_designation'=>$addLeadStep2Data->lead_designation
+            $lead = Lead::where('id', $hiddenCompanyLead->lead_id)->update([
+                'lead_main_profession_id' => $addLeadStep2Data->lead_main_profession_id,
+                'lead_sub_profession_id' => $addLeadStep2Data->lead_sub_profession_id,
+                'lead_company' => $addLeadStep2Data->lead_company,
+                'lead_designation' => $addLeadStep2Data->lead_designation
             ]);
             if ($lead) {
                 return response()->json([
@@ -183,7 +280,7 @@ class SalesInterfaceController extends Controller
         } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error'.$exception->getMessage()
+                'message' => 'Error' . $exception->getMessage()
             ]);
         }
     }

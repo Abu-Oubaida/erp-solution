@@ -3134,7 +3134,7 @@ let SalesSetting = {};
                     },
                 });
             },
-            companyWiseUsersForSalesEmployeeEntry: function (e,output) {
+            companyWiseUsersForSalesEmployeeEntry: function (e, output) {
                 let id = $(e).val();
                 if (id.length === 0) {
                     return false;
@@ -3164,7 +3164,7 @@ let SalesSetting = {};
                                 "id",
                                 "name"
                             );
-                            Sales.salesCompanyWiseLeader(id)
+                            Sales.salesCompanyWiseLeader(id);
                             return;
                         }
                     },
@@ -4219,30 +4219,31 @@ let SalesSetting = {};
                     },
                 });
             },
-            dynamicDropdownMain:function($select,responseData){
-                $select.empty()
-                $select.append("<option value=''>Select One...</option>")
-                $.each(responseData,function(index,item){
+            dynamicDropdownMain: function ($select, responseData) {
+                $select.empty();
+                $select.append("<option value=''>Select One...</option>");
+                $.each(responseData, function (index, item) {
                     let $option = $("<option></option>")
-                                    .attr("value",item.id)
-                                    .text(item.title)
-                    $select.append($option)
+                        .attr("value", item.id)
+                        .text(item.title);
+                    $select.append($option);
                 });
             },
-            dynamicDropdownSub:function($select,responseData,main_id){
-                const matchedItem = responseData.filter(item=>item.parent_id==main_id)
-                if(matchedItem){
-                    $select.empty()
-                    $select.append("<option value=''>Select One...</option>")
-                    $.each(matchedItem,function(index,matched){
+            dynamicDropdownSub: function ($select, responseData, main_id) {
+                const matchedItem = responseData.filter(
+                    (item) => item.parent_id == main_id
+                );
+                if (matchedItem) {
+                    $select.empty();
+                    $select.append("<option value=''>Select One...</option>");
+                    $.each(matchedItem, function (index, matched) {
                         let $option = $("<option></option>")
-                                        .attr("value",matched.id)
-                                        .text(matched.title)
-                        $select.append($option)
+                            .attr("value", matched.id)
+                            .text(matched.title);
+                        $select.append($option);
                     });
                 }
             },
-                
         };
         Archive = {
             settingSetTypePermission: function (
@@ -4438,45 +4439,72 @@ let SalesSetting = {};
                     primary_email: $("#primary_email").val(),
                     notes: $("#notes").val(),
                 };
-                if(!add_lead_step1_data.full_name || !add_lead_step1_data.full_name || !add_lead_step1_data.company_id || !add_lead_step1_data.primary_email){
-                    alert("Comapany, Full Name, Primary Mobile and Primary Email is Required.")
+                // let company_group_data={
+                //     company_group:$("#company_group").val()
+                // };
+                if (
+                    !add_lead_step1_data.full_name ||
+                    !add_lead_step1_data.full_name ||
+                    !add_lead_step1_data.company_id ||
+                    !add_lead_step1_data.primary_email
+                ) {
+                    alert(
+                        "Comapany, Full Name, Primary Mobile and Primary Email is Required."
+                    );
                     return false;
                 }
-                let alternate_mobiles={};
-                if($("#mobile_1").length && $("#mobile_1").val().trim()!==''){
-                    alternate_mobiles.mobile_1=$("#mobile_1").val().trim();
+                let alternate_mobiles = {};
+                if (
+                    $("#mobile_1").length &&
+                    $("#mobile_1").val().trim() !== ""
+                ) {
+                    alternate_mobiles.mobile_1 = $("#mobile_1").val().trim();
                 }
-                if($("#mobile_2").length && $("#mobile_2").val().trim()!==''){
-                    alternate_mobiles.mobile_2=$("#mobile_2").val().trim();
+                if (
+                    $("#mobile_2").length &&
+                    $("#mobile_2").val().trim() !== ""
+                ) {
+                    alternate_mobiles.mobile_2 = $("#mobile_2").val().trim();
                 }
-                if($("#mobile_3").length && $("#mobile_3").val().trim()!==''){
-                    alternate_mobiles.mobile_3=$("#mobile_3").val().trim();
+                if (
+                    $("#mobile_3").length &&
+                    $("#mobile_3").val().trim() !== ""
+                ) {
+                    alternate_mobiles.mobile_3 = $("#mobile_3").val().trim();
                 }
-                if($("#mobile_4").length && $("#mobile_4").val().trim()!==''){
-                    alternate_mobiles.mobile_4=$("#mobile_4").val().trim();
+                if (
+                    $("#mobile_4").length &&
+                    $("#mobile_4").val().trim() !== ""
+                ) {
+                    alternate_mobiles.mobile_4 = $("#mobile_4").val().trim();
                 }
-                if($("#mobile_5").length && $("#mobile_5").val().trim()!==''){
-                    alternate_mobiles.mobile_5=$("#mobile_5").val().trim();
+                if (
+                    $("#mobile_5").length &&
+                    $("#mobile_5").val().trim() !== ""
+                ) {
+                    alternate_mobiles.mobile_5 = $("#mobile_5").val().trim();
                 }
-                let alternate_emails={};
-                if($("#email_1").length && $("#email_1").val().trim()!==''){
-                    alternate_emails.email_1=$("#email_1").val().trim();
+                let alternate_emails = {};
+                if ($("#email_1").length && $("#email_1").val().trim() !== "") {
+                    alternate_emails.email_1 = $("#email_1").val().trim();
                 }
-                if($("#email_2").length && $("#email_2").val().trim()!==''){
-                    alternate_emails.email_2=$("#email_2").val().trim();
+                if ($("#email_2").length && $("#email_2").val().trim() !== "") {
+                    alternate_emails.email_2 = $("#email_2").val().trim();
                 }
-                if($("#email_3").length && $("#email_3").val().trim()!==''){
-                    alternate_emails.email_3=$("#email_3").val().trim();
+                if ($("#email_3").length && $("#email_3").val().trim() !== "") {
+                    alternate_emails.email_3 = $("#email_3").val().trim();
                 }
-                if($("#email_4").length && $("#email_4").val().trim()!==''){
-                    alternate_emails.email_4=$("#email_4").val().trim();
+                if ($("#email_4").length && $("#email_4").val().trim() !== "") {
+                    alternate_emails.email_4 = $("#email_4").val().trim();
                 }
-                if($("#email_5").length && $("#email_5").val().trim()!==''){
-                    alternate_emails.email_5=$("#email_5").val().trim();
+                if ($("#email_5").length && $("#email_5").val().trim() !== "") {
+                    alternate_emails.email_5 = $("#email_5").val().trim();
                 }
                 const url =
                     window.location.origin + sourceDir + "/add-lead-step1";
 
+                let alternate_mobiles_value = Object.values(alternate_mobiles);
+                let alternate_emails_value = Object.values(alternate_emails);
                 $.ajax({
                     url: url,
                     headers: {
@@ -4485,26 +4513,46 @@ let SalesSetting = {};
                         ),
                     },
                     method: "POST",
-                    data: { add_lead_step1_data,alternate_mobiles,alternate_emails },
+                    data: {
+                        add_lead_step1_data,
+                        alternate_mobiles_value,
+                        alternate_emails_value,
+                    },
                     success: function (response) {
                         if (response.status === "error") {
-                            alert("Error: " + response.message);
+                            if (typeof response.message === "object") {
+                                let errorMessages = "";
+                                for (const field in response.message) {
+                                    response.message[field].forEach((msg) => {
+                                        errorMessages += msg + "\n";
+                                    });
+                                }
+                                alert(errorMessages);
+                            } else {
+                                alert(response.message);
+                            }
                         } else if (response.status === "success") {
                             alert(response.message);
                             let form = Sales.addLeadStep2Form(
-                                response.lead_id,response.company_id
+                                response.lead_id,
+                                response.company_id
+                                // response.company_group
                             );
                             $("#commonSlot_for_multiple_step").html(form);
-                            Sales.getSalesProfessionMainProfession(response.company_id)
+                            Sales.getSalesProfessionMainProfession(
+                                response.company_id
+                            );
                         }
                     },
                 });
 
                 return false;
             },
-            getSalesProfessionMainProfession:function(company_id){
+            getSalesProfessionMainProfession: function (company_id) {
                 const url =
-                window.location.origin + sourceDir + "/get-sales-profession-main-profession";
+                    window.location.origin +
+                    sourceDir +
+                    "/get-sales-profession-main-profession";
 
                 $.ajax({
                     url: url,
@@ -4520,33 +4568,46 @@ let SalesSetting = {};
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             let $select = $("#lead_main_profession_id");
-                            Obj.dynamicDropdownMain($select,response.data.mainProfession)
+                            Obj.dynamicDropdownMain(
+                                $select,
+                                response.data.mainProfession
+                            );
                             let $profession = $("#lead_sub_profession_id");
                             let professionData = response.data.profession;
 
-                            $("#lead_main_profession_id").on("change", function () {
-                                let main_profession_id = $(this).val();
-                                Obj.dynamicDropdownSub($profession, professionData, main_profession_id);
-                            });
+                            $("#lead_main_profession_id").on(
+                                "change",
+                                function () {
+                                    let main_profession_id = $(this).val();
+                                    Obj.dynamicDropdownSub(
+                                        $profession,
+                                        professionData,
+                                        main_profession_id
+                                    );
+                                }
+                            );
                         }
                     },
                 });
             },
-            addLeadStep1Form:function(){
-                return`
+            addLeadStep1Form: function () // company_group
+            {
+                let options = "";
+                if (typeof window.allCompanies !== "undefined") {
+                    $.each(window.allCompanies, function (index, company) {
+                        options += `<option value="${company.id}">${company.company_name} (${company.company_code})</option>`;
+                    });
+                } else {
+                    alert("Companies list is undefined");
+                }
+                return `
                   <div class="row">
                             <div class="col-md-6 mb-3">
                                 <div class="form-group">
                                     <label for="company">Company Name<span class="text-danger">*</span></label>
                                     <select class="text-capitalize form-control company_dropdown" id="company_id" name="company">
                                         <option value="">Pick options...</option>
-                                        @if (isset($companies) || count($companies) > 0)
-                                            @foreach ($companies as $c)
-                                                <option value="{{ $c->id }}">{{ $c->company_name }}
-                                                    ({!! $c->company_code !!})
-                                                </option>
-                                            @endforeach
-                                        @endif
+                                        ${options}
                                     </select>
                                 </div>
                             </div>
@@ -4639,7 +4700,11 @@ let SalesSetting = {};
                         </div>
                 `;
             },
-            addLeadStep2Form: function (lead_id,company_id) {
+            addLeadStep2Form: function (
+                lead_id,
+                company_id
+                // company_group
+            ) {
                 return `
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -4690,9 +4755,12 @@ let SalesSetting = {};
             </div>
                 `;
             },
-            addLeadStep2: function () {
+            addLeadStep2: function () // company_group
+            {
                 let add_lead_step2_data = {
-                    lead_main_profession_id: $("#lead_main_profession_id").val(),
+                    lead_main_profession_id: $(
+                        "#lead_main_profession_id"
+                    ).val(),
                     lead_sub_profession_id: $("#lead_sub_profession_id").val(),
                     lead_company: $("#lead_company").val(),
                     lead_designation: $("#lead_designation").val(),
@@ -4701,7 +4769,10 @@ let SalesSetting = {};
                     company_id: $("#company_id").val(),
                     lead_id: $("#lead_id").val(),
                 };
-                if(!add_lead_step2_data.lead_main_profession_id || !add_lead_step2_data.lead_sub_profession_id){
+                if (
+                    !add_lead_step2_data.lead_main_profession_id ||
+                    !add_lead_step2_data.lead_sub_profession_id
+                ) {
                     alert("Main profession and Profession is required");
                     return false;
                 }
@@ -4716,24 +4787,30 @@ let SalesSetting = {};
                         ),
                     },
                     method: "POST",
-                    data: { add_lead_step2_data,hidden_company_lead },
+                    data: { add_lead_step2_data, hidden_company_lead },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             alert(response.message);
-                            let form = Sales.addLeadStep3Form(response.company_id,response.lead_id);
+                            let form = Sales.addLeadStep3Form(
+                                response.company_id,
+                                response.lead_id
+                                // company_group
+                            );
                             $("#commonSlot_for_multiple_step").html(form);
-                            Sales.getSalesSourceMainSource(response.company_id)
+                            Sales.getSalesSourceMainSource(response.company_id);
                         }
                     },
                 });
 
                 return false;
             },
-            getSalesSourceMainSource:function(company_id){
+            getSalesSourceMainSource: function (company_id) {
                 const url =
-                window.location.origin + sourceDir + "/get-sales-source-main-source";
+                    window.location.origin +
+                    sourceDir +
+                    "/get-sales-source-main-source";
 
                 $.ajax({
                     url: url,
@@ -4749,19 +4826,30 @@ let SalesSetting = {};
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             let $select = $("#main_source_id");
-                            Obj.dynamicDropdownMain($select,response.data.mainSource)
+                            Obj.dynamicDropdownMain(
+                                $select,
+                                response.data.mainSource
+                            );
                             let $source = $("#sub_source_id");
                             let sourceData = response.data.source;
 
                             $("#main_source_id").on("change", function () {
                                 let main_source_id = $(this).val();
-                                Obj.dynamicDropdownSub($source, sourceData, main_source_id);
+                                Obj.dynamicDropdownSub(
+                                    $source,
+                                    sourceData,
+                                    main_source_id
+                                );
                             });
                         }
                     },
                 });
             },
-            addLeadStep3Form: function (company_id,lead_id) {
+            addLeadStep3Form: function (
+                company_id,
+                lead_id
+                // company_group
+            ) {
                 return `
                         <div class="row">
                         <div class="col-md-6 mb-3">
@@ -4803,7 +4891,8 @@ let SalesSetting = {};
                 </div>
                 `;
             },
-            addLeadStep3: function () {
+            addLeadStep3: function () // company_group
+            {
                 let add_lead_step3_data = {
                     main_source_id: $("#main_source_id").val(),
                     sub_source_id: $("#sub_source_id").val(),
@@ -4828,18 +4917,26 @@ let SalesSetting = {};
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             alert(response.message);
-                            let form = Sales.addLeadStep4Form( response.company_id,response.lead_id);
+                            let form = Sales.addLeadStep4Form(
+                                response.company_id,
+                                response.lead_id
+                                // company_group
+                            );
                             $("#commonSlot_for_multiple_step").html(form);
-                            Sales.getSalesPreferenceDropdowns(response.company_id)
+                            Sales.getSalesPreferenceDropdowns(
+                                response.company_id
+                            );
                         }
                     },
                 });
 
                 return false;
             },
-            getSalesPreferenceDropdowns:function(company_id){
+            getSalesPreferenceDropdowns: function (company_id) {
                 const url =
-                window.location.origin + sourceDir + "/get-sales-preference-dropdowns";
+                    window.location.origin +
+                    sourceDir +
+                    "/get-sales-preference-dropdowns";
 
                 $.ajax({
                     url: url,
@@ -4855,96 +4952,125 @@ let SalesSetting = {};
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             let $apartment_type = $("#apartment_type_id");
-                            Obj.dynamicDropdownMain($apartment_type,response.data.salesLeadApartmentType)
+                            Obj.dynamicDropdownMain(
+                                $apartment_type,
+                                response.data.salesLeadApartmentType
+                            );
                             let $apartment_size = $("#apartment_size_id");
-                            Obj.dynamicDropdownMain($apartment_size,response.data.salesLeadApartmentSize)
+                            Obj.dynamicDropdownMain(
+                                $apartment_size,
+                                response.data.salesLeadApartmentSize
+                            );
                             let $floor = $("#floor_id");
-                            Obj.dynamicDropdownMain($floor,response.data.salesLeadFloor)
+                            Obj.dynamicDropdownMain(
+                                $floor,
+                                response.data.salesLeadFloor
+                            );
                             let $facing = $("#facing_id");
-                            Obj.dynamicDropdownMain($facing,response.data.salesLeadFacing)
+                            Obj.dynamicDropdownMain(
+                                $facing,
+                                response.data.salesLeadFacing
+                            );
                             let $view = $("#view_id");
-                            Obj.dynamicDropdownMain($view,response.data.salesLeadView)
+                            Obj.dynamicDropdownMain(
+                                $view,
+                                response.data.salesLeadView
+                            );
                             let $budget = $("#budget_id");
-                            Obj.dynamicDropdownMain($budget,response.data.salesLeadBudget)
+                            Obj.dynamicDropdownMain(
+                                $budget,
+                                response.data.salesLeadBudget
+                            );
                         }
                     },
                 });
             },
-            addLeadStep4Form: function (company_id,lead_id) {
+            addLeadStep4Form: function (
+                company_id,
+                lead_id
+                // company_group
+            ) {
                 return `
                         <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                    <input type="hidden" id="company_id" value="${company_id}">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                    <input type="hidden" id="lead_id" value="${lead_id}">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="preference_note" placeholder="Preference Note">
-                                <label for="preference_note">Preference Note</label>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="apartment_type_id">Apartment Type</label>
-                                    <select class="text-capitalize form-control" id="apartment_type_id">
-                                        <option value="">Pick options...</option>
-                                    </select>
+                                <div class="col-md-6 mb-3">
+                                    <button type="button" class="btn btn-chl-outline mt-3" onclick="Sales.addNewLeadForm()"><i class="fa-solid fa-arrow-right"></i>
+                                            Add New Lead</button>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                            <input type="hidden" id="company_id" value="${company_id}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                            <input type="hidden" id="lead_id" value="${lead_id}">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="preference_note" placeholder="Preference Note">
+                                        <label for="preference_note">Preference Note</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="apartment_type_id">Apartment Type</label>
+                                            <select class="text-capitalize form-control" id="apartment_type_id">
+                                                <option value="">Pick options...</option>
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="apartment_size_id">Apartment Size</label>
+                                            <select class="text-capitalize form-control" id="apartment_size_id">
+                                                <option value="">Pick options...</option>
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="floor_id">Floor</label>
+                                            <select class="text-capitalize form-control" id="floor_id">
+                                                <option value="">Pick options...</option>
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="facing_id">Facing</label>
+                                            <select class="text-capitalize form-control" id="facing_id">
+                                                <option value="">Pick options...</option>
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="view_id">View</label>
+                                            <select class="text-capitalize form-control" id="view_id">
+                                                <option value="">Pick options...</option>
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="budget_id">Budget</label>
+                                            <select class="text-capitalize form-control" id="budget_id">
+                                                <option value="">Pick options...</option>
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="col-md-2 mt-2">
+                                    <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep4()"><i class="fa-solid fa-arrow-right"></i>
+                                        Next</button>
                                 </div>
                         </div>
-                        <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="apartment_size_id">Apartment Size</label>
-                                    <select class="text-capitalize form-control" id="apartment_size_id">
-                                        <option value="">Pick options...</option>
-                                    </select>
-                                </div>
-                        </div>
-                        <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="floor_id">Floor</label>
-                                    <select class="text-capitalize form-control" id="floor_id">
-                                        <option value="">Pick options...</option>
-                                    </select>
-                                </div>
-                        </div>
-                        <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="facing_id">Facing</label>
-                                    <select class="text-capitalize form-control" id="facing_id">
-                                        <option value="">Pick options...</option>
-                                    </select>
-                                </div>
-                        </div>
-                        <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="view_id">View</label>
-                                    <select class="text-capitalize form-control" id="view_id">
-                                        <option value="">Pick options...</option>
-                                    </select>
-                                </div>
-                        </div>
-                        <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="budget_id">Budget</label>
-                                    <select class="text-capitalize form-control" id="budget_id">
-                                        <option value="">Pick options...</option>
-                                    </select>
-                                </div>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep4()"><i class="fa-solid fa-arrow-right"></i>
-                                Next</button>
-                        </div>
-                </div>
                 `;
             },
-            addLeadStep4: function () {
+            addLeadStep4: function () // company_group
+            {
                 let add_lead_step4_data = {
                     preference_note: $("#preference_note").val(),
                     apartment_type_id: $("#apartment_type_id").val(),
@@ -4973,23 +5099,30 @@ let SalesSetting = {};
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             alert(response.message);
-                            let form = Sales.addLeadStep1Form();
-                            $("#commonSlot_for_multiple_step").html(form);
-                            // history.pushState(null, '', '/add-lead');
                         }
                     },
                 });
 
                 return false;
             },
+            addNewLeadForm: function () {
+                let form = Sales.addLeadStep1Form();
+                $("#commonSlot_for_multiple_step").html(form);
+            },
             salesEmployeeEntry: function () {
                 let sales_employee_entry_data = {
                     company_id: $("#company").val(),
                     user: $("#user").val(),
-                    leader_id_of_specific_company:$("#leader_id_of_specific_company").val()
+                    leader_id_of_specific_company: $(
+                        "#leader_id_of_specific_company"
+                    ).val(),
                 };
-                if(!sales_employee_entry_data.company_id || !sales_employee_entry_data.user || !sales_employee_entry_data.leader_id_of_specific_company){
-                    alert('Company,User or Leader is required')
+                if (
+                    !sales_employee_entry_data.company_id ||
+                    !sales_employee_entry_data.user ||
+                    !sales_employee_entry_data.leader_id_of_specific_company
+                ) {
+                    alert("Company,User or Leader is required");
                     return;
                 }
                 const url =
@@ -5018,11 +5151,11 @@ let SalesSetting = {};
                     },
                 });
             },
-            saleEmployeeEntryEdit:function(update_id,employee_id){
+            saleEmployeeEntryEdit: function (update_id, employee_id) {
                 const url =
-                window.location.origin +
-                sourceDir +
-                "/get-sale-employee-entry-edit";
+                    window.location.origin +
+                    sourceDir +
+                    "/get-sale-employee-entry-edit";
 
                 $.ajax({
                     url: url,
@@ -5038,25 +5171,33 @@ let SalesSetting = {};
                         } else if (response.status === "success") {
                             let $select = $("#update_leader");
                             $select.empty();
-                            $.each(response.sales_employee_entry_edit,function(index,item){
-                                let $option=$("<option></option>")
-                                            .attr("value",item.employee_id)
-                                            .text(item.user.name);
-                                $select.append($option)
-                            });
-                            $select.val(employee_id)
-                            $("#leader_update_btn").attr("onclick",`Sales.saleEmployeeEntryLeaderUpdate(${update_id})`);
-                            $("#modal_to_update_leader_of_employee").modal('show');
+                            $.each(
+                                response.sales_employee_entry_edit,
+                                function (index, item) {
+                                    let $option = $("<option></option>")
+                                        .attr("value", item.employee_id)
+                                        .text(item.user.name);
+                                    $select.append($option);
+                                }
+                            );
+                            $select.val(employee_id);
+                            $("#leader_update_btn").attr(
+                                "onclick",
+                                `Sales.saleEmployeeEntryLeaderUpdate(${update_id})`
+                            );
+                            $("#modal_to_update_leader_of_employee").modal(
+                                "show"
+                            );
                         }
                     },
                 });
             },
-            saleEmployeeEntryLeaderUpdate:function(update_id){
+            saleEmployeeEntryLeaderUpdate: function (update_id) {
                 const url =
-                window.location.origin +
-                sourceDir +
-                "/get-sale-employee-entry-leader-update";
-                let update_leader=$("#update_leader").val();
+                    window.location.origin +
+                    sourceDir +
+                    "/get-sale-employee-entry-leader-update";
+                let update_leader = $("#update_leader").val();
                 $.ajax({
                     url: url,
                     headers: {
@@ -5065,21 +5206,25 @@ let SalesSetting = {};
                         ),
                     },
                     method: "POST",
-                    data:{update_id,update_leader},
+                    data: { update_id, update_leader },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
-                            alert(response.message)
-                            $("#modal_to_update_leader_of_employee").modal('hide');
-                            $("#partial_sell_employee_entry").html(response.data)
+                            alert(response.message);
+                            $("#modal_to_update_leader_of_employee").modal(
+                                "hide"
+                            );
+                            $("#partial_sell_employee_entry").html(
+                                response.data
+                            );
                         }
                     },
                 });
             },
-            deleteSalesEmployeeEntryMultiple:function(){
-                let selected=[];
-                $("."+"check-box-employee"+":checked").each(function () {
+            deleteSalesEmployeeEntryMultiple: function () {
+                let selected = [];
+                $("." + "check-box-employee" + ":checked").each(function () {
                     selected.push($(this).val());
                 });
                 if (selected.length === 0) {
@@ -5090,7 +5235,10 @@ let SalesSetting = {};
                 if (
                     confirm("Are you sure you want to delete selected records?")
                 ) {
-                    let url = window.location.origin + sourceDir + '/delete-sales-employee-entry-multiple';
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        "/delete-sales-employee-entry-multiple";
                     $.ajax({
                         url: url,
                         headers: {
@@ -5120,9 +5268,9 @@ let SalesSetting = {};
                     });
                 }
             },
-            deleteSalesLeaderEntryMultiple:function(){
-                let selected=[];
-                $("."+"check-box-leader"+":checked").each(function () {
+            deleteSalesLeaderEntryMultiple: function () {
+                let selected = [];
+                $("." + "check-box-leader" + ":checked").each(function () {
                     selected.push($(this).val());
                 });
                 if (selected.length === 0) {
@@ -5133,7 +5281,10 @@ let SalesSetting = {};
                 if (
                     confirm("Are you sure you want to delete selected records?")
                 ) {
-                    let url = window.location.origin + sourceDir + '/delete-sales-leader-entry-multiple';
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        "/delete-sales-leader-entry-multiple";
                     $.ajax({
                         url: url,
                         headers: {
@@ -5168,8 +5319,11 @@ let SalesSetting = {};
                     company_id: $("#company_leader").val(),
                     leader: $("#leader").val(),
                 };
-                if(!sales_leader_entry_data.company_id || !sales_leader_entry_data.leader){
-                    alert('Company or Leader is required')
+                if (
+                    !sales_leader_entry_data.company_id ||
+                    !sales_leader_entry_data.leader
+                ) {
+                    alert("Company or Leader is required");
                     return;
                 }
                 const url =
@@ -5191,14 +5345,12 @@ let SalesSetting = {};
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             alert(response.message);
-                            $("#partial_sell_leader_entry").html(
-                                response.data
-                            );
+                            $("#partial_sell_leader_entry").html(response.data);
                         }
                     },
                 });
             },
-            salesCompanyWiseLeader:function(company_id){
+            salesCompanyWiseLeader: function (company_id) {
                 const url =
                     window.location.origin +
                     sourceDir +
@@ -5211,7 +5363,7 @@ let SalesSetting = {};
                         ),
                     },
                     method: "GET",
-                    data:{company_id:company_id},
+                    data: { company_id: company_id },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
@@ -5221,16 +5373,17 @@ let SalesSetting = {};
                             console.log(res);
                             let $select = $("#leader_id_of_specific_company");
                             $select.empty();
-                            $select.append('<option value="">Select One...</option>')
-                            $.each(res,function(index,item){
-                                if(item.user){
-                                    let option= $("<option></option>")
-                                    .attr("value",item.user.id)
-                                    .text(item.user.name)
-                                     $select.append(option)
+                            $select.append(
+                                '<option value="">Select One...</option>'
+                            );
+                            $.each(res, function (index, item) {
+                                if (item.user) {
+                                    let option = $("<option></option>")
+                                        .attr("value", item.user.id)
+                                        .text(item.user.name);
+                                    $select.append(option);
                                 }
                             });
-                            
                         }
                     },
                 });

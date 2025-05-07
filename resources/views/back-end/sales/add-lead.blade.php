@@ -1,12 +1,5 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
-    {{-- <script>
-        $(function {
-            $(document).ready(function() {
-                
-            })
-        })(jQuery)
-    </script> --}}
     <div class="container-fluid px-4">
         <div class="row">
             <div class="col-md-10">
@@ -50,7 +43,9 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                {{-- <input type="hidden" id="company_group" value="{{$companies}}"> --}}
+                            </div>
                             <div class="col-md-4 mb-1">
                                 <div class="row">
                                     <div class="col-12">
@@ -142,4 +137,7 @@
             </div>
         </div>
     </div>
+    <script>
+        window.allCompanies = @json($companies);
+    </script>
 @stop
