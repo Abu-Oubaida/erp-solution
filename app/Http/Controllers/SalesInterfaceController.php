@@ -20,6 +20,7 @@ use App\Models\department;
 use App\Models\ExtraEmail;
 use App\Models\ExtraMobile;
 use App\Models\Lead;
+use App\Models\SalePreference;
 use App\Models\SalesEmployeeEntry;
 use App\Models\SalesEmployeeEntryLeaderEditHistory;
 use App\Models\SalesLeadApartmentSize;
@@ -32,6 +33,7 @@ use App\Models\SalesLeadSourceInfo;
 use App\Models\SalesLeadStatusInfo;
 use App\Models\SalesLeadView;
 use App\Models\SalesProfession;
+use App\Models\Source;
 use Exception;
 use Illuminate\Http\Request;
 use App\Traits\ParentTraitCompanyWise;
@@ -80,50 +82,50 @@ class SalesInterfaceController extends Controller
     }
     public function addLeadStep1(Request $request)
     {
-        try{
+        try {
             $addLeadStep1Data = $request->add_lead_step1_data;
-            $addLeadStep1Data['created_by']=Auth::id();
-            $alternateMobiles=$request->alternate_mobiles;
-            $alternateEmails=$request->alternate_emails;
-            $lead = Lead::create($addLeadStep1Data );
-            if(!empty($alternateMobiles)){
-                $mobileToInsert=[];
+            $addLeadStep1Data['created_by'] = Auth::id();
+            $alternateMobiles = $request->alternate_mobiles;
+            $alternateEmails = $request->alternate_emails;
+            $lead = Lead::create($addLeadStep1Data);
+            if (!empty($alternateMobiles)) {
+                $mobileToInsert = [];
                 $now = now();
-                foreach($alternateMobiles as $differentMobile){
-                    $mobileToInsert[]=[
-                        'lead_id'=>$lead->id,
-                        'company_id'=>$lead->company_id,
-                        'status'=>'1',
-                        'mobile'=>$differentMobile,
-                        'created_by'=>Auth::id(),
-                        'created_at'=>$now,
-                        'updated_at'=>$now
+                foreach ($alternateMobiles as $differentMobile) {
+                    $mobileToInsert[] = [
+                        'lead_id' => $lead->id,
+                        'company_id' => $lead->company_id,
+                        'status' => '1',
+                        'mobile' => $differentMobile,
+                        'created_by' => Auth::id(),
+                        'created_at' => $now,
+                        'updated_at' => $now
                     ];
                 }
                 $extraMobile = ExtraMobile::insert($mobileToInsert);
-                if(!$extraMobile){
+                if (!$extraMobile) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Unable To Add Extra Mobile Number.',
                     ]);
                 }
             }
-            if(!empty($alternateEmails)){
-                $emailToInsert=[];
+            if (!empty($alternateEmails)) {
+                $emailToInsert = [];
                 $now = now();
-                foreach($alternateEmails as $differentEmail){
-                    $emailToInsert[]=[
-                        'lead_id'=>$lead->id,
-                        'company_id'=>$lead->company_id,
-                        'status'=>'1',
-                        'email'=>$differentEmail,
-                        'created_by'=>Auth::id(),
-                        'created_at'=>$now,
-                        'updated_at'=>$now
+                foreach ($alternateEmails as $differentEmail) {
+                    $emailToInsert[] = [
+                        'lead_id' => $lead->id,
+                        'company_id' => $lead->company_id,
+                        'status' => '1',
+                        'email' => $differentEmail,
+                        'created_by' => Auth::id(),
+                        'created_at' => $now,
+                        'updated_at' => $now
                     ];
                 }
                 $extraEmail = ExtraEmail::insert($emailToInsert);
-                if(!$extraEmail){
+                if (!$extraEmail) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Unable To Add Extra Email.',
@@ -135,7 +137,7 @@ class SalesInterfaceController extends Controller
                     'status' => 'success',
                     'message' => 'Lead Creation Step 1 Completed.',
                     'company_id' => $lead->company_id,
-                    'lead_id'=>$lead->id
+                    'lead_id' => $lead->id
                 ]);
             } else {
                 return response()->json([
@@ -143,7 +145,7 @@ class SalesInterfaceController extends Controller
                     'message' => 'Unable to Create Lead Step 1.'
                 ]);
             }
-        }catch(\Throwable $exception){
+        } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error'
@@ -152,50 +154,87 @@ class SalesInterfaceController extends Controller
     }
     public function addLeadStep2(Request $request)
     {
-        $lead = 1;
-        if ($lead) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Lead Creation Step 2 Completed.',
-                // 'company_id'=>$lead->company_id
+        try {
+            $addLeadStep2Data = (object)$request->add_lead_step2_data;
+            $hiddenCompanyLead = (object)$request->hidden_company_lead;
+            $request->validate([
+                'add_lead_step2_data.lead_main_profession_id'=>'required',
+                'add_lead_step2_data.lead_sub_profession_id'=>'required'
             ]);
-        } else {
+            $lead = Lead::where('id',$hiddenCompanyLead->lead_id)->update([
+                'lead_main_profession_id'=>$addLeadStep2Data->lead_main_profession_id,
+                'lead_sub_profession_id'=>$addLeadStep2Data->lead_sub_profession_id,
+                'lead_company'=>$addLeadStep2Data->lead_company,
+                'lead_designation'=>$addLeadStep2Data->lead_designation
+            ]);
+            if ($lead) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Lead Creation Step 2 Completed.',
+                    'company_id' => $hiddenCompanyLead->company_id,
+                    'lead_id' => $hiddenCompanyLead->lead_id
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unable to Create Lead Step 2.'
+                ]);
+            }
+        } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Operation Failed.'
+                'message' => 'Error'.$exception->getMessage()
             ]);
         }
     }
     public function addLeadStep3(Request $request)
     {
-        $lead = 1;
-        if ($lead) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Lead Creation Step 3 Completed.',
-                // 'company_id'=>$lead->company_id
-            ]);
-        } else {
+        try {
+            $addLeadStep3Data = $request->add_lead_step3_data;
+            $addLeadStep3Data['created_by'] = Auth::id();
+            $addLeadStep3Data['associate_id'] = Auth::id();
+            $source = Source::create($addLeadStep3Data);
+            if ($source) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Lead Creation Step 3 Completed.',
+                    'company_id' => $addLeadStep3Data['company_id'],
+                    'lead_id' => $addLeadStep3Data['lead_id']
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unable to Create Lead Step 3.'
+                ]);
+            }
+        } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Operation Failed.'
+                'message' => 'Error '
             ]);
         }
     }
     public function addLeadStep4(Request $request)
     {
-        $lead = 1;
-        if ($lead) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Lead Creation
-                 Completed.',
-                // 'company_id'=>$lead->company_id
-            ]);
-        } else {
+        try {
+            $addLeadStep4Data = $request->add_lead_step4_data;
+            $addLeadStep4Data['created_by'] = Auth::id();
+            $salePreference = SalePreference::create($addLeadStep4Data);
+            if ($salePreference) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Lead Creation Completed.'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unable to Create Lead.'
+                ]);
+            }
+        } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Operation Failed.'
+                'message' => 'Error '
             ]);
         }
     }
@@ -996,9 +1035,9 @@ class SalesInterfaceController extends Controller
             DB::beginTransaction();
             $ids = $request->selected;
             $salesEmployeeEntries = SalesEmployeeEntry::whereIn('id', $ids)->get();
-            Log::info(json_encode($salesEmployeeEntries,JSON_PRETTY_PRINT));
+            Log::info(json_encode($salesEmployeeEntries, JSON_PRETTY_PRINT));
             $now = now();
-            $historyProcess = $salesEmployeeEntries->map(function ($item) use($now) {
+            $historyProcess = $salesEmployeeEntries->map(function ($item) use ($now) {
                 $data = [
                     'old_id' => $item->id,
                     'old_created_by' => $item->created_by,
@@ -1010,8 +1049,8 @@ class SalesInterfaceController extends Controller
                     'company_id' => $item->company_id,
                     'employee_id' => $item->employee_id,
                     'leader_id' => $item->leader_id,
-                    'created_at'=>$now,
-                    'updated_at'=>$now
+                    'created_at' => $now,
+                    'updated_at' => $now
                 ];
                 return $data;
             })->toArray();
@@ -1048,7 +1087,7 @@ class SalesInterfaceController extends Controller
             $ids = $request->selected;
             $salesLeaderEntries = SalesLeaderEntry::whereIn('id', $ids)->get();
             $now = now();
-            $historyProcess = $salesLeaderEntries->map(function ($item) use($now) {
+            $historyProcess = $salesLeaderEntries->map(function ($item) use ($now) {
                 $data = [
                     'old_id' => $item->id,
                     'old_created_by' => $item->created_by,
@@ -1059,8 +1098,8 @@ class SalesInterfaceController extends Controller
                     'updated_by' => null,
                     'company_id' => $item->company_id,
                     'employee_id' => $item->employee_id,
-                    'created_at'=>$now,
-                    'updated_at'=>$now
+                    'created_at' => $now,
+                    'updated_at' => $now
                 ];
                 return $data;
             })->toArray();
@@ -1090,6 +1129,88 @@ class SalesInterfaceController extends Controller
         }
 
     }
-    
-
+    public function getSalesProfessionMainProfession(Request $request)
+    {
+        try {
+            $salesLeadProfession = SalesProfession::where('company_id', $request->company_id)->select('id', 'title', 'parent_id', 'is_parent')->get();
+            $mainProfession = $salesLeadProfession->where('is_parent', 1)->values();
+            $profession = $salesLeadProfession->where('is_parent', '!=', 1)->values();
+            if ($mainProfession->isNotEmpty() && $profession->isNotEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Success',
+                    'data' => [
+                        'mainProfession' => $mainProfession,
+                        'profession' => $profession
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Error '
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed '
+            ]);
+        }
+    }
+    public function getSalesSourceMainSource(Request $request)
+    {
+        try {
+            $salesLeadSourceInfo = SalesLeadSourceInfo::where('company_id', $request->company_id)->select('id', 'title', 'parent_id', 'is_parent')->get();
+            $mainSource = $salesLeadSourceInfo->where('is_parent', 1)->values();
+            $source = $salesLeadSourceInfo->where('is_parent', '!=', 1)->values();
+            if ($mainSource->isNotEmpty() && $source->isNotEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Success',
+                    'data' => [
+                        'mainSource' => $mainSource,
+                        'source' => $source
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Check Error '
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed '
+            ]);
+        }
+    }
+    public function getSalesPreferenceDropdowns(Request $request)
+    {
+        try {
+            $salesLeadApartmentType = SalesLeadApartmentType::where('company_id', $request->company_id)->select('id', 'title')->get();
+            $salesLeadApartmentSize = SalesLeadApartmentSize::where('company_id', $request->company_id)->select('id', 'title')->get();
+            $salesLeadFloor = SalesLeadFloor::where('company_id', $request->company_id)->select('id', 'title')->get();
+            $salesLeadFacing = SalesLeadFacing::where('company_id', $request->company_id)->select('id', 'title')->get();
+            $salesLeadView = SalesLeadView::where('company_id', $request->company_id)->select('id', 'title')->get();
+            $salesLeadBudget = SalesLeadBudget::where('company_id', $request->company_id)->select('id', 'title')->get();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Success',
+                'data' => [
+                    'salesLeadApartmentType' => $salesLeadApartmentType ?? '',
+                    'salesLeadApartmentSize' => $salesLeadApartmentSize ?? '',
+                    'salesLeadFloor' => $salesLeadFloor ?? '',
+                    'salesLeadFacing' => $salesLeadFacing ?? '',
+                    'salesLeadView' => $salesLeadView ?? '',
+                    'salesLeadBudget' => $salesLeadBudget ?? '',
+                ]
+            ]);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Operation Failed '
+            ]);
+        }
+    }
 }

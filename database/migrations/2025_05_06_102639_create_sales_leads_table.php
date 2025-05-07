@@ -23,6 +23,10 @@ return new class extends Migration
             $table->string('primary_email')->nullable();
             $table->text('notes')->nullable();
             $table->unsignedBigInteger('lead_status_id')->nullable();
+            $table->unsignedBigInteger('lead_main_profession_id')->nullable();
+            $table->unsignedBigInteger('lead_sub_profession_id')->nullable();
+            $table->string('lead_company')->nullable();
+            $table->string('lead_designation')->nullable();
             $table->integer('sell_status')->default(0)->comment("1=sold, other wise unsold")->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

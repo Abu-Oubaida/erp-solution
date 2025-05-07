@@ -27,7 +27,6 @@
         </div>
         <div class="row">
             <div class="col-md-12 card">
-                {{-- @include('back-end.sales._add-lead-stage-1') --}}
                 <div class="card-header mt-2">
                     <div class="row">
                         <h3 class="text-capitalize"><i class="fas fa-leaf"></i> Add Lead Information</h3>

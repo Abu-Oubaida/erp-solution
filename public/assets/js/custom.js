@@ -4219,6 +4219,30 @@ let SalesSetting = {};
                     },
                 });
             },
+            dynamicDropdownMain:function($select,responseData){
+                $select.empty()
+                $select.append("<option value=''>Select One...</option>")
+                $.each(responseData,function(index,item){
+                    let $option = $("<option></option>")
+                                    .attr("value",item.id)
+                                    .text(item.title)
+                    $select.append($option)
+                });
+            },
+            dynamicDropdownSub:function($select,responseData,main_id){
+                const matchedItem = responseData.filter(item=>item.parent_id==main_id)
+                if(matchedItem){
+                    $select.empty()
+                    $select.append("<option value=''>Select One...</option>")
+                    $.each(matchedItem,function(index,matched){
+                        let $option = $("<option></option>")
+                                        .attr("value",matched.id)
+                                        .text(matched.title)
+                        $select.append($option)
+                    });
+                }
+            },
+                
         };
         Archive = {
             settingSetTypePermission: function (
@@ -4480,7 +4504,7 @@ let SalesSetting = {};
             },
             getSalesProfessionMainProfession:function(company_id){
                 const url =
-                window.location.origin + sourceDir + "/add-lead-step1";
+                window.location.origin + sourceDir + "/get-sales-profession-main-profession";
 
                 $.ajax({
                     url: url,
@@ -4490,77 +4514,170 @@ let SalesSetting = {};
                         ),
                     },
                     method: "GET",
-                    data: { add_lead_step1_data,alternate_mobiles,alternate_emails },
+                    data: { company_id },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
-                            alert(response.message);
-                            let form = Sales.addLeadStep2Form(
-                                response.lead_id,response.company_id
-                            );
-                            $("#commonSlot_for_multiple_step").html(form);
+                            let $select = $("#lead_main_profession_id");
+                            Obj.dynamicDropdownMain($select,response.data.mainProfession)
+                            let $profession = $("#lead_sub_profession_id");
+                            let professionData = response.data.profession;
+
+                            $("#lead_main_profession_id").on("change", function () {
+                                let main_profession_id = $(this).val();
+                                Obj.dynamicDropdownSub($profession, professionData, main_profession_id);
+                            });
                         }
                     },
                 });
+            },
+            addLeadStep1Form:function(){
+                return`
+                  <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="company">Company Name<span class="text-danger">*</span></label>
+                                    <select class="text-capitalize form-control company_dropdown" id="company_id" name="company">
+                                        <option value="">Pick options...</option>
+                                        @if (isset($companies) || count($companies) > 0)
+                                            @foreach ($companies as $c)
+                                                <option value="{{ $c->id }}">{{ $c->company_name }}
+                                                    ({!! $c->company_code !!})
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                            <div class="col-md-4 mb-1">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="full_name" type="text" placeholder="Enter full name" />
+                                            <label for="full_name">Full name <span class="text-danger">*</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="spouse" type="text"
+                                                placeholder="Enter husband/wife name" />
+                                            <label for="relation">Husband/Wife </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-1">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="primary_mobile" type="number" placeholder="Primary Mobile"
+                                                value="" />
+                                            <label for="primary_mobile">Primary Mobile <span class="text-danger">*</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input class="form-control" id="mobile_1" type="number" placeholder="Enter phone 1" />
+                                            <label for="phone2">Alternative Mobile 1</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-1">
+                                        <a href="#" class="float-end text-decoration-none"
+                                            onclick="Sales.addEmailPhoneForLead(this,'mobile','add_extra_info')"><i
+                                                class="fas fa-plus small"></i> Add
+                                            Another Mobile</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-1">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="primary_email" type="email" placeholder="Primary Email"
+                                                value="" />
+                                            <label for="primary_email">Primary Email <span class="text-danger">*</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input class="form-control" id="email_1" type="email"
+                                                placeholder="Enter Email 2" />
+                                            <label for="alternative_email_1">Alternative Email 1</label>
+                                        </div>
+                                    </div>
+                
+                                    <div class="col-12 mt-1">
+                                        <a href="#" class="float-end text-decoration-none"
+                                            onclick="Sales.addEmailPhoneForLead(this,'email','add_extra_info')"><i
+                                                class="fas fa-plus small"></i> Add
+                                            Another
+                                            Email</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <div class="form-floating mb-3">
+                                        <textarea type="text" class="form-control" id="notes" name="notes" placeholder="Notes"></textarea>
+                                        <label for="Designation">Notes</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row" id="add_extra_info">
+                
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="button" class="btn btn-chl-outline float-end mt-3" onclick="return Sales.addLeadStep1()"><i class="fa-solid fa-arrow-right"></i>
+                                            Next</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                `;
             },
             addLeadStep2Form: function (lead_id,company_id) {
                 return `
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div class="form-group">
-                                <input type="hidden" value="${company_id}">
+                                <input type="hidden" id="company_id" value="${company_id}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                                <input type="hidden" value="${lead_id}">
+                                <input type="hidden" id="lead_id" value="${lead_id}">
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession"
-                                placeholder="profession">
-                            <datalist id="profession-list">
-                                <option value="Business">Business</option>
-                                <option value="Teacher">Teacher</option>
-                                <option value="Solder">Solder</option>
-                                <option value="Doctor">Doctor</option>
-                                <option value="Engineer">Engineer</option>
-                                <option value="Bankar">Bankar</option>
-                                <option value="Politician">Politician</option>
-                                <option value="Actor">Actor</option>
-                            </datalist>
-                            <label for="branch">Main Profession <span class="text-danger">*</span></label>
-                        </div>
+                            <div class="form-group">
+                                <label for="main_profession">Main Profession<span class="text-danger">*</span></label>
+                                <select class="text-capitalize form-control" id="lead_main_profession_id">
+                                    <option value="">Pick options...</option>
+                                </select>
+                            </div>
                     </div>
                     <div class="col-md-2">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="profession" list="profession-list" name="profession"
-                                placeholder="profession">
-                            <datalist id="profession-list">
-                                <option value="Business">Business</option>
-                                <option value="Teacher">Teacher</option>
-                                <option value="Solder">Solder</option>
-                                <option value="Doctor">Doctor</option>
-                                <option value="Engineer">Engineer</option>
-                                <option value="Bankar">Bankar</option>
-                                <option value="Politician">Politician</option>
-                                <option value="Actor">Actor</option>
-                            </datalist>
-                            <label for="branch">Profession <span class="text-danger">*</span></label>
-                        </div>
+                            <div class="form-group">
+                                <label for="profession">Profession<span class="text-danger">*</span></label>
+                                <select class="text-capitalize form-control" id="lead_sub_profession_id">
+                                    <option value="">Pick options...</option>
+                                </select>
+                            </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="company" name="company" placeholder="Company Of Lead">
+                            <input type="text" class="form-control" id="lead_company" name="company" placeholder="Company Of Lead">
                             <label for="company">Company Of Lead</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-5">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="designation" name="designation"
+                                <input type="text" class="form-control" id="lead_designation" name="designation"
                                     placeholder="Designation Of Lead">
                                 <label for="designation">Designation Of Lead</label>
                             </div>
@@ -4574,14 +4691,20 @@ let SalesSetting = {};
                 `;
             },
             addLeadStep2: function () {
-                // let add_lead_step1_data = {
-                //     company_id: $("#company_id").val(),
-                //     full_name: $("#full_name").val(),
-                //     spouse: $("#spouse").val(),
-                //     primary_mobile: $("#primary_mobile").val(),
-                //     primary_email: $("#primary_email").val(),
-                //     notes: $("#notes").val(),
-                // };
+                let add_lead_step2_data = {
+                    lead_main_profession_id: $("#lead_main_profession_id").val(),
+                    lead_sub_profession_id: $("#lead_sub_profession_id").val(),
+                    lead_company: $("#lead_company").val(),
+                    lead_designation: $("#lead_designation").val(),
+                };
+                let hidden_company_lead = {
+                    company_id: $("#company_id").val(),
+                    lead_id: $("#lead_id").val(),
+                };
+                if(!add_lead_step2_data.lead_main_profession_id || !add_lead_step2_data.lead_sub_profession_id){
+                    alert("Main profession and Profession is required");
+                    return false;
+                }
                 const url =
                     window.location.origin + sourceDir + "/add-lead-step2";
 
@@ -4593,31 +4716,101 @@ let SalesSetting = {};
                         ),
                     },
                     method: "POST",
-                    // data: { add_lead_step1_data },
+                    data: { add_lead_step2_data,hidden_company_lead },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             alert(response.message);
-                            let form = Sales.addLeadStep3Form(
-                                // response.company_id
-                            );
+                            let form = Sales.addLeadStep3Form(response.company_id,response.lead_id);
                             $("#commonSlot_for_multiple_step").html(form);
+                            Sales.getSalesSourceMainSource(response.company_id)
                         }
                     },
                 });
 
                 return false;
             },
+            getSalesSourceMainSource:function(company_id){
+                const url =
+                window.location.origin + sourceDir + "/get-sales-source-main-source";
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "GET",
+                    data: { company_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            let $select = $("#main_source_id");
+                            Obj.dynamicDropdownMain($select,response.data.mainSource)
+                            let $source = $("#sub_source_id");
+                            let sourceData = response.data.source;
+
+                            $("#main_source_id").on("change", function () {
+                                let main_source_id = $(this).val();
+                                Obj.dynamicDropdownSub($source, sourceData, main_source_id);
+                            });
+                        }
+                    },
+                });
+            },
+            addLeadStep3Form: function (company_id,lead_id) {
+                return `
+                        <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                    <input type="hidden" id="company_id" value="${company_id}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                    <input type="hidden" id="lead_id" value="${lead_id}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="main_source_id">Main Source<span class="text-danger">*</span></label>
+                                    <select class="text-capitalize form-control" id="main_source_id">
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="sub_source_id">Source<span class="text-danger">*</span></label>
+                                    <select class="text-capitalize form-control" id="sub_source_id">
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="reference_name" placeholder="Company Of Lead">
+                                <label for="reference_name">Reference Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep3()"><i class="fa-solid fa-arrow-right"></i>
+                                Next</button>
+                        </div>
+                </div>
+                `;
+            },
             addLeadStep3: function () {
-                // let add_lead_step1_data = {
-                //     company_id: $("#company_id").val(),
-                //     full_name: $("#full_name").val(),
-                //     spouse: $("#spouse").val(),
-                //     primary_mobile: $("#primary_mobile").val(),
-                //     primary_email: $("#primary_email").val(),
-                //     notes: $("#notes").val(),
-                // };
+                let add_lead_step3_data = {
+                    main_source_id: $("#main_source_id").val(),
+                    sub_source_id: $("#sub_source_id").val(),
+                    reference_name: $("#reference_name").val(),
+                    company_id: $("#company_id").val(),
+                    lead_id: $("#lead_id").val(),
+                };
                 const url =
                     window.location.origin + sourceDir + "/add-lead-step3";
 
@@ -4629,31 +4822,140 @@ let SalesSetting = {};
                         ),
                     },
                     method: "POST",
-                    // data: { add_lead_step1_data },
+                    data: { add_lead_step3_data },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             alert(response.message);
-                            let form = Sales.addLeadStep4Form(
-                                // response.company_id
-                            );
+                            let form = Sales.addLeadStep4Form( response.company_id,response.lead_id);
                             $("#commonSlot_for_multiple_step").html(form);
+                            Sales.getSalesPreferenceDropdowns(response.company_id)
                         }
                     },
                 });
 
                 return false;
             },
+            getSalesPreferenceDropdowns:function(company_id){
+                const url =
+                window.location.origin + sourceDir + "/get-sales-preference-dropdowns";
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "GET",
+                    data: { company_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            let $apartment_type = $("#apartment_type_id");
+                            Obj.dynamicDropdownMain($apartment_type,response.data.salesLeadApartmentType)
+                            let $apartment_size = $("#apartment_size_id");
+                            Obj.dynamicDropdownMain($apartment_size,response.data.salesLeadApartmentSize)
+                            let $floor = $("#floor_id");
+                            Obj.dynamicDropdownMain($floor,response.data.salesLeadFloor)
+                            let $facing = $("#facing_id");
+                            Obj.dynamicDropdownMain($facing,response.data.salesLeadFacing)
+                            let $view = $("#view_id");
+                            Obj.dynamicDropdownMain($view,response.data.salesLeadView)
+                            let $budget = $("#budget_id");
+                            Obj.dynamicDropdownMain($budget,response.data.salesLeadBudget)
+                        }
+                    },
+                });
+            },
+            addLeadStep4Form: function (company_id,lead_id) {
+                return `
+                        <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                    <input type="hidden" id="company_id" value="${company_id}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                    <input type="hidden" id="lead_id" value="${lead_id}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="preference_note" placeholder="Preference Note">
+                                <label for="preference_note">Preference Note</label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="apartment_type_id">Apartment Type</label>
+                                    <select class="text-capitalize form-control" id="apartment_type_id">
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="apartment_size_id">Apartment Size</label>
+                                    <select class="text-capitalize form-control" id="apartment_size_id">
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="floor_id">Floor</label>
+                                    <select class="text-capitalize form-control" id="floor_id">
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="facing_id">Facing</label>
+                                    <select class="text-capitalize form-control" id="facing_id">
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="view_id">View</label>
+                                    <select class="text-capitalize form-control" id="view_id">
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="budget_id">Budget</label>
+                                    <select class="text-capitalize form-control" id="budget_id">
+                                        <option value="">Pick options...</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep4()"><i class="fa-solid fa-arrow-right"></i>
+                                Next</button>
+                        </div>
+                </div>
+                `;
+            },
             addLeadStep4: function () {
-                // let add_lead_step1_data = {
-                //     company_id: $("#company_id").val(),
-                //     full_name: $("#full_name").val(),
-                //     spouse: $("#spouse").val(),
-                //     primary_mobile: $("#primary_mobile").val(),
-                //     primary_email: $("#primary_email").val(),
-                //     notes: $("#notes").val(),
-                // };
+                let add_lead_step4_data = {
+                    preference_note: $("#preference_note").val(),
+                    apartment_type_id: $("#apartment_type_id").val(),
+                    apartment_size_id: $("#apartment_size_id").val(),
+                    company_id: $("#company_id").val(),
+                    lead_id: $("#lead_id").val(),
+                    floor_id: $("#floor_id").val(),
+                    facing_id: $("#facing_id").val(),
+                    view_id: $("#view_id").val(),
+                    budget_id: $("#budget_id").val(),
+                };
                 const url =
                     window.location.origin + sourceDir + "/add-lead-step4";
 
@@ -4665,232 +4967,20 @@ let SalesSetting = {};
                         ),
                     },
                     method: "POST",
-                    // data: { add_lead_step1_data },
+                    data: { add_lead_step4_data },
                     success: function (response) {
                         if (response.status === "error") {
                             alert("Error: " + response.message);
                         } else if (response.status === "success") {
                             alert(response.message);
-                            
+                            let form = Sales.addLeadStep1Form();
+                            $("#commonSlot_for_multiple_step").html(form);
+                            // history.pushState(null, '', '/add-lead');
                         }
                     },
                 });
 
                 return false;
-            },
-            addLeadStep3Form: function () {
-                return `
-                    <div class="col-md-6">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="source" list="source-list" name="source"
-                                        placeholder="Source">
-                                    <datalist id="source-list">
-                                        <option value="None">None</option>
-                                        <option value="Newspaper">Newspaper</option>
-                                        <option value="Hotline">Hotline</option>
-                                        <option value="Social">Social</option>
-                                        <option value="Reference">Reference</option>
-                                    </datalist>
-                                    <label for="branch">Main Source <span class="text-danger">*</span></label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="source" list="source-list" name="source"
-                                        placeholder="Source">
-                                    <datalist id="source-list">
-                                        <option value="None">None</option>
-                                        <option value="Newspaper">Newspaper</option>
-                                        <option value="Hotline">Hotline</option>
-                                        <option value="Social">Social</option>
-                                        <option value="Reference">Reference</option>
-                                    </datalist>
-                                    <label for="branch">Source <span class="text-danger">*</span></label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <select id="team-leader" class="form-control" name="team_leader">
-                                        <option value="">--Select Option--</option>
-                                        <option value="db_leader_id">Leader 1</option>
-                                        <option value="db_leader_id">Leader 2</option>
-                                    </select>
-                                    <label for="team-leader">Team Leader <span class="text-danger">*</span></label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <select id="associate" class="form-control" name="associate">
-                                        <option value="">--Select Option--</option>
-                                        <option value="db_associate_id">Associate 1</option>
-                                        <option value="db_associate_id">Associate 2</option>
-                                    </select>
-                                    <label for="associate">Associate <span class="text-danger">*</span></label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <input type="text" name="recorded_by" id="recorded_by" class="form-control">
-                                    <label for="recorded_by">Recorded By</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <select id="rating" class="form-control" name="rating">
-                                        <option value="">--Select Option--</option>
-                                        <option value="db_rating_id">Rating 1</option>
-                                        <option value="db_rating_id">Rating 2</option>
-                                    </select>
-                                    <label for="rating">Rating</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <select id="industry" class="form-control" name="industry">
-                                        <option value="">--Select Option--</option>
-                                        <option value="db_industry_id">Industry 1</option>
-                                        <option value="db_industry_id">Industry 2</option>
-                                    </select>
-                                    <label for="industry">Industry</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <select id="branch" class="form-control" name="branch">
-                                        <option value="">--Select Option--</option>
-                                        @if (count($branches))
-                                            @foreach ($branches as $branch)
-                                                <option value="{!! $branch->id !!}">{!! $branch->branch_name !!}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                    <label for="branch">Branch Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <select id="lead-creat-dept" class="form-control" name="lead_create_dept">
-                                        <option value="">--Select Option--</option>
-                                        @if (count($depts))
-                                            @foreach ($depts as $dept)
-                                                <option value="{!! $dept->id !!}">{!! $dept->dept_name !!}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                    <label for="lead-creat-dept">Lead Create Department</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep3()"><i class="fa-solid fa-arrow-right"></i>
-                                    Next</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-            addLeadStep4Form: function (
-                // company_id
-            ) {
-                return `
-                    <div class="col-md-6">
-                        <h6># Prospect Preference</h6>
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-floating mb-3">
-                                    <div class="form-floating mb-3">
-                                        <textarea type="text" class="form-control" id="preference-notes" name="p_notes" placeholder="Preference Notes"></textarea>
-                                        <label for="preference-notes">Preference Notes</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <select id="apartment-type" class="form-control" name="apartment_type">
-                                        <option value="">--Select Option--</option>
-                                        <option value="db_apartment_type_id">apartment type 1</option>
-                                        <option value="db_apartment_type_id">apartment type 1</option>
-                                    </select>
-                                    <label for="associate">Apartment Type </label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <span for="preferred-location">Preferred Location </span>
-                                <div class="form-floating mb-3">
-                                    <select class="text-capitalize select-search" id="preferred_location"
-                                        name="preferred_location[]" multiple>
-                                        {{-- @if (old('company') == $c->id) selected @endif --}}
-                                        <option value="">--select option--</option>
-                                        @if (isset($leadWiseLocations) || count($leadWiseLocations) > 0)
-                                            @foreach ($leadWiseLocations as $c)
-                                                <option value="{{ $c['id'] }}"> {!! $c['dept_name'] !!}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <select class="form-control" id="apartment-size" name="apartment_size">
-                                        <option value="">--Select--</option>
-                                        <option value="db_size_id">1200 sft</option>
-                                        <option value="db_size_id">1300 sft</option>
-                                        <option value="db_size_id">1600 sft</option>
-                                    </select>
-                                    <label for="apartment-size">Apartment Size </label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <select class="form-control" id="apartment-floor" name="apartment_floor">
-                                        <option value="">--Select--</option>
-                                        <option value="1">1st Floor</option>
-                                        <option value="2">2nd Floor</option>
-                                        <option value="3">3rd Floor</option>
-                                        <option value="4">4th Floor</option>
-                                    </select>
-                                    <label for="apartment-floor">Apartment Floor </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <select class="form-control" id="apartment-facing" name="apartment_facing">
-                                        <option value="">--Select--</option>
-                                        <option value="south">South</option>
-                                        <option value="north">North</option>
-                                        <option value="east">East</option>
-                                        <option value="west">West</option>
-                                    </select>
-                                    <label for="apartment-facing">Facing </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <select class="form-control" id="apartment-view" name="apartment_view">
-                                        <option value="">--Select--</option>
-                                        <option value="south">South</option>
-                                        <option value="north">North</option>
-                                        <option value="east">East</option>
-                                        <option value="west">West</option>
-                                    </select>
-                                    <label for="apartment-view">View </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" placeholder="budget" id="budget">
-                                    <label for="budget">Budget </label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep4()"><i class="fa-solid fa-arrow-right"></i>
-                                    Next</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
             },
             salesEmployeeEntry: function () {
                 let sales_employee_entry_data = {
