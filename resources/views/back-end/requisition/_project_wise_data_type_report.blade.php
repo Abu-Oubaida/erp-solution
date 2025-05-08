@@ -13,15 +13,17 @@
     <tbody>
     @php $i=1; @endphp
     @foreach($data as $row)
-        <tr onclick="ProjectWiseDataTypesReportDetails(this,{!! $row->pdri_id !!}, {!! $row->project_id !!}, {!! $row->company_id !!})" style="cursor:pointer;">
-            <td>{!! $i++ !!}</td>
-            <td>{!! $row->company_name !!}</td>
-            <td>{!! $row->project_name !!}</td>
-            <td>{!! $row->project_address !!}</td>
-            <td>{!! $row->data_type_required_count !!}</td>
-            <td>{!! $row->created_by??'-' !!}</td>
-            <td>{!! $row->updated_by??'-' !!}</td>
-        </tr>
+        @if($row->pdri_id)
+            <tr onclick="ProjectWiseDataTypesReportDetails(this,{!! $row->pdri_id??0 !!}, {!! $row->project_id??0 !!}, {!! $row->company_id??0 !!})" style="cursor:pointer;">
+                <td>{!! $i++ !!}</td>
+                <td>{!! $row->company_name !!}</td>
+                <td>{!! $row->project_name !!}</td>
+                <td>{!! $row->project_address !!}</td>
+                <td>{!! $row->data_type_required_count !!}</td>
+                <td>{!! $row->created_by??'-' !!}</td>
+                <td>{!! $row->updated_by??'-' !!}</td>
+            </tr>
+        @endif
     @endforeach
     </tbody>
 </table>

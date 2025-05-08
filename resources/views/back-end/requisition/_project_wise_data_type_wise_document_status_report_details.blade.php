@@ -18,25 +18,29 @@
             <th>SL</th>
             <th>Company</th>
             <th>Project</th>
+            <th>Assign Date</th>
             <th>Data Type</th>
             <th>Necessity</th>
+            <th>Deadline</th>
             <th>Document Status</th>
             <th>Document Count</th>
-            <th>Responsible User Count</th>
+            <th title="Responsible User Count">Responsible Count</th>
         </tr>
         </thead>
         <tbody>
         @php $i=1; @endphp
         @foreach($result->data_types as $row)
             <tr>
-                <td><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $row->data_type_id !!}" value="{!! $row->data_type_id !!}"></td>
+                <td><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $row->req_data_type_id !!}" value="{!! $row->req_data_type_id !!}"></td>
                 <td>{!! $i++ !!}</td>
                 <td>{!! $result->company_name !!}</td>
                 <td>{!! $result->project_name !!}</td>
+                <td>{!! $row->created_at !!}</td>
                 <td>{!! $row->data_type_name !!}</td>
                 <td >{!! $row->necessity? "<span class='badge bg-success'><i class='fa-solid fa-star'></i> Required</span>": "<span class='badge bg-info'><i class='fa-regular fa-star'></i> Optional</span>"!!}</td>
+                <td>{!! $row->deadline !!}</td>
                 <td>{!! $row->documents?'✅ OK':'❌ Missing' !!}</td>
-                <td>{!! $row->documents??'0' !!}</td>
+                <td><a href="{!! route('uploaded.archive.list.pagination', ['c' => $result->company_id, 't' => $row->data_type_id,'p' => $result->project_id]) !!}" target="_blank">{!! $row->documents??'0' !!}</a></td>
                 <td>
                     {!! $row->responsible_by_count !!}
 {{--                    @foreach($row->responsible_by as $usr)--}}

@@ -90,7 +90,7 @@ class DocumentRequisitionInfoController extends Controller
         $data = Project_document_requisition_info::with([
             'project:id,branch_name',
             'company:id,company_name',
-            'dataTypeRequired:id,pdri_id,data_type_id,status',
+            'dataTypeRequired:id,pdri_id,data_type_id,status,deadline,created_at',
             'dataTypeRequired.archiveDataType:id,voucher_type_title',
             'dataTypeRequired.responsibleBy.user:id,name,employee_id',
             'dataTypeRequired.archiveDataType.accountVoucher' => function ($query) use ($project_id) {
@@ -115,7 +115,10 @@ class DocumentRequisitionInfoController extends Controller
             'project_id' => $data->project_id,
             'data_types' => $data->dataTypeRequired->collect()->map(function ($dataTypeRequired) {
                 return (object)[
-                    'data_type_id' => $dataTypeRequired->id,
+                    'req_data_type_id' => $dataTypeRequired->id,
+                    'created_at' => date('d-M-y',strtotime($dataTypeRequired->created_at)),
+                    'deadline' => date('d-M-y',strtotime($dataTypeRequired->deadline)),
+                    'data_type_id' => $dataTypeRequired->archiveDataType->id,
                     'data_type_name' => $dataTypeRequired->archiveDataType->voucher_type_title,
                     'necessity' => $dataTypeRequired->status,
                     'documents' => $dataTypeRequired->archiveDataType->accountVoucher->voucher_documents_count ?? null,

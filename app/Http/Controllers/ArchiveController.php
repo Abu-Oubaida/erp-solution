@@ -705,19 +705,21 @@ class ArchiveController extends Controller
                 'c' => ['required', 'integer', 'exists:company_infos,id'],
                 't' => ['required', 'integer', 'exists:voucher_types,id'],
                 'l' => ['nullable','sometimes', 'integer',],
+                'p' => ['nullable','sometimes', 'integer','exists:branches,id',],
             ]);
             $company_id = $request->get('c');
             $data_type = $request->get('t');
+            $project = $request->get('p')??null;
             $perPage = request('per_page', 10);
 
-            $voucherInfos = $this->archiveListInfo($company_id, $data_type, $perPage);
+            $voucherInfos = $this->archiveListInfo($company_id, $data_type,$project, $perPage);
 
             return view('back-end/archive/pagination-list', compact('voucherInfos','company_id','data_type'));
         } catch (\Throwable $exception) {
             return back()->with('error',$exception->getMessage());
         }
     }
-    private function archiveListInfo($company_id,$type_id,$perPage = null)
+    private function archiveListInfo($company_id,$type_id,$project=null,$perPage = null)
     {
         $data = Account_voucher::with([
             'VoucherDocument',
@@ -760,6 +762,10 @@ class ArchiveController extends Controller
             ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes($company_id)->pluck('id')->toArray())
             ->where('voucher_type_id',$type_id)
             ->orderBy('id', 'desc');
+        if ($project)
+        {
+            $data = $data->where('project_id', $project);
+        }
         if ($perPage) {
             if ($perPage == 'all') {
                 $data = $data->get();

@@ -23,7 +23,8 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col">
-                                <h3 class="text-capitalize"> <i class="fa-solid fa-file-circle-plus"></i> {{str_replace('add','create',str_replace('.', ' ', \Route::currentRouteName()))}}</h3>
+                                <h3 class="text-capitalize d-inline-block"> <i class="fa-solid fa-file-circle-plus"></i> {{str_replace('add','create',str_replace('.', ' ', \Route::currentRouteName()))}}</h3>
+                                <a href="{!! route('project.document.requisition.report') !!}" class="btn btn-sm btn-outline-primary float-end mt-1"><i class="fas fa-file-lines"></i> View Report</a>
                             </div>
                         </div>
                     </div>
