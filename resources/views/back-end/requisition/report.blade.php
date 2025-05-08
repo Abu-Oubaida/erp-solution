@@ -70,6 +70,9 @@
                 </div>
             </div>
         </div>
+        <div id='ajax_loader2' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+            <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+        </div>
     </div>
     <script>
         function ProjectWiseRequiredDataTypeReport(e)
@@ -105,9 +108,9 @@
             })
         }
 
-        function ProjectWiseDataTypesReportDetails(e,id)
+        function ProjectWiseDataTypesReportDetails(e, id, project_id, company_id)
         {
-            if(id.length === 0)
+            if(id.length === 0 || project_id.length === 0 || company_id.length === 0)
             {
                 return false
             }
@@ -120,6 +123,8 @@
                 type: "POST",
                 data: {
                     id: id,
+                    project_id: project_id,
+                    company_id: company_id,
                 },
                 success: function (response) {
                     if(response.status === 'error')
@@ -130,11 +135,96 @@
                     else {
                         // alert("Success: "+response.message)
                         $("#dataTypesDetailsContent").html(response.data.view)
+                        // $("#dataTypesDetailsContent").html(id)
                         $("#dataTypesDetailsModal").modal('show')
+                        return true
                     }
                 },
             })
         }
+
+        function DataTypeNecessityChange(e, inst,pdri_id,project_id,company_id)
+        {
+            let selected = [];
+            let value = inst??0
+            $(".check-box:checked").each(function () {
+                selected.push($(this).val());
+            });
+            if (selected.length === 0) {
+                alert("Please select at least one record to delete.");
+                return false
+            }
+            if(!confirm("Are you sure?"))
+                return false
+            const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-necessity-change";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    ids: selected,
+                    value: value,
+                    pdri_id:pdri_id,
+                    project_id:project_id,
+                    company_id:company_id
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        alert("Success: "+response.message)
+                        $("#dataTypesDetailsContent").html(response.data.view)
+                        return true
+                    }
+                },
+            })
+        }
+
+        function DeleteProjectWiseNecessaryDataType(pdri_id,project_id,company_id)
+        {
+            let selected = [];
+            $(".check-box:checked").each(function () {
+                selected.push($(this).val());
+            });
+            if (selected.length === 0) {
+                alert("Please select at least one record to delete.");
+                return false
+            }
+            if(!confirm("Are you sure?"))
+                return false
+            const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-delete";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    ids: selected,
+                    pdri_id:pdri_id,
+                    project_id:project_id,
+                    company_id:company_id
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        alert("Success: "+response.message)
+                        $("#dataTypesDetailsContent").html(response.data.view)
+                        return true
+                    }
+                },
+            })
+        }
+
     </script>
 @stop
 

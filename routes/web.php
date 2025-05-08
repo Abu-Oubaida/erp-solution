@@ -678,6 +678,12 @@ Route::group(['middleware' => ['auth']],function (){
             Route::middleware(['permission:project_document_requisition_entry'])->group(function (){
                 Route::match(['get','post'],'project-document-requisition-entry','create')->name('project.document.requisition.entry');
             });
+            Route::middleware(['permission:project_document_requisition_edit'])->group(function (){
+                Route::match(['post'],'project-wise-data-type-necessity-change','projectWiseDataTypeNecessityChange');
+            });
+            Route::middleware(['permission:project_document_requisition_delete'])->group(function (){
+                Route::match(['post'],'project-wise-data-type-delete','projectWiseDataTypeDelete');
+            });
             Route::middleware(['permission:project_document_requisition_report'])->group(function (){
                 Route::match(['get','post'],'project-document-requisition-report','index')->name('project.document.requisition.report');
                 Route::post('project-wise-data-type-report-details','projectWiseDataTypeReportDetails');

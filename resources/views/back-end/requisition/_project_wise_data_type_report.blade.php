@@ -13,7 +13,7 @@
     <tbody>
     @php $i=1; @endphp
     @foreach($data as $row)
-        <tr onclick="return ProjectWiseDataTypesReportDetails(this,{!! $row->pdri_id??0 !!})" style="cursor:pointer;">
+        <tr onclick="ProjectWiseDataTypesReportDetails(this,{!! $row->pdri_id !!}, {!! $row->project_id !!}, {!! $row->company_id !!})" style="cursor:pointer;">
             <td>{!! $i++ !!}</td>
             <td>{!! $row->company_name !!}</td>
             <td>{!! $row->project_name !!}</td>
@@ -96,14 +96,6 @@
                     ],
 
                 });
-            }
-
-            if (!$.fn.DataTable.isDataTable('.dataTableSmall')) {
-                $('.dataTableSmall').DataTable({
-                    dom: 'lfrtip',
-                    lengthMenu: [[2, 10, 15, 25, 50, 100, -1], [2, 10, 15, 25, 50, 100, "ALL"]],
-                    pageLength: 2,
-                })
             }
         })
     }(jQuery))
