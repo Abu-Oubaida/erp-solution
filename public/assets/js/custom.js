@@ -4383,10 +4383,11 @@ let SalesSetting = {};
             },
         };
         Sales = {
-            addEmailPhoneForLead: function (event, displayName, outputId) {
+            addEmailPhoneForLead: function (event, displayName, outputId,existsMobileNumber=null,existsEmailAddress=null) {
                 if (!displayName || !outputId) return false;
 
-                let count = null;
+                let count = existsMobileNumber??0;
+                let count2 =existsEmailAddress??0;
                 let inputType = null;
 
                 const maxAllowed = 5;
@@ -4408,14 +4409,30 @@ let SalesSetting = {};
                         return false;
                     }
                     inputType = "email";
-                    count = extraEmailAddressCount++;
+                    count2 = extraEmailAddressCount++;
                 }
-
-                if (inputType !== null && count !== null) {
-                    const inputId = `${displayName}_${count}`;
-                    const inputPlaceholder = `Add Another ${displayName} ${count}`;
-                    const labelText = `Alternative ${displayName} ${count}`;
-
+                // && count !== null
+                if (inputType !== null ) {
+                    let inputId;
+                    let inputPlaceholder ;
+                    let labelText;
+                    if(count != ''){
+                        inputId = `${displayName}_${count}`;
+                        inputPlaceholder = `Add Another ${displayName} ${count}`;
+                        labelText = `Alternative ${displayName} ${count}`;
+                    }else if(count2 != ''){
+                        inputId = `${displayName}_${count2}`;
+                        inputPlaceholder = `Add Another ${displayName} ${count2}`;
+                        labelText = `Alternative ${displayName} ${count2}`;
+                    }else if(count == ''){
+                        inputId = `${displayName}_${count}`;
+                        inputPlaceholder = `Add Another ${displayName} ${count}`;
+                        labelText = `Alternative ${displayName} ${count}`;
+                    }else if(count2 == ''){
+                        inputId = `${displayName}_${count2}`;
+                        inputPlaceholder = `Add Another ${displayName} ${count2}`;
+                        labelText = `Alternative ${displayName} ${count2}`;
+                    }
                     const inputHtml = `
                         <div class="col-md-3">
                             <div class="form-floating mb-2">
@@ -4427,7 +4444,6 @@ let SalesSetting = {};
 
                     $(`#${outputId}`).append(inputHtml);
                 }
-
                 return false;
             },
             addLeadStep1: function () {
@@ -4439,9 +4455,6 @@ let SalesSetting = {};
                     primary_email: $("#primary_email").val(),
                     notes: $("#notes").val(),
                 };
-                // let company_group_data={
-                //     company_group:$("#company_group").val()
-                // };
                 if (
                     !add_lead_step1_data.full_name ||
                     !add_lead_step1_data.full_name ||
@@ -4645,7 +4658,7 @@ let SalesSetting = {};
                                         </div>
                                     </div>
                                     <div class="col-12 mt-1">
-                                        <a href="#" class="float-end text-decoration-none"
+                                        <a href="#" id="another_mobile_click" class="float-end text-decoration-none"
                                             onclick="Sales.addEmailPhoneForLead(this,'mobile','add_extra_info')"><i
                                                 class="fas fa-plus small"></i> Add
                                             Another Mobile</a>
@@ -4670,7 +4683,7 @@ let SalesSetting = {};
                                     </div>
                 
                                     <div class="col-12 mt-1">
-                                        <a href="#" class="float-end text-decoration-none"
+                                        <a href="#" id="another_email_click" class="float-end text-decoration-none"
                                             onclick="Sales.addEmailPhoneForLead(this,'email','add_extra_info')"><i
                                                 class="fas fa-plus small"></i> Add
                                             Another
@@ -4749,11 +4762,63 @@ let SalesSetting = {};
                         </div>
                     </div>
                     <div class="col-md-2">
+                        <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.getLeadStep1Form(${lead_id})"><i class="fa-solid fa-arrow-right"></i>
+                          Back
+                        </button>
                         <button type="button" class="btn btn-chl-outline mt-3" onclick="return Sales.addLeadStep2()"><i class="fa-solid fa-arrow-right"></i>
                             Next</button>
                     </div>
             </div>
                 `;
+            },
+            getLeadStep1Form:function(lead_id){
+                let form = Sales.addLeadStep1Form()
+                $("#commonSlot_for_multiple_step").html(form);
+                Sales.getExistingLeadData(lead_id,'/get-lead-step1')
+            },
+            getExistingLeadData:function(lead_id,passed_url){
+                const url =
+                    window.location.origin + sourceDir + passed_url;
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "GET",
+                    data: { lead_id },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            if(response.output_desn=='step1'){
+                                console.log(response)
+                                $("#company_id").val(response.data.company_id),
+                                $("#full_name").val(response.data.full_name),
+                                $("#spouse").val(response.data.spouse),
+                                $("#primary_mobile").val(response.data.primary_mobile),
+                                $("#primary_email").val(response.data.primary_email),
+                                $("#notes").val(response.data.notes)
+
+                                if(response.extra_mobiles_count>1){
+
+                                }else if(response.extra_mobiles_count==1){
+                                    $("#mobile_1").val(response.data.extra_mobiles[0].mobile)
+                                }
+                                if(response.extra_emails_count>1){
+    
+                                }else if(response.extra_emails_count==1){
+                                    $("#email_1").val(response.data.extra_emails[0].email)
+                                }
+
+                                $("#another_mobile_click").attr("onclick",`Sales.addEmailPhoneForLead(this,'mobile','add_extra_info',${response.extra_mobiles_count},'')`)
+                                $("#another_email_click").attr("onclick",`Sales.addEmailPhoneForLead(this,'email','add_extra_info','',${response.extra_emails_count})`)
+                            }
+                         }
+                    },
+                });
             },
             addLeadStep2: function () // company_group
             {

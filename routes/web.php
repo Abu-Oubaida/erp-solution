@@ -498,6 +498,7 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['get'],'get-sales-profession-main-profession','getSalesProfessionMainProfession')->name('get.sales.profession.main.profession');
             Route::match(['get'],'get-sales-source-main-source','getSalesSourceMainSource')->name('get.sales.source.main.source');
             Route::match(['get'],'get-sales-preference-dropdowns','getSalesPreferenceDropdowns')->name('get.sales.preference.dropdowns');
+            Route::match(['get'],'get-lead-step1','getLeadStep1')->name('get.lead.step1');
         });
         Route::middleware(['permission:sales_lead_list'])->group(function (){
             Route::match(['get','post'],'list-lead','leadList')->name('sales.lead.list');

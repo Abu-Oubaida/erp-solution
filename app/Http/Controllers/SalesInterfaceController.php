@@ -120,6 +120,8 @@ class SalesInterfaceController extends Controller
                 ]
             ];
             $messages=[
+                'company_id.required'=>'Company is Required',
+
                 'primary_mobile.required'=>'Primary Mobile is Required',
                 'primary_mobile.unique'=>'Primary Mobile already exist for this company',
 
@@ -248,6 +250,25 @@ class SalesInterfaceController extends Controller
                 'message' => 'Error ' . $exception->getMessage().$exception->getLine()
             ]);
         }
+    }
+    public function getLeadStep1(Request $request){
+        $getLead=Lead::with(['extraMobiles','extraEmails'])->where('id',$request->lead_id)->first();
+        if($getLead){
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data Fetch Successfull.',
+                'data'=>$getLead,
+                'extra_mobiles_count'=>$getLead->extraMobiles->count(),
+                'extra_emails_count'=>$getLead->extraEmails->count(),
+                'output_desn'=>'step1'
+            ]);
+        }else{
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unable to get Lead Step 1 Data.'
+            ]);
+        }
+        
     }
     public function addLeadStep2(Request $request)
     {
