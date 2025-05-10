@@ -215,6 +215,7 @@ class DataArchiveDashboardController extends Controller
                     $dataTypes = $this->archiveTypeList($permission)
                         ->where('status', 1)
                         ->where('company_id', $company->id)
+                        ->orderBy('voucher_type_title','asc')
                         ->get()
                         ->map(function ($item) {
                             return [
