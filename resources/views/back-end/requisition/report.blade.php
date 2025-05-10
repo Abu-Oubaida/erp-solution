@@ -61,7 +61,7 @@
             </div>
         </div>
     </div>
-    <!-- Modal for details -->
+    <!-- Modal 1 for details -->
     <div class="modal fade modal-xl" id="dataTypesDetailsModal" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="dataTypesDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen-custom">
             <div class="modal-content">
@@ -72,6 +72,20 @@
             </div>
         </div>
         <div id='ajax_loader2' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+            <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+        </div>
+    </div>
+    <!-- Modal 2 for details -->
+    <div class="modal fade modal-xl" id="dataTypesDetailsModal2" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="dataTypesDetailsModalLabel2" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id="dataTypesDetailsModalContent2"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Understood</button>
+                </div>
+            </div>
+        </div>
+        <div id='ajax_loader3' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
             <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
         </div>
     </div>
@@ -220,6 +234,167 @@
                     else {
                         alert("Success: "+response.message)
                         $("#dataTypesDetailsContent").html(response.data.view)
+                        return true
+                    }
+                },
+            })
+        }
+        function ProjectWiseNewDataTypeAdd(pdri_id,project_id,company_id)
+        {
+            const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-add";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    pdri_id:pdri_id,
+                    project_id:project_id,
+                    company_id:company_id
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        $("#dataTypesDetailsModalContent2").html(response.data.view)
+                        $("#dataTypesDetailsModal2").modal('show')
+                        return true
+                    }
+                },
+            })
+        }
+        function ProjectWiseNewDataTypeUpdate(e,pdri_id,project_id,company_id)
+        {
+            let data_types = $("#data_types").val()
+            let res_users = $("#res_users").val()
+            let deadline = $("#deadline").val()
+            if(data_types.length === 0 || res_users.length === 0 || deadline.length === 0)
+            {
+                return false
+            }
+            const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-update";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    data_types: data_types,
+                    res_users: res_users,
+                    deadline: deadline,
+                    pdri_id:pdri_id,
+                    project_id:project_id,
+                    company_id:company_id
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        alert("Success: "+response.message)
+                        $("#dataTypesDetailsModal2").modal('hide')
+                        $("#dataTypesDetailsContent").html(response.data.view)
+                        return true
+                    }
+                },
+            })
+        }
+        function DataTypeWiseResponsibleUserAdd(e,pwdtr_id,company_id)
+        {
+            const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-responsible-user-add";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    pwdtr_id: pwdtr_id,
+                    company_id: company_id,
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        $("#dataTypesDetailsModalContent2").html(response.data.view)
+                        $("#dataTypesDetailsModal2").modal('show')
+                        return true
+                    }
+                },
+            })
+        }
+
+        function DataTypeWiseResponsibleUserSubmit(e,pwdtr_id,company_id)
+        {
+            let res_users = $("#res_users").val()
+            const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-responsible-user-submit";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    users: res_users,
+                    pwdtr_id: pwdtr_id,
+                    company_id: company_id,
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        alert("Success: "+response.message)
+                        $("#responsible_user_table").html(response.data.view)
+                        return true
+                    }
+                },
+            })
+        }
+
+        function DataTypeWiseResponsibleUserDelete(e)
+        {
+            let selected = [];
+            $(".check-box-2:checked").each(function () {
+                selected.push($(this).val());
+            });
+            if (selected.length === 0) {
+                alert("Please select at least one record to delete.");
+                return false
+            }
+            if(!confirm("Are you sure?"))
+                return false
+            const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-responsible-user-delete";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    res_users: selected,
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        alert("Success: "+response.message)
+                        $("#responsible_user_table").html(response.data.view)
                         return true
                     }
                 },

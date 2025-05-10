@@ -680,9 +680,14 @@ Route::group(['middleware' => ['auth']],function (){
             });
             Route::middleware(['permission:project_document_requisition_edit'])->group(function (){
                 Route::match(['post'],'project-wise-data-type-necessity-change','projectWiseDataTypeNecessityChange');
+                Route::post('project-wise-data-type-add','projectWiseDataTypeAdd');
+                Route::post('project-wise-data-type-update','projectWiseDataTypeAddSubmit');
+                Route::post('project-wise-data-type-responsible-user-add','projectWiseDataTypeResponsibleUserAdd');
+                Route::post('project-wise-data-type-responsible-user-submit','projectWiseDataTypeResponsibleUserSubmit');
             });
             Route::middleware(['permission:project_document_requisition_delete'])->group(function (){
                 Route::match(['post'],'project-wise-data-type-delete','projectWiseDataTypeDelete');
+                Route::post('project-wise-data-type-responsible-user-delete','projectWiseDataTypeResponsibleUserDelete');
             });
             Route::middleware(['permission:project_document_requisition_report'])->group(function (){
                 Route::match(['get','post'],'project-document-requisition-report','index')->name('project.document.requisition.report');

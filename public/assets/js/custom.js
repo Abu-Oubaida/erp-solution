@@ -19,10 +19,12 @@ let Requsition  = {};
     $(document).ajaxStop(function () {
         $("#ajax_loader").hide();
         $("#ajax_loader2").hide();
+        $("#ajax_loader3").hide();
     });
     $(document).ajaxStart(function () {
         $("#ajax_loader").show();
         $("#ajax_loader2").show();
+        $("#ajax_loader3").show();
     });
     $(document).ready(function () {
         const tags = [];
