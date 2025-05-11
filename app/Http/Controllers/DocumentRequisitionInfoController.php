@@ -101,8 +101,7 @@ class DocumentRequisitionInfoController extends Controller
             'dataTypeRequired.responsibleBy.user.department:id,dept_name,dept_code',
             'dataTypeRequired.archiveDataType.accountVoucher' => function ($query) use ($project_id) {
                 $query->select('id', 'voucher_type_id', 'project_id') // Add other fields you need
-                ->where('project_id', $project_id)
-                    ->withCount('voucherDocuments');
+                ->where('project_id', $project_id);
             },
             'dataTypeRequired.archiveDataType.accountVoucher.voucherDocuments:id', // Add required fields
         ])
@@ -136,20 +135,25 @@ class DocumentRequisitionInfoController extends Controller
                         'dept_code' => $dept->dept_code,
                     ];
                 })->values();
+
+                $documentCount = optional($dataTypeRequired->archiveDataType->accountVoucher)->sum(function ($accountVoucher) {
+                    return $accountVoucher->voucherDocuments->count();
+                });
+
                 return (object)[
                     'req_data_type_id' => $dataTypeRequired->id,
-                    'created_at' => date('d-M-y',strtotime($dataTypeRequired->created_at)),
-                    'deadline' => date('d-M-y',strtotime($dataTypeRequired->deadline)),
-                    'data_type_id' => $dataTypeRequired->archiveDataType->id,
-                    'data_type_name' => $dataTypeRequired->archiveDataType->voucher_type_title,
+                    'created_at' => date('d-M-y', strtotime($dataTypeRequired->created_at)),
+                    'deadline' => date('d-M-y', strtotime($dataTypeRequired->deadline)),
+                    'data_type_id' => optional($dataTypeRequired->archiveDataType)->id,
+                    'data_type_name' => optional($dataTypeRequired->archiveDataType)->voucher_type_title,
                     'necessity' => $dataTypeRequired->status,
-                    'documents' => $dataTypeRequired->archiveDataType->accountVoucher->voucher_documents_count ?? null,
-                    'responsible_by_count' => $dataTypeRequired->responsibleBy->count() ?? null,
-                    'responsible_by' => $dataTypeRequired->responsibleBy->collect()->map(function ($responsibleBy) {
+                    'documents' => $documentCount ?? 0,
+                    'responsible_by_count' => $dataTypeRequired->responsibleBy->count(),
+                    'responsible_by' => $dataTypeRequired->responsibleBy->map(function ($responsibleBy) {
                         return (object)[
-                            'id' => $responsibleBy->user->id,
-                            'name' => $responsibleBy->user->name,
-                            'employee_id' => $responsibleBy->user->employee_id,
+                            'id' => optional($responsibleBy->user)->id,
+                            'name' => optional($responsibleBy->user)->name,
+                            'employee_id' => optional($responsibleBy->user)->employee_id,
                         ];
                     }),
                     'departments' => $uniqueDepartments,
