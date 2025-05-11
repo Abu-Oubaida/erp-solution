@@ -53,7 +53,7 @@
                 <td>
                     @if($row->departments)
                         @foreach($row->departments as $dept)
-                            <span class="badge bg-secondary"> {!! $dept->dept_name !!}</span>
+                            <span class="badge bg-secondary">{!! $dept->dept_name !!}@if(!$loop->last), @endif</span>
                         @endforeach
                     @endif
                 </td>
