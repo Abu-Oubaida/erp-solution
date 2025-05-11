@@ -1,0 +1,13 @@
+<script>
+    let hostname = window.location.hostname;
+    if(hostname === 'localhost')
+    {
+        sourceDir = "/chl/public" //project directory
+    }else if (hostname === '127.0.0.1')
+    {
+        sourceDir = ""
+    }
+    else{
+        sourceDir = ""
+    }
+</script>

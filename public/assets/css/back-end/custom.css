@@ -43,6 +43,15 @@
         transform: translateX(-250px);
     }
 }
+/* Add left padding to dropdown items */
+.selectize-dropdown .selectize-dropdown-content > div {
+    padding: 5px 12px;
+}
+
+/* Optional: Add more space specifically to the "Select all" option */
+.selectize-dropdown-header {
+    padding-left: 12px !important;
+}
 .text-chl-important {
     color: #f47920!important;
 }

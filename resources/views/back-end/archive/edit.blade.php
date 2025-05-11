@@ -219,7 +219,7 @@
                         @method('post')
                         {{--</form>--}}
                         <!-- Modal For Preview -->
-                        <div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal modal-xl fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -244,7 +244,7 @@
                             </div>
                         </div>
                         <!-- Modal-2 For Share -->
-                        <div class="modal modal-xl fade" id="shareModel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="shareModelLabel" aria-hidden="true">
+                        <div class="modal modal-xl fade" id="shareModel" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="shareModelLabel" aria-hidden="true">
                             <div class="modal-dialog" id="model_dialog">
 
                             </div>

@@ -4,9 +4,9 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\Cache;
 
-trait DataArchiveTrait
+trait CacheTrait
 {
-    private function clearArchiveDashboardCache($companyId)
+    private function clearCache()
     {
         try {
             // Clear all related caches

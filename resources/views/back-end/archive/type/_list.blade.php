@@ -6,11 +6,17 @@
                 <div class="col-8">
                     <h3 class="text-capitalize"><i class="fas fa-list"></i> Data Type List</h3>
                 </div>
-            @if(auth()->user()->hasPermission('add_archive_data_type'))
+
                 <div class="col-4">
-                    <a class="btn btn-success btn-sm float-end mt-1" href="{!! route('add.archive.type') !!}"><i class="fa-solid fa-circle-plus"></i> Add Type</a>
+                    @if(auth()->user()->hasPermission('add_archive_data_type'))
+                    <a class="btn btn-success btn-sm float-end m-1 mt-1" href="{!! route('add.archive.type') !!}"><i class="fa-solid fa-circle-plus"></i> Add Type</a>
+                    @endif
+                    @if(auth()->user()->hasPermission('add_archive_data_type_user_permission'))
+                    <button type="button" class="btn btn-sm btn-primary float-end m-1" data-bs-toggle="modal" data-bs-target="#permissionEditModal">
+                        <i class="fa-solid fa-users-gear"></i> Set User Permission
+                    </button>
+                    @endif
                 </div>
-            @endif
             </div>
         </div>
         <div class="card-body">

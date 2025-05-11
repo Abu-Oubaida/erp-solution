@@ -14,7 +14,9 @@ class EmployeeListPrototypeDataExport implements FromCollection
     {
         $data = [
             [
+                'Company Code*',
                 'Employee Name*',
+                'Employee Id*',
                 'Department',
                 'Department Code*',
                 'Designation*',
@@ -24,6 +26,7 @@ class EmployeeListPrototypeDataExport implements FromCollection
                 'Email',
                 'Status',
                 'Blood Group',
+                'Password',
             ]
         ];
         return collect($data);

@@ -39,4 +39,9 @@ class branch extends Model
             $query->where('branch_id',$this->id);
         })->get();
     }
+
+    public function documentRequiredInfo()
+    {
+        return $this->hasOne(Project_document_requisition_info::class,'project_id','id');
+    }
 }

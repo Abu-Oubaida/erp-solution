@@ -7,6 +7,7 @@ use App\Models\ArchiveInfoLinkDocument;
 use App\Models\ArchiveLinkDocumentDeleteHistory;
 use App\Models\branch;
 use App\Models\company_info;
+use App\Models\Data_archive_storage_package;
 use App\Models\User;
 use App\Models\Voucher_type_permission_user_delete_history;
 use App\Models\VoucherDocument;
@@ -14,12 +15,13 @@ use App\Models\VoucherDocumentDeleteHistory;
 use App\Models\VoucherDocumentIndividualDeletedHistory;
 use App\Models\VoucherType;
 use App\Rules\AccountVoucherInfoStatusRule;
-use App\Traits\DataArchiveTrait;
+use App\Traits\CacheTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -31,7 +33,7 @@ use function PHPUnit\Framework\directoryExists;
 
 class ArchiveController extends Controller
 {
-    use ParentTraitCompanyWise,DataArchiveTrait;
+    use ParentTraitCompanyWise,CacheTrait;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -60,8 +62,9 @@ class ArchiveController extends Controller
     }
     public function listArchiveDataType(Request $request){
         $permission = $this->permissions()->archive_data_type_list;
+        $companies = $this->getCompanyModulePermissionWise($permission)->get();
         $voucherTypes = $this->getArchiveTypeList($permission);
-            return view('back-end/archive/type/list',compact('voucherTypes'))->render();
+            return view('back-end/archive/type/list',compact('voucherTypes','companies'))->render();
     }
     private function storeArchiveType(Request $request,$voucherTypeID=null):RedirectResponse
     {
@@ -103,7 +106,7 @@ class ArchiveController extends Controller
                 }
             }
             DB::commit();
-            $this->clearArchiveDashboardCache($company);
+            $this->clearCache();
             return back()->with('success','Data insert successfully');
         }catch (\Throwable $exception)
         {
@@ -412,10 +415,20 @@ class ArchiveController extends Controller
             extract($request->post());
             $user = Auth::user();
             $documentIds = array();
-            $company_code = company_info::find($company)->company_code;
+            $company_info = company_info::find($company);
+            if(!($company_info->archiveStorage && $company_info->archiveStorage->storage_package_id))
+            {
+                throw new \Exception('Selected company has not any storage package. Please contact system administrator');
+            }
+            $company_code = $company_info->company_code;
             $v_type = VoucherType::where('id',$data_type)->first();
+
+            $root_path = env('APP_ARCHIVE_DATA').'/';
+            $company_path = $root_path.$company_code.'/';
             $file_path = $company_code.'/'.$v_type->voucher_type_title.'/';
-            $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
+            $destinationPath = $root_path.$file_path;
+
+            $this->extracted($company_info, $company_path);
 
 //            $firstInsert = archive infos
             $firstInsert = DB::table('account_voucher_infos')->insertGetId([
@@ -482,7 +495,7 @@ class ArchiveController extends Controller
                 }
             }
             DB::commit();
-            $this->clearArchiveDashboardCache($company);
+            $this->clearCache();
             return back()->with('success', 'Data save successful.');
 
         }catch (\Throwable $exception)
@@ -538,9 +551,21 @@ class ArchiveController extends Controller
                 extract($request->post());
                 $user = Auth::user();
                 $voucherInfo = Account_voucher::with(['VoucherType','company'])->where('id',Crypt::decryptString($id))->first();
-                $company_code = $voucherInfo->company->company_code;
+                $company_info = $voucherInfo->company;
+                if(!($company_info->archiveStorage && $company_info->archiveStorage->storage_package_id))
+                {
+                    throw new \Exception('Selected company has not any storage package. Please contact system administrator');
+                }
+                $root_path = env('APP_ARCHIVE_DATA').'/';
+                $company_code = $company_info->company_code;
+                $company_path = $root_path.$company_code.'/';
+
+
+                $this->extracted($company_info, $company_path);
+
+
                 $file_path = $company_code.'/'.$voucherInfo->VoucherType->voucher_type_title.'/';
-                $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
+                $destinationPath = $root_path.$file_path;
                 $uploadedFiles = []; // Track successfully uploaded files
 
                 foreach ($request->file('voucher_file') as $file) {
@@ -576,18 +601,20 @@ class ArchiveController extends Controller
                     }
                 }
                 DB::commit();
-                $this->clearArchiveDashboardCache($voucherInfo->company_id);
+                $this->clearCache();
                 return back()->with('success','Data upload successfully on Voucher No:'.$voucherInfo->voucher_number);
             }
             return back()->with('error', "request method {$request->method()} not supported")->withInput();
         }catch (\Throwable $exception)
         {
             DB::rollBack();
-
-            // Delete uploaded files if transaction fails
-            foreach ($uploadedFiles as $file) {
-                if (file_exists($file)) {
-                    unlink($file);
+            if (isset($uploadedFiles))
+            {
+                // Delete uploaded files if transaction fails
+                foreach ($uploadedFiles as $file) {
+                    if (file_exists($file)) {
+                        unlink($file);
+                    }
                 }
             }
             return back()->with('error',$exception->getMessage());
@@ -678,19 +705,21 @@ class ArchiveController extends Controller
                 'c' => ['required', 'integer', 'exists:company_infos,id'],
                 't' => ['required', 'integer', 'exists:voucher_types,id'],
                 'l' => ['nullable','sometimes', 'integer',],
+                'p' => ['nullable','sometimes', 'integer','exists:branches,id',],
             ]);
             $company_id = $request->get('c');
             $data_type = $request->get('t');
+            $project = $request->get('p')??null;
             $perPage = request('per_page', 10);
 
-            $voucherInfos = $this->archiveListInfo($company_id, $data_type, $perPage);
+            $voucherInfos = $this->archiveListInfo($company_id, $data_type,$project, $perPage);
 
             return view('back-end/archive/pagination-list', compact('voucherInfos','company_id','data_type'));
         } catch (\Throwable $exception) {
             return back()->with('error',$exception->getMessage());
         }
     }
-    private function archiveListInfo($company_id,$type_id,$perPage = null)
+    private function archiveListInfo($company_id,$type_id,$project=null,$perPage = null)
     {
         $data = Account_voucher::with([
             'VoucherDocument',
@@ -733,6 +762,10 @@ class ArchiveController extends Controller
             ->whereIn('voucher_type_id',$this->getCompanyWiseDataTypes($company_id)->pluck('id')->toArray())
             ->where('voucher_type_id',$type_id)
             ->orderBy('id', 'desc');
+        if ($project)
+        {
+            $data = $data->where('project_id', $project);
+        }
         if ($perPage) {
             if ($perPage == 'all') {
                 $data = $data->get();
@@ -874,7 +907,6 @@ class ArchiveController extends Controller
                 ]);
                 extract($request->post());
                 $projects = branch::where('company_id',$company_id)->whereIn('id',$this->getUserProjectPermissions(Auth::user()->id,$permission)->pluck('id')->toArray())->where('status',1)->get();
-                $userWiseVoucherTypePermissionId = null;
                 $types = $this->getCompanyWiseDataTypes($company_id);
                 return response()->json([
                     'status' => 'success',
@@ -957,7 +989,6 @@ class ArchiveController extends Controller
                 ]);
                 extract($validated);
                 $oldFile = VoucherDocument::with(['accountVoucherInfo','accountVoucherInfo.VoucherType','company'])->find($id);
-//                dd($oldFile);
                 $company_code = $oldFile->company->company_code;
                 $file_path = $oldFile->filepath;
                 $destinationPath = env('APP_ARCHIVE_DATA').'/'.$file_path;
@@ -1002,10 +1033,8 @@ class ArchiveController extends Controller
                 if (!empty($previous_files)) {
                     $finalInsertData = $this->linkDocumentInfoArray($previous_files,$update_archive_info_id,$thisArchiveDocumentIDs,$company_id_link);
                     if (!empty($finalInsertData)) {
-//            $thirdInsert = archive infos and documents link
                         $thirdInsert = ArchiveInfoLinkDocument::insert($finalInsertData); // Bulk insert
                         if (!$thirdInsert) {
-                            // Rollback the transaction if the second insert for any item failed
                             DB::rollBack();
                             return redirect()->back()->with('error', 'Failed to execute the second insert.');
                         }
@@ -1039,18 +1068,6 @@ class ArchiveController extends Controller
 
         $previous_document_single = $previous_documents->first();
         $existingLinks2 = ArchiveInfoLinkDocument::where('voucher_info_id', $previous_document_single->voucher_info_id)->whereIn('document_id', $documentIds)->where('company_id', $company_id)->get()->pluck('document_id')->toArray();
-
-//        $parentLinkData = collect($documentIds)->reject(function ($documentId) use ($existingLinks2){
-//            return in_array($documentId, $existingLinks2);
-//        })->map(function ($documentId) use ($previous_document_single,$company_id) {
-//            return [
-//                'company_id'      => $company_id,
-//                'voucher_info_id' => $previous_document_single->voucher_info_id,
-//                'document_id'        => $documentId,
-//                'created_at'        => now(),
-//            ];
-//        })->toArray();
-
         $parentLinkData = collect($documentIds)
             ->reject(fn($documentId) => in_array($documentId, $existingLinks2))
             ->map(fn($documentId) => [
@@ -1149,7 +1166,7 @@ class ArchiveController extends Controller
             ]);
             VoucherDocument::where('id',$v_d->id)->delete();
             $old_link_data->delete();
-            $this->clearArchiveDashboardCache($v_d->company_id);
+            $this->clearCache();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
@@ -1357,12 +1374,6 @@ class ArchiveController extends Controller
                 'message'=> $exception->getMessage()
                 ]);
         }
-
-
-        // $departments = department::with(['get_users' => function($query) {
-        //     $query->whereColumn('company_id', 'company'); // Compare company_id with company directly
-        // }])
-        // ->get();
     }
 
     public function setting()
@@ -1371,21 +1382,53 @@ class ArchiveController extends Controller
             $permission = $this->permissions()->archive_setting;
             $companies = $this->getCompanyModulePermissionWise($permission)->get(['id','company_name','company_code']);
             $path = env('APP_ARCHIVE_DATA');
-            $base_dir = round(disk_total_space($path) / (1024 * 1024 * 1024),2);
-            $company_wise_storage = $companies->map(function ($company) use ($path) {
-                $company_dir = $path.'/'.$company->company_code;
-                return [
-                    'company_id' => $company->id,
-                    'company_name' => $company->company_name,
-                    'company_code' => $company->company_code,
-                    'company_storage_package' => $company->archiveStorage,
-                    'company_used_storage' => round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2),
-                ];
+            $storage_packages = Cache::remember('storage_packages', 86400, function () {
+                return Data_archive_storage_package::where('status', 1)->get(['id','package_name','package_size']);
             });
-            return view('back-end.archive.setting',compact('companies','base_dir','company_wise_storage'))->render();
+            $total_storage = Cache::remember('total_storage', 600, function () use ($path) {
+                return round(disk_total_space($path) / (1024 * 1024 * 1024),2);
+            });
+            $company_wise_storage = Cache::remember('company_wise_storage', 600, function () use ($companies,$path) {
+                return $companies->map(function ($company) use ($path) {
+                    $company_dir = $path.'/'.$company->company_code;
+                    return [
+                        'company_id' => $company->id,
+                        'company_name' => $company->company_name,
+                        'company_code' => $company->company_code,
+                        'company_storage_package' => ($company->archiveStorage != null)?
+                            [
+                                'package_id'=>($company->archiveStorage->storage_package_id)??null,
+                                'package_name'=>($company->archiveStorage->package->package_name)??null,
+                                'package_size'=>($company->archiveStorage->package->package_size)??null,
+                                'status'=>$company->archiveStorage->status
+                            ]:null,
+                        'company_used_storage' => round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2),
+                    ];
+                });
+            });
+            return view('back-end.archive.setting',compact('companies','total_storage','company_wise_storage','storage_packages'))->render();
         }catch (\Throwable $exception)
         {
             return back()->with('error',$exception->getMessage());
+        }
+    }
+
+    /**
+     * @param mixed $company_info
+     * @param string $company_path
+     * @return void
+     * @throws \Exception
+     */
+    private function extracted(mixed $company_info, string $company_path): void
+    {
+        $company_used_storage = Cache::remember("company_{$company_info->id}_used_storage}", 600, function () use ($company_path) {
+            return round($this->getFolderSize($company_path) / (1024 * 1024 * 1024), 2);
+        });
+        $company_package_size = Cache::remember("company_package_size_{$company_info->id}", 86400, function () use ($company_info) {
+            return $company_info->archiveStorage->package->package_size;
+        });
+        if (($company_package_size - $company_used_storage) <= 0) {
+            throw new \Exception('Selected company storage full. Please contact system administrator');
         }
     }
 }

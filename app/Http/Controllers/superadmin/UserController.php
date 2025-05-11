@@ -25,11 +25,13 @@ use App\Rules\DesignationStatusRule;
 use App\Rules\RoleStatusRule;
 use App\Rules\UserStatusCheck;
 use App\Traits\BranchParent;
+use App\Traits\CacheTrait;
 use App\Traits\ParentTraitCompanyWise;
 use http\Exception\BadConversionException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -42,7 +44,7 @@ use Log;
 
 class UserController extends Controller
 {
-    use ParentTraitCompanyWise;
+    use ParentTraitCompanyWise, CacheTrait;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -60,11 +62,7 @@ class UserController extends Controller
                 return $this->store($request);
             }else{
                 $companies = $this->getCompanyModulePermissionWise($permission)->get();
-                $depts = $this->getDepartment($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
-                $branches = $this->getBranch($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
-                $roles = $this->getRole($permission)->get();
-                $designations = $this->getDesignation($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
-                return view('back-end.user.add',compact('depts','branches','roles','designations','companies'))->render();
+                return view('back-end.user.add',compact('companies'))->render();
             }
 
         }catch (\Throwable $exception)
@@ -137,6 +135,7 @@ class UserController extends Controller
                 ]);
                 $user->attachRole($roles->name,'App\Models\User');
                 event(new Registered($user));
+                $this->clearCache();
                 return back()->with('success','Account create successfully');
             }
         }catch (\Throwable $exception)
@@ -151,30 +150,38 @@ class UserController extends Controller
         try {
             $permission = $this->permissions()->add_user;
             $input = $request->post()['input'];
+            foreach ($input as $index => $row) {
+                if (isset($row['12'])) {
+                    $input[$index]['12'] = (string) $row['12'];
+                }
+            }
+
+            $request->merge(['input' => $input]);
             unset($input[0]);
             $rules = [
-                '*.0'   =>  ['required','string'],
+                '*.0'   =>  ['required','string', 'exists:company_infos,company_code'],//Company code
 //                '*.1'   =>  ['required','exists:departments,dept_name'],
-                '*.1'   =>  ['sometimes','nullable','string'],
-                '*.2'   =>  ['required','exists:departments,dept_code'],
-                '*.3'   =>  ['required','exists:designations,title'],
-                '*.4'   =>  ['required','exists:branches,branch_name'],
-                '*.5'   =>  ['required','date'],
-                '*.6'   =>  ['required','numeric','regex:/^(01[3-9]\d{8})$/', Rule::unique('users','phone')->where(function ($query) {
-                    return $query->where('company',$this->user->company);
-                }),],
-                '*.7'   =>  ['sometimes','nullable', 'email', 'max:255', Rule::unique('users','email')],
-                '*.8'   =>  ['sometimes','nullable','numeric'],
-                '*.9'   =>  ['sometimes','nullable','exists:blood_groups,blood_type'],
+                '*.1'   =>  ['sometimes','nullable','string'], //Name
+                '*.2'   =>  ['sometimes','nullable','min:7','max:12','unique:users,employee_id'], // Employee id
+                '*.4'   =>  ['required','exists:departments,dept_code'], // Department code
+                '*.5'   =>  ['required','exists:designations,title'], // Designation
+                '*.6'   =>  ['required','exists:branches,branch_name'], // Branch
+                '*.7'   =>  ['required','date_format:d-m-Y'], // Joning date
+                '*.8'   =>  ['required','numeric','regex:/^(01[3-9]\d{8})$/', Rule::unique('users','phone')], // User phone
+                '*.9'   =>  ['sometimes','nullable', 'email', 'max:255', Rule::unique('users','email')], // User Email
+                '*.10'   =>  ['sometimes','nullable','numeric','in:0,1'],// Status
+                '*.11'   =>  ['sometimes','nullable','exists:blood_groups,blood_type'], // Blood Group
+                '*.12' => ['required','string', Rules\Password::defaults()], // Password
             ];
             $customMessages = [
-                '*.1.exists' => 'The department name does not exist in the Database.',
-                '*.2.exists' => 'The department code does not exist in the Database.',
-                '*.3.exists' => 'The designations title does not exist in the Database.',
-                '*.4.exists' => 'The branches name does not exist in the Database.',
-                '*.6.unique' => 'The phone number already exist in the Database.',
-                '*.7.unique' => 'The email address already exist in the Database.',
-                '*.9.exists' => 'The blood group does not exist in the Database.',
+                '*.0.exists' => 'This company code does not exist in the Database.',
+                '*.2.unique' => 'This employee id already exist in the Database.',
+                '*.4.exists' => 'The department name does not exist in the Database.',
+                '*.5.exists' => 'The designations title does not exist in the Database.',
+                '*.6.exists' => 'The branches name does not exist in the Database.',
+                '*.8.unique' => 'The phone number already exist in the Database.',
+                '*.9.unique' => 'The email address already exist in the Database.',
+                '*.11.exists' => 'The blood group does not exist in the Database.',
             ];
             $validator = Validator::make($input,$rules,$customMessages);
             // Check if validation fails
@@ -194,52 +201,56 @@ class UserController extends Controller
                 foreach ($input as $key=>$data)
                 {
 //                    $dept = department::where('dept_name',$data[1])->where('dept_code',$data[2])->first();
-                    $dept = $this->getDepartment($permission)->where('dept_code',$data[2])->first();
-                    $designation = $this->getDesignation($permission)->where('title',$data[3])->first();
-                    $branch = $this->getBranch($permission)->where('branch_name',$data[4])->first();
-                    $blood = $this->getBloodGroup()->where('blood_type',$data[9])->first();
+                    $company = $this->getCompany()->where('company_code',$data[0])->first();
+                    $dept = $this->getDepartment($permission)->where('dept_code',$data[4])->first();
+                    $designation = $this->getDesignation($permission)->where('title',$data[5])->first();
+                    $branch = $this->getBranch($permission)->where('branch_name',$data[6])->first();
+                    $blood = $this->getBloodGroup()->where('blood_type',$data[11])->first();
                     ($blood)? $b_id = $blood->id:$b_id = null;
-                    ($data[8])?$status = $data[8]:$status = 0;
-                    $eid = $this->getEid($dept, $data[5],$this->user->company_id);
-                    $alreadyInDB = $this->getUser($permission)->where('company',$this->user->company_id)->where('name',$data[0])->where('phone',$data[6])->where('email',$data[7])->first();
+                    ($data[10])?$status = $data[10]:$status = 0;
+
+//                    $eid = $this->getEid($dept, $data[5],$this->user->company_id);
+                    $eid = $data[2];
+                    $eid_hidden = substr($eid, 4);
+                    $alreadyInDB = $this->getUser($permission)->where('company',$company->id)->where('name',$data[1])->where('employee_id',$data[2])->where('phone',$data[8])->where('email',$data[9])->first();
                     if (!$alreadyInDB)
                     {
                         $user = $this->getUser($permission)->create([
-                            'company' => $this->user->company,
-                            'employee_id' => $eid[1],
-                            'employee_id_hidden'    => $eid[0],
-                            'name' => $data[0],
-                            'phone' => $data[6],
-                            'email' => $data[7],
+                            'company' => $company->id,
+                            'employee_id' => $eid,
+                            'employee_id_hidden'    => $eid_hidden,
+                            'name' => $data[1],
+                            'phone' => $data[8],
+                            'email' => $data[9],
                             'dept_id' => $dept->id,
                             'status' => $status,
                             'designation_id' => $designation->id,
                             'branch_id' => $branch->id,
-                            'joining_date' => $data[5],
-                            'password' => Hash::make('12345'),
+                            'joining_date' => $data[7],
+                            'password' => Hash::make($data[10]),
                             'blood_id' => $b_id,
                         ]);
                         if ($user)
                         {
                             $user->attachRole('user');
                             $stored[$key] = [
-                                'Employee Name'  =>  $data[0],
-                                'phone'  =>  $data[6],
-                                'email'  =>  $data[7],
+                                'EmployeeName'  =>  $data[1],
+                                'phone'  =>  $data[8],
+                                'email'  =>  $data[9],
                             ];
                         }
                         else{
                             $unStored[$key] = [
-                                'Employee Name'  =>  $data[0],
-                                'phone'  =>  $data[6],
-                                'email'  =>  $data[7],
+                                'EmployeeName'  =>  $data[1],
+                                'phone'  =>  $data[8],
+                                'email'  =>  $data[9],
                             ];
                         }
                     }else{
                         $alreadyHave[$key] = [
-                            'Employee Name'  =>  $data[0],
-                            'phone'  =>  $data[6],
-                            'email'  =>  $data[7],
+                            'EmployeeName'  =>  $data[1],
+                            'phone'  =>  $data[8],
+                            'email'  =>  $data[9],
                         ];
                     }
                 }
@@ -250,6 +261,7 @@ class UserController extends Controller
                     'alreadyHasMessage' => $alreadyHave? $alreadyHave:null,
                 ];
             }
+            $this->clearCache();
             return response()->json($response, 200);
         }catch (\Throwable $exception)
         {
@@ -264,21 +276,16 @@ class UserController extends Controller
 
     public function show()
     {
-        try {
+//        try {
             $permission = $this->permissions()->list_user;
-            if ($this->user->isSystemSuperAdmin())
-            {
-                $users = $this->getUser($permission)->orderBy('dept_id','asc')->get();
-            }
-            else {
-                $users = $this->getUser($permission)->where('users.status','!=',5)->orderBy('dept_id','asc')->get();
-            }
-            Log::info(json_encode($users, JSON_PRETTY_PRINT));
+            $users = Cache::remember("users_list_of_{$this->user->id}", 600, function () use ($permission) {
+                    return $this->getUser($permission)->orderBy('dept_id','asc')->get();
+                });
             return view('back-end.user.list',compact('users'))->render();
-        }catch (\Throwable $exception)
-        {
-            return back()->with('error',$exception->getMessage());
-        }
+//        }catch (\Throwable $exception)
+//        {
+//            return back()->with('error',$exception->getMessage());
+//        }
     }
 
     public function SingleView($id)
@@ -513,16 +520,35 @@ class UserController extends Controller
             try {
                 extract($request->post());
                 $userId = Crypt::decryptString($id);
-                if ($this->getUser($this->permissions()->delete_user)->where('id',$userId)->first())
+                if ($delete_user = $this->getUser($this->permissions()->delete_user)->where('id',$userId)->first())
                 {
-                    $this->getUser($this->permissions()->delete_user)->where('id',$userId)->update([
-                        'status'=>5,//delete
-                    ]);
-//                    if (Auth::user()->roles->first()->name == 'systemsuperadmin')
-//                    {
-//
-//                    }
-                    return back()->with('warning','User Deleted!');
+                    if ($delete_user->status == 5)
+                    {
+                        if ($this->user->isSystemSuperAdmin())
+                        {
+                            User::where('id',$userId)->delete();
+                        }
+                        else{
+                            User::where('id',$userId)->where('company',$this->user->company)->delete();
+                        }
+                        $this->clearCache();
+                        return back()->with('success','User Parentally Deleted!');
+                    }
+                    else {
+                        if ($this->user->isSystemSuperAdmin())
+                        {
+                            User::where('id',$userId)->update([
+                                'status'=>5,//delete
+                            ]);
+                        }
+                        else{
+                            User::where('id',$userId)->where('company',$this->user->company)->update([
+                                'status'=>5,//delete
+                            ]);
+                        }
+                        $this->clearCache();
+                        return back()->with('warning','User Deleted!');
+                    }
                 }
             }catch (\Throwable $exception)
             {

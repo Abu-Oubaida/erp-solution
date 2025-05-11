@@ -2,17 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Document_requisition_attested_document_info;
-use App\Models\Document_requisition_info;
-use App\Models\Document_requisition_receiver_user;
+use App\Models\department;
+use App\Models\Project_document_requisition_info;
+use App\Models\Project_wise_data_type_required_info;
+use App\Models\Project_wise_data_type_required_infos_delete_history;
+use App\Models\Required_data_type_upload_responsible_user_info;
+use App\Models\Required_data_type_upload_responsible_user_infos_delete_history;
+use App\Models\User;
+use App\Models\VoucherType;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class DocumentRequisitionInfoController extends Controller
 {
     use ParentTraitCompanyWise;
+
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -20,254 +28,502 @@ class DocumentRequisitionInfoController extends Controller
             return $next($request);
         });
     }
-    public function companyWiseUser(Request $request)
+
+    public function index(Request $request)
+    {
+        try {
+            $permission = $this->permissions()->project_document_requisition_report;
+            if ($request->ajax()) {
+                return $this->report($request, $permission);
+            }
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            return view('back-end.requisition.report', compact('companies'))->render();
+        } catch (\Throwable $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+    }
+
+    private function report(Request $request, $permission)
+    {
+        try {
+            if ($request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'company' => ['required', 'string', 'exists:company_infos,id'],
+                    'projects' => ['required', 'array'],
+                    'projects.*' => ['required', 'string', 'exists:branches,id'],
+                ]);
+                extract($validatedData);
+                $branches = $this->getUserProjectPermissions($this->user->id, $permission)->where('status', 1)->where('company_id', $company)->whereIn('id', $projects)->get();
+                $data = (object)$branches->map(function ($branch) {
+                    return (object)[
+                        'project_id' => $branch->id,
+                        'company_id' => $branch->company_id,
+                        'company_name' => $branch->company->company_name,
+                        'project_name' => $branch->branch_name,
+                        'project_address' => $branch->address,
+                        'pdri_id' => $branch->documentRequiredInfo->id ?? null,
+                        'pdri_subject' => $branch->documentRequiredInfo->message_subject ?? null,
+                        'pdri_details' => $branch->documentRequiredInfo->message_body ?? null,
+                        'created_by' => $branch->documentRequiredInfo->createdBy->name ?? null,
+                        'updated_by' => $branch->documentRequiredInfo->updatedBy->name ?? null,
+                        'created_at' => date('d-F-y H:i:s A', strtotime(@$branch->documentRequiredInfo->created_at)) ?? null,
+                        'updated_at' => date('d-F-y H:i:s A', strtotime(@$branch->documentRequiredInfo->updated_at)) ?? null,
+                        'data_type_required_count' => $branch->documentRequiredInfo?->dataTypeRequired->count() ?? 0,
+                    ];
+                });
+                if ($data->isEmpty()) {
+                    throw new \Exception('No data found!');
+                }
+                $view = view('back-end.requisition._project_wise_data_type_report', compact('data'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view' => $view],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            throw new \Exception('Request method not allowed');
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+
+    private function projectWiseDataTypeReportDetailsData($id, $project_id, $company_id)
+    {
+        $data = Project_document_requisition_info::with([
+            'project:id,branch_name',
+            'company:id,company_name',
+            'dataTypeRequired:id,pdri_id,data_type_id,status,deadline,created_at',
+            'dataTypeRequired.archiveDataType:id,voucher_type_title',
+            'dataTypeRequired.responsibleBy.user:id,name,employee_id,dept_id',
+            'dataTypeRequired.responsibleBy.user.department:id,dept_name,dept_code',
+            'dataTypeRequired.archiveDataType.accountVoucher' => function ($query) use ($project_id) {
+                $query->select('id', 'voucher_type_id', 'project_id') // Add other fields you need
+                ->where('project_id', $project_id);
+            },
+            'dataTypeRequired.archiveDataType.accountVoucher.voucherDocuments:id', // Add required fields
+        ])
+            ->where('company_id', $company_id)
+            ->where('project_id', $project_id)
+            ->where('id', $id)
+            ->first();
+        if (!$data) {
+            throw new \Exception('No data found!');
+        }
+        $result = (object)[
+            'pdri_id' => $data->id,
+            'company_id' => $data->company_id,
+            'company_name' => $data->company->company_name,
+            'project_name' => $data->project->branch_name,
+            'project_id' => $data->project_id,
+            'res_dept' => $data->depts,
+            'data_types' => $data->dataTypeRequired->map(function ($dataTypeRequired) {
+                $departments = collect();
+
+                foreach ($dataTypeRequired->responsibleBy as $responsible) {
+                    if ($responsible->user && $responsible->user->department) {
+                        $departments->push($responsible->user->department);
+                    }
+                }
+
+                $uniqueDepartments = $departments->unique('id')->map(function ($dept) {
+                    return (object)[
+                        'dept_id' => $dept->id,
+                        'dept_name' => $dept->dept_name,
+                        'dept_code' => $dept->dept_code,
+                    ];
+                })->values();
+
+                $documentCount = optional($dataTypeRequired->archiveDataType->accountVoucher)->sum(function ($accountVoucher) {
+                    return $accountVoucher->voucherDocuments->count();
+                });
+
+                return (object)[
+                    'req_data_type_id' => $dataTypeRequired->id,
+                    'created_at' => date('d-M-y', strtotime($dataTypeRequired->created_at)),
+                    'deadline' => date('d-M-y', strtotime($dataTypeRequired->deadline)),
+                    'data_type_id' => optional($dataTypeRequired->archiveDataType)->id,
+                    'data_type_name' => optional($dataTypeRequired->archiveDataType)->voucher_type_title,
+                    'necessity' => $dataTypeRequired->status,
+                    'documents' => $documentCount ?? 0,
+                    'responsible_by_count' => $dataTypeRequired->responsibleBy->count(),
+                    'responsible_by' => $dataTypeRequired->responsibleBy->map(function ($responsibleBy) {
+                        return (object)[
+                            'id' => optional($responsibleBy->user)->id,
+                            'name' => optional($responsibleBy->user)->name,
+                            'employee_id' => optional($responsibleBy->user)->employee_id,
+                        ];
+                    }),
+                    'departments' => $uniqueDepartments,
+                ];
+            }),
+        ];
+        return $result;
+    }
+
+    public function projectWiseDataTypeReportDetails(Request $request)
+    {
+        try {
+            if ($request->ajax()) {
+                $validatedData = $request->validate([
+                    'id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                ]);
+                extract($validatedData);
+                $result = $this->projectWiseDataTypeReportDetailsData($id, $project_id, $company_id);
+                $view = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details', compact('result'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view' => $view],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            throw new \Exception('Request method not allowed');
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+
+    public function create(Request $request)
+    {
+        try {
+            if ($request->ajax()) {
+                return $this->store($request);
+            }
+            $permission = $this->permissions()->project_document_requisition_entry;
+            $companies = $this->getCompanyModulePermissionWise($permission)->get();
+            return view('back-end.requisition.add', compact('companies'))->render();
+        } catch (\Exception $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+    }
+
+    private function store(Request $request)
+    {
+        try {
+            if ($request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                    'projects' => ['required', 'array'],
+                    'projects.*' => ['required', 'string', 'exists:branches,id'],
+                    'data_types' => ['required', 'array'],
+                    'data_types.*' => ['required', 'string', 'exists:voucher_types,id'],
+                    'users' => ['required', 'array'],
+                    'users.*' => ['required', 'string', 'exists:users,id'],
+                    'deadline' => ['required', 'string', 'date'],
+                    'subject' => ['sometimes', 'nullable', 'string', 'max:255'],
+                    'details' => ['sometimes', 'nullable', 'string'],
+                ]);
+
+                // Convert arrays to collections
+                $projects = collect($validatedData['projects']);
+                $data_types = collect($validatedData['data_types']);
+                $users = collect($validatedData['users']);
+
+                foreach ($projects as $project_id) {
+                    $pdri = Project_document_requisition_info::firstOrCreate(
+                        ['project_id' => $project_id],
+                        [
+                            'company_id' => $validatedData['company_id'],
+                            'message_subject' => $validatedData['subject'] ?? null,
+                            'message_body' => $validatedData['details'] ?? null,
+                            'created_by' => $this->user->id,
+                            'updated_by' => null,
+                        ]
+                    );
+
+                    foreach ($data_types as $data_type_id) {
+                        $pwdtr = Project_wise_data_type_required_info::firstOrCreate(
+                            [
+                                'pdri_id' => $pdri->id,
+                                'data_type_id' => $data_type_id,
+                            ],
+                            [
+                                'company_id' => $validatedData['company_id'],
+                                'deadline' => $validatedData['deadline'],
+                                'status' => 1,
+                                'created_by' => $this->user->id,
+                                'updated_by' => null,
+                                'created_at' => now(),
+                                'updated_at' => null,
+                            ]
+                        );
+
+                        $this->responsibleUserEntry($users,$pwdtr->id, $validatedData['company_id']);
+                    }
+                }
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data added successfully.',
+                ]);
+            }
+            throw new \Exception('Request method not allowed');
+        } catch (\Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+
+    public function companyWiseRequiredData(Request $request)
     {
         try {
             $permision = $this->permissions()->requisition;
-            if ($request->isMethod('post'))
-            {
+            if ($request->isMethod('post')) {
                 $request->validate([
-                    'company_id' => ['required','string','exists:company_infos,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
                 ]);
                 extract($request->post());
-                $users = $this->companyWisePermissionUsers($company_id,$permision)->get();
+                $projects = $this->getUserProjectPermissions($this->user->id, $permision)->without('getUsers', 'company')->where('status', 1)->where('company_id', $company_id)->select('id', 'branch_name', 'address')->get();
+                $types = $this->archiveTypeList($permision)->without('voucherWithUsers', 'createdBY', 'updatedBY', 'company', 'archiveDocumentInfos', 'archiveDocuments')->where('status', 1)->where('company_id', $company_id)->select('id', 'voucher_type_title', 'code')->get();
+                $departments = $this->getDepartment($permision)->without('createdBy', 'updatedBy', 'getUsers', 'company')->where('company_id', $company_id)->where('status', 1)->where('company_id', $company_id)->select('id', 'dept_code', 'dept_name')->get();
                 return response()->json([
                     'status' => 'success',
-                    'data' => $users,
+                    'data' => ['projects' => $projects, 'types' => $types, 'departments' => $departments],
                     'message' => 'Request processed successfully.'
                 ]);
             }
             return response()->json([
                 'status' => 'error',
-                'message'=> 'Request method not allowed!',
+                'message' => 'Request method not allowed!',
             ]);
-        }catch (\Throwable $exception)
-        {
+        } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
                 'message' => $exception->getMessage(),
             ]);
         }
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
-    public function indexDocument()
+    public function projectWiseDataTypeNecessityChange(Request $request)
     {
         try {
-            dd('view document');
-        }catch (\Exception $exception){
-            return back()->with('error',$exception->getMessage());
-        }
-    }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-    public function createDocumentRequisition(Request $request)
-    {
-        try {
-            $permission = $this->permissions()->add_document_requisition;
-            if ($request->isMethod('post'))
-            {
-                return $this->storeDocumentRequisition($request);
-            }else{
-                $companies = $this->getCompanyModulePermissionWise($permission)->get();
-                $documents = $this->documentRequisition($permission)->where('created_by',Auth::id())->get();
-                $depts = $this->getDepartment($permission)->where('company_id',$this->user->company_id)->where('status',1)->get();
-                return view('back-end.requisition.add',compact('depts','companies','documents'))->render();
-            }
-        }catch (\Exception $exception){
-            return back()->with('error',$exception->getMessage());
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-    public function storeDocumentRequisition(Request $request)
-    {
-        try {
-            if ($request->isMethod('post'))
-            {
+            if ($request->ajax() && $request->isMethod('post')) {
                 $validatedData = $request->validate([
-                    'company' => ['required','string','exists:company_infos,id'],
-                    'users' => ['required','array',],
-                    'users.*' => ['required','string','exists:users,id'],
-                    'deadline' => ['required','date'],
-                    'd_count' => ['sometimes','nullable','integer','min:1'],
-                    'subject' => ['required','string'],
-                    'details' => ['sometimes','nullable','string'],
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                    'ids' => ['required', 'array'],
+                    'ids.*' => ['required', 'integer', 'exists:project_wise_data_type_required_infos,id'],
+                    'value' => ['required', 'string', 'in:0,1'],
                 ]);
                 extract($validatedData);
-                $today_data_count = Document_requisition_info::whereDate('created_at', date('Y-m-d'))->count();
-                $reference = date("dmy") . '-' . ($today_data_count + 1);
-
-                while (Document_requisition_info::where('reference_number', $reference)->exists()) {
-                    $today_data_count++;
-                    $reference = date("dmy") . '-' . $today_data_count;
-                }
-//                DB::beginTransaction(); // Start Transaction
-                DB::transaction(function () use ($request, $reference, $company, $deadline, $d_count, $subject, $details, $users){
-                    $documentInfo = Document_requisition_info::create([
-                        'reference_number' => $reference,
-                        'status' => 1, // 1 = active
-                        'sander_company_id' => Auth::user()->company_id,
-                        'receiver_company_id' => $company,
-                        'deadline' => $deadline,
-                        'number_of_document' => $d_count ?? 0,
-                        'subject' => $subject,
-                        'description' => $details ?? null,
-                        'created_by' => $this->user->id,
+                foreach ($ids as $id) {
+                    Project_wise_data_type_required_info::where('id', $id)->update([
+                        'status' => $value,
+                        'updated_by' => $this->user->id,
+                        'updated_at' => now(),
                     ]);
+                }
+                $result = $this->projectWiseDataTypeReportDetailsData($pdri_id, $project_id, $company_id);
+                $view = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details', compact('result'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view' => $view],
+                    'message' => 'Data updated successfully.'
+                ]);
+            }
+            throw new \Exception('Request method not allowed!');
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
 
-                    if ($documentInfo) {
-                        if (!empty($d_count)) {
-                            for ($counter = 1; $counter <= $d_count; $counter++) {
-                                $variable = "d_title_" . $counter;
-                                $value = $request->post($variable);
+    public function projectWiseDataTypeDelete(Request $request)
+    {
+        try {
+            if (!$request->ajax()) {
+                throw new \Exception('Request method not allowed!');
+            }
 
-                                Document_requisition_attested_document_info::create([
-                                    'document_requisition_id' => $documentInfo->id,
-                                    'document_title' => $value,
-                                    'document_upload_status' => 0, // 0 = not uploaded yet
-                                    'created_by' => $this->user->id,
-                                ]);
-                            }
-                        }
+            $validatedData = $request->validate([
+                'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                'project_id' => ['required', 'string', 'exists:branches,id'],
+                'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                'ids' => ['required', 'array'],
+                'ids.*' => ['required', 'integer', 'exists:project_wise_data_type_required_infos,id'],
+            ]);
 
-                        foreach ($users as $user) {
-                            Document_requisition_receiver_user::create([
-                                'document_requisition_id' => $documentInfo->id,
-                                'user_id' => $user,
-                                'reply_status' => 0,
-                                'created_by' => $this->user->id,
-                            ]);
-                        }
+            foreach ($validatedData['ids'] as $id) {
+                $old_data = Project_wise_data_type_required_info::with(['responsibleBy'])->find($id);
+
+                if ($old_data) {
+                    $this->projectWiseDataTypeDeleteHistory($old_data);
+                    $old_data->responsibleBy()->delete();
+                    $old_data->delete();
+                }
+            }
+
+            $result = $this->projectWiseDataTypeReportDetailsData(
+                $validatedData['pdri_id'],
+                $validatedData['project_id'],
+                $validatedData['company_id']
+            );
+
+            $view = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details', compact('result'))->render();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => ['view' => $view],
+                'message' => 'Data deleted successfully.'
+            ]);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+
+    private function projectWiseDataTypeDeleteHistory($old_data)
+    {
+        try {
+            if (!$old_data) {
+                throw new \Exception('Old data not found!');
+            }
+
+            $responsibleBy = $old_data->responsibleBy;
+            $old_responsibleBy = [];
+
+            foreach ($responsibleBy as $responsible) {
+                $old_responsibleBy[] = [
+                    'old_id' => $responsible->id,
+                    'company_id' => $responsible->company_id,
+                    'pwdtr_id' => $responsible->pwdtr_id,
+                    'user_id' => $responsible->user_id,
+                    'old_created_by' => $responsible->created_by,
+                    'old_updated_by' => $responsible->updated_by,
+                    'old_created_at' => $responsible->created_at,
+                    'old_updated_at' => $responsible->updated_at,
+                    'created_by' => $this->user->id,
+                    'updated_by' => null,
+                    'created_at' => now(),
+                    'updated_at' => null,
+                ];
+            }
+
+            if (!empty($old_responsibleBy)) {
+                Required_data_type_upload_responsible_user_infos_delete_history::insert($old_responsibleBy);
+            }
+
+            Project_wise_data_type_required_infos_delete_history::create([
+                'old_id' => $old_data->id,
+                'company_id' => $old_data->company_id,
+                'pdri_id' => $old_data->pdri_id,
+                'data_type_id' => $old_data->data_type_id,
+                'deadline' => $old_data->deadline,
+                'status' => $old_data->status,
+                'old_created_by' => $old_data->created_by,
+                'old_updated_by' => $old_data->updated_by,
+                'old_created_at' => $old_data->created_at,
+                'old_updated_at' => $old_data->updated_at,
+                'created_by' => $this->user->id,
+                'updated_by' => null
+            ]);
+
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function projectWiseDataTypeAdd(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                ]);
+                extract($validatedData);
+                $alreadyHas = Project_wise_data_type_required_info::where('company_id', $company_id)->where('pdri_id', $pdri_id)->pluck('data_type_id')->toArray();
+                $dataTypes = VoucherType::where('company_id', $company_id)->whereNotIn('id', $alreadyHas)->where('status',1)->get(['id', 'voucher_type_title', 'code']);
+                if ($dataTypes->isEmpty()) {
+                    throw new \Exception('Nothing to add new');
+                }
+                $departments = department::where('company_id', $company_id)->where('status', 1)->get(['id', 'dept_code', 'dept_name']);
+                if ($departments->isEmpty())
+                {
+                    throw new \Exception('Department not found for this company');
+                }
+                $view = view('back-end.requisition.__project_wise_data_type_add', compact('dataTypes','departments','pdri_id','project_id','company_id'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view' => $view],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            throw new \Exception('Request method not allowed!');
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function projectWiseDataTypeAddSubmit(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                    'data_types' => ['required', 'array'],
+                    'data_types.*' => ['required', 'string', 'exists:voucher_types,id',Rule::unique('project_wise_data_type_required_infos','data_type_id')->where(function ($query) use ($request) {
+                        return $query->where('pdri_id', $request->post('pdri_id'))->where('company_id', $request->post('company_id'));
+                    })],
+                    'res_users' => ['required', 'array'],
+                    'res_users.*' => ['required', 'string', 'exists:users,id'],
+                    'deadline' => ['required', 'string', 'date'],
+                ]);
+                extract($validatedData);
+                foreach ($data_types as $data_type_id) {
+                    $pwdtr = Project_wise_data_type_required_info::firstOrCreate(
+                        [
+                            'pdri_id' => $pdri_id,
+                            'data_type_id' => $data_type_id,
+                        ],
+                        [
+                            'company_id' => $company_id,
+                            'deadline' => $deadline,
+                            'status' => 1,
+                            'created_by' => $this->user->id,
+                            'updated_by' => null,
+                            'created_at' => now(),
+                            'updated_at' => null,
+                        ]
+                    );
+                    if ($pwdtr && $res_users)
+                    {
+                        $this->responsibleUserEntry($res_users,$pwdtr->id, $company_id);
                     }
-                });
-                return back()->with('success', 'Document requisition created successfully!');
-            }
-            return back()->with('error','Requested method not allowed!')->withInput();
-        }catch (\Throwable $exception){
-            return back()->with('error',$exception->getMessage())->withInput();
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Document_requisition_info  $document_requisition_info
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Document_requisition_info $document_requisition_info)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Document_requisition_info  $document_requisition_info
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Document_requisition_info $document_requisition_info)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Document_requisition_info  $document_requisition_info
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Document_requisition_info $document_requisition_info)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Document_requisition_info  $document_requisition_info
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Document_requisition_info $document_requisition_info)
-    {
-        //
-    }
-
-    public function reqDocumentReceiver(Request $request)
-    {
-        try {
-            $permission = $this->permissions()->requisition;
-            if ($request->isMethod('post'))
-            {
-                $validatedData = $request->validate([
-                    'id' => ['required','string','exists:document_requisition_infos,id'],
-                ]);
-                extract($validatedData);
-                $data = $this->documentRequisition($permission)->find($id)->receivers;
-                $view = view('back-end.requisition.__receiver-list-modal',compact('data'))->render();
+                }
+                $result = $this->projectWiseDataTypeReportDetailsData($pdri_id, $project_id, $company_id);
+                $view = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details', compact('result'))->render();
                 return response()->json([
                     'status' => 'success',
-                    'view' => $view,
+                    'data' => ['view' => $view],
+                    'message' => 'Request processed successfully.'
                 ]);
             }
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Request method not allowed!'
-            ]);
-        }catch (\Throwable $exception){
-            return response()->json([
-                'status' => 'error',
-                'message' => $exception->getMessage(),
-            ]);
-        }
-    }
-    public function requestedDocument(Request $request)
-    {
-        try {
-            $permission = $this->permissions()->requisition;
-            if ($request->isMethod('post'))
-            {
-                $validatedData = $request->validate([
-                    'id' => ['required','string','exists:document_requisition_infos,id'],
-                ]);
-                extract($validatedData);
-                $data = $this->documentRequisition($permission)->find($id)->attachmentInfos;
-                $view = view('back-end.requisition.__requested-document-modal',compact('data'))->render();
-                return response()->json([
-                    'status' => 'success',
-                    'view' => $view,
-                ]);
-            }
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Request method not allowed!'
-            ]);
-        }catch (\Throwable $exception){
+            throw new \Exception('Request method not allowed!');
+        }catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
                 'message' => $exception->getMessage(),
@@ -275,28 +531,184 @@ class DocumentRequisitionInfoController extends Controller
         }
     }
 
-    public function documentRequisitionReceivedList()
+    public function projectWiseDataTypeResponsibleUserAdd(Request $request)
     {
         try {
-            $permission = $this->permissions()->document_requisition_received_list;
-            $documents = $this->documentRequisition($permission)->whereHas('receiverUser',function ($query){
-                $query->where('user_id', $this->user->id);
-            })->get();
-            $view = view('back-end.requisition.list',compact('documents'))->render();
-            return $view;
-        }catch (\Throwable $exception){
-            return back()->with('error',$exception->getMessage());
+            if ($request->ajax() && $request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'pwdtr_id' => ['required', 'string', 'exists:project_wise_data_type_required_infos,id'],
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                ]);
+                extract($validatedData);
+                $data_type = Project_wise_data_type_required_info::with(['archiveDataType:id,voucher_type_title,code'])->find($pwdtr_id);
+                $departments = department::where('company_id', $company_id)->where('status', 1)->get(['id', 'dept_code', 'dept_name']);
+                if ($departments->isEmpty())
+                {
+                    throw new \Exception('Department not found for this company');
+                }
+                $existing_users = Required_data_type_upload_responsible_user_info::with([
+                    'user:id,name,employee_id,dept_id',
+                    'user.department:id,dept_code,dept_name',
+                    ])
+                    ->where('pwdtr_id', $pwdtr_id)
+                    ->get();
+                $view = view('back-end.requisition.__project_wise_data_type_responsible_user_add', compact('existing_users','pwdtr_id','departments','data_type','pdri_id','project_id','company_id'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view' => $view,],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            throw new \Exception('Request method not allowed!');
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
         }
     }
-    public function documentRequisitionSentList()
+
+    public function projectWiseDataTypeResponsibleUserSubmit(Request $request)
     {
         try {
-            $permission = $this->permissions()->document_requisition_sent_list;
-            $documents = $this->documentRequisition($permission)->where('created_by',Auth::id())->get();
-            $view = view('back-end.requisition.list',compact('documents'))->render();
-            return $view;
-        }catch (\Throwable $exception){
-            return back()->with('error',$exception->getMessage());
+            if ($request->ajax() && $request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'pwdtr_id' => ['required', 'string', 'exists:project_wise_data_type_required_infos,id'],
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                    'users' => ['required', 'array'],
+                    'users.*' => ['required', 'string', 'exists:users,id'],
+                ]);
+                extract($validatedData);
+                if ($pwdtr_id && $users)
+                {
+                    $this->responsibleUserEntry($users, $pwdtr_id, $company_id);
+                    $existing_users = Required_data_type_upload_responsible_user_info::with([
+                        'user:id,name,employee_id,dept_id',
+                        'user.department:id,dept_code,dept_name',
+                    ])
+                        ->where('pwdtr_id', $pwdtr_id)
+                        ->get();
+                    $view = view('back-end.requisition.___responsible_user_table', compact('existing_users'))->render();
+                    $result = $this->projectWiseDataTypeReportDetailsData($pdri_id, $project_id, $company_id);
+                    $view2 = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details', compact('result'))->render();
+                    return response()->json([
+                        'status' => 'success',
+                        'data' => ['view' => $view, 'view2' => $view2],
+                        'message' => 'Request processed successfully.'
+                    ]);
+                }
+            }
+            throw new \Exception('Request method not allowed!');
+        }
+        catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
         }
     }
+
+    private function responsibleUserEntry($users, $pwdtr_id, $company_id)
+    {
+        $insertData = [];
+
+        foreach ($users as $user_id) {
+            $exists = Required_data_type_upload_responsible_user_info::where('pwdtr_id', $pwdtr_id)
+                ->where('user_id', $user_id)
+                ->exists();
+
+            if (!$exists) {
+                $insertData[] = [
+                    'company_id' => $company_id,
+                    'pwdtr_id' => $pwdtr_id,
+                    'user_id' => $user_id,
+                    'created_by' => $this->user->id,
+                    'updated_by' => null,
+                    'created_at' => now(),
+                    'updated_at' => null,
+                ];
+            }
+        }
+        if (!empty($insertData)) {
+            Required_data_type_upload_responsible_user_info::insert($insertData);
+        }
+    }
+
+    public function projectWiseDataTypeResponsibleUserDelete(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'res_users' => ['required', 'array'],
+                    'res_users.*' => ['required', 'string', 'exists:required_data_type_upload_responsible_user_infos,id'],
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                ]);
+                extract($validatedData);
+                $resUsers = $validatedData['res_users'];
+                $responsibleBy = Required_data_type_upload_responsible_user_info::whereIn('id', $resUsers)->get();
+
+                if ($responsibleBy->isEmpty()) {
+                    throw new \Exception('No responsible users found to delete.');
+                }
+
+                $pwdtr_id = $responsibleBy->first()->pwdtr_id; // Get common pwdtr_id
+                $old_responsibleBy = [];
+
+                DB::beginTransaction();
+
+                foreach ($responsibleBy as $responsible) {
+                    $old_responsibleBy[] = [
+                        'old_id' => $responsible->id,
+                        'company_id' => $responsible->company_id,
+                        'pwdtr_id' => $responsible->pwdtr_id,
+                        'user_id' => $responsible->user_id,
+                        'old_created_by' => $responsible->created_by,
+                        'old_updated_by' => $responsible->updated_by,
+                        'old_created_at' => $responsible->created_at,
+                        'old_updated_at' => $responsible->updated_at,
+                        'created_by' => $this->user->id,
+                        'updated_by' => null,
+                        'created_at' => now(),
+                        'updated_at' => null,
+                    ];
+                    $responsible->delete();
+                }
+
+                if (!empty($old_responsibleBy)) {
+                    Required_data_type_upload_responsible_user_infos_delete_history::insert($old_responsibleBy);
+                }
+
+                DB::commit();
+
+                $existing_users = Required_data_type_upload_responsible_user_info::with([
+                    'user:id,name,employee_id,dept_id',
+                    'user.department:id,dept_code,dept_name',
+                ])->where('pwdtr_id', $pwdtr_id)->get();
+
+                $view = view('back-end.requisition.___responsible_user_table', compact('existing_users'))->render();
+                $result = $this->projectWiseDataTypeReportDetailsData($pdri_id, $project_id, $company_id);
+                $view2 = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details', compact('result'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view' => $view, 'view2' => $view2],
+                    'message' => 'Responsible users deleted and logged successfully.',
+                ]);
+            }
+
+            throw new \Exception('Request method not allowed!');
+        } catch (\Throwable $exception) {
+            DB::rollBack(); // Ensure rollback on error
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
 }

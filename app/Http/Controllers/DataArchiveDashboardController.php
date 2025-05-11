@@ -8,7 +8,7 @@ use App\Models\company_info;
 use App\Models\User;
 use App\Models\VoucherType;
 use App\Models\VoucherDocument;
-use App\Traits\DataArchiveTrait;
+use App\Traits\CacheTrait;
 use App\Traits\ParentTraitCompanyWise;
 use Database\Seeders\CompanyInfo;
 use Illuminate\Http\Request;
@@ -21,7 +21,7 @@ use Carbon\Carbon;
 
 class DataArchiveDashboardController extends Controller
 {
-    use ParentTraitCompanyWise, DataArchiveTrait;
+    use ParentTraitCompanyWise;
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -30,12 +30,6 @@ class DataArchiveDashboardController extends Controller
         });
     }
 
-    public function clearCache($companyID)
-    {
-        $company_id = Crypt::decryptString($companyID);
-        $this->clearArchiveDashboardCache($company_id);
-        return redirect()->back()->with('success', 'Cache cleared successfully!');
-    }
 
     function index(Request $request){
         $permission = $this->permissions()->data_archive;
@@ -183,14 +177,18 @@ class DataArchiveDashboardController extends Controller
                 }
 
                 // Cache disk/folder size info for 10 minutes
-                $diskInfo = Cache::remember("company_disk_info_{$company->id}_{$this->user->id}", 600, function () use ($path, $company_dir) {
-                    $diskTotal = round(disk_total_space($path) / (1024 * 1024 * 1024), 2);
+                $diskInfo = Cache::remember("company_disk_info_{$company->id}_{$this->user->id}", 600, function () use ($path, $company_dir,$company) {
+//                    $diskTotal = ($company->archiveStorage && $company->archiveStorage->storage_package_id)
+//                        ? $company->archiveStorage->package->package_size
+//                        : round(disk_total_space($path) / (1024 * 1024 * 1024), 2);
+                    $diskTotal = ($company->archiveStorage && $company->archiveStorage->storage_package_id)
+                        ? $company->archiveStorage->package->package_size
+                        : 'N/A';
                     $archiveUsed = round($this->getFolderSize($company_dir) / (1024 * 1024 * 1024), 2);
-                    $diskFree = round(disk_free_space($path) / (1024 * 1024 * 1024), 2);
-                    $totalUsed = $diskTotal - $diskFree;
-                    $otherUsed = $totalUsed - $archiveUsed;
+                    $diskFree = ($diskTotal != 'N/A')?$diskTotal-$archiveUsed:'N/A';
+                    $totalUsed = $archiveUsed;
 
-                    return compact('diskTotal', 'archiveUsed', 'diskFree', 'totalUsed', 'otherUsed');
+                    return compact('diskTotal', 'archiveUsed', 'diskFree', 'totalUsed',);
                 });
 
                 // Cache archive-related counts for 5 minutes
@@ -217,6 +215,7 @@ class DataArchiveDashboardController extends Controller
                     $dataTypes = $this->archiveTypeList($permission)
                         ->where('status', 1)
                         ->where('company_id', $company->id)
+                        ->orderBy('voucher_type_title','asc')
                         ->get()
                         ->map(function ($item) {
                             return [

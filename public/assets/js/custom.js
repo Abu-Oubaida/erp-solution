@@ -2,6 +2,7 @@ let Obj = {};
 let Archive = {};
 let Sales = {};
 let SalesSetting = {};
+let Requsition  = {};
 // Show loader immediately when the page starts loading
 (function ($) {
     //     $(document).ready(function() {
@@ -18,10 +19,12 @@ let SalesSetting = {};
     $(document).ajaxStop(function () {
         $("#ajax_loader").hide();
         $("#ajax_loader2").hide();
+        $("#ajax_loader3").hide();
     });
     $(document).ajaxStart(function () {
         $("#ajax_loader").show();
         $("#ajax_loader2").show();
+        $("#ajax_loader3").show();
     });
     $(document).ready(function () {
         const tags = [];
@@ -29,9 +32,70 @@ let SalesSetting = {};
         const materialsTempList = [];
         var extraMobileNumberCount = 2;
         var extraEmailAddressCount = 2;
-        $(".select-search").selectize({
-            create: false,
-            sortField: "text",
+        $("select.select-search").each(function () {
+            const isMultiple = $(this).prop("multiple");
+
+            const selectizeInstance = $(this).selectize({
+                plugins: isMultiple ? ['remove_button'] : [],
+                create: false,
+                closeAfterSelect: false,
+                sortField: 'text',
+                render: {
+                    option: function(item, escape) {
+                        if (item.value === '__select_all__') {
+                            return '<div class="selectize-dropdown-header"><strong>Select all matching: "' + escape(item.text) + '"</strong></div>';
+                        }
+                        return '<div>' + escape(item.text) + '</div>';
+                    }
+                },
+                onType: function(search) {
+                    const selectize = this;
+
+                    // Skip if not multiple
+                    if (!isMultiple) return;
+
+                    selectize.lastQueryTyped = search;
+                    selectize.removeOption('__select_all__');
+
+                    const results = selectize.search(search).items;
+
+                    if (search.length && results.length > 1) {
+                        selectize.addOption({
+                            value: '__select_all__',
+                            text: search
+                        });
+                        selectize.refreshOptions(false);
+                    }
+                },
+                onItemAdd: function(value) {
+                    const selectize = this;
+
+                    if (value === '__select_all__') {
+                        // Skip if not multiple
+                        if (!isMultiple) return;
+
+                        selectize.removeItem('__select_all__');
+                        selectize.removeOption('__select_all__');
+
+                        const matches = selectize.search(selectize.lastQueryTyped).items;
+                        matches.forEach(item => {
+                            if (!selectize.items.includes(item.id)) {
+                                selectize.addItem(item.id);
+                            }
+                        });
+
+                        setTimeout(() => {
+                            selectize.$control_input.val(selectize.lastQueryTyped).trigger('keyup');
+                            selectize.focus();
+                        }, 0);
+                    } else {
+                        setTimeout(() => {
+                            selectize.$control_input.val(selectize.lastQueryTyped).trigger('keyup');
+                            selectize.focus();
+                        }, 0);
+                    }
+                }
+            });
         });
         $(".select-search-with-create").selectize({
             create: true,
@@ -164,7 +228,7 @@ let SalesSetting = {};
                     const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
                         header: 1,
                     });
-                    if (jsonData[0].length !== 10) {
+                    if (jsonData[0].length !== 13) {
                         alert(
                             "Invalid input data! Please flowing the prototype of data format!"
                         );
@@ -172,20 +236,25 @@ let SalesSetting = {};
                     }
                     if (
                         !(
-                            (jsonData[0][0] === "Employee Name*" ||
-                                jsonData[0][0] === "Employee Name") &&
-                            jsonData[0][1] === "Department" &&
-                            (jsonData[0][2] === "Department Code*" ||
-                                jsonData[0][2] === "Department Code") &&
-                            (jsonData[0][3] === "Designation*" ||
-                                jsonData[0][3] === "Designation") &&
-                            jsonData[0][4] === "Branch" &&
-                            (jsonData[0][5] === "Joining Date*" ||
-                                jsonData[0][5] === "Joining Date") &&
-                            jsonData[0][6] === "Phone" &&
-                            jsonData[0][7] === "Email" &&
-                            jsonData[0][8] === "Status" &&
-                            jsonData[0][9] === "Blood Group"
+                            (jsonData[0][0] === "Company Code*" ||
+                                jsonData[0][0] === "Company Code") &&
+                            (jsonData[0][1] === "Employee Name*" ||
+                                jsonData[0][1] === "Employee Name") &&
+                            (jsonData[0][2] === "Employee Id*" ||
+                                jsonData[0][2] === "Employee Id") &&
+                            jsonData[0][3] === "Department" &&
+                            (jsonData[0][4] === "Department Code*" ||
+                                jsonData[0][4] === "Department Code") &&
+                            (jsonData[0][5] === "Designation*" ||
+                                jsonData[0][5] === "Designation") &&
+                            jsonData[0][6] === "Branch" &&
+                            (jsonData[0][7] === "Joining Date*" ||
+                                jsonData[0][7] === "Joining Date") &&
+                            jsonData[0][8] === "Phone" &&
+                            jsonData[0][9] === "Email" &&
+                            jsonData[0][10] === "Status" &&
+                            jsonData[0][11] === "Blood Group" &&
+                            jsonData[0][12] === "Password"
                         )
                     ) {
                         alert(
@@ -198,7 +267,7 @@ let SalesSetting = {};
                         for (let j = 0; j < zero; j++) {
                             if (typeof jsonData[i][j] === "undefined") {
                                 jsonData[i][j] = null;
-                            } else if (i !== 0 && j === 5) {
+                            } else if (i !== 0 && j === 7) {
                                 jsonData[i][j] = ExcelDateToJSDate(
                                     jsonData[i][j]
                                 );
@@ -362,74 +431,84 @@ let SalesSetting = {};
             const modal = document.getElementById("myModal");
             const modelTitle = document.getElementById("userDataModelLabel");
             const dataTable = document.getElementById("data-table");
+
+            // Clear previous content
             while (dataTable.firstChild) {
                 dataTable.removeChild(dataTable.firstChild);
             }
 
-            // Create a table from the data
             const table = document.createElement("table");
             table.className = "table";
-            let t = 0;
-            let action;
-            let row_o = 1;
 
-            let col = 0;
-            const row = document.createElement("tr");
-            cell = document.createElement("td");
-            while (col < data[0][0].length + 2) {
-                cell = document.createElement("td");
-                cell.textContent = col++;
-                row.appendChild(cell);
+            // === First Row: Column indices ===
+            const indexRow = document.createElement("tr");
+            let cell = document.createElement("th");
+            cell.textContent = "#";
+            indexRow.appendChild(cell);
+
+            for (let i = 0; i < data[0][0].length; i++) {
+                cell = document.createElement("th");
+                cell.textContent = i;
+                indexRow.appendChild(cell);
             }
-            table.appendChild(row);
 
-            data[0].forEach((rowData) => {
-                const row = document.createElement("tr");
-                let cell;
-                if (t === 0) {
-                    action = "Action";
-                    cell = document.createElement("th");
-                    cell.textContent = "SL";
-                    row.appendChild(cell);
-                    rowData.forEach((cellData) => {
-                        cell = document.createElement("th");
-                        cell.textContent = cellData;
-                        row.appendChild(cell);
-                    });
-                    cell = document.createElement("th");
-                    cell.innerHTML = action;
-                    row.appendChild(cell);
-                    table.appendChild(row);
-                    t++;
-                } else {
-                    action =
-                        '<a style="cursor: pointer" class="text-danger" onclick="return confirm(`Are you sure?`)? Obj.removeElementOfEmployeeData(this,' +
-                        t +
-                        ",`" +
-                        fileName +
-                        '`):false"><i class="fa fa-trash" aria-hidden="true"></i></a>';
-                    cell = document.createElement("td");
-                    cell.textContent = row_o;
-                    row_o++;
-                    row.appendChild(cell);
-                    rowData.forEach((cellData) => {
-                        cell = document.createElement("td");
-                        cell.textContent = cellData;
-                        row.appendChild(cell);
-                    });
-                    cell = document.createElement("td");
-                    cell.innerHTML = action;
-                    row.appendChild(cell);
-                    table.appendChild(row);
-                    t++;
-                }
+            cell = document.createElement("th");
+            cell.textContent = "Action";
+            indexRow.appendChild(cell);
+
+            table.appendChild(indexRow);
+
+            // === Second Row: Actual Table Headers ===
+            const headerRow = document.createElement("tr");
+            cell = document.createElement("th");
+            cell.textContent = "SL";
+            headerRow.appendChild(cell);
+
+            data[0][0].forEach(headerText => {
+                cell = document.createElement("th");
+                cell.textContent = headerText;
+                headerRow.appendChild(cell);
             });
 
-            // Append the table to the modal
+            cell = document.createElement("th");
+            cell.textContent = "Action";
+            headerRow.appendChild(cell);
+
+            table.appendChild(headerRow);
+
+            // === Data Rows ===
+            data[0].slice(1).forEach((rowData, index) => {
+                const row = document.createElement("tr");
+
+                // SL number
+                cell = document.createElement("td");
+                cell.textContent = index + 1;
+                row.appendChild(cell);
+
+                rowData.forEach(cellData => {
+                    cell = document.createElement("td");
+                    cell.textContent = cellData;
+                    row.appendChild(cell);
+                });
+
+                // Action button
+                cell = document.createElement("td");
+                cell.innerHTML = `
+            <a style="cursor: pointer" class="text-danger"
+               onclick="return confirm('Are you sure?') ? Obj.removeElementOfEmployeeData(this, ${index + 1}, '${fileName}') : false">
+               <i class="fa fa-trash" aria-hidden="true"></i>
+            </a>`;
+                row.appendChild(cell);
+
+                table.appendChild(row);
+            });
+
             dataTable.appendChild(table);
             modelTitle.innerText = fileName;
             $("#myModal").modal("show");
         }
+
+
         function ExcelDateToJSDate(serial) {
             const dateToString = (d) =>
                 `${("00" + d.getDate()).slice(-2)}-${(
@@ -997,7 +1076,7 @@ let SalesSetting = {};
                                     "Error! This Data Are Added not Possible:\n";
                                 for (let key in data.errorMessage) {
                                     let employee = data.errorMessage[key];
-                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
+                                    alertMessage += `Employee name: ${employee["EmployeeName"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
                                 }
                             }
                             if (data.successMessage) {
@@ -1006,7 +1085,7 @@ let SalesSetting = {};
                                     "This Data Are Added Successfully:\n";
                                 for (let key in data.successMessage) {
                                     let employee = data.successMessage[key];
-                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
+                                    alertMessage += `Employee name: ${employee["EmployeeName"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
                                 }
                             }
                             if (data.alreadyHasMessage) {
@@ -1015,7 +1094,7 @@ let SalesSetting = {};
                                     "This Data are Already Exists in DB:\n";
                                 for (let key in data.alreadyHasMessage) {
                                     let employee = data.alreadyHasMessage[key];
-                                    alertMessage += `Employee name: ${employee["Employee name"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
+                                    alertMessage += `Employee name: ${employee["EmployeeName"]}, Phone: ${employee["phone"]}, Email: ${employee["email"]}\n`;
                                 }
                             }
                             alert(alertMessage);
@@ -3132,69 +3211,6 @@ let SalesSetting = {};
                     },
                 });
             },
-            companyWiseUsersForReq: function (
-                e,
-                action_id //only able to requisition
-            ) {
-                let id = $(e).val();
-                if (id.length === 0) {
-                    return false;
-                }
-                const url =
-                    window.location.origin +
-                    sourceDir +
-                    "/requisition/company-wise-user";
-                $.ajax({
-                    url: url,
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                            "content"
-                        ),
-                    },
-                    method: "POST",
-                    data: { company_id: id },
-                    success: function (response) {
-                        if (response.status === "error") {
-                            alert("Error: " + response.message);
-                            return false;
-                        } else if (response.status === "success") {
-                            // updateSelectBoxSingleOption(response.data, action_id, 'id', 'name');
-                            const $select = $("#" + action_id);
-                            // Ensure Selectize is initialized
-                            if ($select[0] && $select[0].selectize) {
-                                const selectize = $select[0].selectize;
-
-                                selectize.clear();
-                                selectize.clearOptions(); // Clear existing options
-                                response.data.forEach(function (item) {
-                                    const companyName = item.get_company
-                                        ? item.get_company.company_name
-                                        : "N/A"; // Fallback if get_company is null
-                                    const designationTitle = item.designation
-                                        ? item.designation.title
-                                        : "N/A"; // Fallback if get_designation is null
-                                    const departmentTitle = item.department
-                                        ? item.department.dept_name
-                                        : "N/A"; // Fallback if get_department is null
-                                    const optionText = `${item.name} (${item.employee_id}, ${designationTitle},  ${departmentTitle}, ${companyName})`;
-
-                                    selectize.addOption({
-                                        value: item.id,
-                                        text: optionText,
-                                    });
-                                });
-                                selectize.refreshOptions(true); // Refresh the options in the select box
-                                $("#user-project-permission-add-list").html("");
-                            } else {
-                                console.error(
-                                    "Selectize is not initialized for #" +
-                                        action_id
-                                );
-                            }
-                        }
-                    },
-                });
-            },
             companyWiseUsersCompanyPermission: function (
                 e,
                 action_id // only able to system super admin permission
@@ -3261,7 +3277,7 @@ let SalesSetting = {};
                     },
                 });
             },
-            companyWiseProjects: function (e, action_id) {
+            companyWiseProjects: function (e, action_id,multiple=null) {
                 let id = $(e).val();
                 if (id.length === 0) {
                     return false;
@@ -3284,12 +3300,12 @@ let SalesSetting = {};
                             alert("Error: " + response.message);
                             return false;
                         } else if (response.status === "success") {
-                            updateSelectBoxSingleOption(
-                                response.data,
-                                action_id,
-                                "id",
-                                "branch_name"
-                            );
+                            if (multiple)
+                            {
+                                updateSelectBox(response.data,action_id,"id","branch_name")
+                            }else {
+                                updateSelectBoxSingleOption(response.data,action_id,"id","branch_name");
+                            }
                         }
                     },
                 });
@@ -3763,35 +3779,7 @@ let SalesSetting = {};
                 }
                 return false;
             },
-            requisitionDocumentUsersInfo: function (e) {
-                let data = $(e).attr("ref");
-                if (data.length <= 0) {
-                    return false;
-                }
-                let url =
-                    window.location.origin +
-                    sourceDir +
-                    "/requisition/req-document-receiver";
-                $.ajax({
-                    url: url,
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                            "content"
-                        ),
-                    },
-                    method: "POST",
-                    data: { id: data },
-                    success: function (response) {
-                        if (response.status === "error") {
-                            alert("Error: " + response.message);
-                        } else if (response.status === "success") {
-                            $("#heading").html("Receiver List");
-                            $("#documentPreview").html(response.view);
-                            $("#receiverList").modal("show");
-                        }
-                    },
-                });
-            },
+
             dataTypePermissionUsersInfo: function (e) {
                 let data = $(e).attr("ref");
                 if (data.length <= 0) {
@@ -4007,35 +3995,7 @@ let SalesSetting = {};
                     });
                 }
             },
-            requisitionDocumentNeed: function (e) {
-                let data = $(e).attr("ref");
-                if (data.length <= 0) {
-                    return false;
-                }
-                let url =
-                    window.location.origin +
-                    sourceDir +
-                    "/requisition/requested-document";
-                $.ajax({
-                    url: url,
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                            "content"
-                        ),
-                    },
-                    method: "POST",
-                    data: { id: data },
-                    success: function (response) {
-                        if (response.status === "error") {
-                            alert("Error: " + response.message);
-                        } else if (response.status === "success") {
-                            $("#heading").html("Requested Document List");
-                            $("#documentPreview").html(response.view);
-                            $("#receiverList").modal("show");
-                        }
-                    },
-                });
-            },
+
             searchPreviousDocumentReference: function (
                 e,
                 company_id,
@@ -4262,6 +4222,51 @@ let SalesSetting = {};
                     },
                 });
             },
+            companyPackageEdit:function (e){
+                let data = $(e).data('info')
+                console.log((data))
+                $("#editModalLabel").html("Edit Company Storage Package of"+data.company)
+                $("#edit_company_name").html(`<option value="${data.company_id}" selected>${data.company}</option>`)
+                $("#edit_company_package").val(data.package_id)
+                if (data.status !== '')
+                {
+                    $("#edit_company_status").val(data.status)
+                }
+                $("#editModal").modal('show')
+                return false
+            },
+            companyPackageUpdate:function ()
+            {
+                let company_id = $("#edit_company_name").val();
+                let selected_package = parseInt($("#edit_company_package").val());
+                let status = parseInt($("#edit_company_status").val());
+
+                selected_package = (isNaN(selected_package) || selected_package === 0) ? null : selected_package;
+                status = (isNaN(status) || status === -1) ? 0 : status;
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/system-operation/company-storage-package-update";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: { company_id: company_id, selected_package: selected_package, status: status },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message)
+                            window.location.reload()
+                        }
+                        return true;
+                    },
+                });
+            }
         };
         Sales = {
             addEmailPhoneForLead: function (event, displayName, outputId) {
@@ -4311,12 +4316,55 @@ let SalesSetting = {};
 
                 return false;
             },
+            addLeadStep1:function(){
+                const url =
+                    window.location.origin + sourceDir + "/add-lead-step1"; // update API endpoint
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: $("#leadForm").serialize(),
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            let form=Sales.addLeadStep2Form()
+                            $("#commonSlot_for_multiple_step").html(form)
+                        }
+                    },
+                });
+
+                return false;
+            },
+            addLeadStep2Form:function(){
+
+            },
         };
 
         SalesSetting = {
-            salesSubTable: function (click_param) {
+            salesSubTable: function (click_param, desn_var = null) {
                 // Clear previous content
                 $("#sales_sub_table_content").empty();
+
+                if (desn_var) {
+                    if (desn_var === "professionList") {
+                        $("#company").attr(
+                            "onchange",
+                            "return SalesSetting.salesProfessionParentIdDropdown(this)"
+                        );
+                    } else if (desn_var === "sourceList") {
+                        $("#company").attr(
+                            "onchange",
+                            "return SalesSetting.salesSourceParentIdDropdown(this)"
+                        );
+                    }
+                }
 
                 var html = "";
 
@@ -4334,13 +4382,13 @@ let SalesSetting = {};
 
                     case "sales_lead_source_info":
                         html += SalesSetting.createInput("title", "Title");
-                        html += SalesSetting.createInput(
+                        html += SalesSetting.createSelectInput(
                             "parent_id",
                             "Parent Id"
                         );
-                        html += SalesSetting.createInput(
+                        html += SalesSetting.createCheckboxInput(
                             "is_parent",
-                            "Is Parent"
+                            "Is Parent ?"
                         );
                         html += SalesSetting.createHiddenInput(click_param);
                         break;
@@ -4370,13 +4418,13 @@ let SalesSetting = {};
 
                     case "sales_lead_profession":
                         html += SalesSetting.createInput("title", "Title");
-                        html += SalesSetting.createInput(
+                        html += SalesSetting.createSelectInput(
                             "parent_id",
                             "Parent Id"
                         );
-                        html += SalesSetting.createInput(
+                        html += SalesSetting.createCheckboxInput(
                             "is_parent",
-                            "Is Parent"
+                            "Is Parent ?"
                         );
                         html += SalesSetting.createHiddenInput(click_param);
                         break;
@@ -4410,10 +4458,310 @@ let SalesSetting = {};
                         " " +
                         title
                 );
+
+                $(".company_dropdown").val("");
+
+                $(".status_dropdown").val("");
+                $("#general_modal").modal("show");
+                return false;
+            },
+            salesSubTableEdit: function (
+                click_param,
+                desn_var = null,
+                record_id = null
+            ) {
+                $("#sales_sub_table_content").empty();
+
+                // Handle the change event for specific dropdowns based on desn_var
+                if (desn_var) {
+                    if (desn_var === "professionList") {
+                        $("#company").attr(
+                            "onchange",
+                            "return SalesSetting.salesProfessionParentIdDropdown(this)"
+                        );
+                    } else if (desn_var === "sourceList") {
+                        $("#company").attr(
+                            "onchange",
+                            "return SalesSetting.salesSourceParentIdDropdown(this)"
+                        );
+                    }
+                }
+
+                var html = "";
+                var url = "";
+
+                if (!record_id) {
+                    alert("Opeartion Fail");
+                }
+                // Define the case logic to generate HTML dynamically based on click_param
+                switch (click_param) {
+                    case "sales_lead_apartment_type":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-apartment-type-edit";
+                        break;
+                    case "sales_lead_apartment_size":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createInput("size", "Size");
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-apartment-size-edit";
+                        break;
+                    case "sales_lead_source_info":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createSelectInput(
+                            "parent_id",
+                            "Parent Id"
+                        );
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-source-info-edit";
+                        break;
+                    case "sales_lead_budget":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-budget-edit";
+                        break;
+                    case "sales_lead_view":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-view-edit";
+                        break;
+                    case "sales_lead_floor":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-floor-edit";
+                        break;
+                    case "sales_lead_location_info":
+                        html += SalesSetting.createInput(
+                            "location_name",
+                            "Location Name"
+                        );
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-location-info-edit";
+                        break;
+                    case "sales_lead_profession":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createSelectInput(
+                            "parent_id",
+                            "Parent Id"
+                        );
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-profession-edit";
+                        break;
+                    case "sales_lead_facing":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-facing-edit";
+                        break;
+                    case "sales_lead_status_info":
+                        html += SalesSetting.createInput("title", "Title");
+                        html += SalesSetting.createHiddenInput(record_id);
+                        html +=
+                            SalesSetting.createHiddenInputForOutput(
+                                click_param
+                            );
+                        url = "/get-sales-lead-status-info-edit";
+                        break;
+                    default:
+                        html += '<p class="text-danger">Unknown</p>';
+                }
+
+                $("#sales_sub_table_content").html(html);
+                const desired_url = window.location.origin + sourceDir + url;
+                $.ajax({
+                    url: desired_url,
+                    method: "GET",
+                    data: { record_id: record_id },
+                    success: function (response) {
+                        if (response && response.data) {
+                            if (click_param === "sales_lead_apartment_type") {
+                                $("#title").val(response.data.title);
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                            } else if (
+                                click_param === "sales_lead_apartment_size"
+                            ) {
+                                $("#title").val(response.data.title);
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                                $("#size").val(response.data.size);
+                            } else if (
+                                click_param === "sales_lead_source_info"
+                            ) {
+                                $("#title").val(response.data.title);
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                                SalesSetting.salesSourceParentIdDropdown(
+                                    $("#company"),
+                                    response.data.parent_id
+                                );
+                            } else if (click_param === "sales_lead_budget") {
+                                $("#title").val(response.data.title);
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                            } else if (
+                                click_param === "sales_lead_location_info"
+                            ) {
+                                $("#location_name").val(
+                                    response.data.location_name
+                                );
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                            } else if (click_param === "sales_lead_view") {
+                                $("#title").val(response.data.title);
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                            } else if (click_param === "sales_lead_floor") {
+                                $("#title").val(response.data.title);
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                            } else if (
+                                click_param === "sales_lead_profession"
+                            ) {
+                                $("#title").val(response.data.title);
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                                SalesSetting.salesProfessionParentIdDropdown(
+                                    $("#company"),
+                                    response.data.parent_id
+                                );
+                            } else if (click_param === "sales_lead_facing") {
+                                $("#title").val(response.data.title);
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                            } else if (
+                                click_param === "sales_lead_status_info"
+                            ) {
+                                $("#title").val(response.data.title);
+                                $("#company").val(response.data.company_id);
+                                $("#status").val(response.data.status);
+                            }
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error fetching data: " + error);
+                    },
+                });
+                $("#perform_store").attr(
+                    "onclick",
+                    `return SalesSetting.editedDataStore('this','${click_param}')`
+                );
                 // Show the modal
                 $("#general_modal").modal("show");
 
                 return false; // Prevent default action
+            },
+            editedDataStore: function (e, click_param) {
+                let subTableData = {};
+                // Get company dropdown value
+                let company_id = SalesSetting.companyIdDropdownForEdit();
+                subTableData["company_id"] = company_id;
+                // Get status dropdown value
+                subTableData["status"] = $("#status").val();
+
+                // Get all input fields (including hidden and text)
+                $("#sales_sub_table_content input").each(function () {
+                    var name = $(this).attr("name");
+                    var type = $(this).attr("type");
+
+                    if (type === "checkbox") {
+                        subTableData[name] = $(this).is(":checked") ? 1 : 0;
+                    } else if (type === "hidden") {
+                        subTableData[name] = $(this).val();
+                    } else {
+                        subTableData[name] = $(this).val();
+                    }
+                });
+                // Get all select fields
+                $("#sales_sub_table_content select").each(function () {
+                    var name = $(this).attr("name");
+                    subTableData[name] = $(this).val();
+                });
+                let url = "";
+                if (click_param === "sales_lead_apartment_type") {
+                    url = "/get-sales-lead-apartment-type-edit";
+                } else if (click_param === "sales_lead_apartment_size") {
+                    url = "/get-sales-lead-apartment-size-edit";
+                } else if (click_param === "sales_lead_source_info") {
+                    url = "/get-sales-lead-source-info-edit";
+                } else if (click_param === "sales_lead_budget") {
+                    url = "/get-sales-lead-budget-edit";
+                } else if (click_param === "sales_lead_view") {
+                    url = "/get-sales-lead-view-edit";
+                } else if (click_param === "sales_lead_floor") {
+                    url = "/get-sales-lead-floor-edit";
+                } else if (click_param === "sales_lead_location_info") {
+                    url = "/get-sales-lead-location-info-edit";
+                } else if (click_param === "sales_lead_profession") {
+                    url = "/get-sales-lead-profession-edit";
+                } else if (click_param === "sales_lead_facing") {
+                    url = "/get-sales-lead-facing-edit";
+                } else if (click_param === "sales_lead_status_info") {
+                    url = "/get-sales-lead-status-info-edit";
+                }
+
+                const desired_url = window.location.origin + sourceDir + url;
+                $.ajax({
+                    url: desired_url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: {
+                        subTableData: subTableData,
+                    },
+                    success: function (response) {
+                        if (response.original.status === "error") {
+                            alert("Error: " + response.original.message);
+                        } else if (response.original.status === "success") {
+                            alert(response.original.message);
+
+                            $("#general_modal").modal("hide");
+                            $("#" + response.original.output_id).html(
+                                response.original.data
+                            );
+                            $("#company").val("").trigger("change");
+                            $("#status").val("").trigger("change");
+                        }
+                    },
+                });
             },
 
             createInput: function (id, label) {
@@ -4435,7 +4783,33 @@ let SalesSetting = {};
                     </div>
                 `;
             },
-            salesSubTableModal: function () {
+            createHiddenInputForOutput: function (click_param) {
+                return `
+                    <div class="mb-2">
+                        <input type="hidden" class="form-control" name="hidden_input_for_output" value="${click_param}">
+                    </div>
+                `;
+            },
+            createCheckboxInput: function (id, label) {
+                return `
+                    <div class="col-md-4 mb-2 form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="${id}" name="${id}">
+                        <label class="form-check-label" for="${id}">${label}</label>
+                    </div>
+                `;
+            },
+            createSelectInput: function (id, label) {
+                return `
+                    <div class="col-md-4 mb-2 form-group">
+                        <label for="${id}" class="form-label">${label}</label>
+                        <select class="form-select" id="${id}" name="${id}">
+                            <option for="pick" class="form-label">--Pick a option--</option>
+                            <!-- Options will be added dynamically -->
+                        </select>
+                    </div>
+                `;
+            },
+            salesSubTableModal: function (element) {
                 var subTableData = {};
                 // Get company dropdown value
                 subTableData["company"] = $("#company").val();
@@ -4443,11 +4817,21 @@ let SalesSetting = {};
                 // Get status dropdown value
                 subTableData["status"] = $("#status").val();
 
-                // Get all dynamic input fields
+                // Get all input fields (including hidden and text)
                 $("#sales_sub_table_content input").each(function () {
                     var name = $(this).attr("name");
-                    var value = $(this).val();
-                    subTableData[name] = value;
+                    var type = $(this).attr("type");
+
+                    if (type === "checkbox") {
+                        subTableData[name] = $(this).is(":checked") ? 1 : 0;
+                    } else {
+                        subTableData[name] = $(this).val();
+                    }
+                });
+                // Get all select fields
+                $("#sales_sub_table_content select").each(function () {
+                    var name = $(this).attr("name");
+                    subTableData[name] = $(this).val();
                 });
                 if (subTableData.company === "") {
                     alert("Comapany is required");
@@ -4475,21 +4859,204 @@ let SalesSetting = {};
                                 subTableData: subTableData,
                             },
                             success: function (response) {
-                                console.log(response);
                                 if (response.status === "error") {
                                     alert("Error: " + response.message);
                                 } else if (response.status === "success") {
                                     alert(response.message);
+
                                     $("#general_modal").modal("hide");
                                     $("#" + response.output_id).html(
                                         response.data
                                     );
+                                    $("#company").val("").trigger("change");
+                                    $("#status").val("").trigger("change");
                                 }
                             },
                         });
                     }
                 }
                 return false;
+            },
+            salesProfessionParentIdDropdown: function (e, selected = null) {
+                let selectedId = $(e).val();
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/get_sale_profession_title_id";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "GET",
+                    data: {
+                        selectedId: selectedId,
+                    },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            const select = $("#parent_id");
+                            select.empty();
+                            select.append(
+                                '<option value="">--Pick a Option--</option>'
+                            );
+                            $.each(
+                                response.salesProfessionData,
+                                function (index, item) {
+                                    select.append(
+                                        `<option value="${item.id}">${item.title}</option>`
+                                    );
+                                }
+                            );
+                            if (selected) {
+                                $("#parent_id").val(selected);
+                            }
+                        }
+                    },
+                });
+            },
+            salesSourceParentIdDropdown: function (e, selected = null) {
+                let selectedId = $(e).val();
+                const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/get_sale_source_title_id";
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "GET",
+                    data: {
+                        selectedId: selectedId,
+                    },
+                    success: function (response) {
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                            return false;
+                        } else if (response.status === "success") {
+                            const select = $("#parent_id");
+                            select.empty();
+                            select.append(
+                                '<option value="">--Pick a Option--</option>'
+                            );
+                            $.each(
+                                response.salesSourceData,
+                                function (index, item) {
+                                    select.append(
+                                        `<option value="${item.id}">${item.title}</option>`
+                                    );
+                                }
+                            );
+                            if (selected) {
+                                $("#parent_id").val(selected);
+                            }
+                        }
+                    },
+                });
+            },
+            companyIdDropdownForEdit: function () {
+                let companyIdDropdownValue = $("#company").val();
+                $("#company").on("change", function () {
+                    companyIdDropdownValue = $("#company").val();
+                });
+                return companyIdDropdownValue;
+            },
+            deleteSalesSettingMultiple: function (get_url) {
+                let selected = [];
+                $(".check-box:checked").each(function () {
+                    selected.push($(this).val());
+                });
+                if (selected.length === 0) {
+                    alert("Please select at least one record to delete.");
+                    return;
+                }
+
+                if (
+                    confirm("Are you sure you want to delete selected records?")
+                ) {
+                    let url =
+                        window.location.origin +
+                        sourceDir +
+                        get_url;
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
+                        },
+                        method: "DELETE",
+                        data: {
+                            selected: selected,
+                        },
+                        success: function (response) {
+                            if (response.original.status == "success") {
+                                alert(response.original.message);
+                                $("#" + response.original.output).html(
+                                    response.original.data
+                                );
+                            } else if (response.original.status == "error") {
+                                alert(response.original.message);
+                            }
+
+                            //location.reload();
+                        },
+                        error: function (error) {
+                            alert("An error occurred while deleting records.");
+                        },
+                    });
+                }
+            },
+            AddLead: function () {
+                let form = $("#addProfessionForm")[0]; // get the form DOM element
+                let formData = new FormData(form); // create FormData from form
+
+                const url =
+                    window.location.origin + sourceDir + "/profession/store"; // update API endpoint
+
+                $.ajax({
+                    url: url,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    method: "POST",
+                    data: formData,
+                    contentType: false, // Important for FormData
+                    processData: false, // Important for FormData
+                    success: function (response) {
+                        console.log(response);
+
+                        if (response.status === "error") {
+                            alert("Error: " + response.message);
+                        } else if (response.status === "success") {
+                            alert(response.message);
+                            $("#general_modal").modal("hide"); // close modal if needed
+
+                            // Refresh some area if needed
+                            if (response.output_id && response.data) {
+                                $("#" + response.output_id).html(response.data);
+                            }
+
+                            // Reset the form after success
+                            $("#addProfessionForm")[0].reset();
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error(xhr.responseText);
+                        alert("Something went wrong.");
+                    },
+                });
+
+                return false; // prevent form default behavior
             },
         };
         AppSetting = {
@@ -4626,6 +5193,38 @@ let SalesSetting = {};
                     return false;
                 }
             },
+        };
+        Requsition = {
+            companyWiseRequiredData: function (e) {
+            let id = $(e).val();
+            if (id.length === 0) {
+                return false;
+            }
+            const url =
+                window.location.origin +
+                sourceDir +
+                "/requisition/company-wise-required-data";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+                method: "POST",
+                data: { company_id: id },
+                success: function (response) {
+                    if (response.status === "error") {
+                        alert("Error: " + response.message);
+                        return false;
+                    } else if (response.status === "success") {
+                        updateSelectBox(response.data.projects, 'projects','id','branch_name');
+                        updateSelectBox(response.data.types, 'data_types','id','voucher_type_title');
+                        updateSelectBox(response.data.departments, 'res_dept','id','dept_name');
+                    }
+                },
+            });
+        }
         };
     });
     function checkFileExists(url, callback) {
