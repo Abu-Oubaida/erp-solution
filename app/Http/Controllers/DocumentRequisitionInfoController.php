@@ -537,6 +537,8 @@ class DocumentRequisitionInfoController extends Controller
             if ($request->ajax() && $request->isMethod('post')) {
                 $validatedData = $request->validate([
                     'pwdtr_id' => ['required', 'string', 'exists:project_wise_data_type_required_infos,id'],
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
                     'company_id' => ['required', 'string', 'exists:company_infos,id'],
                 ]);
                 extract($validatedData);
@@ -552,10 +554,10 @@ class DocumentRequisitionInfoController extends Controller
                     ])
                     ->where('pwdtr_id', $pwdtr_id)
                     ->get();
-                $view = view('back-end.requisition.__project_wise_data_type_responsible_user_add', compact('existing_users','pwdtr_id','departments','data_type','company_id'))->render();
+                $view = view('back-end.requisition.__project_wise_data_type_responsible_user_add', compact('existing_users','pwdtr_id','departments','data_type','pdri_id','project_id','company_id'))->render();
                 return response()->json([
                     'status' => 'success',
-                    'data' => ['view' => $view],
+                    'data' => ['view' => $view,],
                     'message' => 'Request processed successfully.'
                 ]);
             }
@@ -574,6 +576,8 @@ class DocumentRequisitionInfoController extends Controller
             if ($request->ajax() && $request->isMethod('post')) {
                 $validatedData = $request->validate([
                     'pwdtr_id' => ['required', 'string', 'exists:project_wise_data_type_required_infos,id'],
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
                     'company_id' => ['required', 'string', 'exists:company_infos,id'],
                     'users' => ['required', 'array'],
                     'users.*' => ['required', 'string', 'exists:users,id'],
@@ -589,9 +593,11 @@ class DocumentRequisitionInfoController extends Controller
                         ->where('pwdtr_id', $pwdtr_id)
                         ->get();
                     $view = view('back-end.requisition.___responsible_user_table', compact('existing_users'))->render();
+                    $result = $this->projectWiseDataTypeReportDetailsData($pdri_id, $project_id, $company_id);
+                    $view2 = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details', compact('result'))->render();
                     return response()->json([
                         'status' => 'success',
-                        'data' => ['view' => $view],
+                        'data' => ['view' => $view, 'view2' => $view2],
                         'message' => 'Request processed successfully.'
                     ]);
                 }
@@ -639,8 +645,11 @@ class DocumentRequisitionInfoController extends Controller
                 $validatedData = $request->validate([
                     'res_users' => ['required', 'array'],
                     'res_users.*' => ['required', 'string', 'exists:required_data_type_upload_responsible_user_infos,id'],
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
                 ]);
-
+                extract($validatedData);
                 $resUsers = $validatedData['res_users'];
                 $responsibleBy = Required_data_type_upload_responsible_user_info::whereIn('id', $resUsers)->get();
 
@@ -683,10 +692,11 @@ class DocumentRequisitionInfoController extends Controller
                 ])->where('pwdtr_id', $pwdtr_id)->get();
 
                 $view = view('back-end.requisition.___responsible_user_table', compact('existing_users'))->render();
-
+                $result = $this->projectWiseDataTypeReportDetailsData($pdri_id, $project_id, $company_id);
+                $view2 = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details', compact('result'))->render();
                 return response()->json([
                     'status' => 'success',
-                    'data' => ['view' => $view],
+                    'data' => ['view' => $view, 'view2' => $view2],
                     'message' => 'Responsible users deleted and logged successfully.',
                 ]);
             }

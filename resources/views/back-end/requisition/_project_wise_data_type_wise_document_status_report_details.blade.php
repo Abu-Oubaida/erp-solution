@@ -8,7 +8,7 @@
             <label>Selected Oprations</label>
             <button class="btn btn-sm btn-outline-success mb-2" onclick="return DataTypeNecessityChange(this,1,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fa-solid fa-star"></i> Make Required</button>
             <button class="btn btn-sm btn-outline-info mb-2" onclick="return DataTypeNecessityChange(this,0,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fa-regular fa-star"></i> Make Optional</button>
-            <button class="btn btn-sm btn-outline-danger mb-2" onclick="return DeleteProjectWiseNecessaryDataType({!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-trash"></i> Delete</button>
+            <button class="btn btn-sm btn-outline-danger mb-2" onclick="return DeleteProjectWiseNecessaryDataType(this,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-trash"></i> Delete</button>
         @endif
         <button class="btn btn-sm btn-outline-primary mb-2 @if(isset($result->data_types) && count($result->data_types))float-end @endif"  onclick="return ProjectWiseNewDataTypeAdd({!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-plus"></i> Add Data Type</button>
         <hr>
@@ -58,7 +58,7 @@
                     @endif
                 </td>
                 <td>
-                    <a href="#" onclick="return DataTypeWiseResponsibleUserAdd(this,{{$row->req_data_type_id}},{!! $result->company_id !!})">{!! $row->responsible_by_count !!}</a>
+                    <a href="#" onclick="return DataTypeWiseResponsibleUserAdd(this,{{$row->req_data_type_id}},{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!})">{!! $row->responsible_by_count !!}</a>
 {{--                    @foreach($row->responsible_by as $usr)--}}
 {{--                        <span class="badge bg-secondary"> {!! $usr->name !!} ({!! $usr->employee_id !!})</span>--}}
 {{--                    @endforeach--}}
@@ -88,7 +88,7 @@
                             text: '<i class="fas fa-file-pdf"></i> PDF',
                             orientation: 'landscape', // Landscape orientation
                             pageSize: 'A4', // A4 page size
-                            title: 'My Table Export', // Optional: Custom title
+                            title: "{!! $result->project_name !!} Required Data Type Details Report", // Optional: Custom title
                             exportOptions: {
                                 columns: ':visible', // Export only visible columns
                                 format: {
@@ -130,6 +130,7 @@
                         {
                             extend: 'print',
                             text: '<i class="fas fa-print"></i> Print',
+                            title: "{!! $result->project_name !!} Required Data Type Details Report",
                             exportOptions: {
                                 columns: ':visible',
                                 format: {

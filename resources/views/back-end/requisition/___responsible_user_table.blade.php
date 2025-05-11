@@ -14,7 +14,7 @@ $(document).ready(function () {
 </script>
 @if(auth()->user()->hasPermission('project_document_requisition_delete'))
     <label>Selected Oprations</label>
-    <button class="btn btn-sm btn-outline-danger mb-2" onclick="return DataTypeWiseResponsibleUserDelete(this)"><i class="fas fa-trash"></i> Delete</button>
+    <button class="btn btn-sm btn-outline-danger mb-2" onclick="return DataTypeWiseResponsibleUserDelete(this,{!! $pdri_id??0 !!},{!! $project_id??0 !!},{!! $company_id??0 !!})"><i class="fas fa-trash"></i> Delete</button>
 @endif
 <table class="table table-hover table-sm" id="data_type_responsible_user_list_table" style="width: 100%;">
     <thead>

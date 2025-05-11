@@ -200,7 +200,7 @@
             })
         }
 
-        function DeleteProjectWiseNecessaryDataType(pdri_id,project_id,company_id)
+        function DeleteProjectWiseNecessaryDataType(e,pdri_id,project_id,company_id)
         {
             let selected = [];
             $(".check-box:checked").each(function () {
@@ -234,6 +234,7 @@
                     else {
                         alert("Success: "+response.message)
                         $("#dataTypesDetailsContent").html(response.data.view)
+                        ProjectWiseRequiredDataTypeReport(e)
                         return true
                     }
                 },
@@ -301,12 +302,13 @@
                         alert("Success: "+response.message)
                         $("#dataTypesDetailsModal2").modal('hide')
                         $("#dataTypesDetailsContent").html(response.data.view)
+                        ProjectWiseRequiredDataTypeReport(e)
                         return true
                     }
                 },
             })
         }
-        function DataTypeWiseResponsibleUserAdd(e,pwdtr_id,company_id)
+        function DataTypeWiseResponsibleUserAdd(e,pwdtr_id,pdri_id,project_id,company_id)
         {
             const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-responsible-user-add";
             $.ajax({
@@ -317,6 +319,8 @@
                 type: "POST",
                 data: {
                     pwdtr_id: pwdtr_id,
+                    pdri_id: pdri_id,
+                    project_id: project_id,
                     company_id: company_id,
                 },
                 success: function (response) {
@@ -334,7 +338,7 @@
             })
         }
 
-        function DataTypeWiseResponsibleUserSubmit(e,pwdtr_id,company_id)
+        function DataTypeWiseResponsibleUserSubmit(e,pwdtr_id,pdri_id,project_id,company_id)
         {
             let res_users = $("#res_users").val()
             const url = window.location.origin + sourceDir +"/requisition/project-wise-data-type-responsible-user-submit";
@@ -347,6 +351,8 @@
                 data: {
                     users: res_users,
                     pwdtr_id: pwdtr_id,
+                    pdri_id: pdri_id,
+                    project_id: project_id,
                     company_id: company_id,
                 },
                 success: function (response) {
@@ -358,13 +364,14 @@
                     else {
                         alert("Success: "+response.message)
                         $("#responsible_user_table").html(response.data.view)
+                        $("#dataTypesDetailsContent").html(response.data.view2)
                         return true
                     }
                 },
             })
         }
 
-        function DataTypeWiseResponsibleUserDelete(e)
+        function DataTypeWiseResponsibleUserDelete(e,pdri_id,project_id,company_id)
         {
             let selected = [];
             $(".check-box-2:checked").each(function () {
@@ -385,6 +392,9 @@
                 type: "POST",
                 data: {
                     res_users: selected,
+                    pdri_id: pdri_id,
+                    project_id: project_id,
+                    company_id: company_id,
                 },
                 success: function (response) {
                     if(response.status === 'error')
@@ -395,6 +405,7 @@
                     else {
                         alert("Success: "+response.message)
                         $("#responsible_user_table").html(response.data.view)
+                        $("#dataTypesDetailsContent").html(response.data.view2)
                         return true
                     }
                 },

@@ -99,7 +99,7 @@
             </select>
         </div>
         <div class="col-md-12">
-            <button class="btn btn-sm btn-chl-outline float-end" onclick="return DataTypeWiseResponsibleUserSubmit(this,{!! $pwdtr_id??0 !!},{!! $company_id??0 !!})"> <i class="fas fa-user-plus"></i> Add New</button>
+            <button class="btn btn-sm btn-chl-outline float-end" onclick="return DataTypeWiseResponsibleUserSubmit(this,{!! $pwdtr_id??0 !!},{!! $pdri_id??0 !!},{!! $project_id??0 !!},{!! $company_id??0 !!})"> <i class="fas fa-user-plus"></i> Add New</button>
         </div>
     </div>
     @endif
