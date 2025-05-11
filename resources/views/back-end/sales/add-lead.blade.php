@@ -25,119 +25,124 @@
                         <h3 class="text-capitalize"><i class="fas fa-leaf"></i> Add Lead Information</h3>
                     </div>
                 </div>
-                <form id="leadForm">
-                    <div class="card-body" id="commonSlot_for_multiple_step">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="form-group">
-                                    <label for="company">Company Name<span class="text-danger">*</span></label>
-                                    <select class="text-capitalize form-control company_dropdown" id="company_id" name="company">
-                                        <option value="">Pick options...</option>
-                                        @if (isset($companies) || count($companies) > 0)
-                                            @foreach ($companies as $c)
-                                                <option value="{{ $c->id }}">{{ $c->company_name }}
-                                                    ({!! $c->company_code !!})
-                                                </option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                {{-- <input type="hidden" id="company_group" value="{{$companies}}"> --}}
-                            </div>
-                            <div class="col-md-4 mb-1">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" id="full_name" type="text" placeholder="Enter full name" />
-                                            <label for="full_name">Full name <span class="text-danger">*</span></label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" id="spouse" type="text"
-                                                placeholder="Enter husband/wife name" />
-                                            <label for="relation">Husband/Wife </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-1">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" id="primary_mobile" type="number" placeholder="Primary Mobile"
-                                                value="" />
-                                            <label for="primary_mobile">Primary Mobile <span class="text-danger">*</span></label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <input class="form-control" id="mobile_1" type="number" placeholder="Enter phone 1" />
-                                            <label for="phone2">Alternative Mobile 1</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 mt-1">
-                                        <a href="#" class="float-end text-decoration-none"
-                                            onclick="Sales.addEmailPhoneForLead(this,'mobile','add_extra_info')"><i
-                                                class="fas fa-plus small"></i> Add
-                                            Another Mobile</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-1">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" id="primary_email" type="email" placeholder="Primary Email"
-                                                value="" />
-                                            <label for="primary_email">Primary Email <span class="text-danger">*</span></label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <input class="form-control" id="email_1" type="email"
-                                                placeholder="Enter Email 2" />
-                                            <label for="alternative_email_1">Alternative Email 1</label>
-                                        </div>
-                                    </div>
-                
-                                    <div class="col-12 mt-1">
-                                        <a href="#" class="float-end text-decoration-none"
-                                            onclick="Sales.addEmailPhoneForLead(this,'email','add_extra_info')"><i
-                                                class="fas fa-plus small"></i> Add
-                                            Another
-                                            Email</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3">
-                                    <div class="form-floating mb-3">
-                                        <textarea type="text" class="form-control" id="notes" name="notes" placeholder="Notes"></textarea>
-                                        <label for="Designation">Notes</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="row" id="add_extra_info">
-                
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <button type="button" class="btn btn-chl-outline float-end mt-3" onclick="return Sales.addLeadStep1()"><i class="fa-solid fa-arrow-right"></i>
-                                            Next</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form> 
+                @include('back-end.sales.__add-lead-form')
             </div>
         </div>
     </div>
     <script>
-        window.allCompanies = @json($companies);
+        $(document).ready(function(){
+
+        })
+        function addLeadStep1(operation, lead_id) {
+            let add_lead_step1_data = {
+                company_id: $("#company_id").val(),
+                full_name: $("#full_name").val(),
+                spouse: $("#spouse").val(),
+                primary_mobile: $("#primary_mobile").val(),
+                primary_email: $("#primary_email").val(),
+                notes: $("#notes").val(),
+            };
+            console.log(add_lead_step1_data)
+            // if (
+            //     !add_lead_step1_data.full_name ||
+            //     !add_lead_step1_data.company_id ||
+            //     !add_lead_step1_data.primary_email||
+            //     !add_lead_step1_data.primary_mobile
+            // ) {
+            //     alert(
+            //         "Comapany, Full Name, Primary Mobile and Primary Email is Required."
+            //     );
+            //     return false;
+            // }
+            let alternate_mobiles = {};
+            if (
+                $("#mobile_1").length &&
+                $("#mobile_1").val().trim() !== ""
+            ) {
+                alternate_mobiles.mobile_1 = $("#mobile_1").val().trim();
+            }
+            if (
+                $("#mobile_2").length &&
+                $("#mobile_2").val().trim() !== ""
+            ) {
+                alternate_mobiles.mobile_2 = $("#mobile_2").val().trim();
+            }
+            if (
+                $("#mobile_3").length &&
+                $("#mobile_3").val().trim() !== ""
+            ) {
+                alternate_mobiles.mobile_3 = $("#mobile_3").val().trim();
+            }
+            if (
+                $("#mobile_4").length &&
+                $("#mobile_4").val().trim() !== ""
+            ) {
+                alternate_mobiles.mobile_4 = $("#mobile_4").val().trim();
+            }
+            if (
+                $("#mobile_5").length &&
+                $("#mobile_5").val().trim() !== ""
+            ) {
+                alternate_mobiles.mobile_5 = $("#mobile_5").val().trim();
+            }
+            let alternate_emails = {};
+            if ($("#email_1").length && $("#email_1").val().trim() !== "") {
+                alternate_emails.email_1 = $("#email_1").val().trim();
+            }
+            if ($("#email_2").length && $("#email_2").val().trim() !== "") {
+                alternate_emails.email_2 = $("#email_2").val().trim();
+            }
+            if ($("#email_3").length && $("#email_3").val().trim() !== "") {
+                alternate_emails.email_3 = $("#email_3").val().trim();
+            }
+            if ($("#email_4").length && $("#email_4").val().trim() !== "") {
+                alternate_emails.email_4 = $("#email_4").val().trim();
+            }
+            if ($("#email_5").length && $("#email_5").val().trim() !== "") {
+                alternate_emails.email_5 = $("#email_5").val().trim();
+            }
+            console.log(alternate_mobiles);
+            const url =
+                window.location.origin + sourceDir + "/add-lead-step1";
+
+            let alternate_mobiles_value = Object.values(alternate_mobiles);
+            let alternate_emails_value = Object.values(alternate_emails);
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+                method: "POST",
+                data: {
+                    add_lead_step1_data,
+                    alternate_mobiles_value,
+                    alternate_emails_value,
+                    op_name: operation,
+                    lead_id: lead_id
+                },
+                success: function(response) {
+                    if (response.status === "error") {
+                        if (typeof response.message === "object") {
+                            let errorMessages = "";
+                            for (const field in response.message) {
+                                response.message[field].forEach((msg) => {
+                                    errorMessages += msg + "\n";
+                                });
+                            }
+                            alert(errorMessages);
+                        } else {
+                            alert(response.message);
+                        }
+                    } else if (response.status === "success") {
+                        // alert(response.message);
+                        $("#commonSlot_for_multiple_step").html(response.data.view);
+                    }
+                },
+            });
+
+            return false;
+        }
     </script>
 @stop
