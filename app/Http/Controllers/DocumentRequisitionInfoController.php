@@ -278,7 +278,7 @@ class DocumentRequisitionInfoController extends Controller
                 ]);
                 extract($request->post());
                 $projects = $this->getUserProjectPermissions($this->user->id, $permision)->without('getUsers', 'company')->where('status', 1)->where('company_id', $company_id)->select('id', 'branch_name', 'address')->get();
-                $types = $this->archiveTypeList($company_id)->without('voucherWithUsers', 'createdBY', 'updatedBY', 'company', 'archiveDocumentInfos', 'archiveDocuments')->where('status', 1)->where('company_id', $company_id)->select('id', 'voucher_type_title', 'code')->get();
+                $types = $this->archiveTypeList($permision)->without('voucherWithUsers', 'createdBY', 'updatedBY', 'company', 'archiveDocumentInfos', 'archiveDocuments')->where('status', 1)->where('company_id', $company_id)->select('id', 'voucher_type_title', 'code')->get();
                 $departments = $this->getDepartment($permision)->without('createdBy', 'updatedBy', 'getUsers', 'company')->where('company_id', $company_id)->where('status', 1)->where('company_id', $company_id)->select('id', 'dept_code', 'dept_name')->get();
                 return response()->json([
                     'status' => 'success',
