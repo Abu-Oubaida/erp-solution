@@ -13,7 +13,7 @@ class Project_wise_data_type_required_info extends Model
 
     public function projectDocumentReq()
     {
-        return $this->belongsTo(Project_wise_data_type_required_info::class,'pdri_id','id');
+        return $this->belongsTo(Project_document_requisition_info::class,'pdri_id','id');
     }
     public function archiveDataType()
     {

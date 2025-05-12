@@ -10,7 +10,10 @@ use App\Models\Required_data_type_upload_responsible_user_info;
 use App\Models\Required_data_type_upload_responsible_user_infos_delete_history;
 use App\Models\User;
 use App\Models\VoucherType;
+use App\Notifications\DataArchiveProjectAssignedSummaryNotification;
+use App\Notifications\DataArchiveResponsibleUserAssigned;
 use App\Traits\ParentTraitCompanyWise;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -237,7 +240,7 @@ class DocumentRequisitionInfoController extends Controller
                             'updated_by' => null,
                         ]
                     );
-
+                    $userDataMap = []; // user_id => [ ['name' => ..., 'deadline' => ...], ... ]
                     foreach ($data_types as $data_type_id) {
                         $pwdtr = Project_wise_data_type_required_info::firstOrCreate(
                             [
@@ -255,7 +258,18 @@ class DocumentRequisitionInfoController extends Controller
                             ]
                         );
 
-                        $this->responsibleUserEntry($users,$pwdtr->id, $validatedData['company_id']);
+                        $this->responsibleUserEntry($users, $pwdtr, $validatedData['company_id'], $userDataMap);
+                    }
+                    if (!empty($userDataMap)) {
+                        $projectName = optional($pdri->project)->branch_name ?? 'Unknown Project';
+                        foreach ($userDataMap as $user_id => $dataTypes) {
+                            $user = Cache::remember("user_{$user_id}", 60, fn () => User::find($user_id));
+                            $user->notify(new DataArchiveProjectAssignedSummaryNotification(
+                                $projectName,
+                                $dataTypes,
+                                route('project.wise.data.upload.responsible.user.data',['pdriId' => $pdri->id]),
+                            ));
+                        }
                     }
                 }
                 return response()->json([
@@ -271,6 +285,7 @@ class DocumentRequisitionInfoController extends Controller
             ]);
         }
     }
+
 
     public function companyWiseRequiredData(Request $request)
     {
@@ -493,6 +508,8 @@ class DocumentRequisitionInfoController extends Controller
                     'deadline' => ['required', 'string', 'date'],
                 ]);
                 extract($validatedData);
+                $userDataMap = []; // user_id => [ ['name' => ..., 'deadline' => ...], ... ]
+
                 foreach ($data_types as $data_type_id) {
                     $pwdtr = Project_wise_data_type_required_info::firstOrCreate(
                         [
@@ -509,9 +526,22 @@ class DocumentRequisitionInfoController extends Controller
                             'updated_at' => null,
                         ]
                     );
-                    if ($pwdtr && $res_users)
-                    {
-                        $this->responsibleUserEntry($res_users,$pwdtr->id, $company_id);
+
+                    if ($pwdtr && $res_users) {
+                        $this->responsibleUserEntry($res_users, $pwdtr, $company_id, $userDataMap);
+                    }
+                }
+                if (!empty($userDataMap)) {
+                    $pdri = Project_document_requisition_info::with('project')->find($pdri_id);
+                    $projectName = optional($pdri->project)->branch_name ?? 'Unknown Project';
+
+                    foreach ($userDataMap as $user_id => $dataTypes) {
+                        $user = Cache::remember("user_{$user_id}", 60, fn () => User::find($user_id));
+                        $user->notify(new DataArchiveProjectAssignedSummaryNotification(
+                            $projectName,
+                            $dataTypes,
+                            route('project.wise.data.upload.responsible.user.data',['pdriId' => $pdri->id]),
+                        ));
                     }
                 }
                 $result = $this->projectWiseDataTypeReportDetailsData($pdri_id, $project_id, $company_id);
@@ -585,7 +615,22 @@ class DocumentRequisitionInfoController extends Controller
                 extract($validatedData);
                 if ($pwdtr_id && $users)
                 {
-                    $this->responsibleUserEntry($users, $pwdtr_id, $company_id);
+                    $pwdtr = Project_wise_data_type_required_info::with('archiveDataType', 'projectDocumentReq.project')->find($pwdtr_id);
+                    $projectName = optional($pwdtr->projectDocumentReq->project)->branch_name ?? 'Unknown Project';
+                    $this->responsibleUserEntry($users, $pwdtr, $company_id);
+                    // Send notification to each user
+                    foreach ($users as $user_id) {
+                        $user = Cache::remember("user_{$user_id}", 60, fn () => User::find($user_id));
+
+                        $user->notify(new DataArchiveProjectAssignedSummaryNotification(
+                            $projectName,
+                            [[
+                                'name' => $pwdtr->archiveDataType->voucher_type_title,
+                                'deadline' => $pwdtr->deadline,
+                            ]],
+                            route('project.wise.data.upload.responsible.user.data',['pdriId' => $pdri_id]),
+                        ));
+                    }
                     $existing_users = Required_data_type_upload_responsible_user_info::with([
                         'user:id,name,employee_id,dept_id',
                         'user.department:id,dept_code,dept_name',
@@ -612,31 +657,81 @@ class DocumentRequisitionInfoController extends Controller
         }
     }
 
-    private function responsibleUserEntry($users, $pwdtr_id, $company_id)
+//    private function responsibleUserEntry($users, $pwdtr_id, $company_id)
+//    {
+//        $pwdtr = Project_wise_data_type_required_info::find($pwdtr_id);
+//        $projectName = optional($pwdtr->projectDocumentReq->project)->branch_name ?? 'Unknown Project';
+//        $deadline = $pwdtr->deadline;
+//
+//        $insertData = [];
+//        $notifyUsers = [];
+//
+//        foreach ($users as $user_id) {
+//            $exists = Required_data_type_upload_responsible_user_info::where('pwdtr_id', $pwdtr_id)
+//                ->where('user_id', $user_id)
+//                ->exists();
+//
+//            if (!$exists) {
+//                $insertData[] = [
+//                    'company_id' => $company_id,
+//                    'pwdtr_id' => $pwdtr_id,
+//                    'user_id' => $user_id,
+//                    'created_by' => $this->user->id,
+//                    'updated_by' => null,
+//                    'created_at' => now(),
+//                    'updated_at' => null,
+//                ];
+//
+//                $notifyUsers[] = $user_id;
+//            }
+//        }
+//
+//        if (!empty($insertData)) {
+//            DB::transaction(function () use ($insertData, $notifyUsers, $pwdtr_id, $projectName, $deadline) {
+//                Required_data_type_upload_responsible_user_info::insert($insertData);
+//                foreach ($notifyUsers as $user_id) {
+//                    $user = User::find($user_id);
+//                    if ($user) {
+//                        $user->notify(new DataArchiveResponsibleUserAssigned($pwdtr_id, $projectName, $deadline));
+//                    }
+//                }
+//            });
+//        }
+//    }
+
+    private function responsibleUserEntry($users, $pwdtr, $company_id, &$userDataMap =[])
     {
         $insertData = [];
-
         foreach ($users as $user_id) {
-            $exists = Required_data_type_upload_responsible_user_info::where('pwdtr_id', $pwdtr_id)
+            $exists = Required_data_type_upload_responsible_user_info::where('pwdtr_id', $pwdtr->id)
                 ->where('user_id', $user_id)
                 ->exists();
 
             if (!$exists) {
                 $insertData[] = [
                     'company_id' => $company_id,
-                    'pwdtr_id' => $pwdtr_id,
+                    'pwdtr_id' => $pwdtr->id,
                     'user_id' => $user_id,
                     'created_by' => $this->user->id,
                     'updated_by' => null,
                     'created_at' => now(),
                     'updated_at' => null,
                 ];
+
+                // Aggregate data types for notification
+                $userDataMap[$user_id][] = [
+                    'id' => $pwdtr->id,
+                    'name' => $pwdtr->archiveDataType->voucher_type_title,
+                    'deadline' => $pwdtr->deadline,
+                ];
             }
         }
+
         if (!empty($insertData)) {
             Required_data_type_upload_responsible_user_info::insert($insertData);
         }
     }
+
 
     public function projectWiseDataTypeResponsibleUserDelete(Request $request)
     {

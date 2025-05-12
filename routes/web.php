@@ -15,6 +15,7 @@ use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\FixedAssetDistribution;
 use App\Http\Controllers\FixedAssetTransferController;
+use App\Http\Controllers\NotificationViewController;
 use App\Http\Controllers\OpReferenceTypeController;
 use App\Http\Controllers\PreferenceController;
 use App\Http\Controllers\ProfileController;
@@ -79,6 +80,9 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['post','get'],'app-setting','appSetting')->name('app.setting');
         });
     });//3.1 End
+    Route::controller(NotificationViewController::class)->group(function (){
+        Route::get('project-wise-data-upload-responsible-user-data','projectWiseDataUploadResponsibleUserData')->name('project.wise.data.upload.responsible.user.data');
+    });
     Route::controller(PreferenceController::class)->group(function (){
         // routes/web.php
         Route::post('/save-sidebar-width', 'saveSidebarWidth');

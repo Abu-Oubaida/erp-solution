@@ -18,16 +18,16 @@
         <nav class="sb-sidenav-menu-nested nav">
             @if(auth()->user()->hasPermission('project_document_requisition_entry'))
                 @if(Route::currentRouteName() == 'project.document.requisition.entry')
-                    <a class="nav-link" href="{{route('project.document.requisition.entry')}}" title="Create Project Document Requisition"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-plus"></i></div> Create Req.</a>
+                    <a class="nav-link" href="{{route('project.document.requisition.entry')}}" title="Create Project Document Requisition"><div class="sb-nav-link-icon"><i class="fa-solid fa-file-circle-plus"></i></div> Req. Create</a>
                 @else
-                    <a class="nav-link text-chl" href="{{route('project.document.requisition.entry')}}"><div class="sb-nav-link-icon" title="Create Project Document Requisition"><i class="fas fa-solid fa-plus"></i></div> Create Req.</a>
+                    <a class="nav-link text-chl" href="{{route('project.document.requisition.entry')}}"><div class="sb-nav-link-icon" title="Create Project Document Requisition"><i class="fa-solid fa-file-circle-plus"></i></div> Req. Create</a>
                 @endif
             @endif
             @if(auth()->user()->hasPermission('project_document_requisition_report'))
                 @if(Route::currentRouteName() == 'project.document.requisition.report')
-                    <a class="nav-link" href="{{route('project.document.requisition.report')}}" title="Project Document Requisition Report"><div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div> Report</a>
+                    <a class="nav-link" href="{{route('project.document.requisition.report')}}" title="Project Document Requisition Report"><div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div> Req. Report</a>
                 @else
-                    <a class="nav-link text-chl" href="{{route('project.document.requisition.report')}}"><div class="sb-nav-link-icon" title="Project Document Requisition Report"><i class="fas fa-file-lines"></i></div> Report</a>
+                    <a class="nav-link text-chl" href="{{route('project.document.requisition.report')}}"><div class="sb-nav-link-icon" title="Project Document Requisition Report"><i class="fas fa-file-lines"></i></div> Req. Report</a>
                 @endif
             @endif
         </nav>

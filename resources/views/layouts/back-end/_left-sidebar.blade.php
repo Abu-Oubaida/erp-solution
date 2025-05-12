@@ -337,7 +337,8 @@
     </group10>{{-- #2.6    Mobile Sim section End --}}
     <group5>
         @if (auth()->user()->hasPermission('data_archive'))
-            @if (Route::currentRouteName() == 'add.archive.type' ||
+            @if (
+                    Route::currentRouteName() == 'add.archive.type' ||
                     Route::currentRouteName() == 'archive.data.type.list' ||
                     Route::currentRouteName() == 'edit.archive.type' ||
                     Route::currentRouteName() == 'add.archive.info' ||
@@ -347,7 +348,9 @@
                     Route::currentRouteName() == 'uploaded.archive.list.quick' ||
                     Route::currentRouteName() == 'uploaded.archive.list.pagination' ||
                     Route::currentRouteName() == 'data.archive.dashboard.interface' ||
-                    Route::currentRouteName() == 'data.archive.setting')
+                    Route::currentRouteName() == 'data.archive.setting' ||
+                    Route::currentRouteName() == 'project.document.requisition.report'
+                )
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#pagesUploadOption"
                     aria-expanded="true" aria-controls="pagesUploadOption">
                     <div class="sb-nav-link-icon"><i class="fas fa-receipt" aria-hidden="true"></i></div>
@@ -450,12 +453,19 @@
                 @if (auth()->user()->hasPermission('archive_data_list_quick'))
                     @if (Route::currentRouteName() == 'uploaded.archive.list.quick')
                         <a class="nav-link" href="{{ route('uploaded.archive.list.quick') }}">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-bolt"></i></div> Quick List
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-bolt"></i></div> Quick Report
                         </a>
                     @else
                         <a class="nav-link text-chl" href="{{ route('uploaded.archive.list.quick') }}">
-                            <div class="sb-nav-link-icon"><i class="fa-solid fa-bolt"></i></div> Quick List
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-bolt"></i></div> Quick Report
                         </a>
+                    @endif
+                @endif
+                @if(auth()->user()->hasPermission('project_document_requisition_report'))
+                    @if(Route::currentRouteName() == 'project.document.requisition.report')
+                        <a class="nav-link" href="{{route('project.document.requisition.report')}}" title="Project Document Requisition Report"><div class="sb-nav-link-icon"><i class="fas fa-file-lines"></i></div> Project Report</a>
+                    @else
+                        <a class="nav-link text-chl" href="{{route('project.document.requisition.report')}}"><div class="sb-nav-link-icon" title="Project Document Requisition Report"><i class="fas fa-file-lines"></i></div> Project Report</a>
                     @endif
                 @endif
                 @if (auth()->user()->hasPermission('archive_document_view'))

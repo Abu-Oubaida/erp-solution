@@ -16,6 +16,22 @@
 {{--            <button class="btn btn-primary btn-chl" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>--}}
         </div>
     </form>
+    <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4" style="border-radius: 25px;">
+        <li class="nav-item dropdown">
+            <a href="#" class="nav-link text-decoration-none text-primary badge" id="NotificationNavbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px"><i class="fa-solid fa-bell"></i><sup style="    top: -1.5em; font-size: 10px;"><small class="badge bg-danger text-white">{{ $unreadNotificationCount ?? 0 }}</small></sup></a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="NotificationNavbarDropdown">
+                <li><a class="dropdown-item" href="#">Notifications</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                @foreach($userNotifications ?? [] as $notification)
+                    <li>
+                        <a class="dropdown-item" href="{{ $notification->data['url'] }}" target="_blank">
+                            {{ $notification->data['message'] }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </li>
+    </ul>
     <!-- Navbar-->
     <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4 bg-chl" style="border-radius: 10px;">
         <li class="nav-item dropdown">
