@@ -56,7 +56,9 @@
                         <div class="row">
                             <div class="col">
                                 <h3 class="text-capitalize d-inline-block"> <i class="fa-solid fa-file-lines"></i> {{str_replace('add','create',str_replace('.', ' ', \Route::currentRouteName()))}}</h3>
+                            @if(auth()->user()->hasPemission('project_document_requisition_entr'))
                                 <a href="{!! route('project.document.requisition.entry') !!}" class="btn btn-sm btn-outline-success float-end mt-1"><i class="fas fa-plus"></i> Create Requisition</a>
+                            @endif
                             </div>
                         </div>
                     </div>

@@ -24,7 +24,7 @@
                 <li><hr class="dropdown-divider" /></li>
                 @foreach($userNotifications ?? [] as $notification)
                     <li>
-                        <a class="dropdown-item" href="{{ $notification->data['url'] }}" target="_blank">
+                        <a class="dropdown-item" href="{{ route("notification.view") }}" target="_blank">
                             {{ $notification->data['message'] }}
                         </a>
                     </li>
