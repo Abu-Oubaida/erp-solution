@@ -111,8 +111,8 @@
                         @for ($i = 1; $i < $extraMobileCount; $i++)
                             <div class="col-3">
                                 <div class="form-floating">
-                                    <input class="form-control" id="mobile_".{{ $i + 1 }} type="number"
-                                        placeholder="Enter Mobile ".{{ $i + 1 }}
+                                    <input class="form-control" id="mobile_{{ $i + 1 }}" type="number"
+                                        placeholder="Enter Mobile {{ $i + 1 }}"
                                         value="{{ $getLead->extraMobiles[$i]->mobile }}" />
                                     <label for="alternative_mobile_".{{ $i + 1 }}>Alternative Mobile
                                         {{ $i + 1 }}</label>
@@ -124,8 +124,8 @@
                         @for ($i = 1; $i < $extraEmailCount; $i++)
                             <div class="col-3">
                                 <div class="form-floating">
-                                    <input class="form-control" id="email_".{{ $i + 1 }} type="email"
-                                        placeholder="Enter Email ".{{ $i + 1 }}
+                                    <input class="form-control" id="email_{{ $i + 1 }}" type="email"
+                                        placeholder="Enter Email {{ $i + 1 }}"
                                         value="{{ $getLead->extraEmails[$i]->email }}" />
                                     <label for="alternative_email_".{{ $i + 1 }}>Alternative Email
                                         {{ $i + 1 }}</label>

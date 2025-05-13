@@ -30,9 +30,6 @@
         </div>
     </div>
     <script>
-        $(document).ready(function(){
-
-        })
         function addLeadStep1(operation, lead_id) {
             let add_lead_step1_data = {
                 company_id: $("#company_id").val(),
@@ -42,18 +39,6 @@
                 primary_email: $("#primary_email").val(),
                 notes: $("#notes").val(),
             };
-            console.log(add_lead_step1_data)
-            // if (
-            //     !add_lead_step1_data.full_name ||
-            //     !add_lead_step1_data.company_id ||
-            //     !add_lead_step1_data.primary_email||
-            //     !add_lead_step1_data.primary_mobile
-            // ) {
-            //     alert(
-            //         "Comapany, Full Name, Primary Mobile and Primary Email is Required."
-            //     );
-            //     return false;
-            // }
             let alternate_mobiles = {};
             if (
                 $("#mobile_1").length &&
@@ -136,7 +121,7 @@
                             alert(response.message);
                         }
                     } else if (response.status === "success") {
-                        // alert(response.message);
+                         alert(response.message);
                         $("#commonSlot_for_multiple_step").html(response.data.view);
                     }
                 },
