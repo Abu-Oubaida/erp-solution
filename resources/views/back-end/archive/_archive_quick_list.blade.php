@@ -116,7 +116,7 @@
                         <tbody>
                         @foreach($data->voucherDocuments as $d)
                             <tr>
-                                <td>
+                                <td style="width: 80%">
                                     <strong>{!! $x++ !!}.</strong>
                                     {!! preg_replace('/^.*_/', '', pathinfo($d->document, PATHINFO_FILENAME)) . '.' . pathinfo($d->document, PATHINFO_EXTENSION) !!}
                                 <td>
