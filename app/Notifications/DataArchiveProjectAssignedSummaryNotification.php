@@ -48,7 +48,7 @@ class DataArchiveProjectAssignedSummaryNotification extends Notification impleme
         $mail = (new MailMessage)
             ->subject("You are assigned to upload document(s) of project: {$this->projectName}")
             ->greeting("Hello {$notifiable->name},")
-            ->line("You have been assigned the following data types in project **{$this->projectName}**:");
+            ->line("You have been assigned to upload the following data type(s) under project:  **{$this->projectName}** in online document archiving system" );
 
         foreach ($this->dataTypes as $dataType) {
             $mail->line("- {$dataType['name']} (Deadline: " . \Carbon\Carbon::parse($dataType['deadline'])->format('d M Y') . ")");
@@ -56,7 +56,10 @@ class DataArchiveProjectAssignedSummaryNotification extends Notification impleme
 
         return $mail
             ->action('View Task', $this->action_url)
-            ->line('Please make sure to complete your uploads before the respective deadlines.');
+            ->line('Please upload the required documents properly before the respective deadlines.')
+            ->line("**{N:B: This is an automated system-generated email. Hence, no need to reply.}**")
+            ->line('Thank you!');
+
     }
 
     /**
