@@ -24,8 +24,8 @@
                     </div>
                     <div class="col">
                         <div class="float-end">
-                            @if(auth()->user()->hasPermission('archive_data_list'))
-                                <a class="btn btn-success btn-sm mt-1" href="{{route("uploaded.archive.list.quick")}}"><i class="fas fa-list-check"></i> Uploaded List</a>
+                            @if(auth()->user()->hasPermission('archive_data_list_quick'))
+                                <a class="btn btn-outline-success btn-sm mt-1" href="{{route("uploaded.archive.list.quick")}}"><i class="fa-solid fa-bolt"></i> Quick Report</a>
                             @endif
                         </div>
                     </div>

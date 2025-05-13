@@ -119,9 +119,10 @@
                         <tbody>
                         @foreach($data->voucherDocuments as $d)
                             <tr>
-                                <td>
+                                <td style="width: 65%">
                                     <strong>{!! $x++ !!}.</strong>
                                 {!! preg_replace('/^.*_/', '', pathinfo($d->document, PATHINFO_FILENAME)) . '.' . pathinfo($d->document, PATHINFO_EXTENSION) !!}
+                                </td>
                                 <td>
                                     <a class="text-primary" href="#" title="Quick View" ref="{!! \Illuminate\Support\Facades\Crypt::encryptString($d->id) !!}" onclick="return Obj.findDocument(this,'documentPreview','{!! $data->id !!}')"> <i class="fa-solid fa-eye"></i></a>
                                     &nbsp;

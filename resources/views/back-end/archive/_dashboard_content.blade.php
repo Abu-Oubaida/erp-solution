@@ -430,10 +430,9 @@
                 $prevColor = $chosenColor;
             @endphp
             <div class="col-md-3">
-                <div class="card bg-{{ $chosenColor }} sub-card  mb-4">
+                <div class="card bg-{{ $chosenColor }} sub-card  mb-4" title="{!! $dataType['voucher_type_title'] !!}">
                     <div class="card-header">
-                        <h5 class="text-capitalize"><i class="fas fa-file-lines"></i> {!! $dataType['voucher_type_title'] !!}
-                            ({!! $dataType['company_name'] !!})
+                        <h5 class="text-capitalize text-justify" title="{!! $dataType['voucher_type_title'] !!}"><i class="fas fa-file-lines"></i> {{ \Illuminate\Support\Str::limit($dataType['voucher_type_title'], 30) }}
                         </h5>
                     </div>
                     <div class="card-body text-capitalize">

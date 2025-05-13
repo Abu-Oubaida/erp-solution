@@ -92,6 +92,16 @@
         </div>
 
         <div class="card mb-4">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 class="d-inline-block mb-0"><i class="fa-solid fa-bolt"></i> Search Result</h3>
+                        @if(auth()->user()->hasPermission('archive_document_upload'))
+                            <a class="btn btn-outline-success btn-sm mt-1 float-end" href="{{route("add.archive.info")}}"><i class="fas fa-upload"></i> Uploaded New</a>
+                        @endif
+                    </div>
+                </div>
+            </div>
             @php
             $request = request()
             @endphp
@@ -105,6 +115,7 @@
                 </script>
             @endif
             <div class="card-body" id="quick-list">
+                <h5 class="text-center text-danger">No result are found!</h5>
 {{--                @if(isset($voucherInfos))--}}
 {{--                    @include('back-end.archive._archive_quick_list')--}}
 {{--                @endif--}}

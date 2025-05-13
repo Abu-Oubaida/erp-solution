@@ -197,7 +197,7 @@
                             <button onclick="zoomIn()" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</button>
                         </div>
                         <div class="col-md-3 col-sm-3">
-                            @if(auth()->user()->hasPermission('archive_document_download'))
+                            @if(auth()->user()->hasPermission('archive_document_print'))
                                 <button class="btn btn-outline-primary btn-sm float-end"  onclick="printPDF()"><i class="fas fa-print"></i> Print</button>
                             @endif
                         </div>

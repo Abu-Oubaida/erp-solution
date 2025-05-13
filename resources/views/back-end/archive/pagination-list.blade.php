@@ -29,7 +29,12 @@
                     <div class="row">
                         <div class="col-md-12">
                             <h4 class="text-capitalize d-inline-block"><i class="fa-solid fa-book"></i> Uploaded <b>{!! @$d->VoucherType->voucher_type_title !!}</b> Document List (Company: {!! $d->company->company_code !!})</h4>
-                            <a href="{!! route('uploaded.archive.list.quick') !!}" class="btn btn-sm btn-outline-primary float-end"><i class="fa-solid fa-bolt"></i> Quick List</a>
+                            @if(auth()->user()->hasPermission('archive_document_upload'))
+                                <a class="btn btn-outline-success btn-sm m-1 float-end" href="{{route("add.archive.info")}}"><i class="fas fa-upload"></i> Uploaded New</a>
+                            @endif
+                            @if(auth()->user()->hasPermission('archive_data_list_quick'))
+                            <a href="{!! route('uploaded.archive.list.quick') !!}" class="btn btn-sm m-1 btn-outline-primary float-end"><i class="fa-solid fa-bolt"></i> Quick List</a>
+                            @endif
                         </div>
                     </div>
                 </div>

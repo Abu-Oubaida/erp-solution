@@ -213,6 +213,13 @@
                                                                     class="fa-solid fa-file"></i> File Manager
                                                                 Permission</a></li>
                                                     @endif
+
+                                                        @if (auth()->user()->hasPermission('add_archive_data_type_user_permission') && auth()->user()->haspermission('archive_data_type_list'))
+                                                            <li><a class="dropdown-item" type="button"
+                                                                   href="{!! route('archive.data.type.list') !!}"
+                                                                   title="Archive Data Type Permission" target="_blank"><i class="fas fa-receipt" aria-hidden="true"></i> Archive Data Type Permission</a>
+                                                            </li>
+                                                        @endif
                                                 @endif
                                             </ul>
                                         </div>
