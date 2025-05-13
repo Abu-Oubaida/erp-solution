@@ -84,9 +84,25 @@
             </div>
         </div>
         @if (in_array($fileExtension, ['jpg','jpeg','png','JPG']))
+            @if(\Illuminate\Support\Facades\Request::get('ocr') && auth()->user()->hasPermission('archive_document_download'))
+                <h5 class="text-center">
+                    If the document does not download automatically, please
+                    <a href="{{ $pdfUrl }}" download>click here</a>.
+                </h5>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const link = document.createElement("a");
+                        link.href = "{{ $pdfUrl }}";
+                        link.download = ""; // Optional: you can add a filename like "document.pdf"
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    });
+                </script>
             <embed src="{{ $pdfUrl }}" style="width:100%;" />
+            @endif
         @elseif (in_array($fileExtension, ['pdf']))
-            @if(\Illuminate\Support\Facades\Request::get('ocr'))
+            @if(\Illuminate\Support\Facades\Request::get('ocr') && auth()->user()->hasPermission('archive_document_download'))
                 <embed src="{{ $pdfUrl }}" style="width:100%; min-height: 800px;" class="mobile-none"/>
                 <script>
                     document.addEventListener("DOMContentLoaded", function () {
@@ -170,7 +186,9 @@
                                     <input class="form-control form-control-sm" type="number" id="page-input" min="1" placeholder="Go to page">
                                 </div>
                                 <div class="col-sm-3">
-                                    <button onclick="goToPage()" class="btn btn-sm btn-outline-success"><i class="fas fa-search"></i> Go</button>
+                                    <div class="row">
+                                        <button onclick="goToPage()" class="btn btn-sm btn-outline-success"><i class="fas fa-search"></i> Go</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -179,7 +197,7 @@
                             <button onclick="zoomIn()" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</button>
                         </div>
                         <div class="col-md-3 col-sm-3">
-                            @if(auth()->user()->hasPermission('archive_document_print'))
+                            @if(auth()->user()->hasPermission('archive_document_download'))
                                 <button class="btn btn-outline-primary btn-sm float-end"  onclick="printPDF()"><i class="fas fa-print"></i> Print</button>
                             @endif
                         </div>
