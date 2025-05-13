@@ -10,13 +10,17 @@
             <button class="btn btn-sm btn-outline-info mb-2" onclick="return DataTypeNecessityChange(this,0,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fa-regular fa-star"></i> Make Optional</button>
             <button class="btn btn-sm btn-outline-danger mb-2" onclick="return DeleteProjectWiseNecessaryDataType(this,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-trash"></i> Delete</button>
         @endif
-        <button class="btn btn-sm btn-outline-primary mb-2 @if(isset($result->data_types) && count($result->data_types))float-end @endif"  onclick="return ProjectWiseNewDataTypeAdd({!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-plus"></i> Add Data Type</button>
-        <hr>
     @endif
+    @if(auth()->user()->hasPermission('project_document_requisition_entry'))
+        <button class="btn btn-sm btn-outline-primary mb-2 @if(isset($result->data_types) && count($result->data_types))float-end @endif"  onclick="return ProjectWiseNewDataTypeAdd({!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-plus"></i> Add Data Type</button>
+    @endif
+        <hr>
     <table @if($result) id="DataTypeTable" @endif class="table table-hover table-striped table-sm" style="width:100%">
         <thead>
         <tr>
+            @if(auth()->user()->hasPermission('project_document_requisition_edit'))
             <th><input type="checkbox" name="" id="select_all"></th>
+            @endif
             <th>SL</th>
             <th>Company</th>
             <th>Project</th>
@@ -34,7 +38,9 @@
         @php $i=1; @endphp
         @foreach($result->data_types as $row)
             <tr>
+                @if(auth()->user()->hasPermission('project_document_requisition_edit'))
                 <td><input class="check-box" type="checkbox" name="selected[]" id="select_{!! $row->req_data_type_id !!}" value="{!! $row->req_data_type_id !!}"></td>
+                @endif
                 <td>{!! $i++ !!}</td>
                 <td>{!! $result->company_name !!}</td>
                 <td>{!! $result->project_name !!}</td>

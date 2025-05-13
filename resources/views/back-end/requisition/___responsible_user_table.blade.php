@@ -19,7 +19,9 @@ $(document).ready(function () {
 <table class="table table-hover table-sm" id="data_type_responsible_user_list_table" style="width: 100%;">
     <thead>
         <tr>
+            @if(auth()->user()->hasPermission('project_document_requisition_delete'))
             <th><input type="checkbox" name="" id="select_all_2"></th>
+            @endif
             <th>SL</th>
             <th>Department</th>
             <th>User</th>
@@ -32,7 +34,9 @@ $(document).ready(function () {
     @endphp
     @foreach($existing_users as $user)
         <tr>
+            @if(auth()->user()->hasPermission('project_document_requisition_delete'))
             <td><input class="check-box-2" type="checkbox" name="selected[]" id="select_{!! $user->id !!}" value="{!! $user->id !!}"></td>
+            @endif
             <td>{!! $sl++ !!}</td>
             <td>{!! $user->user->department->dept_name !!}</td>
             <td>{!! $user->user->name !!}</td>
