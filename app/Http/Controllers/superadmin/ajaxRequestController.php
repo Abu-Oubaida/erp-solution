@@ -175,7 +175,7 @@ class ajaxRequestController extends Controller
                     ]);
                 }
                 $companyWiseParentPermission = CompanyModulePermission::select('module_parent_id')->where('company_id',$cid)->distinct()->get();
-                $permissionParents = Permission::whereIn('id',$companyWiseParentPermission)->where('parent_id',null)->get();
+                $permissionParents = Permission::whereIn('id',$companyWiseParentPermission)->whereNot('is_parent',null)->get();
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Permission successfully changed',
