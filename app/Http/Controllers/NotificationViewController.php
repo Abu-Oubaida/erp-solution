@@ -14,10 +14,24 @@ class NotificationViewController extends Controller
     public function index()
     {
         try {
-            return view('back-end.notification')->render();
-        }catch (\Throwable $exception)
-        {
-            return back()->with('error',$exception->getMessage());
+            $perPage = request('per_page', 10); // Default to 10
+
+            if ($perPage === 'all') {
+                $notifications = auth()->user()
+                    ->notifications()
+                    ->orderBy('created_at', 'desc')
+                    ->get(); // No pagination
+            } else {
+                $notifications = auth()->user()
+                    ->notifications()
+                    ->orderBy('created_at', 'desc')
+                    ->paginate((int) $perPage)
+                    ->appends(request()->except('page')); // Preserve query
+            }
+
+            return view('back-end.notification', compact('notifications'));
+        } catch (\Throwable $exception) {
+            return back()->with('error', $exception->getMessage());
         }
     }
 

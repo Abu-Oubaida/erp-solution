@@ -10,7 +10,7 @@ class UserNotificationComposer
     {
         if (Auth::check()) {
             $user = Auth::user();
-            $notifications = $user->notifications()->take(10)->get();
+            $notifications = $user->unreadNotifications()->take(10)->get();
             $unreadCount = $user->unreadNotifications()->count();
 
             $view->with('userNotifications', $notifications)

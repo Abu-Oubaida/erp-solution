@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\company_info;
 use App\Models\department;
 use App\Models\Project_document_requisition_info;
 use App\Models\Project_wise_data_type_required_info;
@@ -267,6 +268,7 @@ class DocumentRequisitionInfoController extends Controller
                             $user->notify(new DataArchiveProjectAssignedSummaryNotification(
                                 $projectName,
                                 $dataTypes,
+                                company_info::find($validatedData['company_id'])->company_name,
                                 route('project.wise.data.upload.responsible.user.data',['pdriId' => $pdri->id]),
                             ));
                         }
@@ -540,6 +542,7 @@ class DocumentRequisitionInfoController extends Controller
                         $user->notify(new DataArchiveProjectAssignedSummaryNotification(
                             $projectName,
                             $dataTypes,
+                            company_info::find($validatedData['company_id'])->company_name,
                             route('project.wise.data.upload.responsible.user.data',['pdriId' => $pdri->id]),
                         ));
                     }
@@ -628,6 +631,7 @@ class DocumentRequisitionInfoController extends Controller
                                 'name' => $pwdtr->archiveDataType->voucher_type_title,
                                 'deadline' => $pwdtr->deadline,
                             ]],
+                            company_info::find($validatedData['company_id'])->company_name,
                             route('project.wise.data.upload.responsible.user.data',['pdriId' => $pdri_id]),
                         ));
                     }

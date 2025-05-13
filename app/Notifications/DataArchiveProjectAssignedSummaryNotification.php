@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 
 class DataArchiveProjectAssignedSummaryNotification extends Notification implements ShouldQueue
 {
@@ -14,16 +15,18 @@ class DataArchiveProjectAssignedSummaryNotification extends Notification impleme
     public $projectName;
     public $dataTypes; // array of ['name' => ..., 'deadline' => ...]
     public $action_url;
+    protected $companyName;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($projectName, array $dataTypes,$action_url = null)
+    public function __construct($projectName, array $dataTypes,$companyName,$action_url = null)
     {
         $this->projectName = $projectName;
         $this->dataTypes = $dataTypes;
         $this->action_url = $action_url;
+        $this->companyName = $companyName;
     }
 
     /**
@@ -46,8 +49,9 @@ class DataArchiveProjectAssignedSummaryNotification extends Notification impleme
     public function toMail($notifiable)
     {
         $mail = (new MailMessage)
-            ->subject("You are assigned to upload document(s) of project: {$this->projectName}")
+            ->subject("Document Upload Task Assigned - {$this->projectName}")
             ->greeting("Hello {$notifiable->name},")
+            ->line("Good Day!")
             ->line("You have been assigned to upload the following data type(s) under project:  **{$this->projectName}** in online document archiving system" );
 
         foreach ($this->dataTypes as $dataType) {
@@ -57,8 +61,9 @@ class DataArchiveProjectAssignedSummaryNotification extends Notification impleme
         return $mail
             ->action('View Task', $this->action_url)
             ->line('Please upload the required documents properly before the respective deadlines.')
-            ->line("**{N:B: This is an automated system-generated email. Hence, no need to reply.}**")
-            ->line('Thank you!');
+            ->line("**N:B: This is an automated system-generated email. Hence, no need to reply.**")
+            ->line('Thank you!')
+            ->salutation("Regards,\n{$this->companyName} | ".env('APP_NAME') . " Team");
 
     }
 
@@ -71,7 +76,7 @@ class DataArchiveProjectAssignedSummaryNotification extends Notification impleme
     public function toArray($notifiable)
     {
         return [
-            'message' => "You are assigned to upload document(s) of project: {$this->projectName}",
+            'message' => "You have been assigned to upload the following data type(s) under project:  $this->projectName in online document archiving system",
             'data_types' => array_map(function ($dt) {
                 return "{$dt['name']} (Deadline: " . \Carbon\Carbon::parse($dt['deadline'])->format('d M Y') . ")";
             }, $this->dataTypes),
@@ -83,7 +88,7 @@ class DataArchiveProjectAssignedSummaryNotification extends Notification impleme
     public function toDatabase($notifiable)
     {
         return [
-            'message' => "You are assigned to upload document(s) of project: **{$this->projectName}**",
+            'message' => "You have been assigned to upload the following data type(s) under project:  $this->projectName in online document archiving system",
             'data_types' => array_map(function ($dt) {
                 return "{$dt['name']} (Deadline: " . \Carbon\Carbon::parse($dt['deadline'])->format('d M Y') . ")";
             }, $this->dataTypes),

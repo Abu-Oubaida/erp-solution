@@ -20,15 +20,18 @@
         <li class="nav-item dropdown">
             <a href="#" class="nav-link text-decoration-none text-primary badge" id="NotificationNavbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px"><i class="fa-solid fa-bell"></i><sup style="    top: -1.5em; font-size: 10px;"><small class="badge bg-danger text-white">{{ $unreadNotificationCount ?? 0 }}</small></sup></a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="NotificationNavbarDropdown">
-                <li><a class="dropdown-item" href="#">Notifications</a></li>
+                <li><a class="dropdown-item" href="#"><i class="fa-solid fa-bell"></i> Notifications</a></li>
                 <li><hr class="dropdown-divider" /></li>
                 @foreach($userNotifications ?? [] as $notification)
                     <li>
-                        <a class="dropdown-item" href="{{ route("notification.view") }}" target="_blank">
-                            {{ $notification->data['message'] }}
+                        <a class="dropdown-item" href="{{ route("notification.view",["n"=>$notification->id]) }}" target="_blank" style="font-size: 14px">
+                            {{ $notification->data['message'] }} <br>
+                            <small class="d-block" style="text-align: right; font-size: 10px" >{!! date('d-M-y h:i:s A',strtotime($notification->created_at)) !!}</small>
                         </a>
                     </li>
                 @endforeach
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="text-center d-block text-decoration-none" href="{{ route("notification.view") }}">View All</a></li>
             </ul>
         </li>
     </ul>
