@@ -30,7 +30,7 @@
                 @isset($profession)
                     @if($lead->id)
                         @foreach ($profession->professions as $profession)
-                            <option value="{{$profession->id}}" @if( ($lead->lead_sub_profession_id ?? 0) == $profession->id) selected @endif>{{$profession->title}}</option>
+                            <option value="{{$profession->id}}" disabled @if( ($lead->lead_sub_profession_id ?? 0) == $profession->id) selected @endif>{{$profession->title}}</option>
                         @endforeach
                     @endif
                 @endisset

@@ -497,7 +497,9 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['post'],'add-lead-step4','addLeadStep4')->name('add.sales.step4');
             Route::match(['post'],'back-lead-step1','backLeadStep1')->name('back-lead-step1');
             Route::match(['post'],'back-lead-step2','backLeadStep2')->name('back-lead-step2');
+            Route::match(['post'],'back-lead-step3','backLeadStep3')->name('back-lead-step3');
             Route::match(['post'],'get-sales-profession','getSalesProfession');
+            Route::match(['post'],'get-sales-source','getSalesSource');
             Route::match(['get'],'get-sales-source-main-source','getSalesSourceMainSource')->name('get.sales.source.main.source');
             Route::match(['get'],'get-sales-preference-dropdowns','getSalesPreferenceDropdowns')->name('get.sales.preference.dropdowns');
             Route::match(['get'],'get-lead-step1','getLeadStep1')->name('get.lead.step1');

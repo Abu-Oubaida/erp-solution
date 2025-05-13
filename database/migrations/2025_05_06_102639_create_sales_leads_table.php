@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('primary_mobile');
             $table->string('primary_email')->nullable();
             $table->text('notes')->nullable();
+            $table->unsignedBigInteger('associate_id');
             $table->unsignedBigInteger('lead_status_id')->nullable();
             $table->unsignedBigInteger('lead_main_profession_id')->nullable();
             $table->unsignedBigInteger('lead_sub_profession_id')->nullable();

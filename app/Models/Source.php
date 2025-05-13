@@ -9,5 +9,5 @@ class Source extends Model
 {
     use HasFactory;
     protected $table='sales_lead_sources';
-    protected $fillable = [ 'lead_id', 'main_source_id', 'sub_source_id', 'associate_id','created_by','updated_by','company_id','reference_name'];
+    protected $fillable = [ 'lead_id', 'main_source_id', 'sub_source_id','created_by','updated_by','company_id','reference_name'];
 }

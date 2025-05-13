@@ -20,7 +20,6 @@ return new class extends Migration
             $table->unsignedBigInteger('main_source_id')->nullable();
             $table->unsignedBigInteger('sub_source_id')->nullable();
             $table->string('reference_name')->nullable();
-            $table->unsignedBigInteger('associate_id');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();

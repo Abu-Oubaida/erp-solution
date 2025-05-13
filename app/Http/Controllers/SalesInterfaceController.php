@@ -72,7 +72,10 @@ class SalesInterfaceController extends Controller
             $depts = department::where('status', 1)->get();
             $branches = branch::where('status', 1)->get();
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            //dd($depts);
+            $salesEmployeeEntry = SalesEmployeeEntry::with(['company', 'user', 'createdByUser', 'leader'])->get()->where('');
+            
+            dd($salesEmployeeEntry);
+            // dd($this->user->company_id);
             $leadWiseLocations = [
                 ['id' => 1, 'dept_name' => 'Dhaka'],
                 ['id' => 2, 'dept_name' => 'Narayanganj'],
@@ -140,7 +143,7 @@ class SalesInterfaceController extends Controller
                     Rule::unique('sales_lead_extra_emails', 'email')
                         ->where('company_id', $request->add_lead_step1_data['company_id'])
                         ->whereNot('lead_id', $request->input('lead_id')),
-                        Rule::notIn([$request->add_lead_step1_data['primary_email']])
+                    Rule::notIn([$request->add_lead_step1_data['primary_email']])
                 ],
                 'op_name' => ['required', 'string', 'in:create,update'],
                 'lead_id' => ['sometimes', 'nullable', 'exists:sales_leads,id'],
@@ -232,7 +235,7 @@ class SalesInterfaceController extends Controller
             // dd($validatedData);
             $alternateMobiles = $validatedData['alternate_mobiles_value'] ?? '';
             $alternateEmails = $validatedData['alternate_emails_value'] ?? '';
-             unset($validatedData['alternate_mobiles_value'], $validatedData['alternate_emails_value']);
+            unset($validatedData['alternate_mobiles_value'], $validatedData['alternate_emails_value']);
             $leadDataInput = [
                 "company_id" => $validatedData['company_id'],
                 "full_name" => $validatedData['full_name'],
@@ -243,7 +246,7 @@ class SalesInterfaceController extends Controller
             ];
 
             $leadCreateOrUpdate = null;
-            $lead_id =$request->input('lead_id'); 
+            $lead_id = $request->input('lead_id');
             if (isset($lead_id) && $validatedData['op_name'] == 'update') {
                 // dd($request->all());
                 $leadCreateOrUpdate = Lead::find($lead_id);
@@ -264,7 +267,7 @@ class SalesInterfaceController extends Controller
                 // dd($alternateMobiles);
                 if (!empty($alternateMobiles)) {
                     foreach ($existingMobiles as $extraMobileModel) {
-                        $differentMobile=array_shift($alternateMobiles); 
+                        $differentMobile = array_shift($alternateMobiles);
                         $extraMobileModel->update([
                             'mobile' => $differentMobile,
                             'updated_by' => $this->user->id,
@@ -272,18 +275,18 @@ class SalesInterfaceController extends Controller
                         ]);
                     }
 
-                } 
-                
+                }
+
                 if (!empty($alternateEmails)) {
                     foreach ($existingEmails as $extraEmailModel) {
-                        $differentEmail=array_shift($alternateEmails); 
+                        $differentEmail = array_shift($alternateEmails);
                         $extraEmailModel->update([
                             'email' => $differentEmail,
                             'updated_by' => $this->user->id,
                             'updated_at' => $now,
                         ]);
                     }
-                } 
+                }
                 $profession = $this->getSalesProfessionMainProfession($leadCreateOrUpdate->company_id);
                 $lead = $leadCreateOrUpdate;
                 $view = view('back-end.sales.__add-lead-stage-2', compact('lead', 'profession'))->render();
@@ -298,7 +301,7 @@ class SalesInterfaceController extends Controller
                 $leadDataInput['created_at'] = now();
 
                 $lead = Lead::create($leadDataInput);
-                
+
                 if ($lead) {
                     if (!empty($alternateMobiles)) {
                         $mobileToInsert = [];
@@ -402,12 +405,14 @@ class SalesInterfaceController extends Controller
             if ($request->ajax() && $request->isMethod('post')) {
                 $profession = $this->getSalesProfessionMainProfession($request->company_id);
                 $lead = Lead::where('id', $request->lead_id)->first();
-                $view = view('back-end.sales.__add-lead-stage-2', compact('lead', 'profession'))->render();
+                $view = view('back-end.sales.__add-lead-stage-2', compact('lead', 'profession', ))->render();
                 if ($lead) {
                     return response()->json([
                         'status' => 'success',
                         'message' => 'Data Fetch Successfull.',
-                        'data' => ['view' => $view],
+                        'data' => [
+                            'view' => $view,
+                        ],
                     ]);
                 } else {
                     return response()->json([
@@ -424,7 +429,48 @@ class SalesInterfaceController extends Controller
             ]);
         }
     }
-   
+    public function backLeadStep3(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $getData = Source::where('lead_id', $request->lead_id)->first();
+                $lead = (object) [
+                    'id' => $getData->lead_id,
+                    'company_id' => $getData->company_id,
+                    'main_source_id' => $getData->main_source_id,
+                    'sub_source_id' => $getData->sub_source_id,
+                    'reference_name' => $getData->reference_name,
+                    'associate_id' => $getData->associate_id,
+                    'created_by' => $getData->created_by,
+                    'updated_by' => $getData->updated_by
+                ];
+                // dd($lead);
+                $source = $this->getSalesSourceMainSource($request->company_id);
+                $step = 'back_step_3';
+                $view = view('back-end.sales.__add-lead-stage-3', compact('lead', 'source', 'step'))->render();
+                if ($lead) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Data Fetch Successfull.',
+                        'data' => [
+                            'view' => $view,
+                        ],
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Unable to get Lead Step 3 Data.'
+                    ]);
+                }
+            }
+            throw new Exception('Request Method Not Allowed');
+        } catch (Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
     public function getLeadStep2(Request $request)
     {
         $leadProfession = Lead::where('id', $request->lead_id)->first();
@@ -460,14 +506,22 @@ class SalesInterfaceController extends Controller
                 'lead_company' => $addLeadStep2Data->lead_company,
                 'lead_designation' => $addLeadStep2Data->lead_designation
             ]);
-            $lead = Lead::find($hiddenCompanyLead->lead_id);
+            $existingLead = Source::where('lead_id', $hiddenCompanyLead->lead_id)->first();
             $source = $this->getSalesSourceMainSource($hiddenCompanyLead->company_id);
-            $view = view('back-end.sales.__add-lead-stage-3',compact('lead','source'))->render();
+            $step = null;
+            if ($existingLead) {
+                $lead = $existingLead;
+                // dd($lead);
+                $step = 'forward_step_3';
+            } else {
+                $lead = Lead::find($hiddenCompanyLead->lead_id);
+            }
+            $view = view('back-end.sales.__add-lead-stage-3', compact('lead', 'source', 'step'))->render();
             if ($lead) {
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Lead Creation Step 2 Completed.',
-                    'data'=>['view'=>$view],
+                    'data' => ['view' => $view],
                     'company_id' => $hiddenCompanyLead->company_id,
                     'lead_id' => $hiddenCompanyLead->lead_id
                 ]);
@@ -484,20 +538,51 @@ class SalesInterfaceController extends Controller
             ]);
         }
     }
-    
+
     public function addLeadStep3(Request $request)
     {
         try {
             $addLeadStep3Data = $request->add_lead_step3_data;
             $addLeadStep3Data['created_by'] = Auth::id();
             $addLeadStep3Data['associate_id'] = Auth::id();
+            $existingLead = Source::where('lead_id', $addLeadStep3Data['lead_id'])->first();
+            // dd([$addLeadStep3Data['lead_id'],$existingLead]);
+            $preference = $this->getSalesPreferenceDropdowns($addLeadStep3Data['company_id']);
+            if ($existingLead) {
+                $addLeadStep3Data['created_by'] = Auth::id();
+                $addLeadStep3Data['created_at'] = now();
+                $leadUpdate = Source::where('lead_id', $addLeadStep3Data['lead_id'])->update($addLeadStep3Data);
+                $getPreference = SalePreference::where('lead_id', $addLeadStep3Data['lead_id'])->first();
+                $lead = (object) [
+                    'id' => $existingLead->lead_id,
+                    'company_id' => $existingLead->company_id,
+                    'preference_note' => $getPreference->preference_note ?? null,
+                    'apartment_type_id' => $getPreference->apartment_type_id ?? null,
+                    'apartment_size_id' => $getPreference->apartment_size_id ?? null,
+                    'floor_id' => $getPreference->floor_id ?? null,
+                    'facing_id' => $getPreference->facing_id ?? null,
+                    'view_id' => $getPreference->view_id ?? null,
+                    'budget_id' => $getPreference->budget_id ?? null,
+                ];
+                $view = view('back-end.sales.__add-lead-stage-4', compact('lead', 'preference'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Lead Creation Step 3 Completed.',
+                    'data' => ['view' => $view]
+                ]);
+            }
             $source = Source::create($addLeadStep3Data);
+            // dd($source);
+            $lead = (object) [
+                'id' => $source->lead_id,
+                'company_id' => $source->company_id
+            ];
+            $view = view('back-end.sales.__add-lead-stage-4', compact('lead', 'preference'))->render();
             if ($source) {
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Lead Creation Step 3 Completed.',
-                    'company_id' => $addLeadStep3Data['company_id'],
-                    'lead_id' => $addLeadStep3Data['lead_id']
+                    'data' => ['view' => $view]
                 ]);
             } else {
                 return response()->json([
@@ -508,7 +593,7 @@ class SalesInterfaceController extends Controller
         } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error '
+                'message' => 'Error ' . $exception->getMessage() . $exception->getLine()
             ]);
         }
     }
@@ -516,6 +601,16 @@ class SalesInterfaceController extends Controller
     {
         try {
             $addLeadStep4Data = $request->add_lead_step4_data;
+            $existingLead = SalePreference::where('lead_id', $addLeadStep4Data['lead_id'])->first();
+            if ($existingLead) {
+                $addLeadStep4Data['created_by'] = Auth::id();
+                $addLeadStep4Data['created_at'] = now();
+                SalePreference::where('lead_id', $addLeadStep4Data['lead_id'])->update($addLeadStep4Data);
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Lead Creation Completed.'
+                ]);
+            }
             $addLeadStep4Data['created_by'] = Auth::id();
             $salePreference = SalePreference::create($addLeadStep4Data);
             if ($salePreference) {
@@ -1444,6 +1539,24 @@ class SalesInterfaceController extends Controller
             ]);
         }
     }
+    public function getSalesSource(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $lead_source_parent_id = $request->input('lead_source_parent_id');
+                $source = SalesLeadSourceInfo::where('parent_id', $lead_source_parent_id)->get();
+                return response()->json([
+                    'source' => $source
+                ]);
+            }
+            throw new Exception('Request Method Not Allowed');
+        } catch (Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
     private function getSalesProfessionMainProfession($company_id)
     {
         try {
@@ -1468,38 +1581,27 @@ class SalesInterfaceController extends Controller
         $mainSource = $salesLeadSourceInfo->where('is_parent', 1)->values();
         $source = $salesLeadSourceInfo->where('is_parent', '!=', 1)->values();
         if ($mainSource->isNotEmpty() && $source->isNotEmpty()) {
-            return (object)[
-                'mainSource'=>$mainSource,
-                'source'=>$source
+            return (object) [
+                'mainSource' => $mainSource,
+                'source' => $source
             ];
         }
     }
-    public function getSalesPreferenceDropdowns(Request $request)
+    public function getSalesPreferenceDropdowns($company_id)
     {
-        try {
-            $salesLeadApartmentType = SalesLeadApartmentType::where('company_id', $request->company_id)->select('id', 'title')->get();
-            $salesLeadApartmentSize = SalesLeadApartmentSize::where('company_id', $request->company_id)->select('id', 'title')->get();
-            $salesLeadFloor = SalesLeadFloor::where('company_id', $request->company_id)->select('id', 'title')->get();
-            $salesLeadFacing = SalesLeadFacing::where('company_id', $request->company_id)->select('id', 'title')->get();
-            $salesLeadView = SalesLeadView::where('company_id', $request->company_id)->select('id', 'title')->get();
-            $salesLeadBudget = SalesLeadBudget::where('company_id', $request->company_id)->select('id', 'title')->get();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Success',
-                'data' => [
-                    'salesLeadApartmentType' => $salesLeadApartmentType ?? '',
-                    'salesLeadApartmentSize' => $salesLeadApartmentSize ?? '',
-                    'salesLeadFloor' => $salesLeadFloor ?? '',
-                    'salesLeadFacing' => $salesLeadFacing ?? '',
-                    'salesLeadView' => $salesLeadView ?? '',
-                    'salesLeadBudget' => $salesLeadBudget ?? '',
-                ]
-            ]);
-        } catch (\Throwable $exception) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Operation Failed '
-            ]);
-        }
+        $salesLeadApartmentType = SalesLeadApartmentType::where('company_id', $company_id)->select('id', 'title')->get();
+        $salesLeadApartmentSize = SalesLeadApartmentSize::where('company_id', $company_id)->select('id', 'title')->get();
+        $salesLeadFloor = SalesLeadFloor::where('company_id', $company_id)->select('id', 'title')->get();
+        $salesLeadFacing = SalesLeadFacing::where('company_id', $company_id)->select('id', 'title')->get();
+        $salesLeadView = SalesLeadView::where('company_id', $company_id)->select('id', 'title')->get();
+        $salesLeadBudget = SalesLeadBudget::where('company_id', $company_id)->select('id', 'title')->get();
+        return (object) [
+            'salesLeadApartmentType' => $salesLeadApartmentType ?? '',
+            'salesLeadApartmentSize' => $salesLeadApartmentSize ?? '',
+            'salesLeadFloor' => $salesLeadFloor ?? '',
+            'salesLeadFacing' => $salesLeadFacing ?? '',
+            'salesLeadView' => $salesLeadView ?? '',
+            'salesLeadBudget' => $salesLeadBudget ?? '',
+        ];
     }
 }
