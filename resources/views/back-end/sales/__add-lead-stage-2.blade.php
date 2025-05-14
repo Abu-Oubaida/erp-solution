@@ -24,6 +24,7 @@
     </div>
     <div class="col-md-2">
         <div class="form-group">
+            <input type="hidden" id="lead_sub_profession_id_hidden" value="{{$lead->lead_sub_profession_id}}">
             <label for="profession">Profession<span class="text-danger">*</span></label>
             <select class="text-capitalize form-control" id="lead_sub_profession_id">
                 <option value="">Pick options...</option>
@@ -38,17 +39,17 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="form-floating mb-3">
+        <label for="company">Company Of Lead</label>
+        <div class="mb-3">
             <input type="text" class="form-control" id="lead_company" name="company" placeholder="Company Of Lead" value="{{$lead->lead_company??null}}">
-            <label for="company">Company Of Lead</label>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="form-floating mb-5">
-            <div class="form-floating mb-3">
+        <label for="designation">Designation Of Lead</label>
+        <div class="mb-5">
+            <div class="mb-3">
                 <input type="text" class="form-control" id="lead_designation" name="designation"
                     placeholder="Designation Of Lead" value="{{$lead->lead_designation??null}}">
-                <label for="designation">Designation Of Lead</label>
             </div>
         </div>
     </div>
@@ -115,10 +116,8 @@
     function addLeadStep2() // company_group
     {
         let add_lead_step2_data = {
-            lead_main_profession_id:$(
-                "#lead_main_profession_id"
-            ).val(),
-            lead_sub_profession_id:$("#lead_sub_profession_id").val(),
+            lead_main_profession_id:$("#lead_main_profession_id").val(),
+            lead_sub_profession_id:$("#lead_sub_profession_id").val() || $("#lead_sub_profession_id_hidden").val(),
             lead_company:$("#lead_company").val(),
             lead_designation:$("#lead_designation").val(),
         };
@@ -126,6 +125,7 @@
             company_id:$("#company_id").val(),
             lead_id:$("#lead_id").val(),
         };
+        console.log(add_lead_step2_data);
         const url =
             window.location.origin + sourceDir + "/add-lead-step2";
 
@@ -142,9 +142,7 @@
                 if (response.status === "error") {
                     alert("Error: " + response.message);
                 } else if (response.status === "success") {
-                    alert(response.message);
                     $("#commonSlot_for_multiple_step").html(response.data.view);
-                    // Sales.getSalesSourceMainSource(response.company_id);
                 }
             },
         });

@@ -16,4 +16,16 @@ class Lead extends Model
     public function extraEmails(){
         return $this->hasMany(ExtraEmail::class,'lead_id');
     }
+    public function source(){
+        return $this->hasOne(Source::class,'lead_id');
+    }
+    public function preference(){
+        return $this->hasOne(SalePreference::class,'lead_id');
+    }
+    public function leadMainProfession(){
+        return $this->belongsTo(SalesProfession::class,'lead_main_profession_id');
+    }
+    public function leadSubProfession(){
+        return $this->belongsTo(SalesProfession::class,'lead_sub_profession_id');
+    }
 }

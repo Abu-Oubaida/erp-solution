@@ -4451,9 +4451,9 @@ let SalesSetting = {};
                     }
                     const inputHtml = `
                         <div class="col-md-3">
-                            <div class="form-floating mb-2">
+                        <label for="${inputId}">${labelText}</label>
+                            <div class="mb-2">
                                 <input class="form-control" id="${inputId}" type="${inputType}" placeholder="${inputPlaceholder}">
-                                <label for="${inputId}">${labelText}</label>
                             </div>
                         </div>
                     `;

@@ -6,7 +6,7 @@
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <input type="hidden" id="lead_id" value="{{$lead->id}}">
+            <input type="hidden" id="lead_id" value="{{$step=='forward_step_3'?$lead->lead_id:$lead->id}}">
         </div>
     </div>
     <div class="col-md-2">
@@ -24,6 +24,7 @@
     </div>
     <div class="col-md-2">
         <div class="form-group">
+            <input type="hidden" id="sub_source_id_hidden" value="{{$lead->sub_source_id}}">
             <label for="sub_source_id">Source<span class="text-danger">*</span></label>
             <select class="text-capitalize form-control" id="sub_source_id">
                 <option value="">Pick options...</option>
@@ -38,9 +39,9 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="form-floating mb-3">
+        <label for="reference_name">Reference Name</label>
+        <div class="mb-3">
             <input type="text" class="form-control" id="reference_name" placeholder="Company Of Lead" value="{{$lead->reference_name ?? null}}">
-            <label for="reference_name">Reference Name</label>
         </div>
     </div>
     <div class="col-md-2">
@@ -81,7 +82,7 @@
     {
         let add_lead_step3_data = {
             main_source_id: $("#main_source_id").val(),
-            sub_source_id: $("#sub_source_id").val(),
+            sub_source_id: $("#sub_source_id").val() || $("#sub_source_id_hidden").val(),
             reference_name: $("#reference_name").val(),
             company_id: $("#company_id").val(),
             lead_id: $("#lead_id").val(),
@@ -102,8 +103,6 @@
                 if (response.status === "error") {
                     alert("Error: " + response.message);
                 } else if (response.status === "success") {
-                    console.log(response);
-                    alert(response.message);
                     $("#commonSlot_for_multiple_step").html(response.data.view);
                     
                 }

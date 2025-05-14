@@ -33,6 +33,7 @@
         function addLeadStep1(operation, lead_id) {
             let add_lead_step1_data = {
                 company_id: $("#company_id").val(),
+                associate_id:$("#associate_id").val(),
                 full_name: $("#full_name").val(),
                 spouse: $("#spouse").val(),
                 primary_mobile: $("#primary_mobile").val(),
@@ -86,7 +87,6 @@
             if ($("#email_5").length && $("#email_5").val().trim() !== "") {
                 alternate_emails.email_5 = $("#email_5").val().trim();
             }
-            console.log(alternate_mobiles);
             const url =
                 window.location.origin + sourceDir + "/add-lead-step1";
 
@@ -121,7 +121,6 @@
                             alert(response.message);
                         }
                     } else if (response.status === "success") {
-                         alert(response.message);
                         $("#commonSlot_for_multiple_step").html(response.data.view);
                     }
                 },

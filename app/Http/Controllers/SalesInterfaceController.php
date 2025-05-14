@@ -69,20 +69,18 @@ class SalesInterfaceController extends Controller
             if ($request->isMethod('post')) {
                 return $this->storeLead($request);
             }
-            $depts = department::where('status', 1)->get();
-            $branches = branch::where('status', 1)->get();
+            // $depts = department::where('status', 1)->get();
+            // $branches = branch::where('status', 1)->get();
             $companies = $this->getCompanyModulePermissionWise($permission)->get();
-            $salesEmployeeEntry = SalesEmployeeEntry::with(['company', 'user', 'createdByUser', 'leader'])->get()->where('');
+            $salesEmployeeEntries = SalesEmployeeEntry::with(['user'])->where('company_id',$this->user->company_id)->get();
             
-            dd($salesEmployeeEntry);
-            // dd($this->user->company_id);
-            $leadWiseLocations = [
-                ['id' => 1, 'dept_name' => 'Dhaka'],
-                ['id' => 2, 'dept_name' => 'Narayanganj'],
-                ['id' => 3, 'dept_name' => 'Rupganj'],
-                ['id' => 4, 'dept_name' => 'Dhanmondi'],
-            ];
-            return view('back-end/sales/add-lead', compact('depts', 'branches', 'leadWiseLocations', 'companies'));
+            // $leadWiseLocations = [
+            //     ['id' => 1, 'dept_name' => 'Dhaka'],
+            //     ['id' => 2, 'dept_name' => 'Narayanganj'],
+            //     ['id' => 3, 'dept_name' => 'Rupganj'],
+            //     ['id' => 4, 'dept_name' => 'Dhanmondi'],
+            // ];
+            return view('back-end/sales/add-lead', compact('companies','salesEmployeeEntries'));
         } catch (\Throwable $exception) {
             return back()->with('error', $exception->getMessage())->withInput();
         }
@@ -232,7 +230,6 @@ class SalesInterfaceController extends Controller
             }
 
             $validatedData = $validator->validate();
-            // dd($validatedData);
             $alternateMobiles = $validatedData['alternate_mobiles_value'] ?? '';
             $alternateEmails = $validatedData['alternate_emails_value'] ?? '';
             unset($validatedData['alternate_mobiles_value'], $validatedData['alternate_emails_value']);
@@ -243,12 +240,12 @@ class SalesInterfaceController extends Controller
                 "primary_email" => $validatedData['primary_email'],
                 "spouse" => $request->add_lead_step1_data['spouse'],
                 "notes" => $request->add_lead_step1_data['notes'],
+                "associate_id" => $request->add_lead_step1_data['associate_id'],
             ];
 
             $leadCreateOrUpdate = null;
             $lead_id = $request->input('lead_id');
             if (isset($lead_id) && $validatedData['op_name'] == 'update') {
-                // dd($request->all());
                 $leadCreateOrUpdate = Lead::find($lead_id);
                 if (!$leadCreateOrUpdate) {
                     throw new Exception('Not found!');
@@ -264,7 +261,6 @@ class SalesInterfaceController extends Controller
                     ->get();
 
                 $now = now();
-                // dd($alternateMobiles);
                 if (!empty($alternateMobiles)) {
                     foreach ($existingMobiles as $extraMobileModel) {
                         $differentMobile = array_shift($alternateMobiles);
@@ -296,7 +292,6 @@ class SalesInterfaceController extends Controller
                     'message' => 'Lead Creation Step 1 Completed.'
                 ]);
             } else {
-                // dd($validatedData);
                 $leadDataInput['created_by'] = $this->user->id;
                 $leadDataInput['created_at'] = now();
 
@@ -375,9 +370,9 @@ class SalesInterfaceController extends Controller
             $permission = $this->permissions()->add_sales_lead;
             if ($request->ajax() && $request->isMethod('post')) {
                 $companies = $this->getCompanyModulePermissionWise($permission)->get();
+                $salesEmployeeEntries = SalesEmployeeEntry::with(['user'])->where('company_id',$this->user->company_id)->get();
                 $getLead = Lead::with(['extraMobiles', 'extraEmails'])->where('id', $request->lead_id)->first();
-                //  dd($getLead);
-                $view = view('back-end.sales.__add-lead-form', compact('getLead', 'companies'))->render();
+                $view = view('back-end.sales.__add-lead-form', compact('getLead', 'companies','salesEmployeeEntries'))->render();
                 if ($getLead) {
                     return response()->json([
                         'status' => 'success',
@@ -440,11 +435,9 @@ class SalesInterfaceController extends Controller
                     'main_source_id' => $getData->main_source_id,
                     'sub_source_id' => $getData->sub_source_id,
                     'reference_name' => $getData->reference_name,
-                    'associate_id' => $getData->associate_id,
                     'created_by' => $getData->created_by,
                     'updated_by' => $getData->updated_by
                 ];
-                // dd($lead);
                 $source = $this->getSalesSourceMainSource($request->company_id);
                 $step = 'back_step_3';
                 $view = view('back-end.sales.__add-lead-stage-3', compact('lead', 'source', 'step'))->render();
@@ -511,7 +504,6 @@ class SalesInterfaceController extends Controller
             $step = null;
             if ($existingLead) {
                 $lead = $existingLead;
-                // dd($lead);
                 $step = 'forward_step_3';
             } else {
                 $lead = Lead::find($hiddenCompanyLead->lead_id);
@@ -534,7 +526,7 @@ class SalesInterfaceController extends Controller
         } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error' . $exception->getMessage()
+                'message' => 'Error' . $exception->getMessage().$exception->getLine()
             ]);
         }
     }
@@ -544,9 +536,8 @@ class SalesInterfaceController extends Controller
         try {
             $addLeadStep3Data = $request->add_lead_step3_data;
             $addLeadStep3Data['created_by'] = Auth::id();
-            $addLeadStep3Data['associate_id'] = Auth::id();
             $existingLead = Source::where('lead_id', $addLeadStep3Data['lead_id'])->first();
-            // dd([$addLeadStep3Data['lead_id'],$existingLead]);
+            // dd($existingLead);
             $preference = $this->getSalesPreferenceDropdowns($addLeadStep3Data['company_id']);
             if ($existingLead) {
                 $addLeadStep3Data['created_by'] = Auth::id();
@@ -640,10 +631,51 @@ class SalesInterfaceController extends Controller
         }
     }
 
-    public function leadList()
+    public function leadList(Request $request)
     {
         try {
-            return true;
+            $leadListDatum = Lead::with(['source','preference','extraMobiles','extraEmails'])->get();
+            // dd($leadListDatum);
+            $formattedLeads = $leadListDatum->map(function ($lead) {
+                return [
+                    'id' => $lead->id,
+                    'company_id' => $lead->company_id,
+                    'status' => $lead->status,
+                    'full_name' => $lead->full_name,
+                    'spouse' => $lead->spouse,
+                    'primary_mobile' => $lead->primary_mobile,
+                    'primary_email' => $lead->primary_email,
+                    'notes' => $lead->notes,
+                    'associate_id' => $lead->associate_id,
+                    'lead_status_id' => $lead->lead_status_id,
+                    'lead_company' => $lead->lead_company,
+                    'lead_designation' => $lead->lead_designation,
+                    'sell_status' => $lead->sell_status,
+                    'created_by' => $lead->created_by,
+                    'updated_by' => $lead->updated_by,
+                    'created_at' => $lead->created_at,
+                    'updated_at' => $lead->updated_at,
+                    'lead_main_profession_id'=>$lead->lead_main_profession_id,
+                    'lead_sub_profession_id'=>$lead->lead_sub_profession_id,
+                    'main_profession'=>$lead->leadMainProfession?->title,
+                    'sub_profession'=>$lead->leadSubProfession?->title,
+                    'main_source'=>$lead->source->leadMainSource?->title,
+                    'sub_source'=>$lead->source->leadSubSource?->title,
+                    'reference_name'=>$lead->source->reference_name,
+                    'preference_note'=>$lead->preference->preference_note,
+                    'apartment_type_name'=>$lead->preference->apartmentType?->title,
+                    'apartment_size_name'=>$lead->preference->apartmentSize?->title,
+                    'apartment_size'=>$lead->preference->apartmentSize?->size,
+                    'apartment_floor'=>$lead->preference->floor?->title,
+                    'apartment_facing'=>$lead->preference->facing?->title,
+                    'apartment_view'=>$lead->preference->view?->title,
+                    'apartment_budget'=>$lead->preference->budget?->title,
+                    'mobiles'=>$lead->extraMobiles->pluck('mobile')->all(),
+                    'emails'=>$lead->extraEmails->pluck('email')->all(),
+                ];
+            });
+            // dd($formattedLeads);
+            return view('back-end.sales.sales-lead-list',compact('formattedLeads'));
         } catch (\Throwable $exception) {
             return back()->with('error', $exception->getMessage())->withInput();
         }

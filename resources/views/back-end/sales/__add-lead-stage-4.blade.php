@@ -17,9 +17,9 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="form-floating mb-3">
+        <label for="preference_note">Preference Note</label>
+        <div class="mb-3">
             <input type="text" class="form-control" id="preference_note" placeholder="Preference Note" value="{{$lead->preference_note??null}}">
-            <label for="preference_note">Preference Note</label>
         </div>
     </div>
     <div class="col-md-2">
