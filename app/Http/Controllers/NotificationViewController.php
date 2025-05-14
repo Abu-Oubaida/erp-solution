@@ -35,10 +35,12 @@ class NotificationViewController extends Controller
 
             if ($perPage === 'all') {
                 $notifications = $notifications
-                    ->orderBy('created_at', 'desc')
+                    ->orderByRaw('ISNULL(read_at) DESC') // Unread first
+                    ->orderBy('created_at', 'desc')      // Most recent first
                     ->get(); // No pagination
             } else {
                 $notifications = $notifications
+                    ->orderByRaw('ISNULL(read_at) DESC') // Unread first
                     ->orderBy('created_at', 'desc')
                     ->paginate((int) $perPage)
                     ->appends(request()->except('page')); // Preserve query

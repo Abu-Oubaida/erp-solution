@@ -78,23 +78,22 @@ class DataArchiveProjectAssignedSummaryNotification extends Notification impleme
         $dataLines = [];
 
         foreach ($this->dataTypes as $dataType) {
-            $dataLines[] = "- {$dataType['name']} (Deadline: " . \Carbon\Carbon::parse($dataType['deadline'])->format('d M Y') . ")";
+            $dataLines[] = "<li> {$dataType['name']} (Deadline: " . \Carbon\Carbon::parse($dataType['deadline'])->format('d M Y') . ")</li>";
         }
 
         return [
-            'title' => "Document Upload Task Assigned - {$this->projectName}",
+            'title' => "Document Upload Task Assigned - $this->projectName",
             'greeting' => "Hello {$notifiable->name},",
             'body' => array_merge([
                 "Good Day!",
-                "You have been assigned to upload the following data type(s) under project:  **{$this->projectName}** in online document archiving system",
+                "You have been assigned to upload the following data type(s) under project:  <strong>$this->projectName</strong> in online document archiving system",
             ], $dataLines, [
                 "Please upload the required documents properly before the respective deadlines.",
-                "**N:B: This is an automated system-generated email. Hence, no need to reply.**",
                 "Thank you!",
             ]),
-            'action_text' => 'View Task',
+            'action_text' => 'Upload Now',
             'action_url' => $this->action_url,
-            'footer' => "Regards,\n{$this->companyName} | " . env('APP_NAME') . " Team",
+            'footer' => "Regards,<br>{$this->companyName} | " . env('APP_NAME') . " Team",
         ];
     }
 

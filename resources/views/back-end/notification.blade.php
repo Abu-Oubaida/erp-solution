@@ -52,7 +52,7 @@
                         <tbody>
                         @if(isset($notifications) && count($notifications))
                             @foreach($notifications as $notification)
-                                <tr>
+                                <tr @if(request()->get('n') == $notification->id) class="bg-secondary-light" @elseif($notification->read_at == null) class="bg-primary-light" @endif>
                                     <td>
                                         <input class="mt-3 check-box" type="checkbox" value="{{ $notification->id }}">
                                     </td>
@@ -90,16 +90,17 @@
         <div class="col-md-9">
             <div class="card mb-4" style="min-height: 800px; background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0.5rem; padding: 1rem">
                 @if(@$notification_data)
-                    <div class="car-header"><h3><i class="fa-solid fa-envelope-open"></i> Notification View</h3></div>
+                    <div class="car-header"><h3><i class="fa-solid fa-envelope-open"></i> Details View</h3></div>
                     <div class="card-body p-5 pt-3">
                         <div class="row">
                             <div class="col-md-12">
-                                <h3>{!! optional($notification_data->data)['title'] !!} @if($notification_data->read_at) <sup class="badge bg-success" style=" font-size: 12px"><i class="fa-solid fa-envelope-open"></i> Read</sup>@else <sup class="badge bg-danger" style=" font-size: 12px"><i class="fa-solid fa-envelope"></i> Unread</sup>@endif</h3>
+                                <h4>{!! optional($notification_data->data)['title'] !!} @if($notification_data->read_at) <sup class="badge bg-success" style=" font-size: 12px"><i class="fa-solid fa-envelope-open"></i> Read</sup>@else <sup class="badge bg-danger" style=" font-size: 12px"><i class="fa-solid fa-envelope"></i> Unread</sup>@endif</h4>
                                 <small>Read Time: {!! date('d-M-y h:i:s A',strtotime($notification_data->read_at)) !!}</small>
                                 <small class="float-end">Received Time: {!! date('d-M-y h:i:s A',strtotime($notification_data->created_at)) !!}</small>
                             </div>
                             <div class="col-md-12">
-                                <h4>{!! optional($notification_data->data)['greeting'] !!}</h4>
+                                <br>
+                                <h5>{!! optional($notification_data->data)['greeting'] !!}</h5>
                                 @foreach(optional($notification_data->data)['body'] as $key => $value)
                                     <p>{!! $value !!}</p>
                                 @endforeach
