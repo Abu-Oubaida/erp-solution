@@ -269,7 +269,7 @@ class DocumentRequisitionInfoController extends Controller
                                 $projectName,
                                 $dataTypes,
                                 company_info::find($validatedData['company_id'])->company_name,
-                                route('project.wise.data.upload.responsible.user.data',['pdriId' => $pdri->id]),
+                                route('add.archive.info'),
                             ));
                         }
                     }
@@ -543,7 +543,7 @@ class DocumentRequisitionInfoController extends Controller
                             $projectName,
                             $dataTypes,
                             company_info::find($validatedData['company_id'])->company_name,
-                            route('project.wise.data.upload.responsible.user.data',['pdriId' => $pdri->id]),
+                            route('add.archive.info'),
                         ));
                     }
                 }
@@ -632,7 +632,7 @@ class DocumentRequisitionInfoController extends Controller
                                 'deadline' => $pwdtr->deadline,
                             ]],
                             company_info::find($validatedData['company_id'])->company_name,
-                            route('project.wise.data.upload.responsible.user.data',['pdriId' => $pdri_id]),
+                            route('add.archive.info'),
                         ));
                     }
                     $existing_users = Required_data_type_upload_responsible_user_info::with([

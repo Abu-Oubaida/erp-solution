@@ -75,25 +75,31 @@ class DataArchiveProjectAssignedSummaryNotification extends Notification impleme
      */
     public function toArray($notifiable)
     {
+        $dataLines = [];
+
+        foreach ($this->dataTypes as $dataType) {
+            $dataLines[] = "- {$dataType['name']} (Deadline: " . \Carbon\Carbon::parse($dataType['deadline'])->format('d M Y') . ")";
+        }
+
         return [
-            'message' => "You have been assigned to upload the following data type(s) under project:  $this->projectName in online document archiving system",
-            'data_types' => array_map(function ($dt) {
-                return "{$dt['name']} (Deadline: " . \Carbon\Carbon::parse($dt['deadline'])->format('d M Y') . ")";
-            }, $this->dataTypes),
-            'url' => $this->action_url,
-            'next_url' => env('APP_URL') . '/archive-data-upload',
+            'title' => "Document Upload Task Assigned - {$this->projectName}",
+            'greeting' => "Hello {$notifiable->name},",
+            'body' => array_merge([
+                "Good Day!",
+                "You have been assigned to upload the following data type(s) under project:  **{$this->projectName}** in online document archiving system",
+            ], $dataLines, [
+                "Please upload the required documents properly before the respective deadlines.",
+                "**N:B: This is an automated system-generated email. Hence, no need to reply.**",
+                "Thank you!",
+            ]),
+            'action_text' => 'View Task',
+            'action_url' => $this->action_url,
+            'footer' => "Regards,\n{$this->companyName} | " . env('APP_NAME') . " Team",
         ];
     }
 
     public function toDatabase($notifiable)
     {
-        return [
-            'message' => "You have been assigned to upload the following data type(s) under project:  $this->projectName in online document archiving system",
-            'data_types' => array_map(function ($dt) {
-                return "{$dt['name']} (Deadline: " . \Carbon\Carbon::parse($dt['deadline'])->format('d M Y') . ")";
-            }, $this->dataTypes),
-            'url' => $this->action_url,
-            'next_url' => env('APP_URL') . '/archive-data-upload',
-        ];
+        return $this->toArray($notifiable);
     }
 }

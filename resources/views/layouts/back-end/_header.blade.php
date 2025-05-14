@@ -25,7 +25,7 @@
                 @foreach($userNotifications ?? [] as $notification)
                     <li>
                         <a class="dropdown-item" href="{{ route("notification.view",["n"=>$notification->id]) }}" target="_blank" style="font-size: 14px">
-                            {{ $notification->data['message'] }} <br>
+                            {{ $notification->data['message']??$notification->data['title'] }} <br>
                             <small class="d-block" style="text-align: right; font-size: 10px" >{!! date('d-M-y h:i:s A',strtotime($notification->created_at)) !!}</small>
                         </a>
                     </li>

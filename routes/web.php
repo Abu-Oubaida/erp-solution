@@ -82,6 +82,9 @@ Route::group(['middleware' => ['auth']],function (){
     });//3.1 End
     Route::controller(NotificationViewController::class)->group(function (){
         Route::get('notification-view','index')->name('notification.view');
+        Route::post('notification-read-unread','notificationReadUnread');
+        Route::post('notification-delete','notificationDelete');
+
         Route::get('project-wise-data-upload-responsible-user-data','projectWiseDataUploadResponsibleUserData')->name('project.wise.data.upload.responsible.user.data');
     });
     Route::controller(PreferenceController::class)->group(function (){

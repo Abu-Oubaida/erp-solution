@@ -8,13 +8,19 @@
     </ol>
     <div class="row">
         <div class="col-md-3">
-            <div class="card mb-4">
+            <div class="card mb-4" style="min-height: 800px">
                 <div class="card-header">
-                    <i class="fa-solid fa-bell"></i>
+                    <i class="fa-solid fa-envelopes-bulk"></i>
                     Notifications
                 </div>
                 <div class="card-body">
                     <div class="row">
+                        <div class="col-md-12 d-flex justify-content-between align-items-center">
+                            <input type="checkbox" name="" id="select_all">
+                            <button class="badge bg-danger border-0 mb-2" onclick="return NotificationDelete(this)"><i class="fas fa-trash"></i> Delete</button>
+                            <button class="badge bg-success border-0 mb-2" onclick="return NotificationReadUnread(this,1)"><i class="fa-solid fa-envelope-open"></i> Make Read</button>
+                            <button class="badge bg-primary border-0 mb-2" onclick="return NotificationReadUnread(this,0)"><i class="fa-solid fa-envelope"></i> Make Unread</button>
+                        </div>
                         <div class="col-8">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <form method="GET" class="d-flex align-items-center">
@@ -33,25 +39,27 @@
                             </div>
                         </div>
                         <div class="col-4">
-                            <select class="form-control form-control-sm" name="" id="">
-                                <option value="">All</option>
-                                <option value="">Read</option>
-                                <option value="">Unread</option>
-                            </select>
+                            <form method="GET">
+                                <select class="form-control form-control-sm" onchange="this.form.submit()" name="status">
+                                    <option value="all" @if(request()->get('status') == 'all') selected @endif>All</option>
+                                    <option value="read" @if(request()->get('status') == 'read') selected @endif>Read</option>
+                                    <option value="unread" @if(request()->get('status') == 'unread') selected @endif>Unread</option>
+                                </select>
+                            </form>
                         </div>
                     </div>
-                    <table class="table table-hover">
+                    <table class="table table-hover table-responsive-sm">
                         <tbody>
                         @if(isset($notifications) && count($notifications))
                             @foreach($notifications as $notification)
                                 <tr>
                                     <td>
-                                        <input class="mt-3" type="checkbox" name="" id="">
+                                        <input class="mt-3 check-box" type="checkbox" value="{{ $notification->id }}">
                                     </td>
                                     <td>
-                                        @if($notification->read_at) <small class="badge bg-success" style=" font-size: 8px">Read</small>@else <small class="badge bg-danger" style=" font-size: 8px">Unread</small>@endif
+                                        @if($notification->read_at) <small class="badge bg-success" style=" font-size: 8px"><i class="fa-solid fa-envelope-open"></i> Read</small>@else <small class="badge bg-primary" style=" font-size: 8px"><i class="fa-solid fa-envelope"></i> Unread</small>@endif
                                         <small class="float-end mt-2" style=" font-size: 10px" >{!! date('d-M-y h:i:s A',strtotime($notification->created_at)) !!}</small>
-                                        <a href="{{ route("notification.view",["n"=>$notification->id]) }}" class="d-block text-decoration-none text-black" style="text-align: justify">{{ $notification->data['message'] }}</a>
+                                        <a href="{{ route("notification.view",["n"=>$notification->id]) }}" class="d-block text-decoration-none text-black" style="text-align: justify">{{ $notification->data['message']??$notification->data['title'] }} </a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -80,14 +88,116 @@
             </div>
         </div>
         <div class="col-md-9">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-table me-1"></i>
-                </div>
+            <div class="card mb-4" style="min-height: 800px; background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 0.5rem; padding: 1rem">
+                @if(@$notification_data)
+                    <div class="car-header"><h3><i class="fa-solid fa-envelope-open"></i> Notification View</h3></div>
+                    <div class="card-body p-5 pt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>{!! optional($notification_data->data)['title'] !!} @if($notification_data->read_at) <sup class="badge bg-success" style=" font-size: 12px"><i class="fa-solid fa-envelope-open"></i> Read</sup>@else <sup class="badge bg-danger" style=" font-size: 12px"><i class="fa-solid fa-envelope"></i> Unread</sup>@endif</h3>
+                                <small>Read Time: {!! date('d-M-y h:i:s A',strtotime($notification_data->read_at)) !!}</small>
+                                <small class="float-end">Received Time: {!! date('d-M-y h:i:s A',strtotime($notification_data->created_at)) !!}</small>
+                            </div>
+                            <div class="col-md-12">
+                                <h4>{!! optional($notification_data->data)['greeting'] !!}</h4>
+                                @foreach(optional($notification_data->data)['body'] as $key => $value)
+                                    <p>{!! $value !!}</p>
+                                @endforeach
+                                @if(optional($notification_data->data)['action_text'] && optional($notification_data->data)['action_url'])
+                                <div class="d-flex justify-content-center">
+                                    <a class="btn btn-outline-success" href="{!! optional($notification_data->data)['action_url'] !!}"><i class="fas fa-link"></i> {!! optional($notification_data->data)['action_text'] !!}</a>
+                                </div>
+                                @endif
+                                @if(optional($notification_data->data)['footer'])
+                                    <h5 class="">{!! optional($notification_data->data)['footer'] !!}</h5>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
             </div>
         </div>
     </div>
 
 </div>
+<script>
+    $("#select_all").change(function () {
+        $(".check-box").prop("checked", this.checked);
+    });
+    function NotificationReadUnread(e,status)
+    {
+        let selected = [];
+        $(".check-box:checked").each(function () {
+            selected.push($(this).val());
+        });
+        if (selected.length === 0 && status.length === 0) {
+            alert("Please select at least one record to delete.");
+            return false
+        }
+        if(!confirm("Are you sure?"))
+            return false
+        const url = window.location.origin + sourceDir +"/notification-read-unread";
+        $.ajax({
+            url: url,
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            type: "POST",
+            data: {
+                notification_ids: selected,
+                status: status,
+            },
+            success: function (response) {
+                if(response.status === 'error')
+                {
+                    alert("Error: "+response.message)
+                    return false
+                }
+                else {
+                    alert("Success: "+response.message)
+                    window.location.href = "{{ route('notification.view') }}";
+                    return true
+                }
+            },
+        })
+    }
+    function NotificationDelete(e)
+    {
+        let selected = [];
+        $(".check-box:checked").each(function () {
+            selected.push($(this).val());
+        });
+        if (selected.length === 0) {
+            alert("Please select at least one record to delete.");
+            return false
+        }
+        if(!confirm("Are you sure?"))
+            return false
+        const url = window.location.origin + sourceDir +"/notification-delete";
+        $.ajax({
+            url: url,
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            type: "POST",
+            data: {
+                notification_ids: selected
+            },
+            success: function (response) {
+                if(response.status === 'error')
+                {
+                    alert("Error: "+response.message)
+                    return false
+                }
+                else {
+                    alert("Success: "+response.message)
+                    window.location.href = "{{ route('notification.view') }}";
+                    return true
+                }
+            },
+        })
+    }
+</script>
 @stop
 
