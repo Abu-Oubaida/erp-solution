@@ -18,10 +18,11 @@
     </form>
     <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4" style="border-radius: 25px;">
         <li class="nav-item dropdown">
-            <a href="#" class="nav-link text-decoration-none text-primary badge" id="NotificationNavbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px"><i class="fa-solid fa-bell"></i><sup style="    top: -1.5em; font-size: 10px;"><small class="badge bg-danger text-white">{{ $unreadNotificationCount ?? 0 }}</small></sup></a>
+            <a href="#" class="nav-link text-decoration-none text-primary badge" id="NotificationNavbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px"><i class="fa-solid fa-bell"></i>@if($unreadNotificationCount)<sup style="    top: -1.5em; font-size: 10px;"> <small class="badge bg-danger text-white">{{ $unreadNotificationCount ?? 0 }}</small></sup>@endif</a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="NotificationNavbarDropdown">
                 <li><a class="dropdown-item" href="#"><i class="fa-solid fa-bell"></i> Notifications</a></li>
                 <li><hr class="dropdown-divider" /></li>
+                @if($unreadNotificationCount)
                 @foreach($userNotifications ?? [] as $notification)
                     <li>
                         <a class="dropdown-item" href="{{ route("notification.view",["n"=>$notification->id]) }}" target="_blank" style="font-size: 14px">
@@ -30,6 +31,9 @@
                         </a>
                     </li>
                 @endforeach
+                @else
+                    <li><a href="#" class="dropdown-item text-danger">Nothing To Read</a></li>
+                @endif
                 <li><hr class="dropdown-divider" /></li>
                 <li><a class="text-center d-block text-decoration-none" href="{{ route("notification.view") }}">View All</a></li>
             </ul>
