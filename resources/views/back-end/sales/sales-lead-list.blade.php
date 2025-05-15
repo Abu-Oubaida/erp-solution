@@ -1,5 +1,16 @@
 @extends('layouts.back-end.main')
 @section('mainContent')
+<style>
+    .dt-buttons{
+        margin-left:0;
+    }
+    .dataTables_info{
+        display: none;
+    }
+    .dataTables_paginate {
+        display: none;
+    }
+</style>
 @if($formattedLeads)
     <div class="container-fluid px-4">
         <div class="row">
@@ -8,12 +19,6 @@
                     <li class="breadcrumb-item">
                         <a href="{{route('data.archive.dashboard.interface')}}" class="text-capitalize text-chl">Dashboard</a>
                     </li>
-                    {{-- <li class="breadcrumb-item">
-                        <a style="text-decoration: none;" href="#" class="text-capitalize">{!! $d->company->company_code !!}</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a style="text-decoration: none;" href="#" class="text-capitalize">{!! $d->VoucherType->voucher_type_title !!}</a>
-                    </li> --}}
                 </ol>
             </div>
             <div class="col-md-2 col-sm-3 mb-1">
@@ -24,8 +29,6 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col-md-12">
-                        {{-- <h4 class="text-capitalize d-inline-block"><i class="fa-solid fa-book"></i> Uploaded <b>{!! $d->VoucherType->voucher_type_title !!}</b> Document List (Company: {!! $d->company->company_code !!})</h4>
-                        <a href="{!! route('uploaded.archive.list.quick') !!}" class="btn btn-sm btn-outline-primary float-end"><i class="fa-solid fa-bolt"></i> Quick List</a> --}}
                         <h4>Lead Lists</h4>
                     </div>
                 </div>
@@ -33,16 +36,16 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12">
-                        @include('back-end.sales.__sales-lead-lists-pagination');
+                        @include('back-end.sales.__sales-lead-lists-pagination')
                     </div>
                     <div class="col-md-12 mt-3">
                         {{-- Items per page & total count --}}
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
-                                @if ($formattedLeads instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                                    Showing {{ $voucherInfos->firstItem() }} to {{ $voucherInfos->lastItem() }} of {{ $voucherInfos->total() }} results
+                                @if ($leadListDatum instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                                    Showing {{ $leadListDatum->firstItem() }} to {{ $leadListDatum->lastItem() }} of {{ $leadListDatum->total() }} results
                                 @else
-                                    Showing all {{ $formattedLeads->count() }} results
+                                    Showing all {{ $leadListDatum->count() }} results
                                 @endif
                             </div>
                             <form method="GET" class="d-flex align-items-center">
@@ -61,10 +64,10 @@
                         </div>
 
                         {{-- Pagination --}}
-                        @if ($formattedLeads instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                        @if ($leadListDatum instanceof \Illuminate\Pagination\LengthAwarePaginator)
                             {{-- Only show pagination links if it's a paginated result --}}
                             <div class="d-flex justify-content-center" id="pagination">
-                                {{ $voucherInfos->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
+                                {{ $leadListDatum->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
                             </div>
                         @endif
                     </div>

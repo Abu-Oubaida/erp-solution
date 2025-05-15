@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-md-6 mb-3">
-        <button type="button" class="btn btn-chl-outline mt-3" onclick="Sales.addNewLeadForm()"><i
+        <button type="button" class="btn btn-chl-outline mt-3" onclick="return addNewLeadForm()"><i
                 class="fa-solid fa-arrow-right"></i>
             Add New Lead</button>
     </div>
@@ -168,6 +168,24 @@
             url:url,
             method:"POST",
             data:{lead_id:lead_id,company_id:company_id},
+            success:function(response){
+                if(response.status==='error'){
+                    alert(response.message);
+                }else{
+                     $("#commonSlot_for_multiple_step").html(response.data.view);
+                }
+            }
+        });
+    }
+    function addNewLeadForm(){
+        const url =
+                    window.location.origin +
+                    sourceDir +
+                    "/add-new-lead-form";
+        $.ajax({
+            headers: {"X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")},
+            url:url,
+            method:"POST",
             success:function(response){
                 if(response.status==='error'){
                     alert(response.message);

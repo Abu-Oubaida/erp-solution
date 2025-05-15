@@ -502,9 +502,10 @@ Route::group(['middleware' => ['auth']],function (){
             Route::match(['post'],'get-sales-source','getSalesSource');
             Route::match(['get'],'get-sales-source-main-source','getSalesSourceMainSource')->name('get.sales.source.main.source');
             Route::match(['get'],'get-sales-preference-dropdowns','getSalesPreferenceDropdowns')->name('get.sales.preference.dropdowns');
-            Route::match(['get'],'get-lead-step1','getLeadStep1')->name('get.lead.step1');
-            Route::match(['get'],'edit-lead-step1','editLeadStep1')->name('edit-lead-step1');
-            Route::match(['get'],'get-lead-step2','getLeadStep2')->name('get.lead.step2');
+            // Route::match(['get'],'get-lead-step1','getLeadStep1')->name('get.lead.step1');
+            // Route::match(['get'],'edit-lead-step1','editLeadStep1')->name('edit-lead-step1');
+            // Route::match(['get'],'get-lead-step2','getLeadStep2')->name('get.lead.step2');
+            Route::match(['post'],'add-new-lead-form','addNewLeadForm');
         });
         Route::middleware(['permission:sales_lead_list'])->group(function (){
             Route::match(['get','post'],'list-lead','leadList')->name('sales.lead.list');

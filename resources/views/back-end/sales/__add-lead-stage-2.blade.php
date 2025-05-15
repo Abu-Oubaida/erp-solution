@@ -125,7 +125,6 @@
             company_id:$("#company_id").val(),
             lead_id:$("#lead_id").val(),
         };
-        console.log(add_lead_step2_data);
         const url =
             window.location.origin + sourceDir + "/add-lead-step2";
 

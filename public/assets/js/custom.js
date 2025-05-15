@@ -4465,10 +4465,10 @@ let SalesSetting = {};
             
             
             
-            addNewLeadForm: function () {
-                let form = Sales.addLeadStep1Form();
-                $("#commonSlot_for_multiple_step").html(form);
-            },
+            // addNewLeadForm: function () {
+            //     let form = Sales.addLeadStep1Form();
+            //     $("#commonSlot_for_multiple_step").html(form);
+            // },
             salesEmployeeEntry: function () {
                 let sales_employee_entry_data = {
                     company_id: $("#company").val(),

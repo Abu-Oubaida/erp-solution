@@ -45,6 +45,7 @@ use Illuminate\Validation\ValidationException;
 use Auth;
 use DB;
 use Throwable;
+use Carbon\Carbon;
 
 class SalesInterfaceController extends Controller
 {
@@ -252,6 +253,7 @@ class SalesInterfaceController extends Controller
                 }
                 $leadDataInput['updated_by'] = $this->user->id;
                 $leadDataInput['updated_at'] = now();
+                $leadDataInput['associate_id'] = $leadCreateOrUpdate->associate_id;
                 $leadCreateOrUpdate->where('id', $lead_id)->update($leadDataInput);
                 $existingMobiles = ExtraMobile::where('lead_id', $lead_id)
                     ->orderBy('id') // ensure a consistent order
@@ -294,7 +296,7 @@ class SalesInterfaceController extends Controller
             } else {
                 $leadDataInput['created_by'] = $this->user->id;
                 $leadDataInput['created_at'] = now();
-
+                $leadDataInput['status'] = 6;
                 $lead = Lead::create($leadDataInput);
 
                 if ($lead) {
@@ -464,6 +466,29 @@ class SalesInterfaceController extends Controller
             ]);
         }
     }
+    public function addNewLeadForm(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $permission = $this->permissions()->add_sales_lead;
+                $companies = $this->getCompanyModulePermissionWise($permission)->get();
+                $salesEmployeeEntries = SalesEmployeeEntry::with(['user'])->where('company_id',$this->user->company_id)->get();
+                $view = view('back-end.sales.__add-lead-form', compact('companies', 'salesEmployeeEntries'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [
+                        'view' => $view,
+                    ],
+                ]);
+            }
+            throw new Exception('Request Method Not Allowed');
+        } catch (Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
     public function getLeadStep2(Request $request)
     {
         $leadProfession = Lead::where('id', $request->lead_id)->first();
@@ -497,7 +522,7 @@ class SalesInterfaceController extends Controller
                 'lead_main_profession_id' => $addLeadStep2Data->lead_main_profession_id,
                 'lead_sub_profession_id' => $addLeadStep2Data->lead_sub_profession_id,
                 'lead_company' => $addLeadStep2Data->lead_company,
-                'lead_designation' => $addLeadStep2Data->lead_designation
+                'lead_designation' => $addLeadStep2Data->lead_designation,
             ]);
             $existingLead = Source::where('lead_id', $hiddenCompanyLead->lead_id)->first();
             $source = $this->getSalesSourceMainSource($hiddenCompanyLead->company_id);
@@ -563,6 +588,12 @@ class SalesInterfaceController extends Controller
                 ]);
             }
             $source = Source::create($addLeadStep3Data);
+            if($source){
+                $findForStatus = Lead::where('id',$addLeadStep3Data['lead_id'])->first();
+                $findForStatus->update([
+                    'status'=>7
+                ]);
+            }
             // dd($source);
             $lead = (object) [
                 'id' => $source->lead_id,
@@ -584,7 +615,7 @@ class SalesInterfaceController extends Controller
         } catch (\Throwable $exception) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error ' . $exception->getMessage() . $exception->getLine()
+                'message' => 'Error ' . $exception->getMessage()
             ]);
         }
     }
@@ -604,6 +635,12 @@ class SalesInterfaceController extends Controller
             }
             $addLeadStep4Data['created_by'] = Auth::id();
             $salePreference = SalePreference::create($addLeadStep4Data);
+            if($salePreference){
+                $findForStatus = Lead::where('id',$addLeadStep4Data['lead_id'])->first();
+                $findForStatus->update([
+                    'status'=>1
+                ]);
+            }
             if ($salePreference) {
                 return response()->json([
                     'status' => 'success',
@@ -634,48 +671,51 @@ class SalesInterfaceController extends Controller
     public function leadList(Request $request)
     {
         try {
-            $leadListDatum = Lead::with(['source','preference','extraMobiles','extraEmails'])->get();
+            $leadListDatum = Lead::with(['source','preference','extraMobiles','extraEmails'])->paginate('10');
             // dd($leadListDatum);
             $formattedLeads = $leadListDatum->map(function ($lead) {
                 return [
-                    'id' => $lead->id,
-                    'company_id' => $lead->company_id,
-                    'status' => $lead->status,
-                    'full_name' => $lead->full_name,
-                    'spouse' => $lead->spouse,
+                    'lead_id' => $lead->id,
+                    'creation'=>$lead->created_at?Carbon::parse($lead->created_at)->format('d M,Y'):null,
+                    'full_name' => $lead->full_name ?? null,
                     'primary_mobile' => $lead->primary_mobile,
-                    'primary_email' => $lead->primary_email,
-                    'notes' => $lead->notes,
-                    'associate_id' => $lead->associate_id,
-                    'lead_status_id' => $lead->lead_status_id,
-                    'lead_company' => $lead->lead_company,
-                    'lead_designation' => $lead->lead_designation,
-                    'sell_status' => $lead->sell_status,
-                    'created_by' => $lead->created_by,
-                    'updated_by' => $lead->updated_by,
-                    'created_at' => $lead->created_at,
-                    'updated_at' => $lead->updated_at,
-                    'lead_main_profession_id'=>$lead->lead_main_profession_id,
-                    'lead_sub_profession_id'=>$lead->lead_sub_profession_id,
-                    'main_profession'=>$lead->leadMainProfession?->title,
-                    'sub_profession'=>$lead->leadSubProfession?->title,
-                    'main_source'=>$lead->source->leadMainSource?->title,
-                    'sub_source'=>$lead->source->leadSubSource?->title,
-                    'reference_name'=>$lead->source->reference_name,
-                    'preference_note'=>$lead->preference->preference_note,
-                    'apartment_type_name'=>$lead->preference->apartmentType?->title,
-                    'apartment_size_name'=>$lead->preference->apartmentSize?->title,
-                    'apartment_size'=>$lead->preference->apartmentSize?->size,
-                    'apartment_floor'=>$lead->preference->floor?->title,
-                    'apartment_facing'=>$lead->preference->facing?->title,
-                    'apartment_view'=>$lead->preference->view?->title,
-                    'apartment_budget'=>$lead->preference->budget?->title,
-                    'mobiles'=>$lead->extraMobiles->pluck('mobile')->all(),
-                    'emails'=>$lead->extraEmails->pluck('email')->all(),
+                    'mobiles'=>$lead->extraMobiles?->pluck('mobile')->all(),
+                    'associate_name'=>$lead->associate?->name,
+                    'notes' => $lead->notes ?? null,
+                    'lead_status_id' => $lead->lead_status_id ?? null,
+                    'status' => $lead->status ?? null,
+                    'sell_status' => $lead->sell_status ?? null,
                 ];
             });
-            // dd($formattedLeads);
-            return view('back-end.sales.sales-lead-list',compact('formattedLeads'));
+            // 'spouse' => $lead->spouse ?? null,
+            // 'primary_email' => $lead->primary_email,
+            // 'associate_id' => $lead->associate_id ?? null,
+            // 'lead_company' => $lead->lead_company ?? null,
+            // 'lead_designation' => $lead->lead_designation ?? null,
+            // 'created_by' => $lead->created_by,
+            // 'updated_by' => $lead->updated_by,
+            // 'created_at' => $lead->created_at,
+            // 'updated_at' => $lead->updated_at,
+            // 'lead_main_profession_id'=>$lead->lead_main_profession_id,
+            // 'lead_sub_profession_id'=>$lead->lead_sub_profession_id,
+            // 'main_profession'=>$lead->leadMainProfession?->title,
+            // 'sub_profession'=>$lead->leadSubProfession?->title,
+            // 'main_source'=>$lead->source?->leadMainSource?->title,
+            // 'sub_source'=>$lead->source?->leadSubSource?->title,
+            // 'reference_name'=>$lead->source->reference_name ?? null,
+            // 'preference_note'=>$lead->preference->preference_note ?? null,
+            // 'apartment_type_name'=>$lead->preference?->apartmentType?->title,
+            // 'apartment_size_name'=>$lead->preference?->apartmentSize?->title,
+            // 'apartment_size'=>$lead->preference?->apartmentSize?->size,
+            // 'apartment_floor'=>$lead->preference?->floor?->title,
+            // 'apartment_facing'=>$lead->preference?->facing?->title,
+            // 'apartment_view'=>$lead->preference?->view?->title,
+            // 'apartment_budget'=>$lead->preference?->budget?->title,
+            // 'emails'=>$lead->extraEmails?->pluck('email')->all(),
+            // 'associate_employee_id'=>$lead->associate?->employee_id,
+
+            //  dd($formattedLeads);
+            return view('back-end.sales.sales-lead-list',compact('formattedLeads','leadListDatum'));
         } catch (\Throwable $exception) {
             return back()->with('error', $exception->getMessage())->withInput();
         }

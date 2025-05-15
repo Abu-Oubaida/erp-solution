@@ -28,4 +28,7 @@ class Lead extends Model
     public function leadSubProfession(){
         return $this->belongsTo(SalesProfession::class,'lead_sub_profession_id');
     }
+    public function associate(){
+        return $this->belongsTo(User::class,'associate_id');
+    }
 }
