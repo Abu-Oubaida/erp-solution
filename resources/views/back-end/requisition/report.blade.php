@@ -97,6 +97,20 @@
             <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
         </div>
     </div>
+    <!-- Modal 2 for details -->
+    <div class="modal fade modal-xl" id="dataTypesDetailsModal3" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="dataTypesDetailsModalLabel3" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id="dataTypesDetailsModalContent3"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Understood</button>
+                </div>
+            </div>
+        </div>
+        <div id='ajax_loader4' style="position: fixed; left: 50%; top: 40%;z-index: 1000; display: none">
+            <img width="50%" src="{{url('image/ajax loding/ajax-loading-gif-transparent-background-2.gif')}}"/>
+        </div>
+    </div>
     <script>
         function ProjectWiseRequiredDataTypeReport(e)
         {
@@ -276,6 +290,151 @@
                 },
             })
         }
+        function ProjectWiseNewDataTypeFollowup(pdri_id,project_id,company_id)
+        {
+            let selected = [];
+            $(".check-box:checked").each(function () {
+                selected.push($(this).val());
+            });
+            if (selected.length === 0) {
+                alert("Please select at least one.");
+                return false
+            }
+            const url = window.location.origin + sourceDir +"/requisition/project-document-requisition-followup";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    pwdtr_ids: selected,
+                    pdri_id:pdri_id,
+                    project_id:project_id,
+                    company_id:company_id
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        $("#dataTypesDetailsModalContent3").html(response.data.view)
+                        // Trigger the modal
+                        $("#dataTypesDetailsModal3").modal('show');
+
+                        $('#dataTypesDetailsModal3').on('shown.bs.modal', function () {
+                            initCKEditor();
+                        });
+                        return true
+                    }
+                },
+            })
+        }
+        function ProjectWiseNewDataTypeFollowupSubmit(e,pdri_id,project_id,company_id)
+        {
+            let data_types = $("#followup_data_types").val();
+            let res_users = $("#followup_res_users").val();
+            let subject = $("#subject").val();
+            let message = $("#message").val();
+            let notification = $("#notification").is(":checked") ? $("#notification").val() : null;
+            let email = $("#email").is(":checked") ? $("#email").val() : null;
+            const url = window.location.origin + sourceDir +"/requisition/project-document-requisition-followup-submit";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    data_types: data_types,
+                    res_users: res_users,
+                    subject: subject,
+                    message: message,
+                    notification: notification,
+                    email: email,
+                    pdri_id:pdri_id,
+                    project_id:project_id,
+                    company_id:company_id
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        alert("Success: "+response.message)
+                        $("#dataTypesDetailsContent").html(response.data.view)
+                        return true
+                    }
+                },
+            })
+        }
+        function FollowupsDetails(pwdtr_id)
+        {
+            if(pwdtr_id.length === 0)
+                return false
+            const url = window.location.origin + sourceDir +"/requisition/project-document-requisition-followup-details";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    pwdtr_id: pwdtr_id,
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        $("#dataTypesDetailsModalContent2").html(response.data.view)
+                        // Trigger the modal
+                        $("#dataTypesDetailsModal2").modal('show');
+                        return true
+                    }
+                },
+            })
+        }
+        function FollowupsDetailsSingle(pwdtr_id,followup_id)
+        {
+            if(pwdtr_id.length === 0)
+                return false
+            const url = window.location.origin + sourceDir +"/requisition/project-document-requisition-followup-details-single";
+            $.ajax({
+                url: url,
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                type: "POST",
+                data: {
+                    pwdtr_id: pwdtr_id,
+                    followup_id: followup_id,
+                },
+                success: function (response) {
+                    if(response.status === 'error')
+                    {
+                        alert("Error: "+response.message)
+                        return false
+                    }
+                    else {
+                        $("#dataTypesDetailsModalContent2").html(response.data.view)
+                        // Trigger the modal
+                        $("#dataTypesDetailsModal2").modal('show');
+
+                        $('#dataTypesDetailsModal2').on('shown.bs.modal', function () {
+                            initCKEditor();
+                        });
+                        return true
+                    }
+                },
+            })
+        }
         function ProjectWiseNewDataTypeUpdate(e,pdri_id,project_id,company_id)
         {
             let data_types = $("#data_types").val()
@@ -420,6 +579,34 @@
             })
         }
 
+    </script>
+    <script>
+        // Declare only once outside functions (globally)
+        var editorInstance = null;
+
+        // This function is called when modal opens
+        function initCKEditor() {
+            const editorElement = document.querySelector('#message');
+
+            if (editorInstance) {
+                editorInstance.destroy().then(() => {
+                    createEditor(editorElement);
+                });
+            } else {
+                createEditor(editorElement);
+            }
+        }
+
+        function createEditor(element) {
+            ClassicEditor
+                .create(element)
+                .then(editor => {
+                    editorInstance = editor;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
     </script>
 @stop
 

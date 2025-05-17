@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use http\Env\Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,6 +32,11 @@ class Project_wise_data_type_required_info extends Model
     public function responsibleBy()
     {
         return $this->hasMany(Required_data_type_upload_responsible_user_info::class,'pwdtr_id','id');
+    }
+
+    public function followups()
+    {
+        return $this->hasMany(DocumentRequisitionFollowupDataTypeInfo::class,'data_type_id','id');
     }
 
     public function company()

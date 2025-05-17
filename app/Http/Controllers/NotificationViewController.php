@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationViewController extends Controller
 {
@@ -52,6 +53,16 @@ class NotificationViewController extends Controller
         }
     }
 
+    public function checkNow(Request $request)
+    {
+        $user = Auth::user(); // Make sure user is authenticated
+        $unreadCount = $user->unreadNotifications()->count();
+
+        return response()->json([
+            'new_unread' => $unreadCount > 0,
+            'count' => $unreadCount
+        ]);
+    }
     public function notificationReadUnread(Request $request)
     {
         try {

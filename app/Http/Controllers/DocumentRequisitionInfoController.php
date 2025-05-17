@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\company_info;
 use App\Models\department;
+use App\Models\DocumentRequisitionFollowup;
+use App\Models\DocumentRequisitionFollowupDataTypeInfo;
+use App\Models\DocumentRequisitionFollowupDataUserInfo;
 use App\Models\Project_document_requisition_info;
 use App\Models\Project_wise_data_type_required_info;
 use App\Models\Project_wise_data_type_required_infos_delete_history;
@@ -13,6 +16,7 @@ use App\Models\User;
 use App\Models\VoucherType;
 use App\Notifications\DataArchiveProjectAssignedSummaryNotification;
 use App\Notifications\DataArchiveResponsibleUserAssigned;
+use App\Notifications\DocumentRequisitionFollowupNotification;
 use App\Traits\ParentTraitCompanyWise;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
@@ -100,14 +104,15 @@ class DocumentRequisitionInfoController extends Controller
             'project:id,branch_name',
             'company:id,company_name',
             'dataTypeRequired:id,pdri_id,data_type_id,status,deadline,created_at',
+            'dataTypeRequired.followups:id,followup_id,data_type_id',
             'dataTypeRequired.archiveDataType:id,voucher_type_title',
             'dataTypeRequired.responsibleBy.user:id,name,employee_id,dept_id',
-            'dataTypeRequired.responsibleBy.user.department:id,dept_name,dept_code',
             'dataTypeRequired.archiveDataType.accountVoucher' => function ($query) use ($project_id) {
                 $query->select('id', 'voucher_type_id', 'project_id') // Add other fields you need
                 ->where('project_id', $project_id);
             },
             'dataTypeRequired.archiveDataType.accountVoucher.voucherDocuments:id', // Add required fields
+            'dataTypeRequired.responsibleBy.user.department:id,dept_name,dept_code',
         ])
             ->where('company_id', $company_id)
             ->where('project_id', $project_id)
@@ -152,6 +157,7 @@ class DocumentRequisitionInfoController extends Controller
                     'data_type_name' => optional($dataTypeRequired->archiveDataType)->voucher_type_title,
                     'necessity' => $dataTypeRequired->status,
                     'documents' => $documentCount ?? 0,
+                    'followups' => optional($dataTypeRequired->followups)->count(),
                     'responsible_by_count' => $dataTypeRequired->responsibleBy->count(),
                     'responsible_by' => $dataTypeRequired->responsibleBy->map(function ($responsibleBy) {
                         return (object)[
@@ -165,6 +171,75 @@ class DocumentRequisitionInfoController extends Controller
             }),
         ];
         return $result;
+    }
+
+
+    private function projectDocumentRequisitionFollowupData($pwdtr_id)
+    {
+        return DocumentRequisitionFollowupDataTypeInfo::with([
+            'followupMessage',
+            'requiredDataType.archiveDataType:id,voucher_type_title',
+            'requiredDataType.projectDocumentReq.project:id,branch_name',
+            'requiredDataType.projectDocumentReq.company:id,company_name',
+            'responsibleUsers:id,name,employee_id,dept_id',
+            'responsibleUsers.department:id,dept_name,dept_code',
+        ])->where('data_type_id', $pwdtr_id);
+    }
+    public function projectDocumentRequisitionFollowupDetails(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'pwdtr_id' => ['required', 'string', 'exists:project_wise_data_type_required_infos,id'],
+                ]);
+                extract($validatedData);
+                $followups= $this->projectDocumentRequisitionFollowupData($pwdtr_id)->orderBy('created_at','desc')->get();
+                if ($followups->isEmpty()) {
+                    throw new \Exception('No data found!');
+                }
+                $view = view('back-end.requisition.__followup_details', compact('followups'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view' => $view],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+
+    public function projectDocumentRequisitionFollowupDetailsSingle(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'pwdtr_id' => ['required', 'string', 'exists:project_wise_data_type_required_infos,id'],
+                    'followup_id' => ['required', 'string', 'exists:document_requisition_followup_data_type_infos,id'],
+                ]);
+                extract($validatedData);
+                $followups = $this->projectDocumentRequisitionFollowupData($pwdtr_id)->orderBy('created_at','desc')->get();
+                $followup_single= $followups;
+                $followup_single= $followup_single->where('id',$followup_id)->first();
+                if (!$followup_single || $followups->isEmpty()) {
+                    throw new \Exception('No data found!');
+                }
+                $view = view('back-end.requisition.__followup_details', compact('followup_single','followups'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view' => $view],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+        }
     }
 
     public function projectWiseDataTypeReportDetails(Request $request)
@@ -810,4 +885,137 @@ class DocumentRequisitionInfoController extends Controller
         }
     }
 
+    public function followup(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                    'pwdtr_ids' => ['required','array'],
+                    'pwdtr_ids.*' => ['required','string','exists:project_wise_data_type_required_infos,id'],
+                ]);
+                extract($validatedData);
+                $data = Project_document_requisition_info::with([
+                    'project:id,branch_name',
+                    'company:id,company_name',
+                    'dataTypeRequired' => function ($query) use ($pwdtr_ids) {
+                        $query->whereIn('id', $pwdtr_ids);
+                    },
+                    'dataTypeRequired.archiveDataType:id,voucher_type_title',
+                ])
+                    ->where('company_id', $company_id)
+                    ->where('project_id', $project_id)
+                    ->where('id', $pdri_id)
+                    ->first();
+                if (!$data) {
+                    throw new \Exception('No data found!');
+                }
+                $responsibleUsers = Required_data_type_upload_responsible_user_info::with(
+                    [
+                        'user:id,name,employee_id,dept_id',
+                        'user.department:id,dept_code,dept_name'
+                    ]
+                )
+                    ->whereIn('pwdtr_id', $pwdtr_ids)->get()->unique('user_id') // ensure unique based on user_id
+                    ->values(); // reindex the collection;
+                $view = view('back-end.requisition.__followup', compact('data','pwdtr_ids','pdri_id','project_id','company_id','responsibleUsers'))->render();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => ['view' => $view],
+                    'message' => 'Request processed successfully.'
+                ]);
+            }
+            throw new \Exception('Request method not allowed!');
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function followupSubmit(Request $request)
+    {
+        try {
+            if ($request->ajax() && $request->isMethod('post')) {
+                $validatedData = $request->validate([
+                    'data_types' => ['required', 'array'],
+                    'data_types.*' => ['required', 'string','exists:project_wise_data_type_required_infos,id'],
+                    'res_users' => ['required','array'],
+                    'res_users.*' => ['required','string','exists:required_data_type_upload_responsible_user_infos,user_id'],
+                    'subject' => ['required','string','max:255'],
+                    'message' => ['required','string'],
+                    'notification' => ['nullable','string','in:notification'],
+                    'email' => ['nullable','string','in:email'],
+                    'pdri_id' => ['required', 'string', 'exists:project_document_requisition_infos,id'],
+                    'project_id' => ['required', 'string', 'exists:branches,id'],
+                    'company_id' => ['required', 'string', 'exists:company_infos,id'],
+                ]);
+                extract($validatedData);
+                $followupCreated = DocumentRequisitionFollowup::create([
+                    'company_id' => $company_id,
+                    'subject' => $subject,
+                    'description' => $message,
+                    'notification' => (bool) $notification,
+                    'email' => (bool)$email,
+                    'created_by' => $this->user->id,
+                    'updated_by' => null
+                ]);
+                if ($followupCreated) {
+                    if ($request->has('data_types')) {
+                        $data_types_data =null;
+                        foreach ($data_types as $type) {
+                            $data_types_data = [
+                                'company_id' => $company_id,
+                                'followup_id' => $followupCreated->id,
+                                'data_type_id' => $type,
+                                'created_by' => $this->user->id,
+                                'updated_by' => null,
+                                'created_at' => now(),
+                                'updated_at' => null,
+                            ];
+                        }
+                        if ($data_types_data) {
+                            DocumentRequisitionFollowupDataTypeInfo::insert($data_types_data);
+                        }
+                    }
+                    if ($request->has('res_users')) {
+                        $res_users_data = [];
+                        $company_data = Cache::remember("followup_company_{$company_id}",60, fn() => company_info::find($company_id));
+                        foreach ($res_users as $user) {
+                            $user_data = Cache::remember("user_{$user}", 60, fn () => User::find($user));
+                            $user_data->notify(new DocumentRequisitionFollowupNotification($subject,$user_data,$message,$company_data,$notification,$email));
+                            $res_users_data[] = [
+                                'company_id' => $company_id,
+                                'followup_id' => $followupCreated->id,
+                                'user_id' => $user,
+                                'created_by' => $this->user->id,
+                                'updated_by' => null,
+                                'created_at' => now(),
+                                'updated_at' => null,
+                            ];
+                        }
+                        if ($res_users_data) {
+                            DocumentRequisitionFollowupDataUserInfo::insert( $res_users_data);
+                        }
+                    }
+                    $result = $this->projectWiseDataTypeReportDetailsData($pdri_id, $project_id, $company_id);
+                    $view = view('back-end.requisition._project_wise_data_type_wise_document_status_report_details', compact('result'))->render();
+                    return response()->json([
+                        'status' => 'success',
+                        'data' => ['view' => $view],
+                        'message' => 'Followup added successfully.'
+                    ]);
+                }
+                throw new \Exception('Data process not completed!');
+            }
+        }catch (\Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
 }

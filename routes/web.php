@@ -81,6 +81,7 @@ Route::group(['middleware' => ['auth']],function (){
         });
     });//3.1 End
     Route::controller(NotificationViewController::class)->group(function (){
+        Route::get('check-notification','checkNow')->name('check.notification');
         Route::get('notification-view','index')->name('notification.view');
         Route::post('notification-read-unread','notificationReadUnread');
         Route::post('notification-delete','notificationDelete');
@@ -683,6 +684,8 @@ Route::group(['middleware' => ['auth']],function (){
     Route::middleware(['permission:requisition'])->prefix('requisition')->group(function (){
         Route::controller(DocumentRequisitionInfoController::class)->middleware(['permission:document_requisition'])->group(function (){
             Route::post('company-wise-required-data','companyWiseRequiredData');
+            Route::post('project-document-requisition-followup-details','projectDocumentRequisitionFollowupDetails');
+            Route::post('project-document-requisition-followup-details-single','projectDocumentRequisitionFollowupDetailsSingle');
             Route::middleware(['permission:project_document_requisition_entry'])->group(function (){
                 Route::match(['get','post'],'project-document-requisition-entry','create')->name('project.document.requisition.entry');
             });
@@ -691,6 +694,10 @@ Route::group(['middleware' => ['auth']],function (){
                 Route::post('project-wise-data-type-add','projectWiseDataTypeAdd');
                 Route::post('project-wise-data-type-update','projectWiseDataTypeAddSubmit');
                 Route::post('project-wise-data-type-responsible-user-submit','projectWiseDataTypeResponsibleUserSubmit');
+            });
+            Route::middleware(['permission:project_document_requisition_followup'])->group(function (){
+                Route::match(['get','post'],'project-document-requisition-followup','followup');
+                Route::match(['post'],'project-document-requisition-followup-submit','followupSubmit');
             });
             Route::middleware(['permission:project_document_requisition_delete'])->group(function (){
                 Route::match(['post'],'project-wise-data-type-delete','projectWiseDataTypeDelete');

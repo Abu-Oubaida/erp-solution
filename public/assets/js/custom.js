@@ -20,11 +20,13 @@ let Requsition  = {};
         $("#ajax_loader").hide();
         $("#ajax_loader2").hide();
         $("#ajax_loader3").hide();
+        $("#ajax_loader4").hide();
     });
     $(document).ajaxStart(function () {
         $("#ajax_loader").show();
         $("#ajax_loader2").show();
         $("#ajax_loader3").show();
+        $("#ajax_loader4").show();
     });
     $(document).ready(function () {
         const tags = [];

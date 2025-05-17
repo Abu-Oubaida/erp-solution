@@ -3,18 +3,21 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 <div class="modal-body">
+@if(isset($result->data_types) && count($result->data_types))
+    <label>Selected Operations</label>
+    @if(auth()->user()->hasPermission('project_document_requisition_followup'))
+        <button class="btn btn-sm btn-outline-warning mb-2"  onclick="return ProjectWiseNewDataTypeFollowup({!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fa-solid fa-business-time"></i> Followup</button>
+    @endif
     @if(auth()->user()->hasPermission('project_document_requisition_edit'))
-        @if(isset($result->data_types) && count($result->data_types))
-            <label>Selected Oprations</label>
-            <button class="btn btn-sm btn-outline-success mb-2" onclick="return DataTypeNecessityChange(this,1,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fa-solid fa-star"></i> Make Required</button>
-            <button class="btn btn-sm btn-outline-info mb-2" onclick="return DataTypeNecessityChange(this,0,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fa-regular fa-star"></i> Make Optional</button>
-            <button class="btn btn-sm btn-outline-danger mb-2" onclick="return DeleteProjectWiseNecessaryDataType(this,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-trash"></i> Delete</button>
-        @endif
+        <button class="btn btn-sm btn-outline-success mb-2" onclick="return DataTypeNecessityChange(this,1,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fa-solid fa-star"></i> Make Required</button>
+        <button class="btn btn-sm btn-outline-info mb-2" onclick="return DataTypeNecessityChange(this,0,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fa-regular fa-star"></i> Make Optional</button>
+        <button class="btn btn-sm btn-outline-danger mb-2" onclick="return DeleteProjectWiseNecessaryDataType(this,{!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-trash"></i> Delete</button>
     @endif
-    @if(auth()->user()->hasPermission('project_document_requisition_entry'))
-        <button class="btn btn-sm btn-outline-primary mb-2 @if(isset($result->data_types) && count($result->data_types))float-end @endif"  onclick="return ProjectWiseNewDataTypeAdd({!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-plus"></i> Add Data Type</button>
-    @endif
-        <hr>
+@endif
+@if(auth()->user()->hasPermission('project_document_requisition_entry'))
+    <button class="btn btn-sm btn-outline-primary mb-2 @if(isset($result->data_types) && count($result->data_types))float-end @endif"  onclick="return ProjectWiseNewDataTypeAdd({!! $result->pdri_id !!},{!! $result->project_id !!},{!! $result->company_id !!},)"><i class="fas fa-plus"></i> Add Data Type</button>
+@endif
+    <hr>
     <table @if($result) id="DataTypeTable" @endif class="table table-hover table-striped table-sm" style="width:100%">
         <thead>
         <tr>
@@ -29,6 +32,7 @@
             <th>Necessity</th>
             <th>Deadline</th>
             <th title="Document Status">Status</th>
+            <th>Followup(s)</th>
             <th title="Document Count">Document's</th>
             <th title="Responsible Departments">Res. Depts.</th>
             <th title="Responsible Users">Res. Users</th>
@@ -49,6 +53,7 @@
                 <td >{!! $row->necessity? "<span class='badge bg-success'><i class='fa-solid fa-star'></i> Required</span>": "<span class='badge bg-info'><i class='fa-regular fa-star'></i> Optional</span>"!!}</td>
                 <td>{!! $row->deadline !!}</td>
                 <td>{!! $row->documents?'<span class="badge bg-success"><i class="fa-solid fa-circle-check"></i> Ok</span':'<span class="badge bg-danger"> <i class="fa-solid fa-circle-xmark"></i> Missing</span>' !!}</td>
+                <td><a href="#" onclick="return FollowupsDetails({{$row->req_data_type_id}})">{!! $row->followups !!}</a></td>
                 <td>
                     @if(auth()->user()->hasPermission("archive_data_list_quick"))
                         <a href="{!! route('uploaded.archive.list.pagination', ['c' => $result->company_id, 't' => $row->data_type_id,'p' => $result->project_id]) !!}" target="_blank">{!! $row->documents??'0' !!}</a>
